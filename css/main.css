@@ -1,0 +1,207 @@
+@font-face {
+  font-family: "Roboto";
+  font-weight: 400;
+  src: url(../fonts/Roboto/static/Roboto-Light.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: 500;
+  src: url(../fonts/Roboto/static/Roboto-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Roboto";
+  font-weight: 600;
+  src: url(../fonts/Roboto/static/Roboto-Bold.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Roboto_Mono";
+  font-weight: 400;
+  src: url(../fonts/Roboto_Mono/static/RobotoMono-Light.ttf) format("truetype");
+}
+@media (max-width: 768px) {
+}
+
+* {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Roboto";
+  font-weight: 400;
+}
+header > div:nth-child(1) > img {
+  /* background-color: aqua; */
+  width: 35px;
+  cursor: pointer;
+  /* height: 25px; */
+}
+header > div:nth-child(5) > img {
+  /* background-color: aqua; */
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+body {
+  margin: 0;
+  /* border: solid 1px #006885; */
+  display: flex;
+  flex-direction: column;
+  /* height: calc(600px - 2px); */
+  width: 100%;
+}
+header {
+  width: 100%;
+  position: fixed;
+  display: flex;
+  border-bottom: dotted 1px #006885;
+  flex-direction: row;
+  height: 50px;
+  justify-content: space-between;
+  text-align: center;
+  background-color: #006885;
+  color: white;
+  font-weight: bold;
+  padding: 0 10px 0 10px;
+}
+header > div:nth-child(1),
+header > div:nth-child(5) {
+  display: flex;
+  align-items: center;
+  width: 50px;
+}
+header > div:nth-child(2),
+header > div:nth-child(4) {
+  width: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header > div:nth-child(3) {
+  /* width: 50px; */
+}
+header > div:nth-child(3) {
+  display: flex;
+  align-items: center;
+  div {
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    font-size: 22pt;
+  }
+}
+footer {
+  width: 100%;
+  height: calc(598px - 31px - 5px - 480px);
+}
+h1 {
+  font-family: "Roboto";
+  font-weight: 500;
+  padding-left: 10px;
+}
+
+div.main__wrapper {
+  font-size: 12pt;
+  padding-top: 5px;
+  margin-top: 60px;
+}
+/* ボタンの設定 */
+button {
+  width: 100px;
+  height: 40px;
+  display: block;
+  position: relative;
+  padding: 0px;
+  margin: 10px auto 10px auto;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  background: #006885;
+  border: none;
+  font-size: 9pt;
+  font-weight: bold;
+}
+button:hover {
+  cursor: pointer;
+  text-decoration: none;
+  background: #ff88ef;
+  transition: background 0.3s;
+}
+button:disabled {
+  cursor: default;
+  text-decoration: none;
+  background: #d7d7e9;
+}
+dialog button {
+  height: 50px;
+}
+/* テーブルの設定 */
+table {
+  border-collapse: collapse;
+  cursor: pointer;
+}
+thead,
+tbody {
+  display: block;
+}
+tbody {
+  overflow-y: scroll;
+  font-size: 10pt;
+  height: 75px;
+}
+thead td,
+thead th {
+  background-color: #006885;
+  border: solid 1px white;
+  color: white;
+  text-align: center;
+  font-size: 9pt;
+  font-weight: normal;
+}
+tbody td {
+  border: solid 1px rgb(243, 243, 243);
+  font-size: 9pt;
+  font-weight: normal;
+}
+tbody tr.selected-record {
+  background-color: #d6d283;
+}
+.no-input {
+  background-color: #d6d283;
+}
+.complete-input {
+  background-color: #ffff;
+}
+/* 表のレコードの不可視化 */
+table tbody tr.hide {
+  display: none;
+}
+/* input要素をdisabledにしたとき */
+input:disabled {
+  background-color: #d1d1d1;
+}
+/* ------------ input block -------------------- */
+.input-block__outer {
+  height: 25px;
+  width: 150px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.input__title {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  width: 40px;
+  background-color: #006885;
+  color: white;
+}
+input {
+  width: 40px;
+  height: 20px;
+  border: 1px solid #006885;
+  text-align: right;
+  padding: 0px 2px;
+}
+select {
+  width: 100px;
+  height: 22px;
+  border: 1px solid #006885;
+}

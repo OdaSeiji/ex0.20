@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Base (Bigsize) Page</title>
+    <link rel="stylesheet" href="./css/main2.css" />
+    <!-- <link rel="stylesheet" href="./css/ProductionNumberV3.css" /> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div>Base Page</div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img id="window_close__mark" src="./img/close.png" alt="close button" />
+      </div>
+    </header>
+
+    <div class="main__wrapper"></div>
+    <dialog id="delete__dialog">
+      <div>
+        <div id="dialog_title__wrapper">
+          <div>Delete? Tẩy xóa?</div>
+        </div>
+        <button id="dialog-cancel__button">
+          Cancel <br />
+          Hủy bỏ
+        </button>
+        <div id="dialog_input__wapper">
+          <div id="dialog_input__title">Emploee No</div>
+          <input id="emploee_number" type="text" />
+        </div>
+        <button id="dialog-delete__button" disabled>Del</button>
+      </div>
+    </dialog>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./lib/base.js"></script>
+    <!-- <script src="./scr/ProdcutionNumberV3.js"></script> -->
+  </body>
+</html>

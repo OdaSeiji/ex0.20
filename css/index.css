@@ -1,0 +1,4 @@
+div.main__wrapper {
+  height: 1500px;
+  overflow-y: scroll;
+}
