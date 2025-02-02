@@ -12,7 +12,8 @@ button {
 
 table {
   td {
-    font-family: "Roboto Mono";
+    font-family: "Roboto_Mono";
+    font-size: 14pt;
   }
 }
 
