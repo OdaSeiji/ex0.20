@@ -1,0 +1,86 @@
+/* css */
+div.container {
+  /* comment */
+}
+div.main__wrapper {
+  height: 800px;
+}
+button {
+  font-size: 14pt;
+  height: 40px;
+}
+
+table {
+  td {
+    font-family: "Roboto Mono";
+  }
+}
+
+table#summary__table {
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 50px;
+  }
+  td:nth-child(1) {
+    text-align: right;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 140px;
+  }
+  td:nth-child(2) {
+    text-align: center;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 200px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 100px;
+  }
+  td:nth-child(4) {
+    font-family: "ＭＳ ゴシック";
+  }
+  td:nth-child(4) {
+    text-align: center;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 130px;
+  }
+  td:nth-child(5),
+  td:nth-child(6) {
+    text-align: right;
+  }
+
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 130px;
+  }
+
+  tbody {
+    height: 120px;
+  }
+}
+
+table#billet__table {
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 50px;
+  }
+  td:nth-child(1) {
+    text-align: right;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 140px;
+  }
+  td:nth-child(2) {
+    text-align: right;
+  }
+
+  tbody {
+    height: 120px;
+  }
+}

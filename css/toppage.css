@@ -1,0 +1,10 @@
+div.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  background-color: #e6f5f5;
+  margin: 0 5% 0 5%;
+  padding: 40px 0 40px 0;
+  border-radius: 4px;
+  justify-content: space-around;
+}

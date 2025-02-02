@@ -27,6 +27,18 @@
   font-family: "Roboto";
   font-weight: 400;
 }
+iframe {
+  border: 0;
+  width: 100%;
+  height: 2000px;
+}
+
+h1 {
+  color: #377a94;
+  /* text-decoration: underline; */
+  border-left: solid 5px #377a94; /* left line */
+}
+
 header > div:nth-child(1) > img {
   /* background-color: aqua; */
   width: 35px;
@@ -35,13 +47,13 @@ header > div:nth-child(1) > img {
 }
 header > div:nth-child(5) > img {
   /* background-color: aqua; */
-  width: 25px;
-  height: 25px;
+  /* width: 25px; */
+  height: 35px;
   cursor: pointer;
 }
 body {
   margin: 0;
-  /* border: solid 1px #006885; */
+  /* border: solid 1px #377a94; */
   display: flex;
   flex-direction: column;
   /* height: calc(600px - 2px); */
@@ -51,12 +63,12 @@ header {
   width: 100%;
   position: fixed;
   display: flex;
-  border-bottom: dotted 1px #006885;
+  border-bottom: dotted 1px #377a94;
   flex-direction: row;
   height: 50px;
   justify-content: space-between;
   text-align: center;
-  background-color: #006885;
+  background-color: #377a94;
   color: white;
   font-weight: bold;
   padding: 0 10px 0 10px;
@@ -65,11 +77,11 @@ header > div:nth-child(1),
 header > div:nth-child(5) {
   display: flex;
   align-items: center;
-  width: 50px;
+  width: 85px;
 }
 header > div:nth-child(2),
 header > div:nth-child(4) {
-  width: 230px;
+  width: 150px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -86,43 +98,52 @@ header > div:nth-child(3) {
     font-size: 22pt;
   }
 }
-footer {
-  width: 100%;
-  height: calc(598px - 31px - 5px - 480px);
+
+div.main__wrapper {
+  margin-top: 50px;
 }
+
 h1 {
   font-family: "Roboto";
   font-weight: 500;
   padding-left: 10px;
 }
 
-div.main__wrapper {
-  font-size: 12pt;
-  padding-top: 5px;
-  margin-top: 60px;
+div.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: #e6f5f5;
+  border-radius: 4px;
+  border: 0;
+  margin: 0 5% 0 5%;
+  padding: 40px 0 40px 0;
 }
+
+div.button-row-container {
+  display: flex;
+  flex-direction: row;
+}
+
 /* ボタンの設定 */
 button {
-  width: 100px;
-  height: 40px;
+  width: 120px;
+  height: 60px;
   display: block;
   position: relative;
-  padding: 0px;
-  margin: 10px auto 10px auto;
+  padding: 0 5px 0 5px;
+  margin: 20px 40px 20px 40px;
   text-align: center;
   text-decoration: none;
   color: white;
-  background: #006885;
+  background: #377a94;
   border: none;
-  font-size: 9pt;
-  font-weight: bold;
+  font-size: 12pt;
+  letter-spacing: 0.1em;
+  font-weight: 500;
 }
-button:hover {
-  cursor: pointer;
-  text-decoration: none;
-  background: #ff88ef;
-  transition: background 0.3s;
-}
+
 button:disabled {
   cursor: default;
   text-decoration: none;
@@ -142,25 +163,32 @@ tbody {
 }
 tbody {
   overflow-y: scroll;
-  font-size: 10pt;
-  height: 75px;
+  font-size: 14t;
+  /* height: 75px; */
 }
+td,
+th {
+  padding-left: 3px;
+  padding-right: 3px;
+  height: 28px;
+  border: solid 1px white;
+}
+
 thead td,
 thead th {
-  background-color: #006885;
-  border: solid 1px white;
+  background-color: #377a94;
   color: white;
   text-align: center;
-  font-size: 9pt;
-  font-weight: normal;
+  font-size: 14pt;
+  /* font-weight: normal; */
 }
 tbody td {
-  border: solid 1px rgb(243, 243, 243);
-  font-size: 9pt;
-  font-weight: normal;
+  border: solid 1px #ffffff;
+  /* font-size: 9pt; */
+  /* font-weight: normal; */
 }
 tbody tr.selected-record {
-  background-color: #d6d283;
+  background-color: #fffaad;
 }
 .no-input {
   background-color: #d6d283;
@@ -190,18 +218,18 @@ input:disabled {
   align-items: center;
   height: 22px;
   width: 40px;
-  background-color: #006885;
+  background-color: #377a94;
   color: white;
 }
 input {
   width: 40px;
   height: 20px;
-  border: 1px solid #006885;
+  border: 1px solid #377a94;
   text-align: right;
   padding: 0px 2px;
 }
 select {
   width: 100px;
   height: 22px;
-  border: 1px solid #006885;
+  border: 1px solid #377a94;
 }

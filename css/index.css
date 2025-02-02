@@ -2,3 +2,6 @@ div.main__wrapper {
   height: 1500px;
   overflow-y: scroll;
 }
+h1 {
+  color: #377a94;
+}

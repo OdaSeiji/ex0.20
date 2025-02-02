@@ -1,0 +1,91 @@
+<mxfile host="65bd71144e">
+    <diagram id="Gz92kaDBu5tP0qBZvZyI" name="ページ1">
+        <mxGraphModel dx="1335" dy="914" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="&lt;font face=&quot;Roboto&quot; color=&quot;#ffffff&quot;&gt;&lt;span style=&quot;font-size: 20px;&quot;&gt;Billet Charge&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#377A94;strokeColor=none;strokeWidth=0;" parent="1" vertex="1">
+                    <mxGeometry y="110" width="825" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="&lt;u style=&quot;&quot;&gt;&lt;font data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto&quot; face=&quot;Roboto&quot; color=&quot;#377a94&quot;&gt;Billet Paramater&lt;/font&gt;&lt;/u&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry y="200" width="240" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fontSize=20;fontColor=#006885;fillColor=#F9DD89;strokeWidth=1;arcSize=9;strokeColor=#F9DD89;" parent="1" vertex="1">
+                    <mxGeometry y="250" width="410" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;font style=&quot;font-size: 16px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto&quot; face=&quot;Roboto&quot; color=&quot;#ffffff&quot;&gt;Die Number&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="270" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="290" width="50" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="290" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;font face=&quot;Roboto&quot; color=&quot;#ffffff&quot;&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;Press Date&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="270" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="220" y="290" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="30" value="" style="rounded=1;whiteSpace=wrap;html=1;fontSize=20;fontColor=#006885;fillColor=#F6CE4C;strokeWidth=1;arcSize=9;strokeColor=#99D5D5;" vertex="1" parent="1">
+                    <mxGeometry x="414" y="250" width="411" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="&lt;font face=&quot;Roboto&quot; color=&quot;#ffffff&quot;&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;Press Directive No&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="270" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="290" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="" style="rounded=1;whiteSpace=wrap;html=1;fontSize=20;fontColor=#006885;fillColor=#F4E8EB;strokeWidth=1;arcSize=9;strokeColor=#99D5D5;" vertex="1" parent="1">
+                    <mxGeometry y="370" width="410" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="&lt;font face=&quot;Roboto-Light&quot; style=&quot;font-size: 16px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto-Light&quot; color=&quot;#ffffff&quot;&gt;Billet Size&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="390" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="410" width="50" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="80" y="410" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="&lt;font face=&quot;Roboto-light&quot; style=&quot;font-size: 16px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto-light&quot; color=&quot;#ffffff&quot;&gt;Order&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="297.5" y="550" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" value="&lt;font face=&quot;Roboto-light&quot; color=&quot;#ffffff&quot;&gt;&lt;span style=&quot;font-size: 16px;&quot;&gt;Length&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="397.5" y="550" width="130" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="297.5" y="570" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="397.5" y="570" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="43" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="297.5" y="600" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="397.5" y="600" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="297.5" y="630" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="397.5" y="630" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="297.5" y="660" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#006885;" vertex="1" parent="1">
+                    <mxGeometry x="397.5" y="660" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="&lt;font face=&quot;Roboto-Light&quot; style=&quot;font-size: 16px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto-Light&quot; color=&quot;#ffffff&quot;&gt;Delete Record&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="760" width="122.5" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" value="&lt;font face=&quot;Roboto-Light&quot; style=&quot;font-size: 16px;&quot; data-font-src=&quot;https://fonts.googleapis.com/css?family=Roboto-Light&quot; color=&quot;#ffffff&quot;&gt;Add Record&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=0;fontSize=20;fontColor=#006885;fillColor=#377A94;" vertex="1" parent="1">
+                    <mxGeometry x="280" y="760" width="122.5" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
