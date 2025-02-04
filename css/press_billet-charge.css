@@ -1,10 +1,48 @@
 /* css */
+body {
+  margin-top: 50px;
+}
+
 div.container {
   /* comment */
 }
-div.main__wrapper {
+div.pearent-container {
+  display: flex;
+  flex-direction: row;
+}
+div.wrapper {
   height: 800px;
 }
+.container {
+  padding: 20px 0 20px 0;
+}
+.container2 {
+  background-color: initial;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 60% 40%;
+  grid-auto-rows: 300px;
+  /* column-gap: 40px; */
+  .box {
+    height: 300px;
+  }
+}
+
+.box {
+  /* margin: 0 10px 0 10px; */
+  background-color: #e6f5f5;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.box2 {
+  margin-left: 10px;
+  width: calc(100% - 10px);
+}
+
 button {
   font-size: 14pt;
   height: 40px;
@@ -75,10 +113,84 @@ table#billet__table {
   }
   th:nth-child(2),
   td:nth-child(2) {
-    width: 140px;
+    width: 50px;
   }
   td:nth-child(2) {
     text-align: right;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 120px;
+  }
+  td:nth-child(3) {
+    text-align: right;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 100px;
+  }
+  td:nth-child(4) {
+    text-align: left;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 160px;
+  }
+  td:nth-child(5) {
+    text-align: left;
+  }
+
+  tbody {
+    height: 120px;
+  }
+}
+
+#stock-billet__table {
+  .input-record {
+    td {
+      padding: 0;
+    }
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    display: none;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 40px;
+  }
+  td:nth-child(2) {
+    text-align: right;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 50px;
+  }
+  td:nth-child(3) {
+    text-align: right;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 70px;
+  }
+  td:nth-child(4) {
+    text-align: right;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 150px;
+  }
+  td:nth-child(5) {
+    text-align: left;
+  }
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 160px;
+  }
+  td:nth-child(6) {
+    text-align: left;
   }
 
   tbody {

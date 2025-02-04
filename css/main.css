@@ -33,12 +33,6 @@ iframe {
   height: 2000px;
 }
 
-h1 {
-  color: #377a94;
-  /* text-decoration: underline; */
-  border-left: solid 5px #377a94; /* left line */
-}
-
 header > div:nth-child(1) > img {
   /* background-color: aqua; */
   width: 35px;
@@ -107,9 +101,12 @@ h1 {
   font-family: "Roboto";
   font-weight: 500;
   padding-left: 10px;
+  color: #377a94;
+  /* text-decoration: underline; */
+  border-left: solid 5px #377a94; /* left line */
 }
 
-div.container {
+.container {
   display: flex;
   align-items: center;
   justify-content: center;
