@@ -148,8 +148,15 @@ table#billet__table {
 #stock-billet__table {
   .input-record {
     td {
-      padding: 0;
+      /* padding: 0; */
     }
+  }
+  input {
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    border: none;
+    font-size: 14pt;
   }
 
   th:nth-child(1),
@@ -159,7 +166,7 @@ table#billet__table {
 
   th:nth-child(2),
   td:nth-child(2) {
-    width: 40px;
+    width: 50px;
   }
   td:nth-child(2) {
     text-align: right;
