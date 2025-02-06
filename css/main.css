@@ -90,6 +90,9 @@ header > div:nth-child(3) {
     letter-spacing: 0.05em;
     font-weight: 500;
     font-size: 22pt;
+    @media only screen and (min-with: 768px) {
+      font-size: 24pt;
+    }
   }
 }
 

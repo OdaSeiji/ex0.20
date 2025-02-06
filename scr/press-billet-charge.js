@@ -60,14 +60,24 @@ $(document).on("click", "#summary__table tbody tr", function () {
 
 $(document).on("click", "#stock-add__button", function () {
   //
-  var emptyRow = `
+  const editRow = $("#stock-billet__table tbody tr.input-record");
+  const summaryRow = $("#summary__table tr.selected-record");
+  const billetSize = summaryRow.find("td:eq(6)").html();
+  const billetLength = summaryRow.find("td:eq(7)").html();
+  const emptyRow = `
     <tr class="input-record">
         <td><input type="text" name="id"></td>
-        <td><input type="text" name="size"></td>
-        <td><input type="text" name="length"></td>
+        <td><input type="text" name="size" value="${billetSize}"></td>
+        <td><input type="text" name="length" value="${billetLength}"></td>
         <td><input type="text" name="vendor"></td>
         <td><input type="text" name="qty"></td>
     </tr>
   `;
+
+  editRow.removeClass("input-record");
+  editRow.find("input").attr("readonly", true);
+  // editRow.find("input").attr("pointer-events", none);
   $("#stock-billet__table tbody").append(emptyRow);
+
+  console.log();
 });

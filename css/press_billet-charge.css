@@ -3,6 +3,15 @@ body {
   margin-top: 50px;
 }
 
+input {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 14pt;
+  background-color: #e6f5f5;
+}
+
 div.container {
   /* comment */
 }
@@ -97,6 +106,14 @@ table#summary__table {
   td:nth-child(6) {
     width: 130px;
   }
+  th:nth-child(7),
+  td:nth-child(7) {
+    display: none;
+  }
+  th:nth-child(8),
+  td:nth-child(8) {
+    display: none;
+  }
 
   tbody {
     height: 120px;
@@ -150,13 +167,9 @@ table#billet__table {
     td {
       /* padding: 0; */
     }
-  }
-  input {
-    padding: 0;
-    height: 100%;
-    width: 100%;
-    border: none;
-    font-size: 14pt;
+    input {
+      background-color: #fffaad;
+    }
   }
 
   th:nth-child(1),
