@@ -29,7 +29,8 @@
           t_press_directive.billet_input_quantity AS 'plan-billet-qty',
           tb_01.actual_billet_quantities AS 'actual-billet-qty',
           t_press_directive.billet_size,
-          t_press_directive.billet_length
+          t_press_directive.billet_length,
+          t_press_directive.press_machine
         FROM t_press_directive
         LEFT JOIN m_dies
           ON t_press_directive.dies_id = m_dies.id

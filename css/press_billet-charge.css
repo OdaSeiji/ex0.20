@@ -29,7 +29,7 @@ div.wrapper {
   background-color: initial;
   padding: 0;
   display: grid;
-  grid-template-columns: 60% 40%;
+  grid-template-columns: 52% 48%;
   grid-auto-rows: 300px;
   /* column-gap: 40px; */
   .box {
@@ -114,7 +114,10 @@ table#summary__table {
   td:nth-child(8) {
     display: none;
   }
-
+  th:nth-child(9),
+  td:nth-child(9) {
+    display: none;
+  }
   tbody {
     height: 120px;
   }
@@ -137,7 +140,7 @@ table#billet__table {
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 120px;
+    width: 60px;
   }
   td:nth-child(3) {
     text-align: right;
@@ -167,11 +170,22 @@ table#billet__table {
     td {
       /* padding: 0; */
     }
-    input {
+    input,
+    select {
       background-color: #fffaad;
     }
   }
 
+  select {
+    border: none;
+    width: 70px;
+    height: 100%;
+    font-size: 14pt;
+    background-color: #e6f5f5;
+    option {
+      font-size: 14pt;
+    }
+  }
   th:nth-child(1),
   td:nth-child(1) {
     display: none;
@@ -186,7 +200,7 @@ table#billet__table {
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 50px;
+    width: 60px;
   }
   td:nth-child(3) {
     text-align: right;
@@ -204,13 +218,23 @@ table#billet__table {
   }
   td:nth-child(5) {
     text-align: left;
+    input {
+      text-align: left;
+    }
   }
   th:nth-child(6),
   td:nth-child(6) {
-    width: 160px;
+    width: 50px;
   }
   td:nth-child(6) {
-    text-align: left;
+    text-align: right;
+  }
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 50px;
+  }
+  td:nth-child(7) {
+    text-align: right;
   }
 
   tbody {
