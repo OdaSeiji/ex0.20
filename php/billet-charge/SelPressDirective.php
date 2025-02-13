@@ -38,11 +38,12 @@
           ON t_press_directive.pressing_type_id = m_pressing_type.id
         LEFT JOIN tb_01
           ON tb_01.press_directive_id = t_press_directive.id
+        WHERE t_press_directive.press_machine = :machine
         ORDER BY id DESC
-        LIMIT 50
+        LIMIT 20
       ");
       // $_POST["targetId"] = 1;
-      // $prepare->bindValue(':targetId', (INT)$_POST["targetId"], PDO::PARAM_INT);
+      $prepare->bindValue(':machine', (INT)$_POST["machine"], PDO::PARAM_INT);
       $prepare->execute();
       $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/PressBilletCharge-SelectMachine.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">Billet Upload Page</div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+
+    <div class="wrapper">
+      <h1 class="translation">
+        Select Machine
+        <div id="machine-number" class="translation"></div>
+      </h1>
+      <div class="container container1">
+        <div class="display-box">
+          <div id="machine-number-info"></div>
+        </div>
+        <div class="button-wrapper">
+          <button id="number1__button">#1 2700MT</button
+          ><button id="number2__button">#2 5000MT</button
+          ><button id="number3__button">#3 2700MT</button
+          ><button disabled>#4 6000MT</button>
+        </div>
+      </div>
+
+      <h1 class="translation">
+        Select Press Direction
+        <div id="machine-number" class="translation"></div>
+      </h1>
+      <div class="container container1">
+        <div class="display-box">
+          <div id="press-directive-info"></div>
+        </div>
+        <table id="press-directive__table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th class="translation">Plan Press Date</th>
+              <th class="translation">Die Number</th>
+              <th class="translation">Press Type</th>
+              <th class="translation">Plan Billet Qty</th>
+              <th class="translation">Actual Billet Qty</th>
+              <th class="translation">Billet Size</th>
+              <th class="translation">Billet Length</th>
+              <th class="translation">Press Machine</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <h1 class="translation">Select Input Information</h1>
+      <div class="container">
+        <div class="button-wrapper">
+          <button>Billet Stock</button><button>Billet Upload</button>
+        </div>
+      </div>
+    </div>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./scr/PressBilletCharge-SelectMachine.js"></script>
+  </body>
+</html>
