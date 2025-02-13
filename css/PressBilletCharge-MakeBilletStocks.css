@@ -1,0 +1,83 @@
+table#billet-stocks__table {
+  margin-top: 30px;
+
+  select {
+    border: none;
+    width: 100%;
+    height: 100%;
+    font-size: 14pt;
+    background-color: #e6f5f5;
+    font-family: "Roboto_Mono";
+  }
+  option {
+    font-family: "Roboto_Mono";
+    font-size: 14pt;
+  }
+  th:nth-child(1),
+  td:nth-child(1) {
+    display: none;
+  }
+  td:nth-child(1) {
+    text-align: right;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 140px;
+  }
+  td:nth-child(2) {
+    text-align: left;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 80px;
+  }
+  td:nth-child(3) {
+    text-align: right;
+    select {
+      text-align: right;
+    }
+    option {
+      text-align: right;
+    }
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 80px;
+  }
+  td:nth-child(4) {
+    text-align: right;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 80px;
+  }
+  td:nth-child(5) {
+    text-align: right;
+  }
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 200px;
+  }
+  td:nth-child(6) {
+    text-align: left;
+  }
+
+  tbody {
+    height: 120px;
+  }
+}
+
+button {
+  height: 40px;
+}
+
+input {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 14pt;
+  background-color: #e6f5f5;
+  font-family: "Roboto_Mono";
+}

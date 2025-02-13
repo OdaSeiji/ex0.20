@@ -25,6 +25,5 @@ const myAjax = {
 
 // press date
 $(document).on("click", "#billet-charge__button", function () {
-  console.log("Hello");
   window.parent.postMessage("click__billet-charge", "*");
 });

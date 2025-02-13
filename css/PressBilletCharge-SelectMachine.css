@@ -32,11 +32,6 @@ div.display-box.imput-complete {
   background-color: #fffaad;
 }
 
-.button-wrapper {
-  display: flex;
-  flex-direction: row;
-}
-
 table#press-directive__table {
   margin-top: 30px;
 

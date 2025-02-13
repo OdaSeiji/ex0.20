@@ -144,6 +144,10 @@ div.button-row-container {
   display: flex;
   flex-direction: row;
 }
+.button-wrapper {
+  display: flex;
+  flex-direction: row;
+}
 
 /* ボタンの設定 */
 button {
@@ -172,9 +176,15 @@ dialog button {
   height: 50px;
 }
 /* テーブルの設定 */
+
 table {
   border-collapse: collapse;
   cursor: pointer;
+
+  td {
+    font-family: "Roboto_Mono";
+    font-size: 14pt;
+  }
 }
 thead,
 tbody {
