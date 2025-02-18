@@ -1,4 +1,5 @@
 let selectMachineNumber = 0;
+let billetSize = 0;
 const myAjax = {
   myAjax: function (fileName, sendData) {
     $.ajax({
@@ -87,9 +88,7 @@ function makePressDirectiveTable(number) {
 $(document).on("click", "#press-directive__table tbody tr", function () {
   const dateString = $(this).find("td:eq(1)").html().split("-");
   const dieName = $(this).find("td:eq(2)").html();
-  const billetSize = $(this).find("td:eq(6)").html();
   const planBilletQty = $(this).find("td:eq(4)").html();
-
   const pressDate = "Ngày " + dateString[2] + " tháng " + dateString[1];
   const displayString =
     pressDate +
@@ -100,8 +99,20 @@ $(document).on("click", "#press-directive__table tbody tr", function () {
     "  &nbsp;&nbsp;BilletQty:" +
     planBilletQty;
 
+  billetSize = $(this).find("td:eq(6)").html();
+
   $(this).parent().find("tr").removeClass("selected-record");
   $(this).addClass("selected-record");
 
   $("#press-directive-info").html(displayString);
+});
+
+$(document).on("click", "#billet-stock__button", function () {
+  let newWindow = window.open(
+    "./PressBilletCharge-MakeBilletStocks.html",
+    "_blank"
+  );
+  newWindow.onload = () => {
+    newWindow.postMessage(billetSize, "*");
+  };
 });

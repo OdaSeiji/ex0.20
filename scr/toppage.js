@@ -25,5 +25,7 @@ const myAjax = {
 
 // press date
 $(document).on("click", "#billet-charge__button", function () {
-  window.parent.postMessage("click__billet-charge", "*");
+  // window.parent.postMessage("click__billet-charge", "*");
+  // window.parent.postMessage("./PressBilletCharge-SelectMachine.html", "*");
+  window.open("./PressBilletCharge-SelectMachine.html");
 });
