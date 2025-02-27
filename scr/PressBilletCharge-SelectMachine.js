@@ -1,5 +1,9 @@
 let selectMachineNumber = 0;
 let billetSize = 0;
+let sendData = {
+  billetSize: 0,
+  billetMaterialId: 0,
+};
 const myAjax = {
   myAjax: function (fileName, sendData) {
     $.ajax({
@@ -22,7 +26,7 @@ $(function () {
   let pressTimer;
 
   $("#number1__button")
-    .on("touchstart", function () {
+    .on("touchstart mousedown", function () {
       pressTimer = setTimeout(function () {
         $("#machine-number-info")
           .html("#1 Machine 2700MT")
@@ -37,7 +41,7 @@ $(function () {
     });
 
   $("#number2__button")
-    .on("touchstart", function () {
+    .on("touchstart mousedown", function () {
       pressTimer = setTimeout(function () {
         $("#machine-number-info")
           .html("#2 Machine 5000MT")
@@ -52,7 +56,7 @@ $(function () {
     });
 
   $("#number3__button")
-    .on("touchstart", function () {
+    .on("touchstart mousedown ", function () {
       pressTimer = setTimeout(function () {
         $("#machine-number-info")
           .html("#3 Machine 2700MT")
@@ -100,6 +104,8 @@ $(document).on("click", "#press-directive__table tbody tr", function () {
     planBilletQty;
 
   billetSize = $(this).find("td:eq(6)").html();
+  sendData.billetSize = billetSize;
+  sendData.billetMaterialId = $(this).find("td:eq(9)").html();
 
   $(this).parent().find("tr").removeClass("selected-record");
   $(this).addClass("selected-record");
@@ -113,6 +119,6 @@ $(document).on("click", "#billet-stock__button", function () {
     "_blank"
   );
   newWindow.onload = () => {
-    newWindow.postMessage(billetSize, "*");
+    newWindow.postMessage(sendData, "*");
   };
 });

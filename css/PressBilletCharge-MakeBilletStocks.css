@@ -1,3 +1,21 @@
+body {
+  height: 1000px;
+}
+
+button {
+  height: 40px;
+}
+
+input {
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  border: none;
+  font-size: 14pt;
+  background-color: #e6f5f5;
+  font-family: "Roboto_Mono";
+}
+
 table tr.input-required {
   background-color: #fffaad;
   input,
@@ -84,16 +102,39 @@ table#billet-stocks__table {
   }
 }
 
-button {
-  height: 40px;
-}
+table#billet-stocks-lotnumber__table {
+  tbody {
+    height: 200px;
+    width: 582px;
+  }
 
-input {
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  border: none;
-  font-size: 14pt;
-  background-color: #e6f5f5;
-  font-family: "Roboto_Mono";
+  margin-top: 30px;
+  th:nth-child(1),
+  td:nth-child(1) {
+    display: none;
+  }
+  td:nth-child(1) {
+    text-align: right;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 200px;
+  }
+  td:nth-child(2) {
+    text-align: left;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 150px;
+  }
+  td:nth-child(3) {
+    text-align: left;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 200px;
+  }
+  td:nth-child(4) {
+    text-align: left;
+  }
 }

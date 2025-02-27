@@ -30,7 +30,8 @@
           tb_01.actual_billet_quantities AS 'actual-billet-qty',
           t_press_directive.billet_size,
           t_press_directive.billet_length,
-          t_press_directive.press_machine
+          t_press_directive.press_machine,
+          m_production_numbers.billet_material_id
         FROM t_press_directive
         LEFT JOIN m_dies
           ON t_press_directive.dies_id = m_dies.id
@@ -38,6 +39,8 @@
           ON t_press_directive.pressing_type_id = m_pressing_type.id
         LEFT JOIN tb_01
           ON tb_01.press_directive_id = t_press_directive.id
+        LEFT JOIN m_production_numbers
+        	 ON m_dies.production_number_id = m_production_numbers.id
         WHERE t_press_directive.press_machine = :machine
         ORDER BY id DESC
         LIMIT 20

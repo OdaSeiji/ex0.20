@@ -88,6 +88,10 @@ table#press-directive__table {
   td:nth-child(9) {
     display: none;
   }
+  th:nth-child(10),
+  td:nth-child(10) {
+    display: none;
+  }
   tbody {
     height: 120px;
   }
