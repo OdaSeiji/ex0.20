@@ -23,7 +23,7 @@ const myAjax = {
 };
 
 window.addEventListener("message", (event) => {
-  console.log(event.data); // "こんにちは"
+  console.log(event.data);
   billetSize = event.data.billetSize;
   billetMaterialId = event.data.billetMaterialId;
   console.log(billetSize);

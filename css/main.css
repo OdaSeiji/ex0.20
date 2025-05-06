@@ -88,7 +88,7 @@ header {
     justify-content: space-between;
   }
   > div:nth-child(3) {
-    width: 300px;
+    width: 380px;
     display: flex;
     align-items: center;
     div {

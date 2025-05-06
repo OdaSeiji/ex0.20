@@ -29,3 +29,9 @@ $(document).on("click", "#billet-charge__button", function () {
   // window.parent.postMessage("./PressBilletCharge-SelectMachine.html", "*");
   window.open("./PressBilletCharge-SelectMachine.html");
 });
+
+// die maitenance
+$(document).on("click", "#die-maitenance__button", function () {
+  window.open("./DieMaitenance.html");
+  // console.log("hello");
+});

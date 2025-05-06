@@ -8,3 +8,7 @@ div.button-container {
   border-radius: 4px;
   justify-content: space-around;
 }
+
+button {
+  cursor: pointer; /* マウスポインターがボタン上で変わる！ */
+}
