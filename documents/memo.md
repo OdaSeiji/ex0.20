@@ -35,3 +35,267 @@ billet charge page 作成。ビレットストック情報。`press directive`�
 金型メンテナンスページを作りたい。index.html はヘッダーと中身を変えたが、これ、読み込み異常がでてタブレットで使えないので、従来の作り方に変更したい。
 
 まずは、今の動きの遅い SQL を作り直す。押出が終わった金型の抽出。100 回分ぐらいあればいいかな？
+
+これがメインテーブルの`SQL`。だいぶややこしい。一か所目のややこしさは、前回金型を洗浄してから、何回目の押出になっているか？だろう。`t_press` から引っ張ってきているが、これは、さすがにベースは、`m_dies`でやるべきではないか？
+
+```SQL
+SELECT
+    t_press.dies_id,
+    m_dies.die_number,
+    SUM(CASE WHEN(
+                CONCAT(t_press.press_date_at, ' ', DATE_FORMAT(t_press.press_start_at, '%H:%i')) > (
+                    SELECT
+                        MAX(IFNULL(t_dies_status.do_sth_at, '2000-01-01 00:00')) AS do_sth_date
+                    FROM
+                        m_dies
+                        LEFT JOIN
+                            t_dies_status
+                        ON  t_dies_status.dies_id = m_dies.id
+                    WHERE
+                        m_dies.id = t_press.dies_id
+                    AND (
+                            t_dies_status.die_status_id = 4
+                        OR  t_dies_status.die_status_id = 10
+                        )
+                    GROUP BY
+                        m_dies.id
+                )
+            ) THEN 1 ELSE 0 END) AS is_washed_die,
+    CONCAT(t10.die_status, ' ', IFNULL(t10.tank, '')) AS die_status,
+    t10.die_status_id,
+    SUBSTRING_INDEX(staff_name, ' ', - 1) AS name,
+    t10.note,
+    DATE_FORMAT(t10.do_sth_at, '%y-%m-%d %H:%i') AS do_sth_at,
+    t10.specific_value
+FROM
+    t_press
+    LEFT JOIN
+        m_dies
+    ON  t_press.dies_id = m_dies.id
+    LEFT JOIN
+        (
+            SELECT
+                t_dies_status.dies_id,
+                m_die_status.die_status,
+                t_dies_status.die_status_id,
+                t_dies_status.do_sth_at,
+                t_dies_status.note,
+                t_dies_status.staff_id,
+                m_staff.staff_name,
+                t_dies_status.tank,
+                t_dies_status.specific_value
+            FROM
+                t_dies_status
+                LEFT JOIN
+                    m_die_status
+                ON  t_dies_status.die_status_id = m_die_status.id
+                LEFT JOIN
+                    m_staff
+                ON  t_dies_status.staff_id = m_staff.id
+                LEFT JOIN
+                    (
+                        SELECT
+                            t_dies_status.dies_id,
+                            t_dies_status.die_status_id,
+                            MAX(t_dies_status.do_sth_at) AS do_sth_at,
+                            t_dies_status.staff_id,
+                            t_dies_status.tank
+                        FROM
+                            t_dies_status
+                        GROUP BY
+                            t_dies_status.dies_id
+                    ) AS t10
+                ON  t_dies_status.dies_id = t10.dies_id
+                AND t_dies_status.do_sth_at = t10.do_sth_at
+            WHERE
+                t10.dies_id IS NOT NULL
+        ) AS t10
+    ON  t10.dies_id = t_press.dies_id
+GROUP BY
+    dies_id
+ORDER BY
+    CASE die_status
+        WHEN 'Grinding' THEN 9
+        WHEN 'Wire cutting' THEN 8
+        WHEN 'NG' THEN 7
+        WHEN 'NG Rz/Die mark' THEN 6
+        WHEN 'NG Kích thước' THEN 5
+        WHEN 'Washing' THEN 4
+        WHEN 'OK' THEN 3
+        WHEN 'Measuring' THEN 2
+        WHEN 'On rack' THEN 1
+        ELSE 0
+    END DESC,
+    is_washed_die DESC,
+    die_number ASC
+;
+```
+
+完全ではないが以下である程度コピーできたのではないか？
+
+```SQL
+WITH q_last_wash_date AS (
+    SELECT
+        t_dies_status.dies_id,
+        MAX(t_dies_status.do_sth_at) AS last_wash_date
+    FROM
+        t_dies_status
+    WHERE
+        t_dies_status.die_status_id = 4
+    GROUP BY
+        t_dies_status.dies_id
+),
+press_date_query AS (
+    SELECT
+        t_press.dies_id,
+        CONCAT(t_press.press_date_at, " ", t_press.press_finish_at) AS press_date
+    FROM
+        t_press
+),
+press_cnt_query AS (
+    SELECT
+        q_last_wash_date.dies_id,
+        COUNT(press_date_query.dies_id) AS press_cnt
+    FROM
+        q_last_wash_date
+        LEFT JOIN press_date_query
+        ON q_last_wash_date.dies_id = press_date_query.dies_id
+    WHERE
+        q_last_wash_date.last_wash_date < press_date_query.press_date
+    GROUP BY q_last_wash_date.dies_id
+),
+update_info_query AS (
+    SELECT
+        t1.dies_id,
+        DATE_FORMAT(t1.do_sth_at, '%y/%m/%d') AS update_date,
+        m_staff.staff_name,
+        m_die_status.die_status,
+        t1.die_status_id
+    FROM t_dies_status AS t1
+    LEFT JOIN m_staff
+        ON t1.staff_id = m_staff.id
+    LEFT JOIN m_die_status
+        ON t1.die_status_id = m_die_status.id
+    WHERE t1.do_sth_at = (
+        SELECT MAX(t2.do_sth_at)
+        FROM t_dies_status AS t2
+        WHERE t1.dies_id = t2.dies_id
+    )
+)
+SELECT
+    m_dies.id,
+    m_dies.die_number,
+    IFNULL(press_cnt_query.press_cnt, 0) AS press_cnt,
+    update_info_query.update_date,
+    update_info_query.staff_name,
+    ifnull(update_info_query.die_status_id, 0) AS dies_status_id,
+    update_info_query.die_status
+FROM
+    m_dies
+LEFT JOIN press_cnt_query
+    ON press_cnt_query.dies_id = m_dies.id
+LEFT JOIN update_info_query
+    ON update_info_query.dies_id = m_dies.id
+ORDER BY FIELD(dies_status_id, 4, 2, 10, 8, 0), die_number
+```
+
+ただ、これを見ていると、プレスが終わった金型が分からない。on_rack の金型を押出ししたら、on_rack では無いという事。
+つまり、金型メンテナンス作業に見合った表示にしていかないとならない。押出が終わっても、洗浄しないで、on_rack した金型は、現状は押出可能になる。でも、押出が終わって、その後、何の情報もない金型は、現場に放置されているという事。まずは、その金型を上位に表示すべきではないか？それとは別に型別に、前回の洗浄から何回押出したかは表示する。
+型別の押出日、と型別の最新情報を比較して、押出日以降の記録が無い場合、その金型は洗浄もされていないという事。押出が終わった金型は、洗浄するか、ラックに保管するか？のどちらかを選ぶ。洗浄した金型は、メンテナンスして、ラックに戻す。
+では、型別の最終押出日を抽出する`SQL`、、、苦手な奴。以下、完成形
+
+```sql
+#########################
+# 型別、最終押出日の抽出SQL
+SELECT
+	t1.id,
+	t1.dies_id,
+	t1.press_date_at
+FROM
+	t_press AS t1
+WHERE
+	concat(t1.press_date_at, " ", t1.press_start_at) = (
+		SELECT MAX(CONCAT(t2.press_date_at, " ", t2.press_start_at))
+		FROM t_press AS t2
+		WHERE t1.dies_id = t2.dies_id
+	)
+ORDER BY t1.dies_id
+;
+```
+
+次は、型別の型情報。
+
+```SQl
+WITH dies_last_pressed_date_query AS (
+	SELECT
+		t1.id,
+		t1.dies_id,
+		t1.press_date_at
+	FROM
+		t_press AS t1
+	WHERE
+		concat(t1.press_date_at, " ", t1.press_start_at) = (
+			SELECT MAX(CONCAT(t2.press_date_at, " ", t2.press_start_at))
+			FROM t_press AS t2
+			WHERE t1.dies_id = t2.dies_id
+		)
+	ORDER BY t1.dies_id
+	) , dies_last_status_date_query AS (
+	SELECT
+		t1.id,
+		t1.dies_id,
+		t1.do_sth_at
+	FROM t_dies_status AS t1
+	WHERE t1.do_sth_at = (
+		SELECT MAX(t2.do_sth_at)
+		FROM t_dies_status AS t2
+		WHERE t1.dies_id = t2.dies_id
+		)
+	)
+SELECT *
+FROM dies_last_pressed_date_query
+INNER JOIN dies_last_status_date_query
+ ON dies_last_pressed_date_query.dies_id = dies_last_status_date_query.dies_id
+;
+```
+
+これで型別の最新の`status`がいつ入力されているか明確になった。なので、押出したけど、`status`が入力されていない金型を抽出すればいい。以下がその`SQL`。
+
+```SQL
+WITH dies_last_pressed_date_query AS (
+	SELECT
+		t1.id,
+		t1.dies_id,
+		concat(t1.press_date_at, " ", t1.press_start_at) AS press_date_at
+	FROM
+		t_press AS t1
+	WHERE
+		concat(t1.press_date_at, " ", t1.press_start_at) = (
+			SELECT MAX(CONCAT(t2.press_date_at, " ", t2.press_start_at))
+			FROM t_press AS t2
+			WHERE t1.dies_id = t2.dies_id
+		)
+	ORDER BY t1.dies_id
+	) , dies_last_status_date_query AS (
+	SELECT
+		t1.id,
+		t1.dies_id,
+		t1.do_sth_at,
+		t1.die_status_id
+	FROM t_dies_status AS t1
+	WHERE t1.do_sth_at = (
+		SELECT MAX(t2.do_sth_at)
+		FROM t_dies_status AS t2
+		WHERE t1.dies_id = t2.dies_id
+		)
+	)
+SELECT *
+FROM dies_last_pressed_date_query
+INNER JOIN dies_last_status_date_query
+	ON dies_last_pressed_date_query.dies_id = dies_last_status_date_query.dies_id
+WHERE dies_last_pressed_date_query.press_date_at > dies_last_status_date_query.do_sth_at
+ORDER BY dies_last_pressed_date_query.dies_id
+;
+```
+
+これで、結構な金型が出てくる。確かに、押出後の情報がなさそう。
