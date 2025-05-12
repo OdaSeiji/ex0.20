@@ -5,13 +5,19 @@ table {
   }
 }
 
-table#after_press__table {
+table#after_press_dies__table {
+  tbody {
+    height: 200px;
+  }
   th:nth-child(2),
   td:nth-child(2) {
     width: 120px;
   }
+  td:nth-child(2) {
+    text-align: center;
+  }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 140px;
+    width: 240px;
   }
 }

@@ -34,9 +34,9 @@
     </header>
 
     <div class="main__wrapper">
-      <h1 class="translation">Choose Dies</h1>
-      <div class="button-container">
-        <table id="after_press__table">
+      <h1 class="translation">After Press Dies</h1>
+      <div class="button-container after_press_dies">
+        <table id="after_press_dies__table">
           <thead>
             <td>id</td>
             <td>Press Date</td>
@@ -44,12 +44,25 @@
           </thead>
           <tbody></tbody>
         </table>
-
-        <table id="under_maintenance__table">
+        <div>
+          <img src="./img/right_arrow.png" alt="arrow" width="50" height="50" />
+          <div>
+            <select name="" id="">
+              <option value="0">-</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+        </div>
+        <table id="washing_dies__table">
           <thead>
             <td>id</td>
+            <td>Throw Date</td>
+            <td>Tank</td>
             <td>Die Number</td>
-            <td>Status</td>
+            <!-- <td>Status</td> -->
           </thead>
           <tbody></tbody>
         </table>

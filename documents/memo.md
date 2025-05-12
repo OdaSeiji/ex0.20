@@ -351,8 +351,8 @@ FROM
         m_dies
     ON  dies_last_pressed_date_query.dies_id = m_dies.id
 WHERE
-    dies_last_pressed_date_query.press_date_at > dies_last_status_date_query.do_sth_at #ORDER BY
-        dies_last_pressed_date_query.dies_id
+    dies_last_pressed_date_query.press_date_at > dies_last_status_date_query.do_sth_at
+    #ORDER BY dies_last_pressed_date_query.dies_id
 ORDER BY
     press_date_at DESC
 ;
