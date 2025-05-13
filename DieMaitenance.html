@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/toppage.css" />
+    <link rel="stylesheet" href="./css/DieMaitenance.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">
+          Die Maitenance Page
+        </div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+
+    <div class="main__wrapper">
+      <h1 class="translation">After Press Dies</h1>
+      <div class="button-container after_press_dies">
+        <table id="after_press_dies__table">
+          <thead>
+            <td>id</td>
+            <td>Press Date</td>
+            <td>Die Number</td>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <div>
+          <img src="./img/right_arrow.png" alt="arrow" width="50" height="50" />
+          <div>
+            <select name="" id="">
+              <option value="0">-</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+        </div>
+        <table id="washing_dies__table">
+          <thead>
+            <td>id</td>
+            <td>Throw Date</td>
+            <td>Tank</td>
+            <td>Die Number</td>
+            <!-- <td>Status</td> -->
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <h1 class="translation">Packing Site</h1>
+      <div class="button-container">
+        <button class="translation">Packing Work</button>
+        <button class="translation">Whare House</button>
+        <button class="translation">View Packing</button>
+      </div>
+      <h1>Die Set Site</h1>
+      <div class="button-container">
+        <button id="die-maitenance__button" class="translation">
+          Die Maitenance
+        </button>
+      </div>
+      <h1>Quarity Site</h1>
+      <h1>Today's Press Schedule</h1>
+    </div>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./scr/DieMaitenance.js"></script>
+  </body>
+</html>

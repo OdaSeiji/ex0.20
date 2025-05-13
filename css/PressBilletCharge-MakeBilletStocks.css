@@ -53,14 +53,14 @@ table#billet-stocks__table {
   }
   th:nth-child(2),
   td:nth-child(2) {
-    width: 140px;
+    width: 100px;
   }
   td:nth-child(2) {
     text-align: left;
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 80px;
+    width: 60px;
   }
   td:nth-child(3) {
     text-align: right;
@@ -74,21 +74,21 @@ table#billet-stocks__table {
 
   th:nth-child(4),
   td:nth-child(4) {
-    width: 80px;
+    width: 60px;
   }
   td:nth-child(4) {
     text-align: right;
   }
   th:nth-child(5),
   td:nth-child(5) {
-    width: 80px;
+    width: 120px;
   }
   td:nth-child(5) {
     text-align: right;
   }
   th:nth-child(6),
   td:nth-child(6) {
-    width: 200px;
+    width: 100px;
   }
   td:nth-child(6) {
     text-align: left;
@@ -96,9 +96,19 @@ table#billet-stocks__table {
       text-align: left;
     }
   }
-
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 100px;
+  }
+  td:nth-child(7) {
+    text-align: left;
+    input {
+      text-align: left;
+    }
+  }
   tbody {
     height: 120px;
+    width: 593px;
   }
 }
 

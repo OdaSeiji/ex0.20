@@ -23,7 +23,7 @@ const myAjax = {
 };
 
 window.addEventListener("message", (event) => {
-  console.log(event.data); // "こんにちは"
+  console.log(event.data);
   billetSize = event.data.billetSize;
   billetMaterialId = event.data.billetMaterialId;
   console.log(billetSize);
@@ -31,9 +31,7 @@ window.addEventListener("message", (event) => {
 });
 
 $(document).on("click", "#stock-add__button", function () {
-  //
   const editRow = $("#billet-stocks__table tbody tr.input-record");
-  // const billetSize = 12;
   const billetLength = 1200;
   const emptyRow = `
     <tr class="input-record">
@@ -48,9 +46,10 @@ $(document).on("click", "#stock-add__button", function () {
         <td>
           ${billetSize}
         </td>
-        <td><input type="text" name="qty"></td>
         <td><input type="text" name="length" value="${billetLength}"></td>
         <td><input id="edit-lotnumber__input" type="text" name="lotNumber"></td>
+        <td><input type="text" name="remain-qty"></td>
+        <td><input type="text" name="upload-qty"></td>
     </tr>
   `;
 
