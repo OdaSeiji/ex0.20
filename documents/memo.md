@@ -519,3 +519,29 @@ WHERE
 ORDER BY press_date_at DESC
 ;
 ```
+
+これも正しくないかも。押出後、ラックに載せていればそれも問題ない。つまり、最終の押出記録以降に、洗浄記録が無い又はラックに載せた記録が無い。いや、ちゃんと、ラックに載せているか、洗浄の記録があるものは、リスト対象外になっている。
+
+次は、洗浄が終わった金型のリストアップ。押出の終わった金型のリストアップの様に、洗浄は終わったが、次の工程が入力されていない金型。型別の、最終洗浄日のリストアップ。型別の、最終情報（ラックとか、grind とか）のリストアップ。
+
+```sql
+SELECT
+    t1.id,
+    t1.dies_id,
+    t1.do_sth_at,
+    t1.die_status_id
+FROM
+    t_dies_status AS t1
+WHERE
+	t1.do_sth_at =
+    (SELECT
+            MAX(t2.do_sth_at) AS last_wash_date_time
+        FROM
+            t_dies_status AS t2
+        WHERE
+            t2.die_status_id = 4
+                AND t2.dies_id = t1.dies_id)
+;
+```
+
+型別の、最終洗浄日の抽出 SQL
