@@ -21,3 +21,23 @@ table#after_press_dies__table {
     width: 240px;
   }
 }
+
+div#set_washing_dies__div {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .title__wrapper {
+    width: 140px;
+  }
+  select#tank_number__select {
+    text-align: center;
+    width: 141px;
+  }
+  input#washing_date__input {
+    width: 139px;
+  }
+  img#remove_die__arrow {
+    transform: rotate(180deg);
+  }
+}

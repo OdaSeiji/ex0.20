@@ -522,7 +522,7 @@ ORDER BY press_date_at DESC
 
 これも正しくないかも。押出後、ラックに載せていればそれも問題ない。つまり、最終の押出記録以降に、洗浄記録が無い又はラックに載せた記録が無い。いや、ちゃんと、ラックに載せているか、洗浄の記録があるものは、リスト対象外になっている。
 
-次は、洗浄が終わった金型のリストアップ。押出の終わった金型のリストアップの様に、洗浄は終わったが、次の工程が入力されていない金型。型別の、最終洗浄日のリストアップ。型別の、最終情報（ラックとか、grind とか）のリストアップ。
+次は、洗浄が終わった金型のリストアップ。押出の終わった金型のリストアップの様に、洗浄は終わったが、次の工程が入力されていない金型。型別の、最終洗浄日のリストアップと、型別の、洗浄日以外の最終情報（ラックとか、grind とか）のリストアップ。
 
 ```sql
 SELECT
@@ -544,4 +544,64 @@ WHERE
 ;
 ```
 
-型別の、最終洗浄日の抽出 SQL
+型別の、最終洗浄日の抽出 SQL。
+
+```sql
+WITH latest_wash_date_query AS(
+    SELECT
+        # t1.id,
+        t1.dies_id,
+        t1.do_sth_at,
+        t1.die_status_id
+    FROM
+        t_dies_status AS t1
+    WHERE
+        t1.do_sth_at = (
+            SELECT
+                MAX(t2.do_sth_at) AS last_wash_date_time
+            FROM
+                t_dies_status AS t2
+            WHERE
+                t2.die_status_id = 4
+            AND t2.dies_id = t1.dies_id
+        )
+),
+latest_without_wash_date_query AS(
+    SELECT
+        # t1.id,
+        t1.dies_id,
+        t1.do_sth_at,
+        t1.die_status_id
+    FROM
+        t_dies_status AS t1
+    WHERE
+        t1.do_sth_at = (
+            SELECT
+                MAX(t2.do_sth_at) AS last_wash_date_time
+            FROM
+                t_dies_status AS t2
+            WHERE
+                t2.die_status_id IN(5, 6, 7, 8, 9, 10)
+            AND t2.dies_id = t1.dies_id
+        )
+)
+SELECT
+    latest_wash_date_query.dies_id,
+    m_dies.die_number,
+    date_format(latest_wash_date_query.do_sth_at, '%y/%m/%d') AS wash_date
+FROM
+    latest_wash_date_query
+    INNER JOIN
+        latest_without_wash_date_query
+    ON  latest_wash_date_query.dies_id = latest_without_wash_date_query.dies_id
+    LEFT JOIN
+        m_dies
+    ON  latest_wash_date_query.dies_id = m_dies.id
+WHERE
+    latest_wash_date_query.do_sth_at > latest_without_wash_date_query.do_sth_at
+ORDER BY
+    wash_date DESC,
+    m_dies.die_number
+```
+
+こんな感じか。

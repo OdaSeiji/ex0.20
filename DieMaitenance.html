@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/toppage.css" />
     <link rel="stylesheet" href="./css/DieMaitenance.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&amp;display=swap"
+      rel="stylesheet"
+    />
     <title>Document</title>
   </head>
   <body>
@@ -34,7 +38,7 @@
     </header>
 
     <div class="main__wrapper">
-      <h1 class="translation">After Press Dies</h1>
+      <h1 class="translation">Select Wash Dies</h1>
       <div class="button-container after_press_dies">
         <table id="after_press_dies__table">
           <thead>
@@ -44,16 +48,37 @@
           </thead>
           <tbody></tbody>
         </table>
-        <div>
-          <img src="./img/right_arrow.png" alt="arrow" width="50" height="50" />
-          <div>
-            <select name="" id="">
+        <div id="set_washing_dies__div">
+          <img
+            src="./img/right_arrow-1.png"
+            alt="arrow"
+            width="50"
+            height="50"
+          />
+          <img
+            id="remove_die__arrow"
+            src="./img/right_arrow-1.png"
+            alt="arrow"
+            width="50"
+            height="50"
+          />
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Tank No</div>
+            </div>
+            <select name="" id="tank_number__select">
               <option value="0">-</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
+              <option value="1">No.1 tank</option>
+              <option value="2">No.2 tank</option>
+              <option value="3">No.3 tank</option>
+              <option value="4">No.4 tank</option>
             </select>
+          </div>
+          <div>
+            <div class="input__wrapper">
+              <div class="title__wrapper">Input Date</div>
+              <input id="washing_date__input" type="date" />
+            </div>
           </div>
         </div>
         <table id="washing_dies__table">
@@ -67,7 +92,7 @@
           <tbody></tbody>
         </table>
       </div>
-      <h1 class="translation">Packing Site</h1>
+      <h1 class="translation">Pullout Washing Dies</h1>
       <div class="button-container">
         <button class="translation">Packing Work</button>
         <button class="translation">Whare House</button>
