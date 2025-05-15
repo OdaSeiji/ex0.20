@@ -605,3 +605,110 @@ ORDER BY
 ```
 
 こんな感じか。
+
+少し問題があり、表を、INSERT する必要がある。どうやってやるんだっけ？一行一行やった方がいいかな？
+
+```html
+<table id="data-table">
+  <tr>
+    <td>Value 1</td>
+    <td>Value 2</td>
+  </tr>
+  <tr>
+    <td>Value 3</td>
+    <td>Value 4</td>
+  </tr>
+  <tr>
+    <td>Value 5</td>
+    <td>Value 6</td>
+  </tr>
+</table>
+<button id="send-data">データ送信</button>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $("#send-data").click(function () {
+    const data = [];
+    $("#data-table tr").each(function () {
+      const row = [];
+      $(this)
+        .find("td")
+        .each(function () {
+          row.push($(this).text());
+        });
+      if (row.length > 0) {
+        data.push(row);
+      }
+    });
+
+    // AJAXでデータを送信
+    $.ajax({
+      url: "insert.php",
+      method: "POST",
+      data: { tableData: JSON.stringify(data) },
+      success: function (response) {
+        console.log("データ送信成功: " + response);
+      },
+      error: function (error) {
+        console.log("エラー: " + error);
+      },
+    });
+  });
+</script>
+```
+
+これに対して
+
+```php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "your_database_name";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("接続失敗: " . $conn->connect_error);
+}
+
+$tableData = json_decode($_POST['tableData']);
+
+foreach ($tableData as $row) {
+    $sql = "INSERT INTO your_table_name (column1, column2) VALUES ('$row[0]', '$row[1]')";
+    if ($conn->query($sql) === TRUE) {
+        echo "新しいレコードが作成されました";
+    } else {
+        echo "エラー: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+$conn->close();
+?>
+```
+
+となるそうである。かなり簡単。まずは、表の配列を作る事からかな。
+
+```javascript
+$("#wash_die__img").on("click", function () {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
+  const tankNumber = $("#tank_number__select").val();
+  const data = [];
+  var dieIdObj;
+
+  dieIdObj = $("#after_press_dies__table tr.selected-record td:nth-child(1)");
+
+  dieIdObj.each(function () {
+    const row = [];
+    data.push([$(this).html(), currentDayteTime, tankNumber]);
+  });
+  console.log(data);
+});
+```
+
+データを送る側の表の配列の準備はこんな感じか。

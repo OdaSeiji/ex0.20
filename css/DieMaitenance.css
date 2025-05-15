@@ -18,8 +18,26 @@ table#after_press_dies__table {
   }
   th:nth-child(3),
   td:nth-child(3) {
+    width: 65px;
+  }
+  td:nth-child(3) {
+    /* width: 65px; */
+    text-align: center;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
     width: 240px;
   }
+}
+
+select {
+  font-family: "Roboto_Mono";
+}
+input {
+  font-family: "Roboto_Mono";
+}
+option {
+  font-family: "Roboto_Mono";
 }
 
 div#set_washing_dies__div {
@@ -37,7 +55,10 @@ div#set_washing_dies__div {
   input#washing_date__input {
     width: 139px;
   }
-  img#remove_die__arrow {
+  img#remove_die__img {
     transform: rotate(180deg);
+  }
+  img:hover {
+    transform: scale(1.2);
   }
 }
