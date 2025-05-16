@@ -712,3 +712,28 @@ $("#wash_die__img").on("click", function () {
 ```
 
 データを送る側の表の配列の準備はこんな感じか。
+
+もう一つ、右側に、洗浄中の金型を表示しないと。最新の情報が金型洗浄中なら、それは洗浄中。
+
+```sql
+SELECT
+    t1.dies_id,
+    m_dies.die_number,
+    date_format(t1.do_sth_at, '%m/%d') as wash_date_at
+FROM
+    t_dies_status AS t1
+left join m_dies
+	on t1.dies_id = m_dies.id
+WHERE
+    t1.do_sth_at = (SELECT
+            MAX(t2.do_sth_at)
+        FROM
+            t_dies_status AS t2
+        WHERE
+            t1.dies_id = t2.dies_id
+        GROUP BY t2.dies_id)
+	and
+		t1.die_status_id = 4
+order by t1.do_sth_at desc
+;
+```
