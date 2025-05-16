@@ -719,21 +719,25 @@ $("#wash_die__img").on("click", function () {
 SELECT
     t1.dies_id,
     m_dies.die_number,
+    t1.tank,
     date_format(t1.do_sth_at, '%m/%d') as wash_date_at
 FROM
     t_dies_status AS t1
-left join m_dies
-	on t1.dies_id = m_dies.id
+    left join
+        m_dies
+    on  t1.dies_id = m_dies.id
 WHERE
-    t1.do_sth_at = (SELECT
+    t1.do_sth_at = (
+        SELECT
             MAX(t2.do_sth_at)
         FROM
             t_dies_status AS t2
         WHERE
             t1.dies_id = t2.dies_id
-        GROUP BY t2.dies_id)
-	and
-		t1.die_status_id = 4
-order by t1.do_sth_at desc
-;
+        GROUP BY
+            t2.dies_id
+    )
+and t1.die_status_id = 4
+order by
+    t1.do_sth_at desc;
 ```
