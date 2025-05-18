@@ -45,7 +45,7 @@ $(function () {
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
 
   $("#washing_date__input").val(formattedDate);
-  fillTestTable(100);
+  // fillTestTable(100);
 });
 
 function fillTestTable(dies_id) {
@@ -58,8 +58,18 @@ function fillTestTable(dies_id) {
   fillTableBody(ajaxReturnData, $("#test__table tbody"));
 }
 
-$(document).on("click", "table tbody tr", function () {
+function fillDieHistoryTable(dies_id) {
+  var fileName = "./php/DieMaitenance/SelDiePressHistory.php";
+  var sendData = {
+    dies_id: dies_id,
+  };
+  myAjax.myAjax(fileName, sendData);
+  fillTableBody(ajaxReturnData, $("#die-history__table tbody"));
+}
+
+$(document).on("click", "table#after_press_dies__table tbody tr", function () {
   $(this).toggleClass("selected-record");
+  checkWashingCondition();
 });
 
 $(document).on("click", "#after_press_dies__table tbody tr", function () {
@@ -68,6 +78,7 @@ $(document).on("click", "#after_press_dies__table tbody tr", function () {
   targetObj = $(this).find("td:first");
   console.log(targetObj.text());
   fillTestTable(targetObj.text());
+  fillDieHistoryTable(targetObj.text());
 });
 
 $(document).on("focus", "#edit-lotnumber__input", function () {
@@ -81,10 +92,6 @@ $(document).on("focus", "#edit-lotnumber__input", function () {
   myAjax.myAjax(fileName, sendData);
 });
 
-$("#after_press_dies__table tbody").on("click", function () {
-  checkWashingCondition();
-});
-
 $("#tank_number__select").on("change", function () {
   checkWashingCondition();
 });
@@ -93,11 +100,32 @@ $("#washing_date__input").on("change", function () {
   checkWashingCondition();
 });
 
+$(document).on("change", "#tank_number__select", function () {
+  if ($(this).val() === "0") {
+    $(this).addClass("required-input");
+  } else {
+    $(this).removeClass("required-input");
+  }
+});
+
 function checkWashingCondition() {
-  console.log("hello");
+  const selectDieObj = $(
+    "#after_press_dies__table tr.selected-record td:nth-child(1)"
+  );
+  const washingDate = $("#washing_date__input").val();
+  const washingTank = $("#tank_number__select").val();
+
+  // console.log(selectDieObj);
+  // console.log(washingDate);
+  // console.log(washingTank);
+
+  if (selectDieObj.length != 0 && washingTank != 0) {
+    console.log("Insert");
+    $("#washing__button").prop("disabled", false);
+  }
 }
 
-$("#wash_die__img").on("click", function () {
+$("#washing__button").on("click", function () {
   const now = new Date();
   const hours = now.getHours();
   const minutes = now.getMinutes();

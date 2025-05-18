@@ -220,7 +220,7 @@ tbody tr.selected-record {
   background-color: #fffaad;
 }
 .no-input {
-  background-color: #d6d283;
+  background-color: #ffddae;
 }
 .complete-input {
   background-color: #ffff;
@@ -257,6 +257,9 @@ input {
   text-align: right;
   padding: 0px 2px;
 }
+input.required-input {
+  background-color: #ffddae;
+}
 select {
   /* width: 100px; */
   /* height: 22px; */
@@ -268,6 +271,9 @@ select {
   font-family: "Roboto Mono", monospace;
   font-weight: 300;
   font-size: 12pt;
+}
+select.required-input {
+  background-color: #ffddae;
 }
 .input__wrapper {
   margin: 5px 0 5px 0;

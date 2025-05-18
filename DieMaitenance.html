@@ -46,7 +46,14 @@
           <tbody></tbody>
         </table>
         <div id="set_washing_dies__div">
-          <img
+          <button disabled id="washing__button">
+            <img src="./img/right_arrow-2.png" alt="" />
+          </button>
+          <button disabled id="cancel-washing__button">
+            <img id="remove_die__img" src="./img/right_arrow-2.png" alt="" />
+          </button>
+
+          <!-- <img
             id="wash_die__img"
             src="./img/right_arrrow-03.png"
             alt="arrow"
@@ -59,12 +66,13 @@
             alt="arrow"
             width="50"
             height="50"
-          />
+          /> -->
+
           <div class="input__wrapper">
             <div class="title__wrapper">
               <div class="title__letters">Tank No</div>
             </div>
-            <select name="" id="tank_number__select">
+            <select name="" id="tank_number__select" class="required-input">
               <option value="0">-</option>
               <option value="1">No.1 tank</option>
               <option value="2">No.2 tank</option>
@@ -98,6 +106,14 @@
             <th>Die Number</th>
             <th>Date</th>
             <th>Status</th>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <table id="die-history__table">
+          <thead>
+            <th>id</th>
+            <th>Die Number</th>
+            <th>Press Date</th>
           </thead>
           <tbody></tbody>
         </table>

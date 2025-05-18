@@ -77,7 +77,34 @@ table#test__table {
   }
   th:nth-child(4),
   td:nth-child(4) {
-    width: 150px;
+    width: 170px;
+  }
+  td:nth-child(4) {
+    text-align: center;
+  }
+}
+
+table#die-history__table {
+  tbody {
+    height: 200px;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 200px;
+  }
+  td:nth-child(2) {
+    text-align: left;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 120px;
+  }
+  td:nth-child(3) {
+    text-align: center;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 170px;
   }
   td:nth-child(4) {
     text-align: center;
@@ -109,10 +136,24 @@ div#set_washing_dies__div {
   input#washing_date__input {
     width: 139px;
   }
+  img {
+    margin: 5px 0 5px 0;
+  }
   img#remove_die__img {
     transform: rotate(180deg);
   }
   img:hover {
     transform: scale(1.2);
+  }
+}
+
+button {
+  width: 100px;
+  height: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  img {
+    width: 30px;
+    height: 20px;
   }
 }

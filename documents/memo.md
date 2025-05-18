@@ -741,3 +741,20 @@ and t1.die_status_id = 4
 order by
     t1.do_sth_at desc;
 ```
+
+デバッグ用に型の履歴を表示したのはいいが、同じ金型の押出履歴も出した方がいい。
+
+```sql
+SELECT
+	t_press.id,
+	m_dies.die_number,
+	date_format(t_press.press_date_at, '%y/%m/%d') AS press_date
+FROM t_press
+LEFT JOIN m_dies
+	ON t_press.dies_id = m_dies.id
+WHERE t_press.dies_id = 123
+ORDER BY press_date_at desc
+;
+```
+
+洗浄記録を作る。まずは、タンク番号、洗浄日、金型選択がされているとき、ボタンをアクティブにする。
