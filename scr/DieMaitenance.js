@@ -143,4 +143,10 @@ $("#washing__button").on("click", function () {
     data.push([$(this).html(), currentDayteTime, tankNumber]);
   });
   console.log(data);
+
+  const fileName = "./php/DieMaitenance/InsWashingDie.php";
+  const sendData = {
+    tableData: JSON.stringify(data),
+  };
+  myAjax.myAjax(fileName, sendData);
 });
