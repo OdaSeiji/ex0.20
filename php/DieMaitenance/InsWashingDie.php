@@ -18,22 +18,11 @@
 
     foreach($tableData as $row){
       $sql = 
-        "INSRT INTO t_dies_status (dies_id, do_sth_at, tank, die_status_id)
-         VALUES($row[0], $row[1], $row[2], 4)";
+        "INSERT INTO t_dies_status (dies_id, do_sth_at, tank, die_status_id, created_at)
+         VALUES(?, ?, ?, 4, ?)";
       $prepare = $dbh->prepare($sql);
-      $prepare->execute();
+      $prepare->execute([$row[0], $row[1], $row[2], $row[3]]);
     }
-
-    // $prepare = $dbh->prepare(
-    //   "UPDATE 
-    //     t_press 
-    //   SET 
-    //   measurement_check_date = '$measurement__date' 
-    //   WHERE 
-    //     id = $press_id
-    //   ");
-
-    // $prepare->execute();
 
     echo json_encode("INSERTED");
   } catch (PDOException $e){
