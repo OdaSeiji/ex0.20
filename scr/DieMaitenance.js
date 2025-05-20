@@ -120,8 +120,7 @@ function checkWashingCondition() {
   // console.log(washingTank);
 
   if (selectDieObj.length != 0 && washingTank != 0) {
-    console.log("Insert");
-    $("#washing__button").prop("disabled", false);
+    // $("#washing__button").prop("disabled", false);
   }
 }
 
@@ -132,6 +131,7 @@ $("#washing__button").on("click", function () {
   const seconds = now.getSeconds();
   const currentTime = `${hours}:${minutes}:${seconds}`;
   const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
+  const currentDayte = $("#washing_date__input").val();
   const tankNumber = $("#tank_number__select").val();
   const data = [];
   var dieIdObj;
@@ -140,9 +140,10 @@ $("#washing__button").on("click", function () {
 
   dieIdObj.each(function () {
     const row = [];
-    data.push([$(this).html(), currentDayteTime, tankNumber]);
+    data.push([$(this).html(), currentDayteTime, tankNumber, currentDayte]);
   });
   console.log(data);
+  console.log(JSON.stringify(data));
 
   const fileName = "./php/DieMaitenance/InsWashingDie.php";
   const sendData = {
