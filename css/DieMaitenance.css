@@ -156,9 +156,14 @@ div#set_washing_dies__div {
   .title__wrapper {
     width: 140px;
   }
+  select {
+    width: 141px;
+  }
   select#tank_number__select {
     text-align: center;
-    width: 141px;
+  }
+  select#staff__select {
+    text-align: left;
   }
   input#washing_date__input {
     width: 139px;

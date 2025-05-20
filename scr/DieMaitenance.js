@@ -48,6 +48,7 @@ $(function () {
 
   $("#washing_date__input").val(formattedDate);
   // fillTestTable(100);
+  makeStaffSelectSelect();
 });
 
 function fillTestTable(dies_id) {
@@ -178,3 +179,18 @@ $(document).on("keyup", "#die-number-sort__text", function () {
   //   $("#summary__table tbody tr").length + " items"
   // );
 });
+
+function makeStaffSelectSelect() {
+  fileName = "./php/DieMaitenance/SelStaffList.php";
+  sendData = {
+    dieName: "%",
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  ajaxReturnData.forEach(function (value) {
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo("#staff__select");
+  });
+}
