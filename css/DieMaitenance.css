@@ -7,7 +7,7 @@ table {
 
 table#after_press_dies__table {
   tbody {
-    height: 200px;
+    height: 230px;
   }
   th:nth-child(2),
   td:nth-child(2) {
@@ -51,12 +51,15 @@ table#after_press_dies__table {
     width: 50px;
     margin-left: 5px;
     text-align: left;
+    border-radius: 5px;
+    height: 22px;
+    background-color: #e8e8e8;
   }
 }
 
 table#washing_dies__table {
   tbody {
-    height: 200px;
+    height: 230px;
   }
   th:nth-child(2),
   td:nth-child(2) {

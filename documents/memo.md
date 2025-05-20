@@ -898,3 +898,39 @@ ORDER BY
     press_date_at DESC,
     die_number
 ```
+
+デバッグ用の`input`窓を作ったので、少しデバッグしてみる。それと、メンバーを入力できるようにしたい。それも、ここ最近よくやっている人を上位に出すようにする。過去 1 か月分を元に、ソートしたい。
+
+SELECT \*
+FROM テーブル名
+WHERE 日付カラム <= DATE_SUB(CURDATE(), INTERVAL 1 MONTH);
+
+```sql
+WITH experience_staff AS(
+    SELECT
+        t_dies_status.staff_id,
+        COUNT(*) AS cnt
+    FROM
+        t_dies_status
+    WHERE
+        t_dies_status.die_status_id = 8
+    AND t_dies_status.do_sth_at >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
+    GROUP BY
+        t_dies_status.staff_id
+)
+SELECT
+    m_staff.id,
+    m_staff.staff_name,
+    ifnull(experience_staff.cnt, 0) AS cnt
+FROM
+    m_staff
+    LEFT JOIN
+        experience_staff
+    ON  experience_staff.staff_id = m_staff.id
+ORDER BY
+    cnt DESC,
+    m_staff.id
+;
+```
+
+こうかな、、、2 か月の内で、最も頻度が高い人を上位に出すようにした。
