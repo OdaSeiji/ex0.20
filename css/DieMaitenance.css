@@ -47,6 +47,11 @@ table#after_press_dies__table {
   td:nth-child(6) {
     text-align: center;
   }
+  input#die-number-sort__text {
+    width: 50px;
+    margin-left: 5px;
+    text-align: left;
+  }
 }
 
 table#washing_dies__table {
