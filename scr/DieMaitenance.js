@@ -1,3 +1,4 @@
+var summaryTable = new Object();
 var ajaxReturnData;
 
 const myAjax = {
@@ -38,6 +39,7 @@ $(function () {
   const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
 
   myAjax.myAjax(fileName, sendData);
+  summaryTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#after_press_dies__table tbody"));
 
   fileName = "./php/DieMaitenance/SelWashingDie.php";
@@ -150,4 +152,29 @@ $("#washing__button").on("click", function () {
     tableData: JSON.stringify(data),
   };
   myAjax.myAjax(fileName, sendData);
+});
+
+$(document).on("keyup", "#die-number-sort__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#after_press_dies__table tbody").empty();
+
+  // console.log(summaryTable);
+
+  // return;
+
+  summaryTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#after_press_dies__table tbody");
+    }
+  });
+
+  // $("#summary__table_record").html(
+  //   $("#summary__table tbody tr").length + " items"
+  // );
 });
