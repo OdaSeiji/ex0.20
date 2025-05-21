@@ -100,7 +100,7 @@
                         t_dies_status AS t2
                     WHERE
                         t1.dies_id = t2.dies_id
-                    and t2.die_status_id = 31
+                    and t2.die_status_id IN (31, 32)
                 )
             AND t1.do_sth_at > dies_last_pressed_date_query.press_date_at
         )
