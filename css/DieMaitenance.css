@@ -11,7 +11,7 @@ table#after_press_dies__table {
   }
   th:nth-child(2),
   td:nth-child(2) {
-    width: 120px;
+    width: 90px;
   }
   td:nth-child(2) {
     text-align: center;
@@ -30,6 +30,8 @@ table#after_press_dies__table {
   }
   td:nth-child(4) {
     text-align: center;
+    font-family: "MS Gothic";
+    font-size: 14pt;
   }
 
   th:nth-child(5),
@@ -47,6 +49,14 @@ table#after_press_dies__table {
   td:nth-child(6) {
     text-align: center;
   }
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 80px;
+  }
+  td:nth-child(7) {
+    text-align: center;
+  }
+
   input#die-number-sort__text {
     width: 50px;
     margin-left: 5px;
@@ -78,7 +88,7 @@ table#washing_dies__table {
   }
   th:nth-child(4),
   td:nth-child(4) {
-    width: 120px;
+    width: 90px;
   }
   td:nth-child(4) {
     text-align: center;
@@ -148,7 +158,9 @@ input {
 option {
   font-family: "Roboto_Mono";
 }
-
+option:nth-child(1) {
+  text-align: center;
+}
 div#set_washing_dies__div {
   text-align: center;
   display: flex;

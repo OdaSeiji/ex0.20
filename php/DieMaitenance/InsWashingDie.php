@@ -18,10 +18,10 @@
 
     foreach($tableData as $row){
       $sql = 
-        "INSERT INTO t_dies_status (dies_id, do_sth_at, tank, die_status_id, created_at)
-         VALUES(?, ?, ?, 4, ?)";
+        "INSERT INTO t_dies_status (dies_id, do_sth_at, tank, die_status_id, created_at, staff_id)
+         VALUES(?, ?, ?, 4, ?, ?)";
       $prepare = $dbh->prepare($sql);
-      $prepare->execute([$row[0], $row[1], $row[2], $row[3]]);
+      $prepare->execute([$row[0], $row[1], $row[2], $row[3], $row[4]]);
     }
 
     echo json_encode("INSERTED");

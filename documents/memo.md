@@ -934,3 +934,149 @@ ORDER BY
 ```
 
 こうかな、、、2 か月の内で、最も頻度が高い人を上位に出すようにした。スタッフリストの作成部分も OK。ただし、最初の読み込みがだいぶ時間がかかる。
+判定用のカラムを追加したいが、だいぶ場所が無い。
+
+![](./img/20250521-01.png)
+この表に判定結果を示すカラムを追加したい。
+
+```sql
+
+WITH dies_last_pressed_date_query AS(
+    SELECT
+        t1.id,
+        t1.dies_id,
+        t1.pressing_type_id,
+        t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND AS press_date_at
+    FROM
+        t_press AS t1
+    WHERE
+        t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND = (
+            SELECT
+                MAX(t2.press_date_at + INTERVAL TIME_TO_SEC(t2.press_start_at) SECOND)
+            FROM
+                t_press AS t2
+            WHERE
+                t1.dies_id = t2.dies_id
+                AND
+					 t2.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+
+        ) and
+        t1.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    ORDER BY
+        t1.dies_id
+),
+dies_last_status_date_query AS(
+    SELECT
+        t1.id,
+        t1.dies_id,
+        t1.do_sth_at,
+        t1.die_status_id
+    FROM
+        t_dies_status AS t1
+    WHERE
+        t1.do_sth_at = (
+            SELECT
+                MAX(t2.do_sth_at)
+            FROM
+                t_dies_status AS t2
+            WHERE
+                t1.dies_id = t2.dies_id
+            AND t2.die_status_id IN(4, 10)
+        )
+),
+dies_no_wash_press_time_query AS(
+    SELECT
+        t3.dies_id,
+        COUNT(*) as no_wash_press
+    FROM
+        t_press AS t3
+    WHERE
+        t3.press_date_at + INTERVAL TIME_TO_SEC(t3.press_start_at) SECOND > (
+            SELECT
+                t1.do_sth_at
+            FROM
+                t_dies_status AS t1
+            WHERE
+                t3.dies_id = t1.dies_id
+            and t1.do_sth_at = (
+                    SELECT
+                        MAX(t2.do_sth_at)
+                    FROM
+                        t_dies_status AS t2
+                    WHERE
+                        t1.dies_id = t2.dies_id
+                    AND t2.die_status_id = 4
+                )
+        )
+    GROUP BY
+        t3.dies_id
+),
+dies_id_last_diemark_ng_query AS(
+    SELECT
+        t1.dies_id,
+        t1.do_sth_at
+    FROM
+        t_dies_status AS t1
+        LEFT JOIN
+            dies_last_pressed_date_query
+        ON  dies_last_pressed_date_query.dies_id = t1.dies_id
+    WHERE
+        t1.do_sth_at = (
+            SELECT
+                MAX(t2.do_sth_at)
+            FROM
+                t_dies_status AS t2
+            WHERE
+                t1.dies_id = t2.dies_id
+            and t2.die_status_id IN(31, 32)
+        )
+    AND t1.do_sth_at > dies_last_pressed_date_query.press_date_at
+)
+SELECT
+    dies_last_pressed_date_query.dies_id,
+    date_format(dies_last_pressed_date_query.press_date_at, '%m/%d') AS press_date_at,
+    m_dies.die_number,
+    m_pressing_type.pressing_type,
+    ifnull(dies_no_wash_press_time_query.no_wash_press, 0) AS no_wash_press,
+    # dies_id_last_diemark_ng_query.dies_id,
+    if(dies_id_last_diemark_ng_query.dies_id IS NULL, '', 'NG') AS die_mark,
+    case
+    	when m_pressing_type.id = 1
+#    		then '〇'
+			then if(dies_id_last_diemark_ng_query.dies_id IS NOT NULL, 'Wash', 'Rack')
+    	when m_pressing_type.id = 2
+#    		then '◎'
+			then if((dies_id_last_diemark_ng_query.dies_id IS not NULL) or (no_wash_press > 1), 'Wash', 'Rack')
+    	when m_pressing_type.id = 3
+#    		then '●'
+			then if((dies_id_last_diemark_ng_query.dies_id IS not NULL) or (no_wash_press > 1), 'Wash', 'Rack')
+#			then if((no_wash_press > 1), 'Wash', 'Rack')
+
+   END AS action
+
+FROM
+    dies_last_pressed_date_query
+    INNER JOIN
+        dies_last_status_date_query
+    ON  dies_last_pressed_date_query.dies_id = dies_last_status_date_query.dies_id
+    left JOIN
+        dies_no_wash_press_time_query
+    ON  dies_no_wash_press_time_query.dies_id = dies_last_status_date_query.dies_id
+    LEFT JOIN
+        m_dies
+    ON  dies_last_pressed_date_query.dies_id = m_dies.id
+    LEFT JOIN
+        m_pressing_type
+    ON  dies_last_pressed_date_query.pressing_type_id = m_pressing_type.id
+    LEFT join
+        dies_id_last_diemark_ng_query
+    ON  dies_last_pressed_date_query.dies_id = dies_id_last_diemark_ng_query.dies_id
+WHERE
+    dies_last_pressed_date_query.press_date_at > dies_last_status_date_query.do_sth_at
+AND dies_last_status_date_query.die_status_id != 8
+ORDER BY
+    dies_last_pressed_date_query.press_date_at DESC,
+    die_number
+```
+
+これが今使っている最終形。直近 1 年以内に絞った。多分、ソート機能が必要。その前に、入力の部分を進める。入力は出来るようになった。まだ戻らないけど、、、処理が終わったら、該当する金型をハッチングしている方がいい。どこにインサートされたか分からないから。

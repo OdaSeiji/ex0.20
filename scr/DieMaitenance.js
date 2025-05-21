@@ -31,6 +31,16 @@ function fillTableBody(data, tbodyDom) {
 }
 
 $(function () {
+  const today = new Date();
+  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
+
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+  makeStaffSelectSelect();
+  $("#washing_date__input").val(formattedDate);
+});
+
+function makeAfterPressTalbe() {
   var fileName = "./php/DieMaitenance/SelAfterPressDie.php";
   var sendData = {
     machine: "Dummy",
@@ -41,15 +51,18 @@ $(function () {
   myAjax.myAjax(fileName, sendData);
   summaryTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#after_press_dies__table tbody"));
+}
 
-  fileName = "./php/DieMaitenance/SelWashingDie.php";
+function makeWashingDieTable() {
+  var fileName = "./php/DieMaitenance/SelWashingDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
   myAjax.myAjax(fileName, sendData);
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
 
-  $("#washing_date__input").val(formattedDate);
-  // fillTestTable(100);
   makeStaffSelectSelect();
-});
+}
 
 function fillTestTable(dies_id) {
   // var dies_id = 100;
@@ -95,20 +108,20 @@ $(document).on("focus", "#edit-lotnumber__input", function () {
   myAjax.myAjax(fileName, sendData);
 });
 
-$("#tank_number__select").on("change", function () {
-  checkWashingCondition();
-});
-
-$("#washing_date__input").on("change", function () {
-  checkWashingCondition();
-});
-
-$(document).on("change", "#tank_number__select", function () {
+$(document).on("change", "select", function () {
   if ($(this).val() === "0") {
     $(this).addClass("required-input");
   } else {
     $(this).removeClass("required-input");
   }
+});
+
+$(".after_press_dies select").on("change", function () {
+  checkWashingCondition();
+});
+
+$("#washing_date__input").on("change", function () {
+  checkWashingCondition();
 });
 
 function checkWashingCondition() {
@@ -117,12 +130,15 @@ function checkWashingCondition() {
   );
   const washingDate = $("#washing_date__input").val();
   const washingTank = $("#tank_number__select").val();
+  const staffId = $("#staff__select").val();
+
+  console.log("Hello");
 
   // console.log(selectDieObj);
   // console.log(washingDate);
   // console.log(washingTank);
 
-  if (selectDieObj.length != 0 && washingTank != 0) {
+  if (selectDieObj.length != 0 && washingTank != 0 && staffId != 0) {
     // $("#washing__button").prop("disabled", false);
   }
 }
@@ -136,14 +152,21 @@ $("#washing__button").on("click", function () {
   const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
   const currentDayte = $("#washing_date__input").val();
   const tankNumber = $("#tank_number__select").val();
+  const staffId = $("#staff__select").val();
   const data = [];
   var dieIdObj;
 
   dieIdObj = $("#after_press_dies__table tr.selected-record td:nth-child(1)");
 
   dieIdObj.each(function () {
-    const row = [];
-    data.push([$(this).html(), currentDayteTime, tankNumber, currentDayte]);
+    // const row = [];
+    data.push([
+      $(this).html(),
+      currentDayteTime,
+      tankNumber,
+      currentDayte,
+      staffId,
+    ]);
   });
   console.log(data);
   console.log(JSON.stringify(data));
@@ -153,6 +176,11 @@ $("#washing__button").on("click", function () {
     tableData: JSON.stringify(data),
   };
   myAjax.myAjax(fileName, sendData);
+
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+
+  $("#washing__button").prop("disabled", true);
 });
 
 $(document).on("keyup", "#die-number-sort__text", function () {
