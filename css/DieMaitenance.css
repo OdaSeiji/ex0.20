@@ -7,7 +7,7 @@ table {
 
 table#after_press_dies__table {
   tbody {
-    height: 230px;
+    height: 280px;
   }
   th:nth-child(2),
   td:nth-child(2) {
@@ -70,7 +70,7 @@ table#after_press_dies__table {
 
 table#washing_dies__table {
   tbody {
-    height: 230px;
+    height: 280px;
   }
   th:nth-child(2),
   td:nth-child(2) {
@@ -202,3 +202,70 @@ button {
     height: 20px;
   }
 }
+
+.mode-change-button__wrapper {
+  display: flex;
+  button {
+    margin-left: 5px;
+    margin-right: 5px;
+    height: 40px;
+    font-size: 16pt;
+    background-color: #d7d7e9;
+  }
+  button.active {
+    background-color: #377a94;
+    transition: background-color 0.3s, color 0.4s;
+  }
+}
+
+form.radio-group {
+  display: flex;
+  align-items: center;
+}
+
+input.radio-button {
+  width: 35px;
+}
+
+label {
+  cursor: pointer;
+  /* padding-left: 30px; */
+  position: relative;
+  font-size: 18pt;
+}
+
+.radio-button {
+  appearance: none;
+  position: absolute; /* 完全に目に見えない位置へ */
+  visibility: hidden;
+}
+
+/* label::before,
+label::after {
+  content: "";
+  display: block;
+  border-radius: 50%;
+  position: absolute;
+  transform: translateY(-50%);
+  top: 50%;
+}
+
+label::before {
+  background-color: #fff;
+  border: 1px solid #008000;
+  height: 20px;
+  width: 20px;
+  left: 5px;
+}
+
+label::after {
+  background-color: #008000;
+  opacity: 0;
+  height: 16px;
+  width: 16px;
+  left: 7px;
+}
+
+input:checked + label::after {
+  opacity: 1;
+} */

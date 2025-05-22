@@ -222,3 +222,8 @@ function makeStaffSelectSelect() {
       .appendTo("#staff__select");
   });
 }
+
+$(document).on("click", ".mode-change-button__wrapper button", function () {
+  $("button.active").removeClass("active");
+  $(this).addClass("active");
+});
