@@ -50,8 +50,8 @@
         </table>
         <div id="set_washing_dies__div">
           <div class="mode-change-button__wrapper">
-            <button class="active">Wash</button>
-            <button class="">Rack</button>
+            <button id="wash-mode__button" class="active">Wash</button>
+            <button id="rack-mode__button" class="">Rack</button>
           </div>
           <button disabled id="washing__button">
             <img src="./img/right_arrow-2.png" alt="" />
@@ -91,11 +91,13 @@
         </div>
         <table id="washing_dies__table">
           <thead>
-            <th>id</th>
-            <th>Die Number</th>
-            <th>Tank</th>
-            <th>Input Date</th>
-            <!-- <td>Status</td> -->
+            <tr>
+              <th>id</th>
+              <th>Die Number</th>
+              <th>Tank</th>
+              <th>Input Date</th>
+              <!-- <td>Status</td> -->
+            </tr>
           </thead>
           <tbody></tbody>
         </table>
@@ -119,7 +121,7 @@
           </thead>
           <tbody></tbody>
         </table>
-        <button class="translation">Packing Work</button>
+        <button id="test__button" class="translation">Test</button>
         <button class="translation">Whare House</button>
         <button class="translation">View Packing</button>
       </div>

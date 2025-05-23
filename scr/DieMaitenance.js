@@ -226,4 +226,31 @@ function makeStaffSelectSelect() {
 $(document).on("click", ".mode-change-button__wrapper button", function () {
   $("button.active").removeClass("active");
   $(this).addClass("active");
+
+  var tempObj;
+
+  tempObj = $(".mode-change-button__wrapper button");
+  console.log(tempObj);
+});
+
+$(document).on("click", "#test__button", function () {
+  console.log("hello");
+  $("#washing_dies__table").find("tr").remove();
+
+  const tdTitles = ["id", "DieNumber", "Out Date"];
+  const newRow = $("<tr>");
+
+  tdTitles.forEach((title) => {
+    const td = $("<td>").text(title);
+    newRow.append(td);
+  });
+
+  newRow.appendTo("#washing_dies__table thead");
+
+  // ajaxReturnData.forEach(function (value) {
+  //   $("<option>")
+  //     .val(value["id"])
+  //     .html(value["staff_name"])
+  //     .appendTo("#staff__select");
+  // });
 });
