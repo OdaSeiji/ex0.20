@@ -1081,4 +1081,38 @@ ORDER BY
 
 これが今使っている最終形。直近 1 年以内に絞った。多分、ソート機能が必要。その前に、入力の部分を進める。入力は出来るようになった。まだ戻らないけど、、、処理が終わったら、該当する金型をハッチングしている方がいい。どこにインサートされたか分からないから。
 
-Rack の入力も出来るようにしよう。という事で、Washing タンクと、ラックの入れかをしたい。
+Rack の入力も出来るようにしよう。という事で、Washing タンクと、ラックの入れかをしたい。では、現在ラッキングしている金型を出したい。金型別の最新の情報が
+
+```sql
+SELECT
+    t1.dies_id,
+    m_dies.die_number,
+    date_format(t1.do_sth_at, '%m/%d') AS on_rack
+FROM
+    t_dies_status AS t1
+    LEFT JOIN
+        m_dies
+    ON  t1.dies_id = m_dies.id
+WHERE
+    t1.do_sth_at = (
+        SELECT
+            MAX(t2.do_sth_at) AS do_sth_at
+        FROM
+            t_dies_status AS t2
+        WHERE
+            t1.dies_id = t2.dies_id
+            AND
+            t2.die_status_id = 10
+    )
+ORDER BY
+    date_format(t1.do_sth_at, '%y-%m-%d') DESC,
+    die_number
+LIMIT 50
+;
+```
+
+表の切替も OK。時間切れの場合、元の表にするのも OK。次は、washing タンクに移した場合、右側の表でその金型を表示する。必要なのは、金型 ID、と処理日に一致する部分を反転する機能。これ出来たけど、`die_id`を元に判断してしまうと、`t_die_status`からデータを消去するときに問題になるね。同じ金型で次に情報が入っているとき、そこを消すことが出来ない。なので、`t_die_status`の id を取っていないとだめですね。
+
+![](./img/20250524-01.png)
+
+`Washing Tank`も、`t_die_status.id`を表にする。OK。次は、右ウィンドウから左に戻す方。戻すのは出来た。次は、戻した金型に色を塗る事。完了。次は、右ウィンドウに検索用の input 要素を加えること。OK。次は、Racking をする人の、option を最適化すること。スタッフのリストも最適化できた。ほぼ、終わりが見えてきた。最後は、金型の履歴。これは、`press`と`status`の両方を見たい。日付、プレスまたは、status 情報。

@@ -1,5 +1,26 @@
 var summaryTable = new Object();
+var washingDieTable = new Object();
 var ajaxReturnData;
+var staffOrderMode = 4;
+let timeout;
+
+function resetTimeout() {
+  // Display the washing tank when there is no activity for a certain period of time.
+  const button = document.querySelector("#wash-mode__button");
+  clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    button.click();
+    // console.log("一定時間操作がありませんでした！");
+  }, 30000 * 5); // 30 * 5 秒（5 * 30000ミリ秒）後に動作する
+}
+
+// イベントリスナーを設定
+// window.addEventListener("mousemove", resetTimeout);
+window.addEventListener("keydown", resetTimeout);
+window.addEventListener("click", resetTimeout);
+
+// 初期化
+resetTimeout();
 
 const myAjax = {
   myAjax: function (fileName, sendData) {
@@ -60,7 +81,7 @@ function makeWashingDieTable() {
   };
   myAjax.myAjax(fileName, sendData);
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
-
+  washingDieTable = ajaxReturnData;
   makeStaffSelectSelect();
 }
 
@@ -88,6 +109,13 @@ $(document).on("click", "table#after_press_dies__table tbody tr", function () {
   checkWashingCondition();
 });
 
+$(document).on("click", "table#washing_dies__table tbody tr", function () {
+  $(this).toggleClass("selected-record");
+  // reset input values
+  $("#tank_number__select").val(0).addClass("required-input");
+  $("#staff__select").val(0).addClass("required-input");
+});
+
 $(document).on("click", "#after_press_dies__table tbody tr", function () {
   console.log("hello");
   var targetObj;
@@ -98,13 +126,10 @@ $(document).on("click", "#after_press_dies__table tbody tr", function () {
 });
 
 $(document).on("focus", "#edit-lotnumber__input", function () {
-  console.log("hello");
-
   const fileName = "./php/DieMaitenance/SelNoMantenanceDie.php";
   const sendData = {
     machine: "Dummy",
   };
-  // console.log(number);
   myAjax.myAjax(fileName, sendData);
 });
 
@@ -134,12 +159,8 @@ function checkWashingCondition() {
 
   console.log("Hello");
 
-  // console.log(selectDieObj);
-  // console.log(washingDate);
-  // console.log(washingTank);
-
   if (selectDieObj.length != 0 && washingTank != 0 && staffId != 0) {
-    // $("#washing__button").prop("disabled", false);
+    $("#washing__button").prop("disabled", false);
   }
 }
 
@@ -159,7 +180,6 @@ $("#washing__button").on("click", function () {
   dieIdObj = $("#after_press_dies__table tr.selected-record td:nth-child(1)");
 
   dieIdObj.each(function () {
-    // const row = [];
     data.push([
       $(this).html(),
       currentDayteTime,
@@ -168,8 +188,6 @@ $("#washing__button").on("click", function () {
       staffId,
     ]);
   });
-  console.log(data);
-  console.log(JSON.stringify(data));
 
   const fileName = "./php/DieMaitenance/InsWashingDie.php";
   const sendData = {
@@ -180,6 +198,20 @@ $("#washing__button").on("click", function () {
   makeAfterPressTalbe();
   makeWashingDieTable();
 
+  // color the selected dies name
+  $("#washing_dies__table tbody tr").each(function () {
+    const cellText = $(this).find("td").eq(0).text();
+    const targetTr = $(this);
+    dieIdObj.each(function () {
+      if (cellText === $(this).html()) {
+        targetTr.css("background-color", "#fffaad");
+      }
+    });
+    // reset input values
+    $("#tank_number__select").val(0).addClass("required-input");
+    $("#staff__select").val(0).addClass("required-input");
+  });
+
   $("#washing__button").prop("disabled", true);
 });
 
@@ -188,10 +220,6 @@ $(document).on("keyup", "#die-number-sort__text", function () {
   const text = $(this).val();
 
   $("#after_press_dies__table tbody").empty();
-
-  // console.log(summaryTable);
-
-  // return;
 
   summaryTable.forEach(function (trVal) {
     if (trVal["die_number"].startsWith(text)) {
@@ -202,18 +230,33 @@ $(document).on("keyup", "#die-number-sort__text", function () {
       $(newTr).appendTo("#after_press_dies__table tbody");
     }
   });
+});
 
-  // $("#summary__table_record").html(
-  //   $("#summary__table tbody tr").length + " items"
-  // );
+$(document).on("keyup", "#die-number-sort2__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#washing_dies__table tbody").empty();
+
+  washingDieTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#washing_dies__table tbody");
+    }
+  });
 });
 
 function makeStaffSelectSelect() {
-  fileName = "./php/DieMaitenance/SelStaffList.php";
-  sendData = {
-    dieName: "%",
+  const fileName = "./php/DieMaitenance/SelStaffList.php";
+  const sendData = {
+    staffOrder: staffOrderMode,
   };
   myAjax.myAjax(fileName, sendData);
+  $("#staff__select").empty();
+  $("#staff__select").append($("<option>").html("-").val(0));
 
   ajaxReturnData.forEach(function (value) {
     $("<option>")
@@ -224,33 +267,110 @@ function makeStaffSelectSelect() {
 }
 
 $(document).on("click", ".mode-change-button__wrapper button", function () {
+  if ($(this).hasClass("active")) {
+    // 同じボタンが押された場合は処理を中止
+    return;
+  }
+
   $("button.active").removeClass("active");
   $(this).addClass("active");
 
-  var tempObj;
-
-  tempObj = $(".mode-change-button__wrapper button");
-  console.log(tempObj);
+  switch ($(".mode-change-button__wrapper button.active").attr("id")) {
+    case "rack-mode__button":
+      makeRackingTable();
+      staffOrderMode = 10;
+      makeStaffSelectSelect();
+      break;
+    case "wash-mode__button":
+      makeWashingTable();
+      staffOrderMode = 4;
+      makeStaffSelectSelect();
+      break;
+  }
 });
 
 $(document).on("click", "#test__button", function () {
-  console.log("hello");
-  $("#washing_dies__table").find("tr").remove();
+  const fileName = "./php/DieMaitenance/DelDieStatus.php";
+  let afterPressTable = new Object();
+  // let afterPressTable = $("#after_press_dies__table tbody tr");
 
-  const tdTitles = ["id", "DieNumber", "Out Date"];
+  let sendData = {};
+  let removeDieStatusId = [];
+  let removeDieId = [];
+
+  $("#washing_dies__table tbody tr.selected-record").each(function () {
+    removeDieStatusId.push(Number($(this).find("td").eq(1).text()));
+    removeDieId.push(Number($(this).find("td").eq(0).text()));
+  });
+  // console.log(removeDieStatusId);
+  sendData = {
+    data: removeDieStatusId,
+  };
+  // delete selected information from t_dies_status
+  myAjax.myAjax(fileName, sendData);
+  makeWashingDieTable();
+  makeAfterPressTalbe();
+  // color selected dies at after press table
+  console.log(removeDieId);
+  afterPressTable = $("#after_press_dies__table tbody tr");
+  afterPressTable.each(function (index, element) {
+    const targetRecord = $(this);
+    let dieNumber = $(this).find("td").eq(0).html();
+    // console.log(dieNumber);
+
+    removeDieId.forEach((deletedId) => {
+      // console.log(Number(dieNumber), " : ", deletedId);
+      if (Number(dieNumber) === deletedId) {
+        console.log("OK");
+        targetRecord.addClass("selected-record");
+      }
+    });
+  });
+});
+
+function makeWashingTable() {
+  const tdTitles = ["dies_id", "id", "Die Number", "Tank", "Input Date"];
   const newRow = $("<tr>");
+  const fileName = "./php/DieMaitenance/SelWashingDie.php";
 
+  const sendData = {
+    dieName: "%",
+  };
+
+  $("#racking_dies__table").find("tr").remove();
   tdTitles.forEach((title) => {
-    const td = $("<td>").text(title);
+    const td = $("<th>").text(title);
     newRow.append(td);
   });
 
+  $("#racking_dies__table").attr("id", "washing_dies__table");
   newRow.appendTo("#washing_dies__table thead");
 
-  // ajaxReturnData.forEach(function (value) {
-  //   $("<option>")
-  //     .val(value["id"])
-  //     .html(value["staff_name"])
-  //     .appendTo("#staff__select");
-  // });
-});
+  myAjax.myAjax(fileName, sendData);
+
+  washingDieTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
+}
+
+function makeRackingTable() {
+  const tdTitles = ["dies_id", "id", "Die Number", "Input Date"];
+  const newRow = $("<tr>");
+  const fileName = "./php/DieMaitenance/SelRackingDies.php";
+  const sendData = {
+    dieName: "%",
+  };
+
+  $("#washing_dies__table").find("tr").remove();
+  tdTitles.forEach((title) => {
+    const td = $("<th>").text(title);
+    newRow.append(td);
+  });
+
+  $("#washing_dies__table").attr("id", "racking_dies__table");
+  newRow.appendTo("#racking_dies__table thead");
+
+  myAjax.myAjax(fileName, sendData);
+
+  // summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#racking_dies__table tbody"));
+}

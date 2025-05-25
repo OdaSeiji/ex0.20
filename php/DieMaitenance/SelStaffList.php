@@ -15,13 +15,13 @@
           )
         );
 
-      $prepare = $dbh->prepare("
+      $sql = "
         WITH  experience_staff AS (
         SELECT 
           t_dies_status.staff_id,
           COUNT(*) AS cnt
         FROM t_dies_status
-        WHERE t_dies_status.die_status_id = 8 
+        WHERE t_dies_status.die_status_id = :staff_order
             AND
             t_dies_status.do_sth_at >= DATE_SUB(CURDATE(), INTERVAL 2 MONTH)
         GROUP BY 	t_dies_status.staff_id
@@ -34,9 +34,11 @@
         LEFT JOIN experience_staff
           ON experience_staff.staff_id = m_staff.id
         ORDER BY cnt DESC, m_staff.id 
-      ");
+      ";
+
+      $prepare = $dbh->prepare($sql);
       // $_POST["targetId"] = 1;
-      // $prepare->bindValue(':dies_id', (INT)$_POST["dies_id"], PDO::PARAM_INT);
+      $prepare->bindValue(':staff_order', (INT)$_POST["staffOrder"], PDO::PARAM_INT);
       $prepare->execute();
       $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 

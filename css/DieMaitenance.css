@@ -1,3 +1,13 @@
+input.fillter-letters {
+  width: 50px;
+  margin-left: 5px;
+  text-align: left;
+  border-radius: 5px;
+  height: 22px;
+  background-color: #e8e8e8;
+  padding-left: 4px;
+}
+
 table {
   th:nth-child(1),
   td:nth-child(1) {
@@ -56,16 +66,6 @@ table#after_press_dies__table {
   td:nth-child(7) {
     text-align: center;
   }
-
-  input#die-number-sort__text {
-    width: 50px;
-    margin-left: 5px;
-    text-align: left;
-    border-radius: 5px;
-    height: 22px;
-    background-color: #e8e8e8;
-    padding-left: 4px;
-  }
 }
 
 table#washing_dies__table {
@@ -74,23 +74,59 @@ table#washing_dies__table {
   }
   th:nth-child(2),
   td:nth-child(2) {
-    width: 200px;
-  }
-  td:nth-child(2) {
-    text-align: left;
+    display: none;
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 50px;
+    width: 200px;
   }
   td:nth-child(3) {
+    text-align: left;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 50px;
+  }
+  td:nth-child(4) {
     text-align: center;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 90px;
+  }
+  td:nth-child(5) {
+    text-align: center;
+  }
+}
+
+table#racking_dies__table {
+  tbody {
+    height: 280px;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    display: none;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 200px;
+  }
+  td:nth-child(3) {
+    text-align: left;
   }
   th:nth-child(4),
   td:nth-child(4) {
     width: 90px;
   }
   td:nth-child(4) {
+    text-align: center;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 90px;
+  }
+  td:nth-child(5) {
     text-align: center;
   }
 }
