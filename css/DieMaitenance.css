@@ -131,20 +131,20 @@ table#racking_dies__table {
   }
 }
 
-table#test__table {
+table#status-history__table {
   tbody {
     height: 200px;
   }
   th:nth-child(2),
   td:nth-child(2) {
-    width: 200px;
+    width: 250px;
   }
   td:nth-child(2) {
     text-align: left;
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 120px;
+    width: 170px;
   }
   td:nth-child(3) {
     text-align: center;

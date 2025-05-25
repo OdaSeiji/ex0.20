@@ -1116,3 +1116,42 @@ LIMIT 50
 ![](./img/20250524-01.png)
 
 `Washing Tank`も、`t_die_status.id`を表にする。OK。次は、右ウィンドウから左に戻す方。戻すのは出来た。次は、戻した金型に色を塗る事。完了。次は、右ウィンドウに検索用の input 要素を加えること。OK。次は、Racking をする人の、option を最適化すること。スタッフのリストも最適化できた。ほぼ、終わりが見えてきた。最後は、金型の履歴。これは、`press`と`status`の両方を見たい。日付、プレスまたは、status 情報。
+
+```sql
+SELECT
+#    date_time,
+    date_format(date_time, '%y/%m/%d %H:%i') AS date_time1,
+#    die_status_id,
+    m_die_status.die_status
+FROM
+    (
+        SELECT
+            cast(concat(t_press.press_date_at, ' ', t_press.press_start_at) AS DATETIME) AS date_time,
+            11 AS die_status_id
+        FROM
+            t_press
+        WHERE
+            t_press.dies_id = @die_id
+        UNION
+        SELECT
+            t_dies_status.do_sth_at AS date_time,
+            t_dies_status.die_status_id
+        FROM
+            t_dies_status
+        WHERE
+            t_dies_status.dies_id = @die_id
+    ) AS t1
+    LEFT JOIN
+        m_die_status
+    on  t1.die_status_id = m_die_status.id
+ORDER BY
+    t1.date_time desc
+```
+
+有る金型の t_press と t_dies_status を合わせた表。これを実行するには、下記、INSERT を実行する事
+
+```sql
+INSERT INTO m_die_status (id, die_status) VALUES (11, 'Press')
+```
+
+選択した金型の履歴の表示 OK。ほぼこのページは完成した？

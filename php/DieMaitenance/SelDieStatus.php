@@ -1,42 +1,58 @@
 <?php
-  /* 25/05/12 */
-  $userid = "webuser";
-  $passwd = "";
-  // print_r($_POST);
-  
-  try {
-      $dbh = new PDO(
-          'mysql:host=localhost; dbname=extrusion; charset=utf8',
-          $userid,
-          $passwd,
-          array(
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::ATTR_EMULATE_PREPARES => false
-          )
-        );
+/* 25/05/12 */
+$userid = "webuser";
+$passwd = "";
+// print_r($_POST);
+// $_POST["die_id"] = 100;
+try {
+  $dbh = new PDO(
+    "mysql:host=localhost; dbname=extrusion; charset=utf8",
+    $userid,
+    $passwd,
+    [
+      PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+      PDO::ATTR_EMULATE_PREPARES => false,
+    ]
+  );
+  $sql = "
+          SELECT
+              'dummy',
+              date_format(date_time, '%y/%m/%d %H:%i') AS date_time,
+              m_die_status.die_status
+          FROM
+              (
+                  SELECT
+                      cast(concat(t_press.press_date_at, ' ', t_press.press_start_at) AS DATETIME) AS date_time,
+                      11 AS die_status_id
+                  FROM
+                      t_press
+                  WHERE
+                      t_press.dies_id = :die_id_1
+                  UNION
+                  SELECT
+                      t_dies_status.do_sth_at AS date_time,
+                      t_dies_status.die_status_id
+                  FROM
+                      t_dies_status
+                  WHERE
+                      t_dies_status.dies_id = :die_id_2
+              ) AS t1
+              LEFT JOIN
+                  m_die_status
+              on  t1.die_status_id = m_die_status.id
+          ORDER BY
+              t1.date_time desc        
+        ";
+  $prepare = $dbh->prepare($sql);
+  $prepare->bindValue(":die_id_1", (int) $_POST["die_id"], PDO::PARAM_INT);
+  $prepare->bindValue(":die_id_2", (int) $_POST["die_id"], PDO::PARAM_INT);
+  $prepare->execute();
+  $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
-      $prepare = $dbh->prepare("
-        SELECT 
-          t_dies_status.id,
-          m_dies.die_number,
-          date_format(t_dies_status.do_sth_at, '%y/%m/%d') AS date,
-          m_die_status.die_status
-        FROM t_dies_status
-        LEFT JOIN m_dies
-          ON t_dies_status.dies_id = m_dies.id
-        LEFT JOIN m_die_status
-          ON t_dies_status.die_status_id = m_die_status.id
-        where t_dies_status.dies_id = :dies_id
-        ORDER BY t_dies_status.do_sth_at desc
-      ");
-      // $_POST["targetId"] = 1;
-      $prepare->bindValue(':dies_id', (INT)$_POST["dies_id"], PDO::PARAM_INT);
-      $prepare->execute();
-      $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-
-      echo json_encode($result);
-  } catch (PDOException $e) {
-      $error = $e->getMessage();
-      echo json_encode($error);
-  }
-  $dbh = null;
+  echo json_encode($result);
+} catch (PDOException $e) {
+  $error = $e->getMessage();
+  echo json_encode($error);
+}
+$dbh = null;
+?>

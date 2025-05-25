@@ -85,14 +85,14 @@ function makeWashingDieTable() {
   makeStaffSelectSelect();
 }
 
-function fillTestTable(dies_id) {
-  // var dies_id = 100;
+function fillDieStatusHistoryTable(dies_id) {
+  // dies_id = 100;
   var fileName = "./php/DieMaitenance/SelDieStatus.php";
   var sendData = {
-    dies_id: dies_id,
+    die_id: dies_id,
   };
   myAjax.myAjax(fileName, sendData);
-  fillTableBody(ajaxReturnData, $("#test__table tbody"));
+  fillTableBody(ajaxReturnData, $("#status-history__table tbody"));
 }
 
 function fillDieHistoryTable(dies_id) {
@@ -121,8 +121,9 @@ $(document).on("click", "#after_press_dies__table tbody tr", function () {
   var targetObj;
   targetObj = $(this).find("td:first");
   console.log(targetObj.text());
-  fillTestTable(targetObj.text());
-  fillDieHistoryTable(targetObj.text());
+  fillDieStatusHistoryTable(targetObj.text());
+  $("#die_name").html($(this).find("td").eq(2).text());
+  // fillDieHistoryTable(targetObj.text());
 });
 
 $(document).on("focus", "#edit-lotnumber__input", function () {
