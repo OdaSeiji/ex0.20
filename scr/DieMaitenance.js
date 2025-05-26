@@ -81,6 +81,7 @@ function makeWashingDieTable() {
   };
   myAjax.myAjax(fileName, sendData);
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#washing_dies__table_cp tbody"));
   washingDieTable = ajaxReturnData;
   makeStaffSelectSelect();
 }
@@ -105,8 +106,15 @@ function fillDieHistoryTable(dies_id) {
 }
 
 $(document).on("click", "table#after_press_dies__table tbody tr", function () {
+  var targetObj;
   $(this).toggleClass("selected-record");
   checkWashingCondition();
+
+  // make target die history table
+  targetObj = $(this).find("td:first");
+  console.log(targetObj.text());
+  fillDieStatusHistoryTable(targetObj.text());
+  $("#die_name").html($(this).find("td").eq(2).text());
 });
 
 $(document).on("click", "table#washing_dies__table tbody tr", function () {
@@ -116,14 +124,11 @@ $(document).on("click", "table#washing_dies__table tbody tr", function () {
   $("#staff__select").val(0).addClass("required-input");
 });
 
-$(document).on("click", "#after_press_dies__table tbody tr", function () {
-  console.log("hello");
-  var targetObj;
-  targetObj = $(this).find("td:first");
-  console.log(targetObj.text());
-  fillDieStatusHistoryTable(targetObj.text());
-  $("#die_name").html($(this).find("td").eq(2).text());
-  // fillDieHistoryTable(targetObj.text());
+$(document).on("click", "table#racking_dies__table tbody tr", function () {
+  $(this).toggleClass("selected-record");
+  // reset input values
+  $("#tank_number__select").val(0).addClass("required-input");
+  $("#staff__select").val(0).addClass("required-input");
 });
 
 $(document).on("focus", "#edit-lotnumber__input", function () {
@@ -238,6 +243,7 @@ $(document).on("keyup", "#die-number-sort2__text", function () {
   const text = $(this).val();
 
   $("#washing_dies__table tbody").empty();
+  // $("#washing_dies__table_cp tbody").empty();
 
   washingDieTable.forEach(function (trVal) {
     if (trVal["die_number"].startsWith(text)) {
@@ -246,6 +252,7 @@ $(document).on("keyup", "#die-number-sort2__text", function () {
         $("<td>").html(trVal[tdVal]).appendTo(newTr);
       });
       $(newTr).appendTo("#washing_dies__table tbody");
+      // $(newTr).appendTo("#washing_dies__table_cp tbody");
     }
   });
 });
@@ -281,11 +288,13 @@ $(document).on("click", ".mode-change-button__wrapper button", function () {
       makeRackingTable();
       staffOrderMode = 10;
       makeStaffSelectSelect();
+      $("#tank_number__select").prop("disabled", true);
       break;
     case "wash-mode__button":
       makeWashingTable();
       staffOrderMode = 4;
       makeStaffSelectSelect();
+      $("#tank_number__select").prop("disabled", false);
       break;
   }
 });
@@ -351,6 +360,7 @@ function makeWashingTable() {
 
   washingDieTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#washing_dies__table_cp tbody"));
 }
 
 function makeRackingTable() {

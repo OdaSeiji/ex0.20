@@ -185,6 +185,48 @@ table#die-history__table {
   }
 }
 
+table#washing_dies__table_cp {
+  tbody {
+    height: 200px;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    display: none;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    /* display: none; */
+    width: 200px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 50px;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 90px;
+  }
+}
+
+table#racking_dies_2__table {
+  tbody {
+    height: 200px;
+  }
+  th:nth-child(2),
+  td:nth-child(2) {
+    display: none;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    /* display: none; */
+    width: 200px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 110px;
+  }
+}
+
 select {
   font-family: "Roboto_Mono";
 }
