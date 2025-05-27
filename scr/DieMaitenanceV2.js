@@ -42,8 +42,22 @@ const myAjax = {
 
 $(document).on(
   "click",
-  "table#washing_dies__table th, table#racking_dies__table th",
+  "table#washing_dies__table thead, table#racking_dies__table thead",
   function () {
-    console.log("Hello");
+    if ($(this).parent("table").prop("class") === "inactive__table") {
+      let idName;
+      idName = $(this).parent("table").prop("id");
+      switch (idName) {
+        case "racking_dies__table":
+          $("#racking_dies__table").removeClass("inactive__table");
+          $("#washing_dies__table").addClass("inactive__table");
+
+          break;
+        case "washing_dies__table":
+          $("#washing_dies__table").removeClass("inactive__table");
+          $("#racking_dies__table").addClass("inactive__table");
+          break;
+      }
+    }
   }
 );

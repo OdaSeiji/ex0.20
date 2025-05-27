@@ -89,3 +89,14 @@ caption {
     width: 60px;
   }
 }
+
+#right-arrow__img {
+  width: 32px;
+  height: 32px;
+  margin-top: 50px;
+}
+
+#arrow-img__wrapper {
+  display: flex;
+  align-items: center;
+}
