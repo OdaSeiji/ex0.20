@@ -260,6 +260,15 @@ input {
 input.required-input {
   background-color: #ffddae;
 }
+input.fillter-letters {
+  width: 50px;
+  margin-left: 5px;
+  text-align: left;
+  border-radius: 5px;
+  height: 22px;
+  background-color: #e8e8e8;
+  padding-left: 4px;
+}
 select {
   /* width: 100px; */
   /* height: 22px; */

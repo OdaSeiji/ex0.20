@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/toppage.css" />
+    <link rel="stylesheet" href="./css/DieMaitenanceV2.css" />
+    <title>Die Mentenance</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">
+          Die Maitenance Page
+        </div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+
+    <div class="main__wrapper">
+      <h1 class="translation">Wash Dies and Rask</h1>
+      <div class="button-container after_press_dies">
+        <table id="after_press_dies__table">
+          <caption class="table__caption">
+            After Press Dies List
+          </caption>
+          <thead>
+            <th>id</th>
+            <th>P Date</th>
+            <th>
+              Die Number
+              <input
+                class="fillter-letters"
+                id="die-number-sort__text"
+                type="text"
+              />
+            </th>
+            <th>P/T</th>
+            <th>Tms</th>
+            <th>NG</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            <tr>
+              <td>21</td>
+              <td>05/27</td>
+              <td>ABC12BDE-V02D</td>
+              <td>〇</td>
+              <td>2</td>
+              <td>NG</td>
+              <td>Wash</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table id="washing_dies__table">
+          <caption class="table__caption">
+            Washing Dies List
+          </caption>
+          <thead>
+            <tr>
+              <th>dies_id</th>
+              <th>id</th>
+              <th>
+                Die Number
+                <input
+                  class="fillter-letters"
+                  id="die-number-sort2__text"
+                  type="text"
+                />
+              </th>
+              <th>Tnk</th>
+              <th>I Date</th>
+              <!-- <td>Status</td> -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>32</td>
+              <td>32</td>
+              <td>MGPMA0B3-V03D</td>
+              <td>3</td>
+              <td>05/20</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table id="racking_dies__table" class="inactive__table">
+          <caption class="table__caption">
+            Racking Dies List
+          </caption>
+          <thead>
+            <tr>
+              <th>dies_id</th>
+              <th>id</th>
+              <th>
+                Die Number
+                <input
+                  class="fillter-letters"
+                  id="die-number-sort4__text"
+                  type="text"
+                />
+              </th>
+              <th>R Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>32</td>
+              <td>43</td>
+              <td>CG40DR-V02E</td>
+              <td>05/01</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="main__wrapper">
+      <h1 class="translation">Racking after washing</h1>
+      <div class="button-container racking__wrapper"></div>
+
+      <h1 class="translation">
+        Dies Status History
+        <div id="die_name">test</div>
+      </h1>
+      <div class="button-container"></div>
+    </div>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./scr/DieMaitenanceV2.js"></script>
+  </body>
+</html>
