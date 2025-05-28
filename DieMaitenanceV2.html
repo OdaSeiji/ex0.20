@@ -34,7 +34,7 @@
     </header>
 
     <div class="main__wrapper">
-      <h1 class="translation">Wash Dies and Rask</h1>
+      <h1 class="translation">Wash and Rack</h1>
       <div class="button-container after_press_dies">
         <table id="after_press_dies__table">
           <caption class="table__caption">
@@ -76,66 +76,109 @@
           />
         </div>
 
-        <table id="washing_dies__table">
-          <caption class="table__caption">
-            Washing Dies List
-          </caption>
-          <thead>
-            <tr>
-              <th>dies_id</th>
-              <th>id</th>
-              <th>
-                Die Number
-                <input
-                  class="fillter-letters"
-                  id="die-number-sort2__text"
-                  type="text"
-                />
-              </th>
-              <th>Tnk</th>
-              <th>I Date</th>
-              <!-- <td>Status</td> -->
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>32</td>
-              <td>32</td>
-              <td>MGPMA0B3-V03D</td>
-              <td>3</td>
-              <td>05/20</td>
-            </tr>
-          </tbody>
-        </table>
+        <div id="washing__div" class="sub__container">
+          <table id="washing_dies__table">
+            <caption class="table__caption washing-dies__caption">
+              Washing Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="die-number-sort2__text"
+                    type="text"
+                  />
+                </th>
+                <th>Tnk</th>
+                <th>I Date</th>
+                <!-- <td>Status</td> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>32</td>
+                <td>MGPMA0B3-V03D</td>
+                <td>3</td>
+                <td>05/20</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Tank No</div>
+            </div>
+            <select name="" id="tank_number__select" class="required-input">
+              <option value="0">-</option>
+              <option value="1">No.1 tank</option>
+              <option value="2">No.2 tank</option>
+              <option value="3">No.3 tank</option>
+              <option value="4">No.4 tank</option>
+            </select>
+          </div>
 
-        <table id="racking_dies__table" class="inactive__table">
-          <caption class="table__caption">
-            Racking Dies List
-          </caption>
-          <thead>
-            <tr>
-              <th>dies_id</th>
-              <th>id</th>
-              <th>
-                Die Number
-                <input
-                  class="fillter-letters"
-                  id="die-number-sort4__text"
-                  type="text"
-                />
-              </th>
-              <th>R Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>32</td>
-              <td>43</td>
-              <td>CG40DR-V02E</td>
-              <td>05/01</td>
-            </tr>
-          </tbody>
-        </table>
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select name="" id="wash-staff__select" class="required-input">
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="washing_date__input" type="date" />
+          </div>
+        </div>
+
+        <div id="racking__div" class="sub__container inactive__div">
+          <table id="racking_dies__table" class="inactive__table">
+            <caption
+              class="table__caption racking-dies__caption inactive__caption"
+            >
+              Racking Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="die-number-sort4__text"
+                    type="text"
+                  />
+                </th>
+                <th>R Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>43</td>
+                <td>CG40DR-V02E</td>
+                <td>05/01</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select name="" id="rack-staff__select" class="required-input">
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="racking_date__input" type="date" />
+          </div>
+        </div>
       </div>
     </div>
 

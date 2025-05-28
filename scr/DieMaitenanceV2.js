@@ -40,6 +40,67 @@ const myAjax = {
   },
 };
 
+function fillTableBody(data, tbodyDom) {
+  $(tbodyDom).empty();
+  data.forEach(function (trVal) {
+    let newTr = $("<tr>");
+    Object.keys(trVal).forEach(function (tdVal, index) {
+      $("<td>").html(trVal[tdVal]).appendTo(newTr);
+    });
+    $(newTr).appendTo(tbodyDom);
+  });
+}
+
+$(function () {
+  const today = new Date();
+  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
+
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+  makeWashingStaffSelectSelect();
+  $("#washing_date__input").val(formattedDate);
+});
+
+function makeAfterPressTalbe() {
+  var fileName = "./php/DieMaitenance/SelAfterPressDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+  const today = new Date();
+  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
+
+  myAjax.myAjax(fileName, sendData);
+  summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#after_press_dies__table tbody"));
+}
+
+function makeWashingDieTable() {
+  var fileName = "./php/DieMaitenance/SelWashingDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+  myAjax.myAjax(fileName, sendData);
+  fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
+  washingDieTable = ajaxReturnData;
+}
+
+function makeWashingStaffSelectSelect() {
+  const fileName = "./php/DieMaitenance/SelStaffList.php";
+  const sendData = {
+    staffOrder: staffOrderMode,
+  };
+  myAjax.myAjax(fileName, sendData);
+  $("#wash-staff__select").empty();
+  $("#wash-staff__select").append($("<option>").html("-").val(0));
+
+  ajaxReturnData.forEach(function (value) {
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo("#wash-staff__select");
+  });
+}
+
 $(document).on(
   "click",
   "table#washing_dies__table thead, table#racking_dies__table thead",
@@ -48,16 +109,34 @@ $(document).on(
       let idName;
       idName = $(this).parent("table").prop("id");
       switch (idName) {
-        case "racking_dies__table":
+        case "racking_dies__table": // racking mode
           $("#racking_dies__table").removeClass("inactive__table");
           $("#washing_dies__table").addClass("inactive__table");
+          $("caption.washing-dies__caption").addClass("inactive__caption");
+          $("caption.racking-dies__caption").removeClass("inactive__caption");
+          $("#racking__div").removeClass("inactive__div");
+          $("#washing__div").addClass("inactive__div");
+          $("#washing__div select").val("0").addClass("required-input");
 
           break;
-        case "washing_dies__table":
+        case "washing_dies__table": // washing mode
           $("#washing_dies__table").removeClass("inactive__table");
           $("#racking_dies__table").addClass("inactive__table");
+          $("caption.racking-dies__caption").addClass("inactive__caption");
+          $("caption.washing-dies__caption").removeClass("inactive__caption");
+          $("#washing__div").removeClass("inactive__div");
+          $("#racking__div").addClass("inactive__div");
           break;
       }
     }
+  }
+);
+
+$(document).on(
+  "change",
+  "div.sub__container:not(.inactive__div) select",
+  function () {
+    console.log("Hello");
+    $(this).removeClass("required-input");
   }
 );
