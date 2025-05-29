@@ -136,8 +136,13 @@ $(document).on(
   "change",
   "div.sub__container:not(.inactive__div) select",
   function () {
+    let targetObj = $(this);
     console.log("Hello");
-    $(this).removeClass("required-input");
+    if ($(this).val() == 0) {
+      targetObj.addClass("required-input");
+    } else {
+      targetObj.removeClass("required-input");
+    }
   }
 );
 
@@ -170,9 +175,6 @@ $("#right-arrow__img").on("click", function () {
     ]);
   });
 
-  console.log(data);
-  return;
-
   const fileName = "./php/DieMaitenance/InsWashingDie.php";
   const sendData = {
     tableData: JSON.stringify(data),
@@ -182,6 +184,7 @@ $("#right-arrow__img").on("click", function () {
   makeAfterPressTalbe();
   makeWashingDieTable();
 
+  // return;
   // color the selected dies name
   $("#washing_dies__table tbody tr").each(function () {
     const cellText = $(this).find("td").eq(0).text();
@@ -195,7 +198,7 @@ $("#right-arrow__img").on("click", function () {
     $("#tank_number__select").val(0).addClass("required-input");
     $("#staff__select").val(0).addClass("required-input");
   });
-  $("#washing__button").prop("disabled", true);
+  $(this).prop("disabled", true);
 });
 
 $(document).on("click, change", "#washing__div", function () {
