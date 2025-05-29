@@ -63,7 +63,11 @@ caption.inactive__caption {
 }
 
 .title__wrapper:nth-child(1) {
-  margin-top: 10px;
+  /* margin-top: 15px; */
+}
+
+table {
+  margin-bottom: 20px;
 }
 
 #after_press_dies__table {
@@ -141,10 +145,23 @@ caption.inactive__caption {
 #right-arrow__img {
   width: 32px;
   height: 32px;
-  margin-bottom: 130px;
+  margin-bottom: 50px;
+  cursor: pointer;
+}
+
+#left-arrow__img {
+  transform: rotate(180deg);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
 }
 
 #arrow-img__wrapper {
   display: flex;
   align-items: center;
+  div {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 160px;
+  }
 }

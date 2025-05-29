@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/toppage.css" />
     <link rel="stylesheet" href="./css/DieMaitenanceV2.css" />
-    <title>Die Mentenance</title>
+    <title>Die Mentenance V2</title>
   </head>
   <body>
     <header>
@@ -69,11 +69,18 @@
           </tbody>
         </table>
         <div id="arrow-img__wrapper">
-          <img
-            id="right-arrow__img"
-            src="./img/right_arrow-3.png"
-            alt="arrow"
-          />
+          <div>
+            <img
+              id="right-arrow__img"
+              src="./img/right_arrow-4.png"
+              alt="arrow"
+            />
+            <img
+              id="left-arrow__img"
+              src="./img/right_arrow-4.png"
+              alt="arrow"
+            />
+          </div>
         </div>
 
         <div id="washing__div" class="sub__container">
@@ -112,7 +119,11 @@
             <div class="title__wrapper">
               <div class="title__letters">Tank No</div>
             </div>
-            <select name="" id="tank_number__select" class="required-input">
+            <select
+              name=""
+              id="tank_number__select"
+              class="save-data required-input"
+            >
               <option value="0">-</option>
               <option value="1">No.1 tank</option>
               <option value="2">No.2 tank</option>
@@ -125,13 +136,17 @@
             <div class="title__wrapper">
               <div class="title__letters">Staff</div>
             </div>
-            <select name="" id="wash-staff__select" class="required-input">
+            <select
+              name=""
+              id="wash-staff__select"
+              class="save-data required-input"
+            >
               <option value="0">-</option>
             </select>
           </div>
           <div class="input__wrapper">
             <div class="title__wrapper">Input Date</div>
-            <input id="washing_date__input" type="date" />
+            <input id="washing_date__input" class="save-data" type="date" />
           </div>
         </div>
 
@@ -184,7 +199,9 @@
 
     <div class="main__wrapper">
       <h1 class="translation">Racking after washing</h1>
-      <div class="button-container racking__wrapper"></div>
+      <div class="button-container racking__wrapper">
+        <button id="test__button">TEST</button>
+      </div>
 
       <h1 class="translation">
         Dies Status History

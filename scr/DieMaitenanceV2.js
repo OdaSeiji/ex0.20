@@ -140,3 +140,93 @@ $(document).on(
     $(this).removeClass("required-input");
   }
 );
+
+$(document).on("click", "tbody tr", function () {
+  $(this).toggleClass("selected-record");
+});
+
+$("#right-arrow__img").on("click", function () {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
+  const currentDayte = $("#washing_date__input").val();
+  const tankNumber = $("#tank_number__select").val();
+  const staffId = $("#staff__select").val();
+  const data = [];
+  var dieIdObj;
+
+  dieIdObj = $("#after_press_dies__table tr.selected-record td:nth-child(1)");
+
+  dieIdObj.each(function () {
+    data.push([
+      $(this).html(),
+      currentDayteTime,
+      tankNumber,
+      currentDayte,
+      staffId,
+    ]);
+  });
+
+  console.log(data);
+  return;
+
+  const fileName = "./php/DieMaitenance/InsWashingDie.php";
+  const sendData = {
+    tableData: JSON.stringify(data),
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+
+  // color the selected dies name
+  $("#washing_dies__table tbody tr").each(function () {
+    const cellText = $(this).find("td").eq(0).text();
+    const targetTr = $(this);
+    dieIdObj.each(function () {
+      if (cellText === $(this).html()) {
+        targetTr.css("background-color", "#fffaad");
+      }
+    });
+    // reset input values
+    $("#tank_number__select").val(0).addClass("required-input");
+    $("#staff__select").val(0).addClass("required-input");
+  });
+  $("#washing__button").prop("disabled", true);
+});
+
+$(document).on("click, change", "#washing__div", function () {
+  checkWashingCondition();
+});
+
+$(document).on("click", "#after_press_dies__table", function () {
+  console.log("Hello");
+  checkWashingCondition();
+});
+
+function checkWashingCondition() {
+  let inputValidation = true;
+  // Input Validation
+  $("#washing__div .save-data").each(function () {
+    if ($(this).val() == 0) {
+      inputValidation = false;
+    }
+  });
+
+  if ($("#after_press_dies__table .selected-record").length == 0) {
+    inputValidation = false;
+  }
+
+  if (inputValidation) {
+    $("#right-arrow__img").attr("src", "./img/right_arrow-3.png");
+  } else {
+    $("#right-arrow__img").attr("src", "./img/right_arrow-4.png");
+  }
+}
+
+$("#test__button").on("click", function () {
+  checkWashingCondition();
+});

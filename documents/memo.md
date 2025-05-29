@@ -1162,3 +1162,6 @@ INSERT INTO m_die_status (id, die_status) VALUES (11, 'Press')
 色々ありすぎたので、位置から作り直している。アクティブな表を作ることとしよう。
 
 テーブルの下に、タンクナンバーとかセレクトが欲しい。
+そこらへんは終わって、`activate`も OK。
+
+次は、`after-press`テーブルでクリックした場合、`washing`テーブルに移動するところ。
