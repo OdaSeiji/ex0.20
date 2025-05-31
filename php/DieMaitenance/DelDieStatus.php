@@ -3,7 +3,22 @@
   $userid = "webuser";
   $passwd = "";
   // print_r($_POST);
-  $data = $_POST['data'];
+  $data = $_POST['dieStatudId'];
+  // print_r($data);
+  
+  // $data = [1234, 5678];
+  // print_r($data);
+
+  // exit();
+  // if (is_array($data)) {
+  //   echo "$data は配列です。<br>";
+  // } else {
+  //   echo "$data は配列ではありません。<br>";
+  // }
+  // print_r(is_array($data));
+
+
+  // exit();
   
   try {
       $dbh = new PDO(
@@ -24,10 +39,10 @@
             $prepare->execute();
           }
         }
+        echo json_encode(["status" => "success"]);
 
-        $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
-
-        echo json_encode($result);
+        // $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
+        // echo json_encode($result);
 
   } catch (PDOException $e) {
       $error = $e->getMessage();

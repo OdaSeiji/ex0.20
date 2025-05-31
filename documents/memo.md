@@ -1165,3 +1165,65 @@ INSERT INTO m_die_status (id, die_status) VALUES (11, 'Press')
 そこらへんは終わって、`activate`も OK。
 
 次は、`after-press`テーブルでクリックした場合、`washing`テーブルに移動するところ。
+
+一つ目、〇のフォントを変えてみるか？変えた、違いが分からない。
+次は、選択した金型を戻すところ。
+
+```javascript
+sendData = {
+  // dieStatudId: JSON.stringify(dieStatusId),
+  dieStatudId: dieStatusId,
+};
+```
+
+配列を、`php`に送るところでかなり躓く。コメントアウトしているのが、以前のやり方。今回の配列は、`dieStatusId`だけを送っているので、直接送ってしまっていいみたい。これが表形式の配列を送る場合は、コメントアウトしている方を使うべき。
+
+次は、`cancel`ボタンを active にする方法。
+まずは、両方の金型を選択できないようにすべきでは？washing までは出来た。次は、racking。このプログラムのこの部分は良くないね。。。
+
+```javascript
+$(document).on(
+  "click",
+  "table#washing_dies__table thead, table#racking_dies__table thead",
+  function () {
+    if ($(this).parent("table").prop("class") === "inactive__table") {
+      let idName;
+      idName = $(this).parent("table").prop("id");
+      switch (idName) {
+        case "racking_dies__table": // racking mode
+          $("#racking_dies__table").removeClass("inactive__table");
+          $("#washing_dies__table").addClass("inactive__table");
+          $("caption.washing-dies__caption").addClass("inactive__caption");
+          $("caption.racking-dies__caption").removeClass("inactive__caption");
+          $("#racking__div").removeClass("inactive__div");
+          $("#washing__div").addClass("inactive__div");
+          $("#washing__div select").val("0").addClass("required-input");
+
+          $("#after_press_dies__table .selected-record").removeClass(
+            "selected-record"
+          );
+
+          // make staff select
+          staffOrderMode = 10;
+          makeRackingStaffSelect();
+
+          break;
+        case "washing_dies__table": // washing mode
+          $("#washing_dies__table").removeClass("inactive__table");
+          $("#racking_dies__table").addClass("inactive__table");
+          $("caption.racking-dies__caption").addClass("inactive__caption");
+          $("caption.washing-dies__caption").removeClass("inactive__caption");
+          $("#washing__div").removeClass("inactive__div");
+          $("#racking__div").addClass("inactive__div");
+
+          $("#after_press_dies__table .selected-record").removeClass(
+            "selected-record"
+          );
+          break;
+      }
+    }
+  }
+);
+```
+
+それぞれ分けて作った方がいい。二つをまとめて作る意味がない。地味だが矢印の file ネームを数字で分けるのは分かりにくい。次、racking から戻す方。ほぼ、やりきったかな。
