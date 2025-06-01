@@ -1,5 +1,6 @@
 let summaryTable = new Object();
 let washingDieTable = new Object();
+let rackingDieTable = new Object();
 let ajaxReturnData;
 let staffOrderMode = 4;
 let timeout;
@@ -303,7 +304,6 @@ $("#right-arrow__img").on("click", function () {
         const targetTr = $(this);
         dieIdObj.each(function () {
           if (cellText === $(this).html()) {
-            // targetTr.css("background-color", "#fffaad");
             targetTr.addClass("selected-record");
           }
         });
@@ -314,6 +314,16 @@ $("#right-arrow__img").on("click", function () {
       $(this).prop("disabled", true);
       break;
     case "racking":
+      $("#racking_dies__table tbody tr").each(function () {
+        const cellText = $(this).find("td").eq(0).text();
+        const targetTr = $(this);
+        dieIdObj.each(function () {
+          if (cellText === $(this).html()) {
+            targetTr.addClass("selected-record");
+          }
+        });
+      });
+      // reset input values
       $("#rack-staff__select").val("0").addClass("required-input");
       break;
   }
@@ -426,6 +436,7 @@ function makeRackingTable() {
   $("#racking_dies__table tbody").empty();
   myAjax.myAjax(fileName, sendData);
 
+  rackingDieTable = ajaxReturnData;
   // summaryTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#racking_dies__table tbody"));
 }
@@ -473,3 +484,54 @@ function uncheckRackingCondition() {
     $("#left-arrow__img").attr("src", "./img/right_arrow-4.png");
   }
 }
+
+$(document).on("keyup", "#after-press-die-number-sort__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#after_press_dies__table tbody").empty();
+
+  summaryTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#after_press_dies__table tbody");
+    }
+  });
+});
+
+$(document).on("keyup", "#washing-die-number-sort__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#washing_dies__table tbody").empty();
+
+  washingDieTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#washing_dies__table tbody");
+    }
+  });
+});
+
+$(document).on("keyup", "#racking-die-number-sort__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#racking_dies__table tbody").empty();
+
+  rackingDieTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#racking_dies__table tbody");
+    }
+  });
+});

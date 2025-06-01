@@ -3,7 +3,8 @@ td:nth-child(1) {
   /* width: 200px; */
   display: none;
 }
-caption {
+caption,
+.caption__div {
   letter-spacing: 0.03em;
   text-align: left;
   font-size: 14pt;
@@ -160,7 +161,7 @@ table {
   cursor: pointer;
 }
 
-#arrow-img__wrapper {
+.arrow-img__wrapper {
   display: flex;
   align-items: center;
   div {
@@ -168,4 +169,14 @@ table {
     flex-direction: column;
     padding-bottom: 160px;
   }
+}
+
+/* .caption__div {
+} */
+.die-fix__wrapper {
+  height: 300px;
+  display: flex;
+  height: 300px;
+  border: 5px solid rgb(180, 217, 223);
+  border-radius: 5px;
 }
