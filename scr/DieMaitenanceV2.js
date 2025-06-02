@@ -535,3 +535,28 @@ $(document).on("keyup", "#racking-die-number-sort__text", function () {
     }
   });
 });
+
+function ajaxFileUpload() {
+  // var formdata = new FormData($("#file-upload__form").get(0));
+  var formdata = new FormData($("#file-upload__form").get(0));
+  var fileName;
+
+  $.ajax({
+    url: "./php/DailyReport/FileUpload.php",
+    type: "POST",
+    data: formdata,
+    cache: false,
+    processData: false,
+    contentType: false,
+    dataType: "html",
+    // async: false,
+  })
+    .done(function (data, textStatus, jqXHR) {
+      // なぜか受渡しないと、上手く値が入らない。
+      fileName = data;
+    })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      alert("fail");
+    });
+  return fileName;
+}

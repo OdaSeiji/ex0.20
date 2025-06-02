@@ -175,8 +175,55 @@ table {
 } */
 .die-fix__wrapper {
   height: 300px;
+  width: 400px;
   display: flex;
-  height: 300px;
+  flex-direction: column;
   border: 5px solid rgb(180, 217, 223);
   border-radius: 5px;
+}
+
+.radio__button {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.sub__wrapper {
+  display: flex;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.die-fix__wrapper button {
+  margin-left: 20px;
+  margin-right: 20px;
+  height: 40px;
+  width: 140px;
+}
+
+#file-upload__input {
+  display: none;
+}
+#file-upload__input + label {
+  background-color: white;
+  display: inline-block;
+  cursor: pointer;
+  border: solid 1px #377a94;
+  width: 150px;
+  height: 25px;
+}
+
+.die-fix__wrapper .input__wrapper {
+  margin-left: 10px;
+  margin-right: 10px;
+  .title__wrapper {
+    width: 150px;
+  }
+  input {
+    width: 150px;
+  }
+}
+
+#fixing-date__input {
+  width: 149px;
 }

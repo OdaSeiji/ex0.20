@@ -1229,3 +1229,27 @@ $(document).on(
 それぞれ分けて作った方がいい。二つをまとめて作る意味がない。地味だが矢印の file ネームを数字で分けるのは分かりにくい。次、racking から戻す方。ほぼ、やりきったかな。
 
 各テーブルの、検索も付けた。
+いよいよ file＿name のテーブルを作る
+
+```sql
+CREATE TABLE t_dies_status_filename (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_name VARCHAR(100),
+    time_stamp TIMESTAMP,
+    t_dies_status_id INT
+);
+```
+
+```sql
+ALTER TABLE t_dies_status_filename
+ADD CONSTRAINT fk_t_dies_status
+FOREIGN KEY (t_dies_status_id)
+REFERENCES
+```
+
+上ではエラーが出るかな、、、
+
+```sql
+ALTER TABLE `t_dies_status_filename`
+	ADD CONSTRAINT `FK_t_dies_status_filename_t_dies_status` FOREIGN KEY (`t_dies_status_id`) REFERENCES `t_dies_status` (`id`);
+```
