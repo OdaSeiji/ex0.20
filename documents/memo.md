@@ -1253,3 +1253,5 @@ REFERENCES
 ALTER TABLE `t_dies_status_filename`
 	ADD CONSTRAINT `FK_t_dies_status_filename_t_dies_status` FOREIGN KEY (`t_dies_status_id`) REFERENCES `t_dies_status` (`id`);
 ```
+
+ファイルのアップロード。アップロードプログラム自身はあっさり動く。次は、アップロードされたファイル名の表示。

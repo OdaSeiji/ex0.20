@@ -197,6 +197,11 @@
             <div class="title__wrapper">Input Date</div>
             <input id="racking_date__input" type="date" / class="save-data">
           </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Note</div>
+            <!-- <input id="note__input" type="" / class="save-data"> -->
+            <textarea name="" id="note__textarea"></textarea>
+          </div>
         </div>
       </div>
     </div>
@@ -284,8 +289,20 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+      <h1 class="translation">
+        Die Fixing
+        <div id="die_name">test</div>
+      </h1>
+      <div class="button-container">
         <div>
-          <div class="caption__div">Die Fix</div>
+          <div class="caption__div">Dies List</div>
+          <div id="fix-die__list" class="die-fix__wrapper"></div>
+        </div>
+
+        <div>
+          <div class="caption__div">Fix Content</div>
           <div class="die-fix__wrapper">
             <div class="radio__button">
               <button id="grind__button">Griding</button>
@@ -298,21 +315,56 @@
               </div>
               <div class="input__wrapper">
                 <div class="title__wrapper">Add File</div>
-                <form id="file-upload__form">
+                <!-- <form id="file-upload__form">
                   <input type="file" name="file_01" id="file-upload__input" />
                   <label id="file_name" for="file-upload__input">no file</label>
+                </form> -->
+                <form id="uploadForm">
+                  <input type="file" name="file_01" id="fileInput__input" />
+                  <label id="file_name__label" for="fileInput__input"
+                    >no file</label
+                  >
                 </form>
               </div>
             </div>
           </div>
         </div>
+
+        <div>
+          <div class="caption__div">Pictures</div>
+          <div class="die-fix__wrapper"></div>
+        </div>
+
+        <button id="test__button">Save</button>
       </div>
 
-      <h1 class="translation">
-        Dies Status History
-        <div id="die_name">test</div>
-      </h1>
-      <div class="button-container"></div>
+      <h1 class="translation">Die history</h1>
+      <div class="button-container">
+        <table id="all-dies__table" class="">
+          <caption class="table__caption racking-dies__caption">
+            All Dies List
+          </caption>
+          <thead>
+            <tr>
+              <th>dies_id</th>
+              <th>
+                Die Number
+                <input
+                  class="fillter-letters"
+                  id="racking-die-number-sort-2__text"
+                  type="text"
+                />
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>32</td>
+              <td>CG40DR-V02E</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <script src="./lib/jquery.min.js"></script>
     <script src="./scr/DieMaitenanceV2.js"></script>

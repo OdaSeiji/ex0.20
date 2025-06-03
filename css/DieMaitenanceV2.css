@@ -47,7 +47,8 @@ caption.inactive__caption {
     border-color: #b4d9df;
   }
   select,
-  input {
+  input,
+  textarea {
     border-color: #b4d9df;
     background-color: #f0f0f0;
     color: #a0a0a0;
@@ -174,7 +175,7 @@ table {
 /* .caption__div {
 } */
 .die-fix__wrapper {
-  height: 300px;
+  height: 400px;
   width: 400px;
   display: flex;
   flex-direction: column;
@@ -201,16 +202,17 @@ table {
   width: 140px;
 }
 
-#file-upload__input {
+#fileInput__input {
   display: none;
 }
-#file-upload__input + label {
+#fileInput__input + label {
   background-color: white;
   display: inline-block;
   cursor: pointer;
   border: solid 1px #377a94;
   width: 150px;
   height: 25px;
+  font-size: 12pt;
 }
 
 .die-fix__wrapper .input__wrapper {
@@ -226,4 +228,24 @@ table {
 
 #fixing-date__input {
   width: 149px;
+}
+
+/* #note__input {
+  text-align: left;
+} */
+
+textarea {
+  width: 176px;
+  border: 1px solid #377a94;
+}
+
+#fix-die__list {
+  width: 300px;
+}
+
+#all-dies__table {
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 200px;
+  }
 }

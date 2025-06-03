@@ -62,6 +62,7 @@ $(function () {
   makeWashingStaffSelectSelect();
   $("#washing_date__input").val(formattedDate);
   $("#racking_date__input").val(formattedDate);
+  $("#fixing-date__input").val(formattedDate);
 });
 
 function makeAfterPressTalbe() {
@@ -255,6 +256,7 @@ $("#right-arrow__img").on("click", function () {
   const currentDayte = $("#washing_date__input").val();
   const tankNumber = $("#tank_number__select").val();
   const staffId = $("#staff__select").val();
+  const note = $("#note__textarea").val();
   const data = [];
   let status;
   let dieIdObj;
@@ -277,8 +279,12 @@ $("#right-arrow__img").on("click", function () {
       currentDayte,
       staffId,
       status,
+      note,
     ]);
   });
+
+  // console.log(data);
+  // return;
 
   const fileName = "./php/DieMaitenance/InsDieStatus.php";
   const sendData = {
@@ -308,9 +314,9 @@ $("#right-arrow__img").on("click", function () {
           }
         });
         // reset input values
-        $("#tank_number__select").val(0).addClass("required-input");
-        $("#staff__select").val(0).addClass("required-input");
       });
+      $("#tank_number__select").val(0).addClass("required-input");
+      $("#staff__select").val(0).addClass("required-input");
       $(this).prop("disabled", true);
       break;
     case "racking":
@@ -325,6 +331,7 @@ $("#right-arrow__img").on("click", function () {
       });
       // reset input values
       $("#rack-staff__select").val("0").addClass("required-input");
+      $("#note__textarea").val("");
       break;
   }
   $("#right-arrow__img").attr("src", "./img/right_arrow-4.png");
@@ -402,6 +409,7 @@ $("#left-arrow__img").on("click", function () {
 
   // return;
   makeAfterPressTalbe();
+  makeWashingDieTable();
   makeRackingTable();
 
   $("#left-arrow__img").attr("src", "./img/right_arrow-4.png");
@@ -536,27 +544,39 @@ $(document).on("keyup", "#racking-die-number-sort__text", function () {
   });
 });
 
+$(document).on("click", "#test__button", function () {
+  var temp;
+  console.log("hello");
+  temp = ajaxFileUpload();
+  console.log(temp);
+});
+
 function ajaxFileUpload() {
-  // var formdata = new FormData($("#file-upload__form").get(0));
-  var formdata = new FormData($("#file-upload__form").get(0));
-  var fileName;
+  const formData = new FormData();
+  let responseData;
+  formData.append("file", $("#fileInput__input")[0].files[0]);
 
   $.ajax({
-    url: "./php/DailyReport/FileUpload.php",
+    url: "./php/DieMaitenance/upload.php",
     type: "POST",
-    data: formdata,
-    cache: false,
+    data: formData,
     processData: false,
     contentType: false,
-    dataType: "html",
-    // async: false,
-  })
-    .done(function (data, textStatus, jqXHR) {
-      // なぜか受渡しないと、上手く値が入らない。
-      fileName = data;
-    })
-    .fail(function (jqXHR, textStatus, errorThrown) {
-      alert("fail");
-    });
-  return fileName;
+    cache: false,
+    async: false,
+    success: function (response) {
+      console.log("sccess to file upload");
+      responseData = response;
+    },
+    error: function (error) {
+      console.log("error to upload:" + error);
+    },
+  });
+  return responseData;
 }
+
+$(document).on("change", "#fileInput__input", function () {
+  const fileName = $(this).val().split("\\").pop();
+  console.log(fileName);
+  $("#file_name__label").html(fileName);
+});
