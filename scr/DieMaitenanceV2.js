@@ -1,10 +1,12 @@
 let summaryTable = new Object();
 let washingDieTable = new Object();
 let rackingDieTable = new Object();
+let fixDieTable = new Object();
 let ajaxReturnData;
 let staffOrderMode = 4;
 let timeout;
 let washingOrRacking = "washing";
+let uploadFile = [];
 
 function resetTimeout() {
   // Display the washing tank when there is no activity for a certain period of time.
@@ -172,10 +174,6 @@ $(document).on(
     }
   }
 );
-
-$(document).on("click", "tbody tr", function () {
-  // $(this).toggleClass("selected-record");
-});
 
 // table record activation
 
@@ -547,8 +545,9 @@ $(document).on("keyup", "#racking-die-number-sort__text", function () {
 $(document).on("click", "#test__button", function () {
   var temp;
   console.log("hello");
-  temp = ajaxFileUpload();
+  // temp = ajaxFileUpload();
   console.log(temp);
+  uploadFile.push(ajaxFileUpload());
 });
 
 function ajaxFileUpload() {
@@ -579,4 +578,65 @@ $(document).on("change", "#fileInput__input", function () {
   const fileName = $(this).val().split("\\").pop();
   console.log(fileName);
   $("#file_name__label").html(fileName);
+});
+
+$(document).on("click", "#fixing-die__table thead", function () {
+  makeFixDieList();
+});
+
+function makeFixDieList() {
+  console.log("hello");
+
+  const fileName = "./php/DieMaitenance/SelFixDieList.php";
+  const sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  fixDieTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#fixing-die__table tbody"));
+}
+
+$(document).on("click", "#fixing-die__table tbody tr", function () {
+  if ($(this).hasClass("selected-record")) {
+    $(this).removeClass("selected-record");
+    in_activeFix();
+  } else {
+    $("#fixing-die__table tr.selected-record").removeClass("selected-record");
+    $(this).addClass("selected-record");
+    activeFix();
+  }
+});
+
+function activeFix() {
+  $("#fix-content__div").removeClass("inactive__div");
+}
+
+function in_activeFix() {
+  $("#fix-content__div").addClass("inactive__div");
+}
+
+$(document).on("click", "#add_test", function () {
+  let temp;
+  let newImg;
+  temp = JSON.parse(ajaxFileUpload());
+  uploadFile.push(temp.fileName);
+
+  newImg = $("<img>").attr(
+    "src",
+    "./upload/02_die_maitenance/" + temp.fileName
+  );
+  $("#picture__div").append(newImg);
+
+  $("#fileInput__input").val("");
+  $("#file_name__label").html("no file");
+});
+
+$(document).on("click", "img", function () {
+  console.log("hello");
+  $("#modal").fadeIn();
+});
+
+$(document).on("click", "#close-btn", function () {
+  $("#modal").fadeOut();
 });

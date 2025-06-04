@@ -298,12 +298,41 @@
       <div class="button-container">
         <div>
           <div class="caption__div">Dies List</div>
-          <div id="fix-die__list" class="die-fix__wrapper"></div>
+          <div id="fix-die__list" class="die-fix__wrapper">
+            <table id="fixing-die__table" class="">
+              <caption class="table__caption racking-dies__caption">
+                Dies List
+              </caption>
+              <thead>
+                <tr>
+                  <th>dies_id</th>
+                  <th>
+                    Die Number
+                    <input
+                      class="fillter-letters"
+                      id="racking-die-number-sort-2__text"
+                      type="text"
+                    />
+                  </th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>32</td>
+                  <td>CG40DR-V02E</td>
+                  <td>05/01</td>
+                  <td>05/01</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <div>
           <div class="caption__div">Fix Content</div>
-          <div class="die-fix__wrapper">
+          <div class="die-fix__wrapper inactive__div" id="fix-content__div">
             <div class="radio__button">
               <button id="grind__button">Griding</button>
               <button id="wire-cut__button">Wire Cutting</button>
@@ -315,10 +344,6 @@
               </div>
               <div class="input__wrapper">
                 <div class="title__wrapper">Add File</div>
-                <!-- <form id="file-upload__form">
-                  <input type="file" name="file_01" id="file-upload__input" />
-                  <label id="file_name" for="file-upload__input">no file</label>
-                </form> -->
                 <form id="uploadForm">
                   <input type="file" name="file_01" id="fileInput__input" />
                   <label id="file_name__label" for="fileInput__input"
@@ -326,13 +351,14 @@
                   >
                 </form>
               </div>
+              <button id="add_test">UPLOAD</button>
             </div>
           </div>
         </div>
 
         <div>
           <div class="caption__div">Pictures</div>
-          <div class="die-fix__wrapper"></div>
+          <div id="picture__div" class="die-fix__wrapper grid-container"></div>
         </div>
 
         <button id="test__button">Save</button>
@@ -366,6 +392,24 @@
         </table>
       </div>
     </div>
+
+    <div id="image-container" style="display: none">
+      <img
+        src="./upload/02_die_maitenance/20250604_152240.jpg"
+        alt="クリックして拡大"
+        id="clickable-img"
+      />
+    </div>
+
+    <div id="modal" style="display: none">
+      <img
+        src="./upload/02_die_maitenance/20250604_152240.jpg"
+        alt="拡大画像"
+        id="modal-img"
+      />
+      <button id="close-btn">閉じる</button>
+    </div>
+
     <script src="./lib/jquery.min.js"></script>
     <script src="./scr/DieMaitenanceV2.js"></script>
   </body>
