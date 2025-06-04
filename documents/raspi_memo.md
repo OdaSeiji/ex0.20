@@ -161,3 +161,204 @@ PS C:\Users\odaseiji>
 PS C:\Users\odaseiji> ssh pi@10.163.113.234
 pi@10.163.113.234's password:
 ```
+
+最終的に、現状のルーティングは以下のようになっている。
+
+```terminal
+pi@raspberrypi02:~ $ ip route show
+default via 10.163.112.1 dev wlan1 proto static metric 10
+default via 10.163.112.1 dev eth0 proto static metric 100
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.234 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.164 metric 10
+10.163.112.1 dev eth0 proto static scope link metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+```
+
+これで、接続は問題が無い。
+
+プログラムの自動起動。
+
+# #1 ラズパイ
+
+今日から接続。ssh でのログインは出来るが、、、`eth0`に対して、ネットワークの設定が終わっていない。
+
+```terminal
+pi@raspberrypi01:~/work $ ifconfig
+eth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether d8:3a:dd:14:03:84  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 104  bytes 9114 (8.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 104  bytes 9114 (8.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether d8:3a:dd:14:03:87  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.163.113.223  netmask 255.255.240.0  broadcast 10.163.127.255
+        ether b0:c7:45:78:46:01  txqueuelen 1000  (Ethernet)
+        RX packets 376863  bytes 59280661 (56.5 MiB)
+        RX errors 0  dropped 23129  overruns 0  frame 0
+        TX packets 3281  bytes 521643 (509.4 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+その前に、ルーティングの優先順位を上げておくか。以下が、変更前。
+
+```terminal
+pi@raspberrypi01:~/work $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 600
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 600
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 600
+```
+
+これを以下のコマンドで、実行、変化なし？
+
+```terminal
+pi@raspberrypi01:~/work $ sudo nmcli connection modify WirelessConnection2 ipv4.route-metric 10
+pi@raspberrypi01:~/work $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 600
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 600
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 600
+pi@raspberrypi01:~/work $
+```
+
+以下のコマンドで有効化する必要がある。
+
+```terminal
+pi@raspberrypi01:~/work $ sudo nmcli connection up WirelessConnection2
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/3)
+pi@raspberrypi01:~/work $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 10
+```
+
+設定完了。次、
+eth0 の ip を 192.168.1.10 に固定
+
+```terminal
+sudo nmcli connection modify WiredConnection1 ipv4.method manual ipv4.addresses 192.168.1.10/2
+```
+
+その後ネットワーク設定を反映させる
+
+```terminal
+pi@raspberrypi01:~/work $ sudo nmcli connection down WiredConnection1
+Error: 'WiredConnection1' is not an active connection.
+Error: no active connection provided.
+pi@raspberrypi01:~/work $ sudo nmcli connection up WiredConnection1
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/4)
+pi@raspberrypi01:~/work $ ifconfig
+eth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        inet 192.168.1.10  netmask 255.255.255.0  broadcast 192.168.1.255
+        ether d8:3a:dd:14:03:84  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 15 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 104  bytes 9114 (8.9 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 104  bytes 9114 (8.9 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether d8:3a:dd:14:03:87  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.163.113.223  netmask 255.255.240.0  broadcast 10.163.127.255
+        ether b0:c7:45:78:46:01  txqueuelen 1000  (Ethernet)
+        RX packets 464180  bytes 76550757 (73.0 MiB)
+        RX errors 0  dropped 30443  overruns 0  frame 0
+        TX packets 4043  bytes 620402 (605.8 KiB)
+        TX errors 0  dropped 3 overruns 0  carrier 0  collisions 0
+
+pi@raspberrypi01:~/work $
+```
+
+再起動してみる。
+
+```terminal
+pi@raspberrypi01:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 10
+```
+
+ルーティングは問題無。
+
+```terminal
+pi@raspberrypi01:~ $ ifconfig
+eth0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether d8:3a:dd:14:03:84  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+lo: flags=73<UP,LOOPBACK,RUNNING>  mtu 65536
+        inet 127.0.0.1  netmask 255.0.0.0
+        inet6 ::1  prefixlen 128  scopeid 0x10<host>
+        loop  txqueuelen 1000  (Local Loopback)
+        RX packets 98  bytes 8676 (8.4 KiB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 98  bytes 8676 (8.4 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan0: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500
+        ether d8:3a:dd:14:03:87  txqueuelen 1000  (Ethernet)
+        RX packets 0  bytes 0 (0.0 B)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 0  bytes 0 (0.0 B)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+
+wlan1: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 10.163.113.223  netmask 255.255.240.0  broadcast 10.163.127.255
+        ether b0:c7:45:78:46:01  txqueuelen 1000  (Ethernet)
+        RX packets 6741  bytes 1772799 (1.6 MiB)
+        RX errors 0  dropped 433  overruns 0  frame 0
+        TX packets 460  bytes 117918 (115.1 KiB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
+```
+
+eth0 の設定が無くなっている。。。
+ヤバい、ルーティングがおかしい。
+eth0 を接続すると、ネットワーク接続できなくなる。
+
+```terminal
+pi@raspberrypi01:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 10
+pi@raspberrypi01:~ $ sudo ip route add 192.168.1.0/24 dev eth0
+pi@raspberrypi01:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.122.56 metric 10
+192.168.1.0/24 dev eth0 scope link linkdown
+pi@raspberrypi01:~ $
+```
+
+を実行。一旦再起動。
