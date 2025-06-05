@@ -310,7 +310,7 @@
                     Die Number
                     <input
                       class="fillter-letters"
-                      id="racking-die-number-sort-2__text"
+                      id="fix-die-list__text"
                       type="text"
                     />
                   </th>
@@ -333,9 +333,12 @@
         <div>
           <div class="caption__div">Fix Content</div>
           <div class="die-fix__wrapper inactive__div" id="fix-content__div">
-            <div class="radio__button">
+            <div id="radio__button" class="radio__button">
               <button id="grind__button">Griding</button>
-              <button id="wire-cut__button">Wire Cutting</button>
+              <button id="wire-cut__button" class="inactive__button">
+                Wire Cutting
+              </button>
+              <div id="line__div"></div>
             </div>
             <div class="sub__wrapper">
               <div class="input__wrapper">
@@ -351,7 +354,10 @@
                   >
                 </form>
               </div>
-              <button id="add_test">UPLOAD</button>
+              <div class="input__wrapper">
+                <div class="title__wrapper">Note</div>
+                <textarea name="" id="fix-note__textarea"></textarea>
+              </div>
             </div>
           </div>
         </div>
@@ -361,7 +367,7 @@
           <div id="picture__div" class="die-fix__wrapper grid-container"></div>
         </div>
 
-        <button id="test__button">Save</button>
+        <button id="test__button">Test</button>
       </div>
 
       <h1 class="translation">Die history</h1>
@@ -393,13 +399,13 @@
       </div>
     </div>
 
-    <div id="image-container" style="display: none">
+    <!-- <div id="image-container" style="display: none">
       <img
         src="./upload/02_die_maitenance/20250604_152240.jpg"
         alt="クリックして拡大"
         id="clickable-img"
       />
-    </div>
+    </div> -->
 
     <div id="modal" style="display: none">
       <img
@@ -407,7 +413,15 @@
         alt="拡大画像"
         id="modal-img"
       />
-      <button id="close-btn">閉じる</button>
+      <div class="modal-button__wrapper">
+        <button id="close-modal__button">Close</button>
+        <button id="delete-picture__button">Delete</button>
+      </div>
+    </div>
+
+    <div id="delete-confirm" style="display: none">
+      <button id="delete-picture-confirm__button">Delete</button>
+      <button id="close-confirm__button">Calcel</button>
     </div>
 
     <script src="./lib/jquery.min.js"></script>

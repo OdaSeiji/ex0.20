@@ -201,10 +201,13 @@ table {
 }
 
 .die-fix__wrapper button {
-  margin-left: 20px;
-  margin-right: 20px;
-  height: 40px;
-  width: 140px;
+  margin: 10px 20px 10px 20px;
+  height: 30px;
+  width: 150px;
+}
+
+button.inactive__button {
+  background-color: #b4d9df;
 }
 
 #fileInput__input {
@@ -279,6 +282,14 @@ textarea {
 }
 #fix-content__div {
   width: 200px;
+  textarea {
+    width: 146px;
+  }
+}
+#line__div {
+  width: 150px;
+  border: 1px solid rgb(180, 217, 223);
+  margin-bottom: 5px;
 }
 
 .grid-container {
@@ -286,6 +297,7 @@ textarea {
   grid-template-columns: 1fr 1fr; /* 列を2つに分割 */
   grid-template-rows: 1fr 1fr; /* 行を2つに分割 */
   gap: 10px; /* 各画像の間にスペースを追加 */
+  place-items: center;
 }
 
 .grid-container img {
@@ -307,7 +319,8 @@ textarea {
 
 #modal img {
   max-width: 100%;
-  height: auto;
+  /* height: auto; */
+  max-height: 600px;
 }
 
 #close-btn {
@@ -316,4 +329,21 @@ textarea {
   background-color: #f0f0f0;
   border: none;
   cursor: pointer;
+}
+
+.modal-button__wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+#delete-confirm {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 2px solid #ccc;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }

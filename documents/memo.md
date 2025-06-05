@@ -1254,4 +1254,5 @@ ALTER TABLE `t_dies_status_filename`
 	ADD CONSTRAINT `FK_t_dies_status_filename_t_dies_status` FOREIGN KEY (`t_dies_status_id`) REFERENCES `t_dies_status` (`id`);
 ```
 
-ファイルのアップロード。アップロードプログラム自身はあっさり動く。次は、アップロードされたファイル名の表示。
+ファイルのアップロード。アップロードプログラム自身はあっさり動く。次は、アップロードされたファイル名の表示。アップロードされた写真を拡大する機能の実装。
+その為には、クリックされたファイルの`alt`属性にファイル名を付けること。

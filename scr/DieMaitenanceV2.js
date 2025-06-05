@@ -542,12 +542,19 @@ $(document).on("keyup", "#racking-die-number-sort__text", function () {
   });
 });
 
+$(document).on("click", "#radio__button button.inactive__button", function () {
+  $(".radio__button button:not(.inactive__button)").addClass(
+    "inactive__button"
+  );
+  $(this).removeClass("inactive__button");
+});
+
 $(document).on("click", "#test__button", function () {
   var temp;
   console.log("hello");
   // temp = ajaxFileUpload();
-  console.log(temp);
-  uploadFile.push(ajaxFileUpload());
+  console.log(uploadFile);
+  // uploadFile.push(ajaxFileUpload());
 });
 
 function ajaxFileUpload() {
@@ -585,8 +592,6 @@ $(document).on("click", "#fixing-die__table thead", function () {
 });
 
 function makeFixDieList() {
-  console.log("hello");
-
   const fileName = "./php/DieMaitenance/SelFixDieList.php";
   const sendData = {
     machine: "Dummy",
@@ -596,6 +601,23 @@ function makeFixDieList() {
   fixDieTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#fixing-die__table tbody"));
 }
+
+$(document).on("keyup", "#fix-die-list__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#fixing-die__table tbody").empty();
+
+  fixDieTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#fixing-die__table tbody");
+    }
+  });
+});
 
 $(document).on("click", "#fixing-die__table tbody tr", function () {
   if ($(this).hasClass("selected-record")) {
@@ -616,27 +638,56 @@ function in_activeFix() {
   $("#fix-content__div").addClass("inactive__div");
 }
 
-$(document).on("click", "#add_test", function () {
-  let temp;
+$(document).on("change", "#uploadForm", function () {
+  console.log("hello");
+
+  let fileObject;
   let newImg;
-  temp = JSON.parse(ajaxFileUpload());
-  uploadFile.push(temp.fileName);
+  fileObject = JSON.parse(ajaxFileUpload());
+  uploadFile.push(fileObject.fileName);
 
   newImg = $("<img>").attr(
     "src",
-    "./upload/02_die_maitenance/" + temp.fileName
+    "./upload/02_die_maitenance/" + fileObject.fileName
   );
+  newImg = newImg.attr("alt", fileObject.fileName);
   $("#picture__div").append(newImg);
 
   $("#fileInput__input").val("");
   $("#file_name__label").html("no file");
 });
 
-$(document).on("click", "img", function () {
-  console.log("hello");
+$(document).on("click", "#picture__div img", function () {
+  const fileName = $(this).attr("alt");
+  $("#modal-img").attr("src", "./upload/02_die_maitenance/" + fileName);
+  $("#modal-img").attr("alt", fileName);
+
   $("#modal").fadeIn();
 });
 
-$(document).on("click", "#close-btn", function () {
+$(document).on("click", "#close-modal__button", function () {
+  $("#modal").fadeOut();
+});
+
+$(document).on("click", "#delete-picture__button", function () {
+  $("#delete-confirm").fadeIn();
+});
+
+$(document).on("click", "#close-confirm__button", function () {
+  $("#delete-confirm").fadeOut();
+});
+
+$(document).on("click", "#delete-picture-confirm__button", function () {
+  let targetImgObj;
+  const imgObj = $("#picture__div img");
+  targetImgObj = $("#modal-img");
+
+  imgObj.each(function () {
+    const fileName = $(this).attr("alt");
+    if (targetImgObj.attr("alt") === fileName) {
+      $(this).remove();
+      $("#delete-confirm").fadeOut();
+    }
+  });
   $("#modal").fadeOut();
 });
