@@ -68,7 +68,7 @@
             </tr>
           </tbody>
         </table>
-        <div class="arrow-img__wrapper">
+        <div id="after-press-arrow__wrapper" class="arrow-img__wrapper">
           <div>
             <img
               id="right-arrow__img"
@@ -242,26 +242,42 @@
             </tbody>
           </table>
         </div>
-        <div class="arrow-img__wrapper">
-          <div>
+
+        <div id="after-wash-arrow__wrapper" class="arrow-img__wrapper">
+          <div id="wash-arrow-inner__wrapper">
             <img
-              id="right-arrow__img"
+              id="right-arrow-2__img"
               src="./img/right_arrow-inactive.png"
               alt="arrow"
             />
             <img
-              id="left-arrow__img"
+              id="left-arrow-2__img"
               src="./img/right_arrow-inactive.png"
               alt="arrow"
             />
           </div>
+
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select
+              name=""
+              id="rack-staff-2__select"
+              class="save-data required-input"
+            >
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="racking_date-2__input" type="date" / class="save-data">
+          </div>
         </div>
 
         <div>
-          <table id="racking_dies-2__table" class="inactive__table">
-            <caption
-              class="table__caption racking-dies__caption inactive__caption"
-            >
+          <table id="racking_dies-2__table" class="">
+            <caption class="table__caption racking-dies__caption">
               Racking Dies List
             </caption>
             <thead>
@@ -291,10 +307,7 @@
         </div>
       </div>
 
-      <h1 class="translation">
-        Die Fixing
-        <div id="die_name">test</div>
-      </h1>
+      <h1 class="translation">Die Fixing</h1>
       <div class="button-container">
         <div>
           <div class="caption__div">Dies List</div>
@@ -354,6 +367,20 @@
                   >
                 </form>
               </div>
+
+              <div class="input__wrapper">
+                <div class="title__wrapper">
+                  <div class="title__letters">Staff</div>
+                </div>
+                <select
+                  name=""
+                  id="fix-staff__select"
+                  class="save-data required-input"
+                >
+                  <option value="0">-</option>
+                </select>
+              </div>
+
               <div class="input__wrapper">
                 <div class="title__wrapper">Note</div>
                 <textarea name="" id="fix-note__textarea"></textarea>
@@ -367,55 +394,92 @@
           <div id="picture__div" class="die-fix__wrapper grid-container"></div>
         </div>
 
-        <button id="test__button">Test</button>
+        <button id="fix-die-save__button" disabled>Save</button>
       </div>
 
       <h1 class="translation">Die history</h1>
       <div class="button-container">
-        <table id="all-dies__table" class="">
-          <caption class="table__caption racking-dies__caption">
-            All Dies List
-          </caption>
-          <thead>
-            <tr>
-              <th>dies_id</th>
-              <th>
-                Die Number
-                <input
-                  class="fillter-letters"
-                  id="racking-die-number-sort-2__text"
-                  type="text"
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>32</td>
-              <td>CG40DR-V02E</td>
-            </tr>
-          </tbody>
-        </table>
+        <div>
+          <div class="caption__div">All Dies Status</div>
+          <div class="die-fix__wrapper" id="all-dies__div">
+            <table id="all-dies__table" class="">
+              <caption class="table__caption racking-dies__caption">
+                All Dies List
+              </caption>
+
+              <thead>
+                <tr>
+                  <th>dies_id</th>
+                  <th>
+                    Die Number
+                    <input
+                      class="fillter-letters"
+                      id="die-sort__text"
+                      type="text"
+                    />
+                  </th>
+                  <th>P/T</th>
+                  <th>P Date</th>
+                  <th>Mente.</th>
+                  <th>M Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>32</td>
+                  <td>CG40DR-V02E</td>
+                  <td>〇</td>
+                  <td>24/05/01</td>
+                  <td>Grinding</td>
+                  <td>25/06/06</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="caption__div">History</div>
+          <div class="die-fix__wrapper" id="each-dies-history__div">
+            <table id="dies_history__table">
+              <caption class="table__caption racking-dies__caption">
+                History
+              </caption>
+              <thead>
+                <th>id</th>
+                <th>Date</th>
+                <th>Status</th>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="caption__div">Pictures</div>
+          <div
+            class="die-fix__wrapper grid-container"
+            id="history-picture__div"
+          ></div>
+        </div>
+
+        <button id="test__btn">TEST</button>
       </div>
     </div>
 
-    <!-- <div id="image-container" style="display: none">
-      <img
-        src="./upload/02_die_maitenance/20250604_152240.jpg"
-        alt="クリックして拡大"
-        id="clickable-img"
-      />
-    </div> -->
-
     <div id="modal" style="display: none">
-      <img
-        src="./upload/02_die_maitenance/20250604_152240.jpg"
-        alt="拡大画像"
-        id="modal-img"
-      />
+      <img src="" alt="big_pic" id="modal-img" />
       <div class="modal-button__wrapper">
         <button id="close-modal__button">Close</button>
         <button id="delete-picture__button">Delete</button>
+      </div>
+    </div>
+
+    <div id="history-modal" style="display: none">
+      <img src="" alt="big_pic" id="history-modal-img" />
+      <div class="modal-button__wrapper">
+        <button id="hitory-close-modal__button">Close</button>
+        <!-- <button id="delete-picture__button">Delete</button> -->
       </div>
     </div>
 

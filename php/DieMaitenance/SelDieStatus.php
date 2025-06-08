@@ -15,34 +15,36 @@ try {
     ]
   );
   $sql = "
-          SELECT
-              'dummy',
-              date_format(date_time, '%y/%m/%d %H:%i') AS date_time,
-              m_die_status.die_status
-          FROM
-              (
-                  SELECT
-                      cast(concat(t_press.press_date_at, ' ', t_press.press_start_at) AS DATETIME) AS date_time,
-                      11 AS die_status_id
-                  FROM
-                      t_press
-                  WHERE
-                      t_press.dies_id = :die_id_1
-                  UNION
-                  SELECT
-                      t_dies_status.do_sth_at AS date_time,
-                      t_dies_status.die_status_id
-                  FROM
-                      t_dies_status
-                  WHERE
-                      t_dies_status.dies_id = :die_id_2
-              ) AS t1
-              LEFT JOIN
-                  m_die_status
-              on  t1.die_status_id = m_die_status.id
-          ORDER BY
-              t1.date_time desc        
-        ";
+        SELECT
+            t1.t_die_status_id,
+            date_format(date_time, '%y/%m/%d %H:%i') AS date_time,
+            m_die_status.die_status
+        FROM
+            (
+                SELECT
+                    9999999 AS t_die_status_id,
+                    cast(concat(t_press.press_date_at, ' ', t_press.press_start_at) AS DATETIME) AS date_time,
+                    11 AS die_status_id
+                FROM
+                    t_press
+                WHERE
+                    t_press.dies_id = :die_id_1
+                UNION
+                SELECT
+                    t_dies_status.id AS t_die_status_id,
+                    t_dies_status.do_sth_at AS date_time,
+                    t_dies_status.die_status_id
+                FROM
+                    t_dies_status
+                WHERE
+                    t_dies_status.dies_id = :die_id_2
+            ) AS t1
+            LEFT JOIN
+                m_die_status
+            on  t1.die_status_id = m_die_status.id
+        ORDER BY
+            t1.date_time desc
+              ";
   $prepare = $dbh->prepare($sql);
   $prepare->bindValue(":die_id_1", (int) $_POST["die_id"], PDO::PARAM_INT);
   $prepare->bindValue(":die_id_2", (int) $_POST["die_id"], PDO::PARAM_INT);
