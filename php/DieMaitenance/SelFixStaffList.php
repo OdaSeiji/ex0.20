@@ -46,7 +46,7 @@
 
       $prepare = $dbh->prepare($sql);
       // $_POST["targetId"] = 1;
-      $prepare->bindValue(':staff_order', (INT)$_POST["staffOrder"], PDO::PARAM_INT);
+    //   $prepare->bindValue(':staff_order', (INT)$_POST["staffOrder"], PDO::PARAM_INT);
       $prepare->execute();
       $result = $prepare->fetchAll(PDO::FETCH_ASSOC);
 
