@@ -2,6 +2,7 @@ let summaryTable = new Object();
 let washingDieTable = new Object();
 let rackingDieTable = new Object();
 let fixDieTable = new Object();
+let allDiesTable = new Object();
 let ajaxReturnData;
 let staffOrderMode = 4;
 let timeout;
@@ -25,6 +26,17 @@ window.addEventListener("click", resetTimeout);
 
 // 初期化
 resetTimeout();
+
+// 2 min after load excute
+window.onload = function () {
+  setTimeout(function () {
+    makeRackingTable();
+    makeFixDieList();
+    makeFixStaffSelectSelect();
+    makeAllDiesStatusTable();
+    makeRackingStaffSelect();
+  }, 1000); // 2000ミリ秒 = 2秒
+};
 
 const myAjax = {
   myAjax: function (fileName, sendData) {
@@ -62,8 +74,10 @@ $(function () {
   makeAfterPressTalbe();
   makeWashingDieTable();
   makeWashingStaffSelectSelect();
+  makeFixDieList();
   $("#washing_date__input").val(formattedDate);
   $("#racking_date__input").val(formattedDate);
+  $("#racking_date-2__input").val(formattedDate);
   $("#fixing-date__input").val(formattedDate);
 });
 
@@ -72,8 +86,6 @@ function makeAfterPressTalbe() {
   var sendData = {
     machine: "Dummy",
   };
-  const today = new Date();
-  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
 
   myAjax.myAjax(fileName, sendData);
   summaryTable = ajaxReturnData;
@@ -87,6 +99,7 @@ function makeWashingDieTable() {
   };
   myAjax.myAjax(fileName, sendData);
   fillTableBody(ajaxReturnData, $("#washing_dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#washing_dies-2__table tbody"));
   washingDieTable = ajaxReturnData;
 }
 
@@ -96,9 +109,7 @@ function makeWashingStaffSelectSelect() {
     staffOrder: staffOrderMode,
   };
   myAjax.myAjax(fileName, sendData);
-  $("#wash-staff__select").empty();
-  $("#wash-staff__select").append($("<option>").html("-").val(0));
-
+  $("#wash-staff__select").empty().append($("<option>").html("-").val(0));
   ajaxReturnData.forEach(function (value) {
     $("<option>")
       .val(value["id"])
@@ -166,7 +177,6 @@ $(document).on(
   "div.sub__container:not(.inactive__div) select",
   function () {
     let targetObj = $(this);
-    console.log("Hello");
     if ($(this).val() == 0) {
       targetObj.addClass("required-input");
     } else {
@@ -422,14 +432,18 @@ function makeRackingStaffSelect() {
     staffOrder: staffOrderMode,
   };
   myAjax.myAjax(fileName, sendData);
-  $("#rack-staff__select").empty();
-  $("#rack-staff__select").append($("<option>").html("-").val(0));
+  $("#rack-staff__select").empty().append($("<option>").html("-").val(0));
+  $("#rack-staff-2__select").empty().append($("<option>").html("-").val(0));
 
   ajaxReturnData.forEach(function (value) {
     $("<option>")
       .val(value["id"])
       .html(value["staff_name"])
       .appendTo("#rack-staff__select");
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo("#rack-staff-2__select");
   });
 }
 
@@ -440,11 +454,13 @@ function makeRackingTable() {
   };
 
   $("#racking_dies__table tbody").empty();
+  $("#racking_dies-2__table tbody").empty();
   myAjax.myAjax(fileName, sendData);
 
   rackingDieTable = ajaxReturnData;
   // summaryTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#racking_dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#racking_dies-2__table tbody"));
 }
 
 function checkRackingCondition() {
@@ -469,7 +485,6 @@ function checkRackingCondition() {
 }
 
 $(document).on("click change", "#racking__div", function () {
-  console.log("hello");
   uncheckRackingCondition();
 });
 
@@ -549,12 +564,110 @@ $(document).on("click", "#radio__button button.inactive__button", function () {
   $(this).removeClass("inactive__button");
 });
 
-$(document).on("click", "#test__button", function () {
-  var temp;
-  console.log("hello");
-  // temp = ajaxFileUpload();
-  console.log(uploadFile);
-  // uploadFile.push(ajaxFileUpload());
+$(document).on("chnage click", "#fix-content__div", function () {
+  const targetObj = $("#fix-die-save__button");
+  if (checkFixDieCondition()) {
+    targetObj.prop("disabled", false);
+  } else {
+    targetObj.prop("disabled", true);
+  }
+});
+
+function checkFixDieCondition() {
+  let flag = true;
+
+  if ($("#fix-content__div select").hasClass("required-input")) {
+    flag = false;
+  }
+  if ($("#picture__div img").length == 0) {
+    flag = false;
+  }
+  return flag;
+}
+
+$(document).on("click", "#fix-die-save__button", function () {
+  const selectedId = $("#fixing-die__table tr.selected-record td:first").html();
+  const selectdBtn = $("#radio__button button:not(.inactive__button)");
+  const targetObj = $("#picture__div img");
+  let fileName = "./php/DieMaitenance/InsFixDieStatus.php";
+  let sendData = new Object();
+  let dieStatus;
+  uploadFile = [];
+  switch (selectdBtn.attr("id")) {
+    case "grind__button":
+      dieStatus = 7;
+      break;
+    case "wire-cut__button":
+      dieStatus = 9;
+      break;
+    default:
+      console.log("error");
+      break;
+  }
+
+  targetObj.each(function () {
+    uploadFile.push($(this).attr("alt"));
+  });
+  // save information to t_dies_status
+  sendData = {
+    dieId: Number(selectedId),
+    staffId: Number($("#fix-staff__select").val()),
+    fixDate: $("#fixing-date__input").val(),
+    note: $("#fix-note__textarea").val(),
+    dieStatus: dieStatus,
+  };
+  myAjax.myAjax(fileName, sendData);
+  // t_dies_statusにINSERTしたので、そのレコードのidをt_dies_status_filenameに渡す
+  uploadFile.unshift(ajaxReturnData["id"]);
+
+  // save picture to t_dies_status_filename
+  fileName = "./php/DieMaitenance/InsFixDieImgFiles.php";
+  sendData = {
+    sendData: JSON.stringify(uploadFile),
+  };
+  myAjax.myAjax(fileName, sendData);
+  // initilaize
+  makeFixDieList();
+  makeAllDiesStatusTable();
+
+  $("#fix-staff__select").val("0").addClass("required-input");
+  $("#picture__div").empty();
+});
+
+function makeFixStaffSelectSelect() {
+  const fileName = "./php/DieMaitenance/SelFixStaffList.php";
+  const sendData = {
+    staffOrder: staffOrderMode,
+  };
+  const targetObj = $("#fix-staff__select");
+  myAjax.myAjax(fileName, sendData);
+  targetObj.empty();
+  targetObj.append($("<option>").html("-").val(0));
+
+  ajaxReturnData.forEach(function (value) {
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo(targetObj);
+  });
+}
+
+$(document).on("change", "#fix-staff__select", function () {
+  let targetObj = $(this);
+  if ($(this).val() == 0) {
+    targetObj.addClass("required-input");
+  } else {
+    targetObj.removeClass("required-input");
+  }
+});
+
+$(document).on("change", "#rack-staff-2__select", function () {
+  let targetObj = $(this);
+  if ($(this).val() == 0) {
+    targetObj.addClass("required-input");
+  } else {
+    targetObj.removeClass("required-input");
+  }
 });
 
 function ajaxFileUpload() {
@@ -639,12 +752,10 @@ function in_activeFix() {
 }
 
 $(document).on("change", "#uploadForm", function () {
-  console.log("hello");
-
   let fileObject;
   let newImg;
   fileObject = JSON.parse(ajaxFileUpload());
-  uploadFile.push(fileObject.fileName);
+  // uploadFile.push(fileObject.fileName);
 
   newImg = $("<img>").attr(
     "src",
@@ -655,6 +766,13 @@ $(document).on("change", "#uploadForm", function () {
 
   $("#fileInput__input").val("");
   $("#file_name__label").html("no file");
+
+  const targetObj = $("#fix-die-save__button");
+  if (checkFixDieCondition()) {
+    targetObj.prop("disabled", false);
+  } else {
+    targetObj.prop("disabled", true);
+  }
 });
 
 $(document).on("click", "#picture__div img", function () {
@@ -690,4 +808,235 @@ $(document).on("click", "#delete-picture-confirm__button", function () {
     }
   });
   $("#modal").fadeOut();
+});
+
+function makeAllDiesStatusTable() {
+  var fileName = "./php/DieMaitenance/SelAllDiesStatus.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  allDiesTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#all-dies__table tbody"));
+}
+
+$(document).on("click", "#test__btn", function () {
+  makeAllDiesStatusTable();
+});
+
+$(document).on("click", "#all-dies__table tbody tr", function () {
+  $("#all-dies__table tbody tr.selected-record").removeClass("selected-record");
+  $(this).toggleClass("selected-record");
+  let temp;
+  temp = $(this).find("td").eq(6).html();
+  console.log(temp);
+
+  var fileName = "./php/DieMaitenance/SelDieStatus.php";
+  var sendData = {
+    die_id: Number($(this).find("td:first").text()),
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  fillTableBody(ajaxReturnData, $("#dies_history__table tbody"));
+
+  $("#history-picture__div").empty();
+});
+
+$(document).on("keyup", "#die-sort__text", function () {
+  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  const text = $(this).val();
+
+  $("#all-dies__table tbody").empty();
+
+  allDiesTable.forEach(function (trVal) {
+    if (trVal["die_number"].startsWith(text)) {
+      var newTr = $("<tr>");
+      Object.keys(trVal).forEach(function (tdVal) {
+        $("<td>").html(trVal[tdVal]).appendTo(newTr);
+      });
+      $(newTr).appendTo("#all-dies__table tbody");
+    }
+  });
+});
+
+$(document).on("click", "#dies_history__table tr", function () {
+  $("#dies_history__table tbody tr.selected-record").removeClass(
+    "selected-record"
+  );
+  $(this).toggleClass("selected-record");
+
+  putFixPictures($(this).find("td").eq(0).html());
+  console.log("hello");
+});
+
+function putFixPictures(statudId) {
+  var fileName = "./php/DieMaitenance/SelPictureFileName.php";
+  var sendData = {
+    die_status_id: statudId,
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  $("#history-picture__div").empty();
+
+  console.log(ajaxReturnData);
+  if (Object.keys(ajaxReturnData).length === 0) {
+    console.log("このオブジェクトは空です！");
+    $("#history-picture__div").html("No image");
+  }
+
+  ajaxReturnData.forEach(function (value) {
+    let newImg = $("<img>").attr(
+      "src",
+      "./upload/02_die_maitenance/" + value.file_name
+    );
+    newImg = newImg.attr("alt", value.file_name);
+    $("#history-picture__div").append(newImg);
+  });
+}
+
+$(document).on("click", "#history-picture__div img", function () {
+  const fileName = $(this).attr("alt");
+  $("#history-modal-img").attr("src", "./upload/02_die_maitenance/" + fileName);
+  $("#history-modal-img").attr("alt", fileName);
+
+  $("#history-modal").fadeIn();
+});
+
+$(document).on("click", "#hitory-close-modal__button", function () {
+  $("#history-modal").fadeOut();
+});
+
+$(document).on("click", "#washing_dies-2__table tbody tr", function () {
+  let selectedObj;
+  $("#racking_dies-2__table tbody tr.selected-record").removeClass(
+    "selected-record"
+  );
+  $(this).toggleClass("selected-record");
+  // activate button
+
+  return;
+  selectedObj = $("#washing_dies__table tr.selected-record");
+  if (selectedObj.length != 0) {
+    $("#left-arrow__img").attr("src", "./img/right_arrow-3.png");
+    // inactive input value
+    $("#washing__div select").val("0").addClass("required-input");
+    $("#washing__div select").parent().addClass("inactive__div");
+    $("#washing_date__input").parent().addClass("inactive__div");
+  } else {
+    $("#left-arrow__img").attr("src", "./img/right_arrow-4.png");
+    // active input value
+    $("#washing__div select").val("0").addClass("required-input");
+    $("#washing__div select").parent().removeClass("inactive__div");
+    $("#washing_date__input").parent().removeClass("inactive__div");
+  }
+});
+
+$(document).on("click", "#racking_dies-2__table tbody tr", function () {
+  let selectedObj;
+  $("#washing_dies-2__table tbody tr.selected-record").removeClass(
+    "selected-record"
+  );
+  $(this).toggleClass("selected-record");
+  // activate button
+});
+
+$(document).on("click change", ".racking__wrapper", function () {
+  // input validation
+  console.log("hello");
+
+  let temp;
+  temp = $("#washing_dies-2__table tr.selected-record");
+  console.log(temp);
+
+  if (
+    $("#washing_dies-2__table tr.selected-record").length >= 1 &&
+    $("#rack-staff-2__select").val() != "0"
+  ) {
+    $("#right-arrow-2__img").attr("src", "./img/right_arrow-active.png");
+  } else {
+    $("#right-arrow-2__img").attr("src", "./img/right_arrow-inactive.png");
+  }
+
+  if (
+    $("#racking_dies-2__table tr.selected-record").length >= 1 &&
+    $("#rack-staff-2__select").val() != "0"
+  ) {
+    $("#left-arrow-2__img").attr("src", "./img/right_arrow-active.png");
+  } else {
+    $("#left-arrow-2__img").attr("src", "./img/right_arrow-inactive.png");
+  }
+});
+
+$(document).on("click", "#right-arrow-2__img", function () {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
+  const currentDayte = $("#washing_date__input").val();
+  const tankNumber = $("#tank_number__select").val();
+  const staffId = $("#rack-staff-2__select").val();
+  const note = $("#note__textarea").val();
+  const data = [];
+  let status;
+  let dieIdObj;
+
+  dieIdObj = $("#washing_dies-2__table tr.selected-record td:nth-child(1)");
+  status = 10;
+
+  dieIdObj.each(function () {
+    data.push([
+      $(this).html(),
+      currentDayteTime,
+      tankNumber,
+      currentDayte,
+      staffId,
+      status,
+      note,
+    ]);
+  });
+
+  const fileName = "./php/DieMaitenance/InsDieStatus.php";
+  const sendData = {
+    tableData: JSON.stringify(data),
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  $("#rack-staff-2__select").val("0").addClass("required-input");
+
+  makeWashingDieTable();
+  makeRackingTable();
+
+  $("#right-arrow-2__img").attr("src", "./img/right_arrow-4.png");
+});
+
+$("#left-arrow-2__img").on("click", function () {
+  const fileName = "./php/DieMaitenance/DelDieStatus.php";
+  let dieStatusIdObj;
+  let sendData = new Object();
+  let dieStatusId = [];
+
+  dieStatusIdObj = $(
+    "#racking_dies-2__table tr.selected-record td:nth-child(2)"
+  );
+
+  dieStatusIdObj.each(function () {
+    dieStatusId.push(Number($(this).html()));
+  });
+
+  sendData = {
+    dieStatudId: dieStatusId,
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  // return;
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+  makeRackingTable();
+
+  $("#left-arrow-2__img").attr("src", "./img/right_arrow-4.png");
+
+  $("#rack-staff-2__select").val("0").addClass("required-input");
 });

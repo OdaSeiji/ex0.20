@@ -3,6 +3,10 @@ td:nth-child(1) {
   /* width: 200px; */
   display: none;
 }
+
+div.button-container {
+  width: 1200px;
+}
 caption,
 .caption__div {
   letter-spacing: 0.03em;
@@ -115,7 +119,8 @@ table {
     width: 55px;
   }
 }
-#washing_dies__table {
+#washing_dies__table,
+#washing_dies-2__table {
   th:nth-child(2),
   td:nth-child(2) {
     display: none;
@@ -128,12 +133,17 @@ table {
   td:nth-child(4) {
     width: 35px;
   }
+  td:nth-child(4) {
+    text-align: center;
+  }
+
   th:nth-child(5),
   td:nth-child(5) {
     width: 60px;
   }
 }
-#racking_dies__table {
+#racking_dies__table,
+#racking_dies-2__table {
   th:nth-child(2),
   td:nth-child(2) {
     display: none;
@@ -152,14 +162,16 @@ table {
   }
 }
 
-#right-arrow__img {
+#right-arrow__img,
+#right-arrow-2__img {
   width: 32px;
   height: 32px;
   margin-bottom: 50px;
   cursor: pointer;
 }
 
-#left-arrow__img {
+#left-arrow__img,
+#left-arrow-2__img {
   transform: rotate(180deg);
   width: 32px;
   height: 32px;
@@ -169,11 +181,24 @@ table {
 .arrow-img__wrapper {
   display: flex;
   align-items: center;
+  flex-direction: column;
   div {
     display: flex;
     flex-direction: column;
-    padding-bottom: 160px;
+    /* padding-bottom: 160px; */
   }
+}
+
+#after-press-arrow__wrapper {
+  margin-top: 130px;
+}
+
+#after-wash-arrow__wrapper {
+  margin-top: 50px;
+}
+
+#wash-arrow-inner__wrapper {
+  margin-bottom: 50px;
 }
 
 /* .caption__div {
@@ -185,6 +210,7 @@ table {
   flex-direction: column;
   border: 5px solid rgb(180, 217, 223);
   border-radius: 5px;
+  margin-bottom: 20px;
 }
 
 .radio__button {
@@ -256,6 +282,26 @@ textarea {
   td:nth-child(2) {
     width: 200px;
   }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 40px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 95px;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 150px;
+  }
+  th:nth-child(6),
+  td:nth-child(6) {
+    width: 95px;
+  }
+  th:nth-child(7),
+  td:nth-child(7) {
+    display: none;
+  }
 }
 
 #fix-die__list {
@@ -306,7 +352,8 @@ textarea {
   object-fit: contain;
 }
 
-#modal {
+#modal,
+#history-modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -317,7 +364,8 @@ textarea {
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-#modal img {
+#modal img,
+#history-modal img {
   max-width: 100%;
   /* height: auto; */
   max-height: 600px;
@@ -346,4 +394,30 @@ textarea {
   border: 2px solid #ccc;
   padding: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#fix-staff__select {
+  width: 151px;
+}
+
+#all-dies__div {
+  width: 650px;
+  display: flex;
+  align-items: center;
+}
+
+#dies_history__table {
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 170px;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 150px;
+  }
+}
+
+#each-dies-history__div {
+  display: flex;
+  align-items: center;
 }

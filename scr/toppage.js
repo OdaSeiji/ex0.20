@@ -32,6 +32,6 @@ $(document).on("click", "#billet-charge__button", function () {
 
 // die maitenance
 $(document).on("click", "#die-maitenance__button", function () {
-  window.open("./DieMaitenance.html");
+  window.open("./DieMaitenanceV2.html");
   // console.log("hello");
 });
