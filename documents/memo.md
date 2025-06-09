@@ -1263,3 +1263,40 @@ ALTER TABLE `t_dies_status_filename`
 # 2025/06/08
 
 次は、金型の履歴の表示。写真の表示も出来るようになった。
+写真の保存先を、従来の場所と同じフォルダーにできた。次は、`t_dies_status`に入っている写真をどう表示するか？
+一番簡単なのは、写真の呼び出しの`sql`に従来の写真情報も読み出せてしまうように改造。
+
+```sql
+        SELECT
+          t_dies_status_filename.file_name
+        FROM t_dies_status_filename
+        WHERE t_dies_status_filename.t_dies_status_id = :die_status_id
+```
+
+このぐらいなら、出来そうだが、、
+
+```sql
+WITH all_data_table AS(
+    SELECT
+        t_dies_status_filename.file_name
+    FROM
+        t_dies_status_filename
+    WHERE
+        t_dies_status_filename.t_dies_status_id = 20082
+    UNION
+    SELECT
+        t_dies_status.file_url AS file_name
+    FROM
+        t_dies_status
+    WHERE
+        t_dies_status.id = 20082
+)
+SELECT
+    *
+FROM
+    all_data_table
+WHERE
+    all_data_table.file_name IS NOT NULL
+```
+
+こんな感じ

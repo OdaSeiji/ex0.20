@@ -11,6 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $newFileName = $timestamp . '.' . $originalExtension; // 新しいファイル名
 
         $uploadDir = '../../upload/02_die_maitenance/'; // 保存先ディレクトリ
+        $uploadDir = '../../../diereport/upload/DieHistory/'; // 保存先ディレクトリ
         
         // ディレクトリがない場合は作成
         if (!is_dir($uploadDir)) {

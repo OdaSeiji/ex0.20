@@ -759,7 +759,7 @@ $(document).on("change", "#uploadForm", function () {
 
   newImg = $("<img>").attr(
     "src",
-    "./upload/02_die_maitenance/" + fileObject.fileName
+    "../diereport/upload/DieHistory/" + fileObject.fileName
   );
   newImg = newImg.attr("alt", fileObject.fileName);
   $("#picture__div").append(newImg);
@@ -777,7 +777,7 @@ $(document).on("change", "#uploadForm", function () {
 
 $(document).on("click", "#picture__div img", function () {
   const fileName = $(this).attr("alt");
-  $("#modal-img").attr("src", "./upload/02_die_maitenance/" + fileName);
+  $("#modal-img").attr("src", "../diereport/upload/DieHistory/" + fileName);
   $("#modal-img").attr("alt", fileName);
 
   $("#modal").fadeIn();
@@ -879,16 +879,16 @@ function putFixPictures(statudId) {
 
   $("#history-picture__div").empty();
 
-  console.log(ajaxReturnData);
+  // console.log(ajaxReturnData);
   if (Object.keys(ajaxReturnData).length === 0) {
-    console.log("このオブジェクトは空です！");
+    // console.log("このオブジェクトは空です！");
     $("#history-picture__div").html("No image");
   }
 
   ajaxReturnData.forEach(function (value) {
     let newImg = $("<img>").attr(
       "src",
-      "./upload/02_die_maitenance/" + value.file_name
+      "../diereport/upload/DieHistory/" + value.file_name
     );
     newImg = newImg.attr("alt", value.file_name);
     $("#history-picture__div").append(newImg);
@@ -897,7 +897,10 @@ function putFixPictures(statudId) {
 
 $(document).on("click", "#history-picture__div img", function () {
   const fileName = $(this).attr("alt");
-  $("#history-modal-img").attr("src", "./upload/02_die_maitenance/" + fileName);
+  $("#history-modal-img").attr(
+    "src",
+    "../diereport/upload/DieHistory/" + fileName
+  );
   $("#history-modal-img").attr("alt", fileName);
 
   $("#history-modal").fadeIn();
