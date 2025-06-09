@@ -362,3 +362,165 @@ pi@raspberrypi01:~ $
 ```
 
 を実行。一旦再起動。
+
+# raspi #1 を ethernet ケーブルを繋ぐと日本から接続できない
+
+まずは、問題のない`#2`を解析。
+
+```terminal
+pi@raspberrypi02:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+default via 10.163.112.1 dev eth0 proto static metric 100
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.234 metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.164 metric 10
+10.163.112.1 dev eth0 proto static scope link metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+pi@raspberrypi02:~ $
+```
+
+2 行目の eth0 に設定されているルーター設定が必要ない。
+以下、変更後
+
+```terminal
+pi@raspberrypi02:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+default via 10.163.112.1 dev eth0 proto static metric 100
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.234 metric 10
+10.163.112.1 dev eth0 proto static scope link metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+pi@raspberrypi02:~ $
+```
+
+減った。変更したのは、
+
+```terminal
+[connection]
+id=WirelessConnection2
+uuid=2302b4d7-e057-451f-acc6-9ec6cf41810c
+type=wifi
+interface-name=wlan1
+timestamp=1748226004
+
+[wifi]
+mode=infrastructure
+ssid=SMC-Data
+
+[wifi-security]
+key-mgmt=wpa-psk
+psk=SMCmfg#2020#
+
+[ipv4]
+address1=10.163.113.234/20,10.163.112.1
+method=manual
+route-metric=10
+
+[ipv6]
+addr-gen-mode=stable-privacy
+method=disabled
+
+[proxy]
+
+```
+
+この中の[ipv4]の`method=manual`が変更前は`method=auto`になっていた。これを#1 にも展開。
+昼頃やると、#1 に接続できない問題。#2 経由だと入れる。再起動したら、入れる。一体何だったんだ。。。
+
+気になっている点
+
+```terminal
+pi@raspberrypi02:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+default via 10.163.112.1 dev eth0 proto static metric 100
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.234 metric 10
+10.163.112.1 dev eth0 proto static scope link metric 100
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+```
+
+と`eth0`にルーティングの設定が入っている点。優先順位が低いので、使われることは無いはずだが、気持ち悪い。これは、eth0 の設定ファイル内の、`never-default=true`を入れてやればいい。
+
+```terminal
+[connection]
+id=WiredConnection1
+uuid=75b62f1f-a547-3003-a368-f95c8301303b
+type=ethernet
+autoconnect-priority=-999
+interface-name=eth0
+timestamp=1748232006
+
+[ethernet]
+
+[ipv4]
+address1=192.168.1.10/24,10.163.112.1
+method=manual
+never-default=true
+
+[ipv6]
+addr-gen-mode=stable-privacy
+method=disabled
+
+[proxy]
+
+```
+
+そうすると、以下の様になる
+
+```terminal
+pi@raspberrypi02:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.234 metric 10
+192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.10 metric 100
+pi@raspberrypi02:~ $
+```
+
+そう、こうあるべきですね。#1 も同様の処置。
+
+```terminal
+pi@raspberrypi01:~ $ ip route
+default via 10.163.112.1 dev wlan1 proto static metric 10
+10.163.112.0/20 dev wlan1 proto kernel scope link src 10.163.113.223 metric 10
+pi@raspberrypi01:~ $
+```
+
+あれ、、、#1 のこの設定駄目じゃないか、、、？
+
+```terminal
+[connection]
+id=WiredConnection1
+uuid=02af3c0b-cca2-3a1f-bc6e-fe10fc9e2ed2
+type=ethernet
+autoconnect-priority=-999
+interface-name=eth0
+timestamp=1749010713
+
+[ethernet]
+
+[ipv4]
+address1=192.168.1.10/2
+method=manual
+never-default=true
+
+[ipv6]
+addr-gen-mode=stable-privacy
+method=disabled
+
+[proxy]
+```
+
+これを
+
+```terminal
+[ipv4]
+address1=192.168.1.10/24,10.163.112.1
+method=manual
+never-default=true
+```
+
+とちゃんと記述した。
+そしたら、Ethernet を繋げると
+
+```terminal
+PS C:\Users\odaseiji> ssh pi@10.163.113.223
+ssh: connect to host 10.163.113.223 port 22: Connection refused
+```
+
+が出るようになった。これは、何が原因か、、、
