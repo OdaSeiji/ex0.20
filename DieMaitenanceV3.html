@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/toppage.css" />
+    <!-- <link rel="stylesheet" href="./css/DieMaitenance.css" /> -->
+    <title>Die Mentenance V3</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">
+          Washing and Racking
+        </div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+
+    <div class="main__wrapper">
+      <h1 class="translation">Wash Dies and Rask</h1>
+      <div class="button-container after_press_dies">
+        <div class="after-press-dies__div">
+          <table class="after_press_dies__table" id="after_press_dies__table">
+            <caption class="table__caption">
+              After Press Dies List
+            </caption>
+            <thead>
+              <th>id</th>
+              <th>P Date</th>
+              <th>
+                Die Number
+                <input
+                  class="fillter-letters"
+                  id="after-press-die-number-sort__text"
+                  type="text"
+                />
+              </th>
+              <th>P/T</th>
+              <th>Tms</th>
+              <th>NG</th>
+              <th>Action</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>05/27</td>
+                <td>ABC12BDE-V02D</td>
+                <td>〇</td>
+                <td>2</td>
+                <td>NG</td>
+                <td>Wash</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="after-press-arrow__wrapper" class="arrow-img__wrapper">
+          <div>
+            <img
+              id="right-arrow__img"
+              src="./img/right_arrow-inactive.png"
+              alt="arrow"
+            />
+            <img
+              id="left-arrow__img"
+              src="./img/right_arrow-inactive.png"
+              alt="arrow"
+            />
+          </div>
+        </div>
+
+        <div class="washing-dies__wrapper">
+          <table class="washing-dies__table" id="washing-dies__table">
+            <caption class="table__caption washing-dies__caption">
+              Washing Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="washing-die-number-sort__text"
+                    type="text"
+                  />
+                </th>
+                <th>Tnk</th>
+                <th>I Date</th>
+                <!-- <td>Status</td> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>32</td>
+                <td>MGPMA0B3-V03D</td>
+                <td>3</td>
+                <td>05/20</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Tank No</div>
+            </div>
+            <select
+              name=""
+              id="tank_number__select"
+              class="save-data required-input"
+            >
+              <option value="0">-</option>
+              <option value="1">No.1 tank</option>
+              <option value="2">No.2 tank</option>
+              <option value="3">No.3 tank</option>
+              <option value="4">No.4 tank</option>
+            </select>
+          </div>
+
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select
+              name=""
+              id="wash-staff__select"
+              class="save-data required-input"
+            >
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="washing_date__input" class="save-data" type="date" />
+          </div>
+        </div>
+
+        <div class="racking-dies__wrapper inactive__div">
+          <table
+            id="racking-dies__table"
+            class="racking-dies__table inactive__table"
+          >
+            <caption class="table__caption racking-dies__caption">
+              Racking Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="racking-die-number-sort__text"
+                    type="text"
+                  />
+                </th>
+                <th>R Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>43</td>
+                <td>CG40DR-V02E</td>
+                <td>05/01</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select
+              name=""
+              id="rack-staff__select"
+              class="save-data required-input"
+            >
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="racking_date__input" type="date" / class="save-data">
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Note</div>
+            <!-- <input id="note__input" type="" / class="save-data"> -->
+            <textarea name="" id="note__textarea"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <h1 class="translation">After washing</h1>
+      <div class="button-container racking__wrapper">
+        <div id="washing-die-list__div">
+          <table id="washing_dies-2__table">
+            <caption class="table__caption washing-dies__caption">
+              Washing Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="washing-die-number-sort-2__text"
+                    type="text"
+                    disabled
+                  />
+                </th>
+                <th>Tnk</th>
+                <th>I Date</th>
+                <!-- <td>Status</td> -->
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>32</td>
+                <td>MGPMA0B3-V03D</td>
+                <td>3</td>
+                <td>05/20</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="after-wash-arrow__wrapper" class="arrow-img__wrapper">
+          <div id="wash-arrow-inner__wrapper">
+            <img
+              id="right-arrow-2__img"
+              src="./img/right_arrow-inactive.png"
+              alt="arrow"
+            />
+            <img
+              id="left-arrow-2__img"
+              src="./img/right_arrow-inactive.png"
+              alt="arrow"
+            />
+          </div>
+
+          <div class="input__wrapper">
+            <div class="title__wrapper">
+              <div class="title__letters">Staff</div>
+            </div>
+            <select
+              name=""
+              id="rack-staff-2__select"
+              class="save-data required-input"
+            >
+              <option value="0">-</option>
+            </select>
+          </div>
+          <div class="input__wrapper">
+            <div class="title__wrapper">Input Date</div>
+            <input id="racking_date-2__input" type="date" / class="save-data">
+          </div>
+        </div>
+
+        <div>
+          <table id="racking_dies-2__table" class="">
+            <caption class="table__caption racking-dies__caption">
+              Racking Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="racking-die-number-sort-2__text"
+                    type="text"
+                    disabled
+                  />
+                </th>
+                <th>R Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>43</td>
+                <td>CG40DR-V02E</td>
+                <td>05/01</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h1 class="translation">Die Fixing</h1>
+      <div class="button-container">
+        <div class="button-container">
+          <div>
+            <div class="caption__div">Dies List</div>
+            <div id="fix-die__list" class="die-fix__wrapper">
+              <table id="fixing-die__table" class="">
+                <caption class="table__caption racking-dies__caption">
+                  Dies List
+                </caption>
+                <thead>
+                  <tr>
+                    <th>dies_id</th>
+                    <th>
+                      Die Number
+                      <input
+                        class="fillter-letters"
+                        id="fix-die-list__text"
+                        type="text"
+                      />
+                    </th>
+                    <th>Date</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>32</td>
+                    <td>CG40DR-V02E</td>
+                    <td>05/01</td>
+                    <td>05/01</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div>
+            <div class="caption__div">Fix Content</div>
+            <div class="die-fix__wrapper inactive__div" id="fix-content__div">
+              <div id="radio__button" class="radio__button">
+                <button id="grind__button">Griding</button>
+                <button id="wire-cut__button" class="inactive__button">
+                  Wire Cutting
+                </button>
+                <div id="line__div"></div>
+              </div>
+              <div class="sub__wrapper">
+                <div class="input__wrapper">
+                  <div class="title__wrapper">Fixing Date</div>
+                  <input
+                    id="fixing-date__input"
+                    type="date"
+                    class="save-data"
+                  />
+                </div>
+                <div class="input__wrapper">
+                  <div class="title__wrapper">Add File</div>
+                  <form id="uploadForm">
+                    <input type="file" name="file_01" id="fileInput__input" />
+                    <label id="file_name__label" for="fileInput__input"
+                      >no file</label
+                    >
+                  </form>
+                </div>
+
+                <div class="input__wrapper">
+                  <div class="title__wrapper">
+                    <div class="title__letters">Staff</div>
+                  </div>
+                  <select
+                    name=""
+                    id="fix-staff__select"
+                    class="save-data required-input"
+                  >
+                    <option value="0">-</option>
+                  </select>
+                </div>
+
+                <div class="input__wrapper">
+                  <div class="title__wrapper">Note</div>
+                  <textarea name="" id="fix-note__textarea"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="caption__div">Pictures</div>
+            <div
+              id="picture__div"
+              class="die-fix__wrapper grid-container"
+            ></div>
+          </div>
+
+          <button id="fix-die-save__button" disabled>Save</button>
+        </div>
+      </div>
+    </div>
+    <script src="./lib/jquery.min.js"></script>
+    <!-- <script src="./scr/DieMaitenance.js"></script> -->
+  </body>
+</html>
