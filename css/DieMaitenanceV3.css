@@ -39,6 +39,10 @@ caption {
   padding: 10px;
 }
 
+.sub__wrapper.inactive__div {
+  border-color: rgb(205, 231, 234);
+}
+
 .inactive__div {
   caption {
     color: #91b1c4;
