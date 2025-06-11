@@ -226,7 +226,8 @@ tbody tr.selected-record {
   background-color: #ffff;
 }
 /* 表のレコードの不可視化 */
-table tbody tr.hide {
+table td:first-child,
+table th:first-child {
   display: none;
 }
 /* input要素をdisabledにしたとき */
@@ -277,9 +278,12 @@ select {
   width: calc(183px - 2px);
   height: 25px;
   padding: 0 1px 0 0;
-  font-family: "Roboto Mono", monospace;
+  font-family: "Roboto_Mono";
   font-weight: 300;
   font-size: 12pt;
+}
+option {
+  font-family: "Roboto_Mono";
 }
 select.required-input {
   background-color: #ffddae;
@@ -304,7 +308,7 @@ input {
   width: calc(180px - 1px);
   height: 25px;
   padding: 0 1px 0 0;
-  font-family: "Roboto_Mono", monospace;
+  font-family: "Roboto_Mono";
   font-weight: 300;
   font-size: 12pt;
 }

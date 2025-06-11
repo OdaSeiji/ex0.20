@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./css/main.css" />
     <link rel="stylesheet" href="./css/toppage.css" />
-    <!-- <link rel="stylesheet" href="./css/DieMaitenance.css" /> -->
-    <title>Die Mentenance V3</title>
+    <link rel="stylesheet" href="./css/DieMaitenanceV3.css" />
+    <title>Die Maintenance V3</title>
   </head>
   <body>
     <header>
@@ -33,60 +33,62 @@
       </div>
     </header>
 
-    <div class="main__wrapper">
+    <main>
       <h1 class="translation">Wash Dies and Rask</h1>
       <div class="button-container after_press_dies">
-        <div class="after-press-dies__div">
-          <table class="after_press_dies__table" id="after_press_dies__table">
-            <caption class="table__caption">
-              After Press Dies List
-            </caption>
-            <thead>
-              <th>id</th>
-              <th>P Date</th>
-              <th>
-                Die Number
-                <input
-                  class="fillter-letters"
-                  id="after-press-die-number-sort__text"
-                  type="text"
-                />
-              </th>
-              <th>P/T</th>
-              <th>Tms</th>
-              <th>NG</th>
-              <th>Action</th>
-            </thead>
-            <tbody>
-              <tr>
-                <td>21</td>
-                <td>05/27</td>
-                <td>ABC12BDE-V02D</td>
-                <td>〇</td>
-                <td>2</td>
-                <td>NG</td>
-                <td>Wash</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div id="after-press-arrow__wrapper" class="arrow-img__wrapper">
-          <div>
-            <img
-              id="right-arrow__img"
-              src="./img/right_arrow-inactive.png"
-              alt="arrow"
-            />
-            <img
-              id="left-arrow__img"
-              src="./img/right_arrow-inactive.png"
-              alt="arrow"
-            />
+        <div class="sub__wrapper">
+          <div class="after-press-dies__div">
+            <table class="after_press_dies__table" id="after_press_dies__table">
+              <caption class="table__caption">
+                After Press Dies List
+              </caption>
+              <thead>
+                <th>id</th>
+                <th>P Date</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="after-press-die-number-sort__text"
+                    type="text"
+                  />
+                </th>
+                <th>P/T</th>
+                <th>Tms</th>
+                <th>NG</th>
+                <th>Action</th>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>21</td>
+                  <td>05/27</td>
+                  <td>ABC12BDE-V02D</td>
+                  <td>〇</td>
+                  <td>2</td>
+                  <td>NG</td>
+                  <td>Wash</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div class="washing-dies__wrapper">
+        <div class="arrow-img__wrapper">
+          <img
+            class="right-arrow__img"
+            id="right-arrow__img"
+            src="./img/right_arrow-inactive.png"
+            alt="right-arrow"
+          />
+          <img
+            class="left-arrow__img"
+            id="left-arrow__img"
+            src="./img/right_arrow-inactive.png"
+            alt="left-arrow"
+          />
+        </div>
+
+        <div class="sub__wrapper washing-dies__wrapper">
           <table class="washing-dies__table" id="washing-dies__table">
             <caption class="table__caption washing-dies__caption">
               Washing Dies List
@@ -153,7 +155,7 @@
           </div>
         </div>
 
-        <div class="racking-dies__wrapper inactive__div">
+        <div class="sub__wrapper racking-dies__wrapper inactive__div">
           <table
             id="racking-dies__table"
             class="racking-dies__table inactive__table"
@@ -199,7 +201,7 @@
           </div>
           <div class="input__wrapper">
             <div class="title__wrapper">Input Date</div>
-            <input id="racking_date__input" type="date" / class="save-data">
+            <input id="racking_date__input" type="date" class="save-data" />
           </div>
           <div class="input__wrapper">
             <div class="title__wrapper">Note</div>
@@ -274,7 +276,7 @@
           </div>
           <div class="input__wrapper">
             <div class="title__wrapper">Input Date</div>
-            <input id="racking_date-2__input" type="date" / class="save-data">
+            <input id="racking_date-2__input" type="date" class="save-data" />
           </div>
         </div>
 
@@ -409,7 +411,76 @@
           <button id="fix-die-save__button" disabled>Save</button>
         </div>
       </div>
-    </div>
+
+      <h1 class="translation">Die history</h1>
+      <div class="button-container">
+        <div>
+          <div class="caption__div">All Dies Status</div>
+          <div class="die-fix__wrapper" id="all-dies__div">
+            <table id="all-dies__table" class="">
+              <caption class="table__caption racking-dies__caption">
+                All Dies List
+              </caption>
+
+              <thead>
+                <tr>
+                  <th>dies_id</th>
+                  <th>
+                    Die Number
+                    <input
+                      class="fillter-letters"
+                      id="die-sort__text"
+                      type="text"
+                    />
+                  </th>
+                  <th>P/T</th>
+                  <th>P Date</th>
+                  <th>Mente.</th>
+                  <th>M Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>32</td>
+                  <td>CG40DR-V02E</td>
+                  <td>〇</td>
+                  <td>24/05/01</td>
+                  <td>Grinding</td>
+                  <td>25/06/06</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="caption__div">History</div>
+          <div class="die-fix__wrapper" id="each-dies-history__div">
+            <table id="dies_history__table">
+              <caption class="table__caption racking-dies__caption">
+                History
+              </caption>
+              <thead>
+                <th>id</th>
+                <th>Date</th>
+                <th>Status</th>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <div class="caption__div">Pictures</div>
+          <div
+            class="die-fix__wrapper grid-container"
+            id="history-picture__div"
+          ></div>
+        </div>
+
+        <!-- <button id="test__btn">TEST</button> -->
+      </div>
+    </main>
     <script src="./lib/jquery.min.js"></script>
     <!-- <script src="./scr/DieMaitenance.js"></script> -->
   </body>
