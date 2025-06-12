@@ -34,6 +34,9 @@ caption {
 }
 
 .sub__wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border: 5px solid rgb(180, 217, 223);
   border-radius: 5px;
   padding: 10px;
@@ -60,10 +63,38 @@ caption {
   }
   select,
   input,
-  textarea {
+  textarea,
+  label {
     border-color: #b4d9df;
     background-color: #f0f0f0;
     color: #a0a0a0;
     /* font-size: 14pt; */
   }
+}
+
+.caption__div {
+  letter-spacing: 0.03em;
+  text-align: left;
+  font-size: 14pt;
+  font-weight: 500;
+  color: #377a94;
+  height: 26pt;
+}
+
+#fileInput__input {
+  display: none;
+}
+
+label {
+  background-color: white;
+  display: inline-block;
+  cursor: pointer;
+  border: solid 1px #377a94;
+  width: 150px;
+  height: 25px;
+  font-size: 12pt;
+}
+
+.picture__wrapper {
+  width: 500px;
 }

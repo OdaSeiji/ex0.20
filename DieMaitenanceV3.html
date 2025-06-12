@@ -315,162 +315,141 @@
 
       <h1 class="translation">Die Fixing</h1>
       <div class="button-container">
-        <div class="button-container">
-          <div>
-            <div class="caption__div">Dies List</div>
-            <div id="fix-die__list" class="die-fix__wrapper">
-              <table id="fixing-die__table" class="">
-                <caption class="table__caption racking-dies__caption">
-                  Dies List
-                </caption>
-                <thead>
-                  <tr>
-                    <th>dies_id</th>
-                    <th>
-                      Die Number
-                      <input
-                        class="fillter-letters"
-                        id="fix-die-list__text"
-                        type="text"
-                      />
-                    </th>
-                    <th>Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>32</td>
-                    <td>CG40DR-V02E</td>
-                    <td>05/01</td>
-                    <td>05/01</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <div class="caption__div">Fix Content</div>
-            <div class="die-fix__wrapper inactive__div" id="fix-content__div">
-              <div id="radio__button" class="radio__button">
-                <button id="grind__button">Griding</button>
-                <button id="wire-cut__button" class="inactive__button">
-                  Wire Cutting
-                </button>
-                <div id="line__div"></div>
-              </div>
-              <div class="sub__wrapper">
-                <div class="input__wrapper">
-                  <div class="title__wrapper">Fixing Date</div>
+        <div id="fix-die__list" class="sub__wrapper">
+          <table id="fixing-die__table" class="">
+            <caption class="table__caption racking-dies__caption">
+              Dies List
+            </caption>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>
+                  Die Number
                   <input
-                    id="fixing-date__input"
-                    type="date"
-                    class="save-data"
+                    class="fillter-letters"
+                    id="fix-die-list__text"
+                    type="text"
                   />
-                </div>
-                <div class="input__wrapper">
-                  <div class="title__wrapper">Add File</div>
-                  <form id="uploadForm">
-                    <input type="file" name="file_01" id="fileInput__input" />
-                    <label id="file_name__label" for="fileInput__input"
-                      >no file</label
-                    >
-                  </form>
-                </div>
+                </th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>CG40DR-V02E</td>
+                <td>05/01</td>
+                <td>05/01</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-                <div class="input__wrapper">
-                  <div class="title__wrapper">
-                    <div class="title__letters">Staff</div>
-                  </div>
-                  <select
-                    name=""
-                    id="fix-staff__select"
-                    class="save-data required-input"
-                  >
-                    <option value="0">-</option>
-                  </select>
-                </div>
+        <div class="sub__wrapper inactive__div" id="fix-content__div">
+          <div id="radio__button" class="radio__button">
+            <button id="grind__button">Griding</button>
+            <button id="wire-cut__button" class="inactive__button">
+              Wire Cutting
+            </button>
+            <div id="line__div"></div>
+          </div>
+          <div class="">
+            <div class="input__wrapper">
+              <div class="title__wrapper">Fixing Date</div>
+              <input id="fixing-date__input" type="date" class="save-data" />
+            </div>
+            <div class="input__wrapper">
+              <div class="title__wrapper">Add File</div>
+              <form id="uploadForm">
+                <input type="file" name="file_01" id="fileInput__input" />
+                <label id="file_name__label" for="fileInput__input"
+                  >no file</label
+                >
+              </form>
+            </div>
 
-                <div class="input__wrapper">
-                  <div class="title__wrapper">Note</div>
-                  <textarea name="" id="fix-note__textarea"></textarea>
-                </div>
+            <div class="input__wrapper">
+              <div class="title__wrapper">
+                <div class="title__letters">Staff</div>
               </div>
+              <select
+                name=""
+                id="fix-staff__select"
+                class="save-data required-input"
+              >
+                <option value="0">-</option>
+              </select>
+            </div>
+
+            <div class="input__wrapper">
+              <div class="title__wrapper">Note</div>
+              <textarea name="" id="fix-note__textarea"></textarea>
             </div>
           </div>
-
-          <div>
-            <div class="caption__div">Pictures</div>
-            <div
-              id="picture__div"
-              class="die-fix__wrapper grid-container"
-            ></div>
-          </div>
-
-          <button id="fix-die-save__button" disabled>Save</button>
         </div>
+
+        <div class="sub__wrapper picture__wrapper">
+          <div class="caption__div">Pictures</div>
+          <div id="picture__div" class="die-fix__wrapper grid-container"></div>
+        </div>
+
+        <button id="fix-die-save__button" disabled>Save</button>
       </div>
 
       <h1 class="translation">Die history</h1>
       <div class="button-container">
-        <div>
-          <div class="caption__div">All Dies Status</div>
-          <div class="die-fix__wrapper" id="all-dies__div">
-            <table id="all-dies__table" class="">
-              <caption class="table__caption racking-dies__caption">
-                All Dies List
-              </caption>
+        <div class="sub__wrapper" id="all-dies__div">
+          <table id="all-dies__table" class="">
+            <caption class="table__caption racking-dies__caption">
+              All Dies List
+            </caption>
 
-              <thead>
-                <tr>
-                  <th>dies_id</th>
-                  <th>
-                    Die Number
-                    <input
-                      class="fillter-letters"
-                      id="die-sort__text"
-                      type="text"
-                    />
-                  </th>
-                  <th>P/T</th>
-                  <th>P Date</th>
-                  <th>Mente.</th>
-                  <th>M Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>32</td>
-                  <td>CG40DR-V02E</td>
-                  <td>〇</td>
-                  <td>24/05/01</td>
-                  <td>Grinding</td>
-                  <td>25/06/06</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="die-sort__text"
+                    type="text"
+                  />
+                </th>
+                <th>P/T</th>
+                <th>P Date</th>
+                <th>Mente.</th>
+                <th>M Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>CG40DR-V02E</td>
+                <td>〇</td>
+                <td>24/05/01</td>
+                <td>Grinding</td>
+                <td>25/06/06</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div>
-          <div class="caption__div">History</div>
-          <div class="die-fix__wrapper" id="each-dies-history__div">
-            <table id="dies_history__table">
-              <caption class="table__caption racking-dies__caption">
-                History
-              </caption>
-              <thead>
-                <th>id</th>
-                <th>Date</th>
-                <th>Status</th>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+        <div class="sub__wrapper" id="each-dies-history__div">
+          <table id="dies_history__table">
+            <caption class="table__caption racking-dies__caption">
+              History
+            </caption>
+            <thead>
+              <th>id</th>
+              <th>Date</th>
+              <th>Status</th>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
 
-        <div>
+        <div class="sub__wrapper picture__wrapper">
           <div class="caption__div">Pictures</div>
           <div
             class="die-fix__wrapper grid-container"
