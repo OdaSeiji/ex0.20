@@ -1310,4 +1310,256 @@ ALTER TABLE m_title_name
 ADD COLUMN page_number INT;
 ```
 
-まずは、レイアウトを全体的に完成させるべき。そのうえで、共通で使える部分は共通に書いていく。
+まずは、レイアウトを全体的に完成させるべき。そのうえで、共通で使える部分は共通に書いていく。V3 作成中。
+
+窒化も加えられないか、見てみよう。
+二つの表にデータがバラバラになっているので、これを比較してみる。`t_dies_status`にはほとんど窒化の情報は入ってきていない。なので`t_nitriding`を見ればいい。そうすると、型別の前回窒化からの押出長さを算出する。
+
+```sql
+with latest_nitriding_date_by_dies_id as (
+  SELECT
+    m_dies.id as dies_id,
+    IFNULL(t10.nitriding_date_at, DATE_FORMAT('2021-1-1', '%Y-%d-%m')) as nitriding_date_at
+  from m_dies
+  left join (
+    select
+      t10.dies_id,
+      t10.nitriding_date_at
+    from t_nitriding as t10
+    where t10.nitriding_date_at = (
+      select
+        max(t2.nitriding_date_at)
+      from t_nitriding as t2
+      where t2.dies_id = t10.dies_id
+      group by t2.dies_id
+      )
+    ) as t10
+  on m_dies.id = t10.dies_id
+), dies_id_and_production_weight as (
+select
+  m_dies.id as dies_id,
+  m_production_numbers.specific_weight
+from m_dies
+left join m_production_numbers
+  on m_dies.production_number_id = m_production_numbers.id
+)
+select
+  t1.dies_id,
+  m_dies.die_number,
+  ROUND(SUM((3.14159 * POWER(t1.billet_size * 25.4 / 2, 2)
+    * t1.billet_length * 0.001 * 2.70 * t1.actual_billet_quantities / 1000)
+    / specific_weight /1000), 2) as length_km,
+  count(t1.id) as press_count
+from t_press as t1
+left join dies_id_and_production_weight
+  on t1.dies_id = dies_id_and_production_weight.dies_id
+left join m_dies
+  on t1.dies_id = m_dies.id
+where t1.press_date_at >
+  (
+    select latest_nitriding_date_by_dies_id.nitriding_date_at
+    from latest_nitriding_date_by_dies_id
+    where latest_nitriding_date_by_dies_id.dies_id = t1.dies_id
+  )
+group by t1.dies_id
+order by length_km desc
+;
+select
+  t1.dies_id,
+  t1.nitriding_date_at
+from t_nitriding as t1
+where t1.nitriding_date_at = (
+  select
+    max(t2.nitriding_date_at)
+  from t_nitriding as t2
+  where t2.dies_id = t1.dies_id
+  group by t2.dies_id
+  )
+;
+```
+
+こんな感じではないだろうか。いや、もしかしたら、一回も窒化していないやつは、ここに出てこないとか。。。これは修正済み。さらに多数本押しは、その分減らさないとですね。それと、窒化後のプレス回数で管理していないですね。窒化後の洗浄回数。
+
+```sql
+with latest_nitriding_date_by_dies_id as (
+  SELECT
+    m_dies.id as dies_id,
+    IFNULL(t10.nitriding_date_at, DATE_FORMAT('2021-1-1', '%Y-%d-%m')) as nitriding_date_at
+  from m_dies
+  left join (
+    select
+      t10.dies_id,
+      t10.nitriding_date_at
+    from t_nitriding as t10
+    where t10.nitriding_date_at = (
+      select
+        max(t2.nitriding_date_at)
+      from t_nitriding as t2
+      where t2.dies_id = t10.dies_id
+      group by t2.dies_id
+      )
+    ) as t10
+  on m_dies.id = t10.dies_id
+), dies_id_and_production_weight as (
+select
+  m_dies.id as dies_id,
+  m_production_numbers.specific_weight
+from m_dies
+left join m_production_numbers
+  on m_dies.production_number_id = m_production_numbers.id
+), washing_count_after_nitriding_by_dies_id as (
+select
+  t20.dies_id,
+  count(t20.dies_id) as washing_count_after_nitriding
+from t_dies_status as t20
+where
+  t20.die_status_id = 4
+  and
+  t20.do_sth_at >
+  (
+    select
+      latest_nitriding_date_by_dies_id.nitriding_date_at
+    from
+      latest_nitriding_date_by_dies_id
+    where
+      latest_nitriding_date_by_dies_id.dies_id = t20.dies_id
+  )
+group by t20.dies_id
+order by t20.dies_id
+)
+select
+  t1.dies_id,
+  m_dies.die_number,
+  ROUND(SUM((3.14159 * POWER(t1.billet_size * 25.4 / 2, 2)
+    * t1.billet_length * 0.001 * 2.70 * t1.actual_billet_quantities / 1000)
+    / specific_weight /1000 / m_dies.hole), 2) as length_km_after_nitiriding,
+  count(t1.id) as press_count_after_nitriding,
+  ifnull(washing_count_after_nitriding, 0) as washing_count_after_nitiriding
+from t_press as t1
+left join dies_id_and_production_weight
+  on t1.dies_id = dies_id_and_production_weight.dies_id
+left join m_dies
+  on t1.dies_id = m_dies.id
+left join washing_count_after_nitriding_by_dies_id
+  on t1.dies_id = washing_count_after_nitriding_by_dies_id.dies_id
+where t1.press_date_at >
+  (
+    select latest_nitriding_date_by_dies_id.nitriding_date_at
+    from latest_nitriding_date_by_dies_id
+    where latest_nitriding_date_by_dies_id.dies_id = t1.dies_id
+  )
+group by t1.dies_id
+order by length_km_after_nitiriding desc
+;
+```
+
+これで出来るように放ったが、これに total lenth とか total washing とか入れるとなると、更に長くなる。元々、t_dies の左結合が出来るようになるべきじゃないか。作り直すかな、、、考え方として、型別の、前回の窒化からの、押出距離、洗浄回数、と押出距離、洗浄回数。
+では、まずは、`m_dies`へ左結合できるように前回の窒化からの押出距離、洗浄回数を出してみよう。押出距離は出た。次は洗浄回数。出来た。次は、トータルの押出距離。次は、型別の洗浄回数。
+
+```sql
+set @washing_die_status = 4;
+set @specific_gravity_of_aluminum = 2.70;
+set @pi = 3.141459;
+set @inch = 25.4;
+with latest_nitriding_date_by_dies_id as (
+  SELECT
+    m_dies.id as dies_id,
+    IFNULL(t10.nitriding_date_at, DATE_FORMAT('2021-1-1', '%Y-%m-%d')) as nitriding_date_at
+  from m_dies
+  left join (
+    select
+      t10.dies_id,
+      t10.nitriding_date_at
+    from t_nitriding as t10
+    where t10.nitriding_date_at = (
+      select
+        max(t2.nitriding_date_at)
+      from t_nitriding as t2
+      where t2.dies_id = t10.dies_id
+      group by t2.dies_id
+      )
+    ) as t10
+  on m_dies.id = t10.dies_id
+), profile_length_after_nitriding_by_dies_id as (
+  select
+    t_press.dies_id,
+    round(SUM(((@pi * POWER(t_press.billet_size * @inch / 2, 2)
+      * t_press.billet_length * 0.001 * @spcific_grabity_of_alminium
+      * t_press.actual_billet_quantities / 1000)
+      / specific_weight /1000 / m_dies.hole)), 2) as length_km_after_nitiriding
+  #  count(t_press.id) as press_count_after_nitriding
+  from latest_nitriding_date_by_dies_id
+  left join t_press
+    on t_press.dies_id = latest_nitriding_date_by_dies_id.dies_id
+  left join m_dies
+    on latest_nitriding_date_by_dies_id.dies_id = m_dies.id
+  left join m_production_numbers
+    on m_dies.production_number_id = m_production_numbers.id
+  where t_press.press_date_at > latest_nitriding_date_by_dies_id.nitriding_date_at
+  group by t_press.dies_id
+), washing_count_after_nitriding_by_dies_id as (
+  select
+    t_dies_status.dies_id,
+    count(t_dies_status.dies_id) as washing_count_after_nitriding
+  from t_dies_status
+  left join latest_nitriding_date_by_dies_id
+    on t_dies_status.dies_id = latest_nitriding_date_by_dies_id.dies_id
+  where
+    t_dies_status.die_status_id = @washing_die_status
+    and
+    t_dies_status.do_sth_at > latest_nitriding_date_by_dies_id.nitriding_date_at
+  group by t_dies_status.dies_id
+), dies_id_and_production_weight as (
+select
+  m_dies.id as dies_id,
+  m_dies.hole,
+  m_production_numbers.specific_weight
+from m_dies
+left join m_production_numbers
+  on m_dies.production_number_id = m_production_numbers.id
+), total_profile_length_by_dies_id as (
+  select
+    t_press.dies_id,
+    round(SUM(((@pi * POWER(t_press.billet_size * @inch / 2, 2)
+        * t_press.billet_length * 0.001 * @specific_gravity_of_aluminum
+        * t_press.actual_billet_quantities / 1000)
+        / specific_weight /1000 / hole)), 2) as total_profile_length
+  from t_press
+  left join dies_id_and_production_weight
+    on t_press.dies_id = dies_id_and_production_weight.dies_id
+  group by t_press.dies_id
+), total_washing_count_by_dies_id as (
+  select
+    t_dies_status.dies_id,
+    count(*) as count
+  from t_dies_status
+  where t_dies_status.die_status_id = 4
+  group by t_dies_status.dies_id
+)
+select
+  m_dies.id,
+  m_dies.die_number,
+  ifnull(profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding, 0)
+    as profile_length_after_nitriding,
+  ifnull(washing_count_after_nitriding_by_dies_id.washing_count_after_nitriding, 0)
+    as washing_count_after_nitriding,
+  ifnull(total_profile_length_by_dies_id.total_profile_length, 0) as total_profile_length,
+  ifnull(total_washing_count_by_dies_id.count, 0) as total_washing_count
+from m_dies
+left join profile_length_after_nitriding_by_dies_id
+  on m_dies.id = profile_length_after_nitriding_by_dies_id.dies_id
+left join washing_count_after_nitriding_by_dies_id
+  on washing_count_after_nitriding_by_dies_id.dies_id = m_dies.id
+left join total_profile_length_by_dies_id
+  on total_profile_length_by_dies_id.dies_id = m_dies.id
+left JOIN total_washing_count_by_dies_id
+  on total_washing_count_by_dies_id.dies_id = m_dies.id
+order by profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding desc
+```
+
+これかな。。。
+これをページの一番下に入れますか。。。html は出来た。
+窒化の履歴と、型別の履歴も表示できた。
+表のフィルター掛けをオブジェクト化できた。
+
+次は、表のソート機能。

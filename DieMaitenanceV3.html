@@ -34,6 +34,7 @@
     </header>
 
     <main>
+      <!-- ************    1st Row  *********************** -->
       <h1 class="translation">Wash Dies and Rask</h1>
       <div class="button-container after_press_dies">
         <div class="sub__wrapper">
@@ -211,10 +212,11 @@
         </div>
       </div>
 
+      <!-- ************    2nd Row  *********************** -->
       <h1 class="translation">After washing</h1>
       <div class="button-container racking__wrapper">
         <div class="sub__wrapper" id="washing-die-list__div">
-          <table id="washing_dies-2__table">
+          <table class="washing-dies__table" id="washing_dies-2__table">
             <caption class="table__caption washing-dies__caption">
               Washing Dies List
             </caption>
@@ -281,7 +283,11 @@
         </div>
 
         <div class="sub__wrapper">
-          <table id="racking_dies-2__table" class="">
+          <table
+            class="racking-dies__table"
+            id="racking_dies-2__table"
+            class=""
+          >
             <caption class="table__caption racking-dies__caption">
               Racking Dies List
             </caption>
@@ -313,6 +319,7 @@
         </div>
       </div>
 
+      <!-- ************    3rd Row  *********************** -->
       <h1 class="translation">Die Fixing</h1>
       <div class="button-container">
         <div id="fix-die__list" class="sub__wrapper">
@@ -397,10 +404,11 @@
         <button id="fix-die-save__button" disabled>Save</button>
       </div>
 
+      <!-- ************    4th Row  *********************** -->
       <h1 class="translation">Die history</h1>
       <div class="button-container">
         <div class="sub__wrapper" id="all-dies__div">
-          <table id="all-dies__table" class="">
+          <table id="all-dies__table" class="all-dies__table">
             <caption class="table__caption racking-dies__caption">
               All Dies List
             </caption>
@@ -410,11 +418,7 @@
                 <th>dies_id</th>
                 <th>
                   Die Number
-                  <input
-                    class="fillter-letters"
-                    id="die-sort__text"
-                    type="text"
-                  />
+                  <input class="fillter-letters" id="" type="text" />
                 </th>
                 <th>P/T</th>
                 <th>P Date</th>
@@ -436,7 +440,7 @@
         </div>
 
         <div class="sub__wrapper" id="each-dies-history__div">
-          <table id="dies_history__table">
+          <table class="dies-history__table" id="dies_history__table">
             <caption class="table__caption racking-dies__caption">
               History
             </caption>
@@ -459,8 +463,69 @@
 
         <!-- <button id="test__btn">TEST</button> -->
       </div>
+
+      <!-- ************    5th Row  *********************** -->
+      <h1 class="translation">Nitriding</h1>
+      <div class="button-container">
+        <div class="sub__wrapper" id="">
+          <table id="nitriding__table" class="nitriding__table">
+            <caption class="table__caption">
+              Nitriding
+            </caption>
+
+            <thead>
+              <tr>
+                <th>dies_id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="nitriding-fileter__input"
+                    type="text"
+                  />
+                </th>
+                <th>Length</th>
+                <th class="sort__th">Wash count</th>
+                <th>Total Length</th>
+                <th>Total wash</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>32</td>
+                <td>CG40DR-V02E</td>
+                <td>〇</td>
+                <td>24/05/01</td>
+                <td>Grinding</td>
+                <td>25/06/06</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sub__wrapper">
+          <table id="nitriding-hisotry__table" class="nitriding-history__table">
+            <caption class="table__caption" id="nitriding-history__caption">
+              Nitriding Hisotry
+            </caption>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>Date</th>
+                <th>Length</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>99</td>
+                <td>21/08/21</td>
+                <td>5.68</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </main>
     <script src="./lib/jquery.min.js"></script>
-    <!-- <script src="./scr/DieMaitenance.js"></script> -->
+    <script src="./scr/DieMaitenanceV3.js"></script>
   </body>
 </html>
