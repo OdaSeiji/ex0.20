@@ -4,6 +4,7 @@ let rackingDieTable = new Object();
 let fixDieTable = new Object();
 let allDiesTable = new Object();
 let nitridingTable = new Object();
+let allNitridingTable = new Object();
 let ajaxReturnData;
 let tableFilterConfig = {
   targetTableBody: null,
@@ -78,6 +79,7 @@ $(function () {
   console.log("Hello");
   makeNitridingTable();
   applyHighlightToNitridingTable();
+  makeAllNitridingRecordTable();
   // makeNitridingHistoryTable();
 });
 
@@ -100,6 +102,16 @@ function makeNitridingHistoryTable(dieId) {
   myAjax.myAjax(fileName, sendData);
   // console.log(ajaxReturnData);
   fillTableBody(ajaxReturnData, $("#nitriding-hisotry__table tbody"));
+}
+
+function makeAllNitridingRecordTable() {
+  var fileName = "./php/DieMaitenance/SelAllNitridingRecord.php";
+  var sendData = {
+    dieId: "dummy",
+  };
+  myAjax.myAjax(fileName, sendData);
+  allNitridingTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#all-nitriding-record__table tbody"));
 }
 
 function applyHighlightToNitridingTable() {
@@ -149,6 +161,16 @@ $(document).on("change", "#nitriding-fileter__input", function () {
   };
   tableFilter(tableFilterConfig);
   applyHighlightToNitridingTable();
+});
+
+$(document).on("change", "#all-nitriding__input", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#all-nitriding-record__table tbody"),
+    targetTableContent: allNitridingTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
 });
 
 function tableFilter(tableFilterConfig) {

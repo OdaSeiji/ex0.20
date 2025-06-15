@@ -1563,3 +1563,4 @@ order by profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding de
 表のフィルター掛けをオブジェクト化できた。
 
 次は、表のソート機能。
+汎用的に、実装完了。で、一回も窒化していない金型が有るらしい。なので、単純に窒化の記録を一覧表示し、型番で検索できるようにする。

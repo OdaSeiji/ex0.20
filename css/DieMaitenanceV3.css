@@ -48,6 +48,7 @@ input:focus {
   border: 5px solid rgb(180, 217, 223);
   border-radius: 5px;
   padding: 10px;
+  margin-bottom: 50px;
 }
 
 .sub__wrapper.inactive__div {
@@ -279,6 +280,20 @@ tbody {
   th:nth-child(3),
   td:nth-child(3) {
     width: 120px;
+  }
+  td:nth-child(3) {
+    text-align: right;
+  }
+}
+
+.all-nitriding-record__table {
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 180px;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 150px;
   }
   td:nth-child(3) {
     text-align: right;
