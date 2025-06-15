@@ -524,3 +524,12 @@ ssh: connect to host 10.163.113.223 port 22: Connection refused
 ```
 
 が出るようになった。これは、何が原因か、、、
+今のところ、時々ログインできるので、ログインした時に、ログを見たいが、ログが取られていない。
+ログを取るソフトが動いていないことが原因。
+
+```terminal
+sudo apt update
+sudo apt install rsyslog
+```
+
+が必要のようだが、これ、どうやってインストールするか。。。
