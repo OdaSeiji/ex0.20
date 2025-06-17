@@ -1564,3 +1564,62 @@ order by profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding de
 
 次は、表のソート機能。
 汎用的に、実装完了。で、一回も窒化していない金型が有るらしい。なので、単純に窒化の記録を一覧表示し、型番で検索できるようにする。
+
+なんでか、after press table が表示されなくなる問題が発生。いま、改めてみてみると、なんとも無駄の多いというか、理解の苦しむ`SQL`になっているので、改定する。
+
+ここは、現場に有る金型で、洗うか、ラッキング記録の無い金型。
+
+- 型別の最新の押出の後に、洗い、ラッキングの情報が無い金型。
+  まずは、型別の最新の押出の抽出。それらの金型の洗いか、ラッキングの最新情報が有れば、表示しない。
+
+```sql
+WITH latest_press_date_by_die_id AS(
+  SELECT
+    t1.id as press_id,
+    t1.dies_id,
+    t1.pressing_type_id,
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND AS press_date_at
+  FROM
+    t_press AS t1
+  WHERE
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND = (
+      SELECT
+        MAX(t2.press_date_at + INTERVAL TIME_TO_SEC(t2.press_start_at) SECOND)
+      FROM
+        t_press AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+  ORDER BY
+    t1.dies_id
+), latest_washing_or_racking_date_by_die_id as (
+  SELECT
+    t1.id as t_dies_status_id,
+    t1.dies_id,
+    t1.do_sth_at,
+    t1.die_status_id
+  FROM
+    t_dies_status AS t1
+  WHERE
+    t1.do_sth_at = (
+      SELECT
+        MAX(t2.do_sth_at)
+      FROM
+        t_dies_status AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.die_status_id IN(@washing, @racking)
+      and t2.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+)
+select
+  *
+from latest_press_date_by_die_id
+left join latest_washing_or_racking_date_by_die_id
+  on latest_press_date_by_die_id.dies_id = latest_washing_or_racking_date_by_die_id.dies_id
+where latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
+;
+```
