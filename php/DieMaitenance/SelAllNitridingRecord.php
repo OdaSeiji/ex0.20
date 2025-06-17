@@ -35,7 +35,7 @@ SELECT
 from t_nitriding
 left join m_dies
   on t_nitriding.dies_id = m_dies.id
-order by t_nitriding.nitriding_date_at desc
+order by t_nitriding.nitriding_date_at desc, m_dies.die_number
 
       ";
 

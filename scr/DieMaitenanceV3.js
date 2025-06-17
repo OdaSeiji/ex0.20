@@ -76,12 +76,26 @@ function fillTableBody(data, tbodyDom) {
 }
 
 $(function () {
-  console.log("Hello");
+  makeAfterPressTalbe();
+  applyHighlightToAfterPressTable();
   makeNitridingTable();
   applyHighlightToNitridingTable();
   makeAllNitridingRecordTable();
+
+  makeWashingDieTable();
   // makeNitridingHistoryTable();
 });
+
+function makeAfterPressTalbe() {
+  var fileName = "./php/DieMaitenance/SelAfterPressDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#after_press_dies__table tbody"));
+}
 
 function makeNitridingTable() {
   var fileName = "./php/DieMaitenance/SelNitriding.php";
@@ -114,19 +128,53 @@ function makeAllNitridingRecordTable() {
   fillTableBody(ajaxReturnData, $("#all-nitriding-record__table tbody"));
 }
 
+function makeWashingDieTable() {
+  var fileName = "./php/DieMaitenance/SelWashingDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+  myAjax.myAjax(fileName, sendData);
+  fillTableBody(ajaxReturnData, $("#washing-dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#washing-dies-2__table tbody"));
+  washingDieTable = ajaxReturnData;
+}
+
+function applyHighlightToAfterPressTable() {
+  const targetObj = $("#after_press_dies__table tbody tr");
+  targetObj.each(function () {
+    const $row = $(this);
+    const result = $row.find("td:nth-child(7)").text();
+    if (result == "Wash") {
+      $row.addClass("redHighlight");
+    }
+  });
+}
+
 function applyHighlightToNitridingTable() {
-  const lnegthThreshold = 3;
+  const lnegthThreshold260 = 3.5;
+  const lnegthThreshold300 = 2.5;
   const washingThreshold = 5;
   const targetObj = $("#nitriding__table tbody tr");
   targetObj.each(function () {
     const $row = $(this);
-    const profileLength = parseInt($row.find("td:nth-child(3)").text());
+    const profileLength = parseFloat($row.find("td:nth-child(3)").text());
     const washingCount = parseInt($row.find("td:nth-child(4)").text());
-    if (
-      (!isNaN(profileLength) && profileLength > lnegthThreshold) ||
-      (!isNaN(washingCount) && washingCount >= washingThreshold)
-    ) {
-      $row.addClass("redHighlight");
+    const dieDiamater = parseInt($row.find("td:nth-child(7)").text());
+
+    if (dieDiamater >= 300) {
+      if (
+        (!isNaN(profileLength) && profileLength > lnegthThreshold300) ||
+        (!isNaN(washingCount) && washingCount >= washingThreshold)
+      ) {
+        $row.addClass("redHighlight");
+      }
+    } else if (dieDiamater <= 260) {
+      if (
+        (!isNaN(profileLength) && profileLength > lnegthThreshold260) ||
+        (!isNaN(washingCount) && washingCount >= washingThreshold)
+      ) {
+        $row.addClass("redHighlight");
+      }
     }
   });
 }
@@ -148,9 +196,13 @@ $(document).on("keydown", "#nitriding-fileter__input", function (event) {
   }
 });
 
-$(document).on("keyup", "#nitriding-fileter__input", function () {
-  $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
-});
+$(document).on(
+  "keyup",
+  "#nitriding-fileter__input, #all-nitriding__input",
+  function () {
+    $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
+  }
+);
 
 $(document).on("change", "#nitriding-fileter__input", function () {
   tableFilterConfig = {
