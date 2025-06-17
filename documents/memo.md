@@ -1883,3 +1883,4 @@ order by date_format(after_press_dies.press_date_at, '%y%m%d') desc, m_dies.die_
 
 窒化後の金型の閾値による色付けも完了。
 次は、V3 の作成の継続。
+表の読み出しは、出来るようになった。次は、1 段目のアクティベート。

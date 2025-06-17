@@ -82,7 +82,13 @@ $(function () {
   applyHighlightToNitridingTable();
   makeAllNitridingRecordTable();
 
+  makeRackingTable();
+
   makeWashingDieTable();
+
+  makeFixDieList();
+
+  makeAllDiesStatusTable();
   // makeNitridingHistoryTable();
 });
 
@@ -137,6 +143,46 @@ function makeWashingDieTable() {
   fillTableBody(ajaxReturnData, $("#washing-dies__table tbody"));
   fillTableBody(ajaxReturnData, $("#washing-dies-2__table tbody"));
   washingDieTable = ajaxReturnData;
+}
+
+function makeRackingTable() {
+  const fileName = "./php/DieMaitenance/SelRackingDies.php";
+  const sendData = {
+    dieName: "%",
+  };
+
+  $("#racking-dies__table tbody").empty();
+  $("#racking_dies-2__table tbody").empty();
+  myAjax.myAjax(fileName, sendData);
+
+  rackingDieTable = ajaxReturnData;
+  // summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#racking-dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#racking_dies-2__table tbody"));
+}
+
+function makeFixDieList() {
+  const fileName = "./php/DieMaitenance/SelFixDieList.php";
+  const sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  fixDieTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#fixing-die__table tbody"));
+}
+
+function makeAllDiesStatusTable() {
+  var fileName = "./php/DieMaitenance/SelAllDiesStatus.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+
+  console.log("hello");
+
+  myAjax.myAjax(fileName, sendData);
+  allDiesTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#all-dies-status__table tbody"));
 }
 
 function applyHighlightToAfterPressTable() {
@@ -295,3 +341,12 @@ function tableDataSort(tableSortConfig) {
 
   return tableSortConfig.tableContent;
 }
+
+// ===============================================================
+// ===============================================================
+// ===============================================================
+// ===============================================================
+
+$(document).on("click", ".washing-dies__wrapper", function () {
+  console.log("hello--");
+});

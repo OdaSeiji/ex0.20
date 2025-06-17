@@ -818,7 +818,7 @@ function makeAllDiesStatusTable() {
 
   myAjax.myAjax(fileName, sendData);
   allDiesTable = ajaxReturnData;
-  fillTableBody(ajaxReturnData, $("#all-dies__table tbody"));
+  fillTableBody(ajaxReturnData, $("#all-dies-status__table tbody"));
 }
 
 $(document).on("click", "#test__btn", function () {
