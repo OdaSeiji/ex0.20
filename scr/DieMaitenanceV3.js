@@ -76,6 +76,14 @@ function fillTableBody(data, tbodyDom) {
 }
 
 $(function () {
+  const today = new Date();
+  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
+
+  $("#washing_date__input").val(formattedDate);
+  $("#racking_date__input").val(formattedDate);
+  $("#racking_date-2__input").val(formattedDate);
+  $("#fixing-date__input").val(formattedDate);
+
   makeAfterPressTalbe();
   applyHighlightToAfterPressTable();
   makeNitridingTable();
@@ -236,15 +244,23 @@ $(document).on("click", "#nitriding__table tbody tr", function () {
   makeNitridingHistoryTable(dieId);
 });
 
-$(document).on("keydown", "#nitriding-fileter__input", function (event) {
-  if (event.key === "Enter") {
-    $(this).blur();
+$(document).on(
+  "keydown",
+  "#nitriding-fileter__input, " +
+    "#after-press-die-number-sort__text, " +
+    "#washing-die-number-sort__text",
+  function (event) {
+    if (event.key === "Enter") {
+      $(this).blur();
+    }
   }
-});
+);
 
 $(document).on(
   "keyup",
-  "#nitriding-fileter__input, #all-nitriding__input",
+  "#nitriding-fileter__input, #all-nitriding__input, " +
+    "#after-press-die-number-sort__text," +
+    "#washing-die-number-sort__text",
   function () {
     $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
   }
@@ -265,6 +281,26 @@ $(document).on("change", "#all-nitriding__input", function () {
   tableFilterConfig = {
     targetTableBody: $("#all-nitriding-record__table tbody"),
     targetTableContent: allNitridingTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+});
+
+$(document).on("change", "#after-press-die-number-sort__text", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#after_press_dies__table tbody"),
+    targetTableContent: summaryTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+});
+
+$(document).on("change", "#washing-die-number-sort__text", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#washing-dies__table tbody"),
+    targetTableContent: washingDieTable,
     targetColumnName: "die_number",
     filterText: $(this).val(),
   };
@@ -348,5 +384,39 @@ function tableDataSort(tableSortConfig) {
 // ===============================================================
 
 $(document).on("click", ".washing-dies__wrapper", function () {
-  console.log("hello--");
+  $(this).removeClass("inactive__div");
+  $(".racking-dies__wrapper").addClass("inactive__div");
+
+  $("#tank_number__select")
+    .val("0")
+    .attr("disabled", false)
+    .addClass("required-input");
+  $("#wash-staff__select")
+    .val("0")
+    .attr("disabled", false)
+    .addClass("required-input");
+  $("#washing_date__input").attr("disabled", false);
+
+  $("#racking-dies__table .selected-record").removeClass("selected-record");
+
+  $("#racking-die-number-sort__text").val("");
+});
+
+$(document).on("click", ".racking-dies__wrapper.inactive__div", function () {
+  $(this).removeClass("inactive__div");
+  $(".washing-dies__wrapper").addClass("inactive__div");
+
+  $("#tank_number__select")
+    .val("0")
+    .attr("disabled", true)
+    .addClass("required-input");
+  $("#wash-staff__select")
+    .val("0")
+    .attr("disabled", true)
+    .addClass("required-input");
+  $("#washing_date__input").attr("disabled", true);
+
+  $("#washing-dies__table .selected-record").removeClass("selected-record");
+
+  $("#washing-die-number-sort__text").val("");
 });
