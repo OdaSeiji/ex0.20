@@ -132,7 +132,8 @@ select
   			then if((after_press_ng_dies_id.die_status_id IS not NULL) or (press_count_no_wash > 1), 'Wash', 'Rack')
     	when m_pressing_type.id = 3
 			  then if((after_press_ng_dies_id.die_status_id IS not NULL) or (press_count_no_wash > 1), 'Wash', 'Rack')
-      end as action
+      end as action,
+    DATE_FORMAT(after_press_dies.press_date_at, '%y%m%d') as yymmdd
 from after_press_dies
 left join press_count_after_wash
   on after_press_dies.dies_id = press_count_after_wash.dies_id

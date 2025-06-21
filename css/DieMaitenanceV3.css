@@ -149,7 +149,11 @@ tbody {
   }
   th:nth-child(7),
   td:nth-child(7) {
-    width: 55px;
+    width: 65px;
+  }
+  th:nth-child(8),
+  td:nth-child(8) {
+    display: none;
   }
 }
 
