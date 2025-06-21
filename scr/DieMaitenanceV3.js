@@ -100,6 +100,8 @@ $(function () {
   // makeNitridingHistoryTable();
 
   makeWashingStaffSelect();
+
+  makeRackingStaffSelect();
 });
 
 function makeAfterPressTalbe() {
@@ -247,6 +249,27 @@ function makeWashingStaffSelect() {
       .val(value["id"])
       .html(value["staff_name"])
       .appendTo("#wash-staff__select");
+  });
+}
+
+function makeRackingStaffSelect() {
+  const fileName = "./php/DieMaitenance/SelStaffList.php";
+  const sendData = {
+    staffOrder: staffOrderMode,
+  };
+  myAjax.myAjax(fileName, sendData);
+  $("#rack-staff__select").empty().append($("<option>").html("-").val(0));
+  $("#rack-staff-2__select").empty().append($("<option>").html("-").val(0));
+
+  ajaxReturnData.forEach(function (value) {
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo("#rack-staff__select");
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo("#rack-staff-2__select");
   });
 }
 // color record
@@ -506,23 +529,34 @@ $(document).on("change", "select", function () {
   $(this).toggleClass("required-input", $(this).val() == "0");
 });
 
-// 1st row actvation arrow
+// 1st row, arrow actvation
 $(document).on(
   "click change",
-  ".after-press-dies__wrapper, .washing-dies__wrapper",
+  ".after-press-dies__wrapper, .washing-dies__wrapper, .racking-dies__wrapper",
   function () {
     const afterPressSelectRows = $(
       "#after_press_dies__table tr.selected-record"
     );
-    const washingSelectRows = $("#washing-dies__table tr.selected-record");
-    const selectElements = $("div.washing-dies__wrapper").find("select");
+    let selectRows;
+    let selectElements;
     let rightArrowFlag = true;
     let leftArrowFlag = true;
+
+    switch (washingOrRacking) {
+      case "washing":
+        selectElements = $("div.washing-dies__wrapper").find("select");
+        selectRows = $("#washing-dies__table tr.selected-record");
+        break;
+      case "racking":
+        selectElements = $("div.racking-dies__wrapper").find("select");
+        selectRows = $("#racking-dies__table tr.selected-record");
+        break;
+    }
 
     if (afterPressSelectRows.length == 0) {
       rightArrowFlag = false;
     }
-    if (washingSelectRows.length == 0) {
+    if (selectRows.length == 0) {
       leftArrowFlag = false;
     }
 
@@ -562,7 +596,7 @@ $(document).on("click", "#right-arrow__img.active", function () {
   const currentTime = `${hours}:${minutes}:${seconds}`;
   const currentDayteTime = $("#washing_date__input").val() + " " + currentTime;
   const currentDate = $("#washing_date__input").val();
-  const tankNumber = $("#tank_number__select").val();
+  const tankNumber = Number($("#tank_number__select").val());
   const note = $("#note__textarea").val();
   const data = [];
   const dieIdObj = $(
@@ -584,7 +618,7 @@ $(document).on("click", "#right-arrow__img.active", function () {
 
   dieIdObj.each(function () {
     data.push([
-      $(this).html(), // die_id
+      Number($(this).html()), // die_id
       currentDayteTime, // input_date_time
       tankNumber, // tank number
       currentDate, // input_date
@@ -594,7 +628,7 @@ $(document).on("click", "#right-arrow__img.active", function () {
     ]);
   });
 
-  console.log(data);
+  // console.log(data);
   // return;
 
   const fileName = "./php/DieMaitenance/InsDieStatus.php";
@@ -612,7 +646,7 @@ $(document).on("click", "#right-arrow__img.active", function () {
       makeRackingTable();
       break;
   }
-
+  // console.log("hello");
   // color the selected dies name
   switch (washingOrRacking) {
     case "washing":
@@ -634,10 +668,12 @@ $(document).on("click", "#right-arrow__img.active", function () {
         .removeClass("active");
       break;
     case "racking":
-      $("#racking_dies__table tbody tr").each(function () {
-        const cellText = $(this).find("td").eq(0).text();
+      $("#racking-dies__table tbody tr").each(function () {
+        const dieIdText = $(this).find("td").eq(0).text();
         const targetTr = $(this);
         dieIdObj.each(function () {
+          console.log(dieIdText);
+          console.log($(this).html());
           if (Number(dieIdText) === Number($(this).html())) {
             targetTr.addClass("selected-record");
           }
@@ -663,9 +699,7 @@ $("#left-arrow__img").on("click", function () {
       dieStatusIdObj = $("#washing-dies__table tr.selected-record");
       break;
     case "racking":
-      dieStatusIdObj = $(
-        "#racking-dies__table tr.selected-record td:nth-child(2)"
-      );
+      dieStatusIdObj = $("#racking-dies__table tr.selected-record");
       break;
   }
   dieStatusIdObj.each(function () {
@@ -676,7 +710,7 @@ $("#left-arrow__img").on("click", function () {
   sendData = {
     dieStatudId: dieStatusId,
   };
-
+  console.log(sendData);
   myAjax.myAjax(fileName, sendData);
 
   // return;
@@ -687,11 +721,6 @@ $("#left-arrow__img").on("click", function () {
   $("#after_press_dies__table tbody tr").each(function () {
     const dieIdText = $(this).find("td").eq(0).text();
     const targetTr = $(this);
-    // dieIdObj.each(function () {
-    //   if (Number(dieIdText) === Number($(this).html())) {
-    //     targetTr.addClass("selected-record");
-    //   }
-    // });
     dieId.forEach(function (value, index) {
       if (Number(dieIdText) === Number(value)) {
         targetTr.addClass("selected-record");
