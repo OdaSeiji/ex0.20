@@ -94,7 +94,7 @@ $(function () {
 
   makeRackingTable();
 
-  // makeFixDieList();
+  makeFixDieList();
 
   // makeAllDiesStatusTable();
   // makeNitridingHistoryTable();
@@ -102,6 +102,8 @@ $(function () {
   makeWashingStaffSelect();
 
   makeRackingStaffSelect();
+
+  makeFixStaffSelectSelect();
 });
 
 function makeAfterPressTalbe() {
@@ -272,6 +274,24 @@ function makeRackingStaffSelect() {
       .appendTo("#rack-staff-2__select");
   });
 }
+
+function makeFixStaffSelectSelect() {
+  const fileName = "./php/DieMaitenance/SelFixStaffList.php";
+  const sendData = {
+    staffOrder: staffOrderMode,
+  };
+  const targetObj = $("#fix-staff__select");
+  myAjax.myAjax(fileName, sendData);
+  targetObj.empty();
+  targetObj.append($("<option>").html("-").val(0));
+
+  ajaxReturnData.forEach(function (value) {
+    $("<option>")
+      .val(value["id"])
+      .html(value["staff_name"])
+      .appendTo(targetObj);
+  });
+}
 // color record
 $(document).on("click", "table tbody tr", function () {
   $(this).toggleClass("selected-record");
@@ -291,12 +311,22 @@ $(document).on("click", "#nitriding__table tbody tr", function () {
   $("#nitriding-history__caption").html("'" + dieNumber + "' history");
   makeNitridingHistoryTable(dieId);
 });
+// ========================================================================
+// ========================================================================
+// ========================================================================
+// table filter section
+// ========================================================================
+// ========================================================================
+// ========================================================================
 
 $(document).on(
   "keydown",
   "#nitriding-fileter__input, " +
     "#after-press-die-number-sort__text, " +
-    "#washing-die-number-sort__text",
+    "#racking-die-number-sort__text, " +
+    "#washing-die-number-sort__text, " +
+    "#washing-die-number-sort-2__text, " +
+    "#racking-die-number-sort-2__text",
   function (event) {
     if (event.key === "Enter") {
       $(this).blur();
@@ -308,8 +338,10 @@ $(document).on(
   "keyup",
   "#nitriding-fileter__input, #all-nitriding__input, " +
     "#after-press-die-number-sort__text," +
+    "#racking-die-number-sort__text, " +
     "#washing-die-number-sort__text, " +
-    "#racking-die-number-sort__text",
+    "#washing-die-number-sort-2__text, " +
+    "#racking-die-number-sort-2__text",
   function () {
     $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
   }
@@ -324,6 +356,7 @@ $(document).on("change", "#nitriding-fileter__input", function () {
   };
   tableFilter(tableFilterConfig);
   applyHighlightToNitridingTable();
+  $(this).focus();
 });
 
 $(document).on("change", "#all-nitriding__input", function () {
@@ -334,6 +367,7 @@ $(document).on("change", "#all-nitriding__input", function () {
     filterText: $(this).val(),
   };
   tableFilter(tableFilterConfig);
+  $(this).focus();
 });
 
 $(document).on("change", "#after-press-die-number-sort__text", function () {
@@ -344,6 +378,7 @@ $(document).on("change", "#after-press-die-number-sort__text", function () {
     filterText: $(this).val(),
   };
   tableFilter(tableFilterConfig);
+  $(this).focus();
 });
 
 $(document).on("change", "#washing-die-number-sort__text", function () {
@@ -354,6 +389,7 @@ $(document).on("change", "#washing-die-number-sort__text", function () {
     filterText: $(this).val(),
   };
   tableFilter(tableFilterConfig);
+  $(this).focus();
 });
 
 $(document).on("change", "#racking-die-number-sort__text", function () {
@@ -364,6 +400,29 @@ $(document).on("change", "#racking-die-number-sort__text", function () {
     filterText: $(this).val(),
   };
   tableFilter(tableFilterConfig);
+  $(this).focus();
+});
+
+$(document).on("change", "#washing-die-number-sort-2__text", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#washing-dies-2__table tbody"),
+    targetTableContent: washingDieTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+  $(this).focus();
+});
+
+$(document).on("change", "#racking-die-number-sort-2__text", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#racking_dies-2__table tbody"),
+    targetTableContent: rackingDieTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+  $(this).focus();
 });
 
 function tableFilter(tableFilterConfig) {
@@ -387,7 +446,13 @@ function tableFilter(tableFilterConfig) {
     }
   });
 }
-
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Table sort section
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // after press table sort
 $(document).on(
   "click",
@@ -427,6 +492,27 @@ $(document).on(
     applyHighlightToAfterPressTable();
   }
 );
+// washing table sort
+$(document).on("click", "#washing-dies-2__table th:nth-child(4)", function () {
+  console.log("hello");
+
+  let isDescending = false;
+  let className;
+  let sortColumnName = "tank";
+
+  $(this).parent().find("th.sortActive").removeClass("sortActive");
+  $(this).addClass("sortActive").toggleClass("isDescending");
+  className = $(this).attr("class");
+
+  if (className.includes("isDescending")) {
+    isDescending = true;
+    washingDieTable.sort((a, b) => a.tank - b.tank);
+  } else {
+    isDescending = false;
+    washingDieTable.sort((a, b) => b.tank - a.tank);
+  }
+  fillTableBody(washingDieTable, $("#washing-dies-2__table tbody"));
+});
 
 // nitriding table sort
 $(document).on(
@@ -731,4 +817,171 @@ $("#left-arrow__img").on("click", function () {
   $("#left-arrow__img")
     .attr("src", "./img/right_arrow-inactive.png")
     .removeClass("active");
+});
+
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+// 2nd row arrow function
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+
+// right and left arrow activation
+$(document).on(
+  "click change",
+  ".button-container.racking__wrapper",
+  function () {
+    const washingDiesTableSelect = $(
+      "#washing-dies-2__table tbody tr.selected-record"
+    ).length;
+    const rackingDiesTableSelect = $(
+      "#racking_dies-2__table tbody tr.selected-record"
+    ).length;
+    const isStaffSelect =
+      $("#rack-staff-2__select").val() !== "0" ? true : false;
+
+    if (washingDiesTableSelect > 0 && isStaffSelect) {
+      $("#right-arrow-2__img")
+        .attr("src", "./img/right_arrow-active.png")
+        .addClass("active");
+    } else {
+      $("#right-arrow-2__img")
+        .attr("src", "./img/right_arrow-inactive.png")
+        .removeClass("active");
+    }
+    if (rackingDiesTableSelect > 0) {
+      $("#left-arrow-2__img")
+        .attr("src", "./img/right_arrow-active.png")
+        .addClass("active");
+    } else {
+      $("#left-arrow-2__img")
+        .attr("src", "./img/right_arrow-inactive.png")
+        .removeClass("active");
+    }
+  }
+);
+
+$(document).on("click", "#right-arrow-2__img.active", function () {
+  console.log("hello");
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const seconds = now.getSeconds();
+  const currentTime = `${hours}:${minutes}:${seconds}`;
+  const currentDayteTime =
+    $("#racking_date-2__input").val() + " " + currentTime;
+  const currentDayte = $("#racking_date-2__input").val();
+  const staffId = $("#rack-staff-2__select").val();
+  const status = 10; // on rack
+  const tankNumber = null;
+  const note = null;
+  const insertData = [];
+  let dieIdObj;
+
+  dieIdObj = $("#washing-dies-2__table tr.selected-record td:nth-child(1)");
+
+  dieIdObj.each(function () {
+    insertData.push([
+      $(this).html(), // dies_id
+      currentDayteTime,
+      tankNumber,
+      currentDayte,
+      staffId,
+      status,
+      note,
+    ]);
+  });
+
+  const fileName = "./php/DieMaitenance/InsDieStatus.php";
+  const sendData = {
+    tableData: JSON.stringify(insertData),
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  makeWashingDieTable();
+  makeRackingTable();
+
+  // make highlight
+  $("#racking_dies-2__table tbody tr").each(function () {
+    const dieIdText = $(this).find("td").eq(0).text();
+    const targetTr = $(this);
+    insertData.forEach(function (value, index) {
+      if (Number(dieIdText) === Number(value[0])) {
+        targetTr.addClass("selected-record");
+      }
+    });
+  });
+
+  $("#rack-staff-2__select").val("0").addClass("required-input");
+  $("#right-arrow-2__img").attr("src", "./img/right_arrow-inactive.png");
+});
+
+$("#left-arrow-2__img").on("click", function () {
+  console.log("hello");
+  const fileName = "./php/DieMaitenance/DelDieStatus.php";
+  let dieStatusIdObj;
+  let sendData = new Object();
+  let selectedDieStatusId = [];
+  let selectedDieId = [];
+
+  dieStatusIdObj = $("#racking_dies-2__table tr.selected-record");
+
+  dieStatusIdObj.each(function () {
+    selectedDieStatusId.push(Number($(this).find("td").eq(1).html()));
+    selectedDieId.push(Number($(this).find("td").eq(0).html()));
+  });
+
+  sendData = {
+    dieStatudId: selectedDieStatusId,
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  // return;
+  makeAfterPressTalbe();
+  makeWashingDieTable();
+  makeRackingTable();
+
+  // make highlight
+  $("#washing-dies-2__table tbody tr").each(function () {
+    const dieIdText = $(this).find("td").eq(0).text();
+    const targetTr = $(this);
+    selectedDieId.forEach(function (value, index) {
+      if (Number(dieIdText) === Number(value)) {
+        targetTr.addClass("selected-record");
+      }
+    });
+  });
+
+  $(this).attr("src", "./img/right_arrow-inactive.png").removeClass("active");
+});
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+// 3rd row arrow function
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+$(document).on("click", "#fixing-die__table tbody tr", function () {
+  const selectedRow = $("#fixing-die__table tbody tr.selected-record");
+  const isValid = selectedRow.length !== 0 ? true : false;
+
+  if (isValid == false) {
+    $("#fix-content__div").addClass("inactive__div");
+    $("#fix-content__div button")
+      .prop("disabled", true)
+      .removeClass("active__btn");
+    return;
+  } else {
+    $("#fix-content__div").removeClass("inactive__div");
+    $("#fix-content__div button").prop("disabled", false);
+  }
+
+  let temp = $("#fixing-die__table tbody tr.selected-record");
+  console.log(temp);
+});
+
+$(document).on("click", "#radio__button button", function () {
+  $("#radio__button button").removeClass("active__btn");
+  $(this).addClass("active__btn");
 });

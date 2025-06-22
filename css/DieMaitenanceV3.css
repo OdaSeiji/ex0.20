@@ -41,6 +41,10 @@ input:focus {
   transform: rotate(180deg);
 }
 
+#wash-arrow-inner__wrapper {
+  height: 180px;
+}
+
 .sub__wrapper {
   display: flex;
   flex-direction: column;
@@ -311,6 +315,46 @@ tbody {
   }
 }
 
+.washing-dies-2__table {
+  th:nth-child(2),
+  td:nth-child(2) {
+    display: none;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 200px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 48px;
+  }
+  td:nth-child(4) {
+    text-align: center;
+  }
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 60px;
+  }
+  td:nth-child(5) {
+    text-align: center;
+  }
+}
+
+.fixing-die__table {
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 200px;
+  }
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 100px;
+  }
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 150px;
+  }
+}
+
 table .redHighlight {
   color: red;
 }
@@ -318,4 +362,39 @@ table .redHighlight {
 th.sortActive {
   color: #ffddae;
   /* color: #000000; */
+}
+
+.radio__button button {
+  height: 30px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+#radio__button button {
+  background-color: #b4d9df;
+  .active__btn {
+    background-color: #377a94;
+  }
+}
+
+#radio__button button.active__btn {
+  background-color: #377a94;
+}
+
+.fix-input__div {
+  .title__wrapper {
+    width: 130px;
+  }
+  input {
+    width: 129px;
+  }
+  select {
+    width: 131px;
+  }
+  label {
+    width: 130px;
+  }
+  textarea {
+    width: 127px;
+  }
 }

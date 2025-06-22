@@ -230,10 +230,9 @@
                     class="fillter-letters"
                     id="washing-die-number-sort-2__text"
                     type="text"
-                    disabled
                   />
                 </th>
-                <th>Tnk</th>
+                <th>&#x2191;Tnk</th>
                 <th>I Date</th>
                 <!-- <td>Status</td> -->
               </tr>
@@ -251,7 +250,7 @@
         </div>
 
         <div id="after-wash-arrow__wrapper" class="arrow-img__wrapper">
-          <div id="wash-arrow-inner__wrapper">
+          <div id="wash-arrow-inner__wrapper" class="arrow-img__wrapper">
             <img
               id="right-arrow-2__img"
               src="./img/right_arrow-inactive.png"
@@ -259,6 +258,7 @@
             />
             <img
               id="left-arrow-2__img"
+              class="left-arrow__img"
               src="./img/right_arrow-inactive.png"
               alt="arrow"
             />
@@ -301,7 +301,6 @@
                     class="fillter-letters"
                     id="racking-die-number-sort-2__text"
                     type="text"
-                    disabled
                   />
                 </th>
                 <th>R Date</th>
@@ -323,7 +322,7 @@
       <h1 class="translation">Die Fixing</h1>
       <div class="button-container">
         <div id="fix-die__list" class="sub__wrapper">
-          <table id="fixing-die__table" class="">
+          <table id="fixing-die__table" class="fixing-die__table">
             <caption class="table__caption racking-dies__caption">
               Dies List
             </caption>
@@ -355,13 +354,14 @@
 
         <div class="sub__wrapper inactive__div" id="fix-content__div">
           <div id="radio__button" class="radio__button">
-            <button id="grind__button">Griding</button>
-            <button id="wire-cut__button" class="inactive__button">
+            <button id="grind__button" disabled>Griding</button>
+            <button id="wire-cut__button" class="" disabled>
               Wire Cutting
             </button>
+            <button id="measure__button" disabled>Measuring</button>
             <div id="line__div"></div>
           </div>
-          <div class="">
+          <div class="fix-input__div">
             <div class="input__wrapper">
               <div class="title__wrapper">Fixing Date</div>
               <input id="fixing-date__input" type="date" class="save-data" />
