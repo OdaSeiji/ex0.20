@@ -985,3 +985,51 @@ $(document).on("click", "#radio__button button", function () {
   $("#radio__button button").removeClass("active__btn");
   $(this).addClass("active__btn");
 });
+
+$(document).on("change", "#uploadForm", function () {
+  let fileObject;
+  let newImg;
+  fileObject = JSON.parse(ajaxFileUpload());
+  // uploadFile.push(fileObject.fileName);
+
+  newImg = $("<img>").attr(
+    "src",
+    "../diereport/upload/DieHistory/" + fileObject.fileName
+  );
+  newImg = newImg.attr("alt", fileObject.fileName);
+  $("#picture__div").append(newImg);
+
+  $("#fileInput__input").val("");
+  $("#file_name__label").html("no file");
+
+  const targetObj = $("#fix-die-save__button");
+  if (checkFixDieCondition()) {
+    targetObj.prop("disabled", false);
+  } else {
+    targetObj.prop("disabled", true);
+  }
+});
+
+function ajaxFileUpload() {
+  const formData = new FormData();
+  let responseData;
+  formData.append("file", $("#fileInput__input")[0].files[0]);
+
+  $.ajax({
+    url: "./php/DieMaitenance/upload.php",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    cache: false,
+    async: false,
+    success: function (response) {
+      console.log("sccess to file upload");
+      responseData = response;
+    },
+    error: function (error) {
+      console.log("error to upload:" + error);
+    },
+  });
+  return responseData;
+}
