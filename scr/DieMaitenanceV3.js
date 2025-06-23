@@ -86,9 +86,9 @@ $(function () {
 
   makeAfterPressTalbe();
   applyHighlightToAfterPressTable();
-  // makeNitridingTable();
-  // applyHighlightToNitridingTable();
-  // makeAllNitridingRecordTable();
+  makeNitridingTable();
+  applyHighlightToNitridingTable();
+  makeAllNitridingRecordTable();
 
   makeWashingDieTable();
 
@@ -1033,3 +1033,38 @@ function ajaxFileUpload() {
   });
   return responseData;
 }
+
+$(document).on("click", "#picture__div img", function () {
+  const fileName = $(this).attr("alt");
+  $("#modal-img").attr("src", "../diereport/upload/DieHistory/" + fileName);
+  $("#modal-img").attr("alt", fileName);
+
+  $("#modal").fadeIn();
+});
+
+$(document).on("click", "#close-modal__button", function () {
+  $("#modal").fadeOut();
+});
+
+$(document).on("click", "#delete-picture__button", function () {
+  $("#delete-confirm").fadeIn();
+});
+
+$(document).on("click", "#close-confirm__button", function () {
+  $("#delete-confirm").fadeOut();
+});
+
+$(document).on("click", "#delete-picture-confirm__button", function () {
+  let targetImgObj;
+  const imgObj = $("#picture__div img");
+  targetImgObj = $("#modal-img");
+
+  imgObj.each(function () {
+    const fileName = $(this).attr("alt");
+    if (targetImgObj.attr("alt") === fileName) {
+      $(this).remove();
+      $("#delete-confirm").fadeOut();
+    }
+  });
+  $("#modal").fadeOut();
+});

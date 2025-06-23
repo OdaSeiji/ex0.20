@@ -406,3 +406,40 @@ th.sortActive {
   gap: 10px;
   place-items: center;
 }
+
+.grid-container img {
+  width: 230px;
+  height: 210px;
+  object-fit: contain;
+}
+
+.picture__div {
+  height: 450px;
+  overflow-y: auto;
+}
+
+#modal,
+#history-modal {
+  width: 800px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 2px solid #ccc;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#modal img,
+#history-modal img {
+  max-width: 100%;
+  /* height: auto; */
+  max-height: 800px;
+}
+
+.modal-button__wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
