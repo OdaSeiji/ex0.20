@@ -19,12 +19,12 @@ let uploadFile = [];
 
 function resetTimeout() {
   // Display the washing tank when there is no activity for a certain period of time.
-  const button = document.querySelector("#wash-mode__button");
-  clearTimeout(timeout);
-  timeout = setTimeout(() => {
-    button.click();
-    // console.log("一定時間操作がありませんでした！");
-  }, 30000 * 5); // 30 * 5 秒（5 * 30000ミリ秒）後に動作する
+  // const button = document.querySelector("#wash-mode__button");
+  // clearTimeout(timeout);
+  // timeout = setTimeout(() => {
+  //   button.click();
+  //   // console.log("一定時間操作がありませんでした！");
+  // }, 30000 * 5); // 30 * 5 秒（5 * 30000ミリ秒）後に動作する
 }
 
 // イベントリスナーを設定
@@ -977,6 +977,9 @@ $(document).on("click", "#fixing-die__table tbody tr", function () {
 
   const selectedRow = $("#fixing-die__table tbody tr.selected-record");
   const isValid = selectedRow.length !== 0 ? true : false;
+  const dieStatusId = Number(selectedRow.find("td").eq(4).html());
+  // console.log(dieStatusId);
+  // console.log(selectedRow.find("td").eq(4));
 
   if (isValid == false) {
     $("#fix-content__div").addClass("inactive__div");
@@ -988,10 +991,38 @@ $(document).on("click", "#fixing-die__table tbody tr", function () {
   } else {
     $("#fix-content__div").removeClass("inactive__div");
     $("#fix-content__div button").prop("disabled", false);
+
+    displaySavedImage(dieStatusId);
   }
 
   let temp = $("#fixing-die__table tbody tr.selected-record");
 });
+
+function displaySavedImage(dieStatudId) {
+  const targetImgObj = $("#picture__div");
+  const fileName = "./php/DieMaitenance/SelPictureFileName.php";
+  sendData = {
+    die_status_id: dieStatudId,
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  targetImgObj.empty();
+
+  // console.log(ajaxReturnData);
+  if (Object.keys(ajaxReturnData).length === 0) {
+    // console.log("このオブジェクトは空です！");
+    targetImgObj.html("No image");
+  }
+
+  ajaxReturnData.forEach(function (value) {
+    let newImg = $("<img>").attr(
+      "src",
+      "../diereport/upload/DieHistory/" + value.file_name
+    );
+    newImg = newImg.attr("alt", value.file_name);
+    targetImgObj.append(newImg);
+  });
+}
 
 $(document).on("click", "#radio__button button", function () {
   $("#radio__button button").removeClass("active__btn");
@@ -1144,4 +1175,18 @@ $(document).on("click", "#fix-die-save__button", function () {
 
   $("#fix-staff__select").val("0").addClass("required-input");
   $("#picture__div").empty();
+});
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+// 5th row arrow function
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+
+$(document).on("click", "#nitriding__table tbody tr", function () {
+  $("#nitriding__table tbody tr.selected-record").removeClass(
+    "selected-record"
+  );
+  $(this).addClass("selected-record");
 });
