@@ -96,7 +96,7 @@ $(function () {
 
   makeFixDieList();
 
-  // makeAllDiesStatusTable();
+  makeAllDiesStatusTable();
   // makeNitridingHistoryTable();
 
   makeWashingStaffSelect();
@@ -333,7 +333,8 @@ $(document).on(
     "#racking-die-number-sort__text, " +
     "#washing-die-number-sort__text, " +
     "#washing-die-number-sort-2__text, " +
-    "#racking-die-number-sort-2__text",
+    "#racking-die-number-sort-2__text, " +
+    "#fix-die-list__text",
   function (event) {
     if (event.key === "Enter") {
       $(this).blur();
@@ -348,7 +349,8 @@ $(document).on(
     "#racking-die-number-sort__text, " +
     "#washing-die-number-sort__text, " +
     "#washing-die-number-sort-2__text, " +
-    "#racking-die-number-sort-2__text",
+    "#racking-die-number-sort-2__text, " +
+    "#fix-die-list__text",
   function () {
     $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
   }
@@ -425,6 +427,17 @@ $(document).on("change", "#racking-die-number-sort-2__text", function () {
   tableFilterConfig = {
     targetTableBody: $("#racking_dies-2__table tbody"),
     targetTableContent: rackingDieTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+  $(this).focus();
+});
+
+$(document).on("change", "#fix-die-list__text", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#fixing-die__table tbody"),
+    targetTableContent: fixDieTable,
     targetColumnName: "die_number",
     filterText: $(this).val(),
   };
@@ -1053,6 +1066,8 @@ $(document).on("change", "#uploadForm", function () {
   }
 });
 
+function checkFixDieCondition() {}
+
 function ajaxFileUpload() {
   const formData = new FormData();
   let responseData;
@@ -1114,12 +1129,10 @@ $(document).on("click", "#delete-picture-confirm__button", function () {
 
 $(document).on("click change", "#fix-content__div", function () {
   const fixStaffVal = Number($("#fix-staff__select").val());
-  const fixBtnActive = Number($("#fix-content__div button.active__btn").length);
+  const fixBtnActive = Number($("#radio__button button.active__btn").length);
   const $saveBtn = $("#fix-die-save__button");
 
-  console.log(fixBtnActive.length);
-  console.log(fixStaffVal);
-  if (fixStaffVal != 0 && fixBtnActive.length != 0) {
+  if (fixStaffVal != 0 && fixBtnActive != 0) {
     $saveBtn.prop("disabled", false);
   } else {
     $saveBtn.prop("disabled", true);
@@ -1128,7 +1141,7 @@ $(document).on("click change", "#fix-content__div", function () {
 
 $(document).on("click", "#fix-die-save__button", function () {
   const selectedId = $("#fixing-die__table tr.selected-record td:first").html();
-  const selectdBtn = $("#radio__button button:not(.inactive__button)");
+  const selectdBtn = $("#radio__button button.active__btn");
   const targetObj = $("#picture__div img");
   let fileName = "./php/DieMaitenance/InsFixDieStatus.php";
   let sendData = new Object();
@@ -1140,6 +1153,9 @@ $(document).on("click", "#fix-die-save__button", function () {
       break;
     case "wire-cut__button":
       dieStatus = 9;
+      break;
+    case "measure__button":
+      dieStatus = 1;
       break;
     default:
       console.log("error");
@@ -1175,6 +1191,32 @@ $(document).on("click", "#fix-die-save__button", function () {
 
   $("#fix-staff__select").val("0").addClass("required-input");
   $("#picture__div").empty();
+});
+
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+// 4th row arrow function
+// ********************************************************************
+// ********************************************************************
+// ********************************************************************
+
+$(document).on("click", "#all-dies-status__table tr", function () {
+  $("#all-dies-status__table tbody tr.selected-record").removeClass(
+    "selected-record"
+  );
+  $(this).addClass("selected-record");
+
+  var fileName = "./php/DieMaitenance/SelDieStatus.php";
+  var sendData = {
+    die_id: Number($(this).find("td:first").text()),
+  };
+
+  console.log(sendData);
+  myAjax.myAjax(fileName, sendData);
+  fillTableBody(ajaxReturnData, $("#dies-history__table tbody"));
+
+  $(".sub__wrapper.picture__wrapper").empty();
 });
 // ********************************************************************
 // ********************************************************************
