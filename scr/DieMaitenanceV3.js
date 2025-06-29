@@ -192,8 +192,6 @@ function makeAllDiesStatusTable() {
     machine: "Dummy",
   };
 
-  console.log("hello");
-
   myAjax.myAjax(fileName, sendData);
   allDiesTable = ajaxReturnData;
   fillTableBody(ajaxReturnData, $("#all-dies-status__table tbody"));
@@ -300,6 +298,12 @@ $(document).on("click", "table tbody tr", function () {
   if ($(this).closest("table").attr("id") === "nitriding__table") {
     return;
   }
+  if ($(this).closest("table").attr("id") === "all-dies-status__table") {
+    return;
+  }
+  if ($(this).closest("table").attr("id") === "dies_history__table") {
+    return;
+  }
 
   $(this).toggleClass("selected-record");
 
@@ -334,7 +338,8 @@ $(document).on(
     "#washing-die-number-sort__text, " +
     "#washing-die-number-sort-2__text, " +
     "#racking-die-number-sort-2__text, " +
-    "#fix-die-list__text",
+    "#fix-die-list__text, " +
+    "#die-history-filter__input",
   function (event) {
     if (event.key === "Enter") {
       $(this).blur();
@@ -350,7 +355,8 @@ $(document).on(
     "#washing-die-number-sort__text, " +
     "#washing-die-number-sort-2__text, " +
     "#racking-die-number-sort-2__text, " +
-    "#fix-die-list__text",
+    "#fix-die-list__text, " +
+    "#die-history-filter__input",
   function () {
     $(this).val($(this).val().toUpperCase()); // 小文字を大文字に
   }
@@ -438,6 +444,17 @@ $(document).on("change", "#fix-die-list__text", function () {
   tableFilterConfig = {
     targetTableBody: $("#fixing-die__table tbody"),
     targetTableContent: fixDieTable,
+    targetColumnName: "die_number",
+    filterText: $(this).val(),
+  };
+  tableFilter(tableFilterConfig);
+  $(this).focus();
+});
+
+$(document).on("change", "#die-history-filter__input", function () {
+  tableFilterConfig = {
+    targetTableBody: $("#all-dies-status__table tbody"),
+    targetTableContent: allDiesTable,
     targetColumnName: "die_number",
     filterText: $(this).val(),
   };
@@ -1214,9 +1231,57 @@ $(document).on("click", "#all-dies-status__table tr", function () {
 
   console.log(sendData);
   myAjax.myAjax(fileName, sendData);
-  fillTableBody(ajaxReturnData, $("#dies-history__table tbody"));
+  fillTableBody(ajaxReturnData, $("#dies_history__table tbody"));
 
-  $(".sub__wrapper.picture__wrapper").empty();
+  $("#history-picture__div").empty();
+});
+
+$(document).on("click", "#dies_history__table tbody tr", function () {
+  const $targetRow = $(this);
+  const dieStatusId = $targetRow.find("td").eq(0).text();
+  $targetRow.parent().find("tr.selected-record").removeClass("selected-record");
+  $targetRow.addClass("selected-record");
+
+  console.log(dieStatusId);
+  displaySavedImage2(dieStatusId);
+});
+
+function displaySavedImage2(dieStatudId) {
+  const targetImgObj = $("#history-picture__div");
+  const fileName = "./php/DieMaitenance/SelPictureFileName.php";
+  sendData = {
+    die_status_id: dieStatudId,
+  };
+  myAjax.myAjax(fileName, sendData);
+
+  targetImgObj.empty();
+
+  // console.log(ajaxReturnData);
+  if (Object.keys(ajaxReturnData).length === 0) {
+    // console.log("このオブジェクトは空です！");
+    targetImgObj.html("No image");
+  }
+
+  ajaxReturnData.forEach(function (value) {
+    let newImg = $("<img>").attr(
+      "src",
+      "../diereport/upload/DieHistory/" + value.file_name
+    );
+    newImg = newImg.attr("alt", value.file_name);
+    targetImgObj.append(newImg);
+  });
+}
+
+$(document).on("click", "#history-picture__div img", function () {
+  const fileName = $(this).attr("alt");
+  $("#modal-2-img").attr("src", "../diereport/upload/DieHistory/" + fileName);
+  $("#modal-2-img").attr("alt", fileName);
+
+  $("#modal-2").fadeIn();
+});
+
+$(document).on("click", "#close-modal-2__button", function () {
+  $("#modal-2").fadeOut();
 });
 // ********************************************************************
 // ********************************************************************
