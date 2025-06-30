@@ -533,3 +533,104 @@ sudo apt install rsyslog
 ```
 
 が必要のようだが、これ、どうやってインストールするか。。。
+
+# 1 セットアップ中。
+
+```terminal
+sudo apt-get update
+sudo apt-get install rsyslog
+```
+
+ssh のロギング
+
+```terminal
+========= True:Overwirte False:Insert ============
+**** Overwrite ****
+Database: Data was updated
+Database: connection closed successfully
+Database: connection error: 2003: Can't connect to MySQL server on '10.163.50.17:3306' (Errno 110: Connection timed out)
++++++++++++++++++++++++++++++++++++++++++
+Machine Number = 2
++++++++++++++++++++++++++++++++++++++++++
+Traceback (most recent call last):
+  File "/home/pi/work/plc_sampling.py", line 274, in <module>
+    schedule.run_pending()
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 854, in run_pending
+    default_scheduler.run_pending()
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 101, in run_pending
+    self._run_job(job)
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 173, in _run_job
+    ret = job.run()
+          ^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 691, in run
+    ret = self.job_func()
+          ^^^^^^^^^^^^^^^
+  File "/home/pi/work/plc_sampling.py", line 241, in job
+    select_data = select_data_from_mysql(db_connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/work/plc_sampling.py", line 45, in select_data_from_mysql
+    cursor = connection.cursor()
+             ^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'cursor'
+client_loop: send disconnect: Connection reset
+PS C:\Users\odaseiji>
+```
+
+止まったね、そしてコネクションが切れたね。。。
+
+```terminal
+Traceback (most recent call last):
+  File "/home/pi/work/plc_sampling.py", line 274, in <module>
+    schedule.run_pending()
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 854, in run_pending
+    default_scheduler.run_pending()
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 101, in run_pending
+    self._run_job(job)
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 173, in _run_job
+    ret = job.run()
+          ^^^^^^^^^
+  File "/home/pi/.local/lib/python3.11/site-packages/schedule/__init__.py", line 691, in run
+    ret = self.job_func()
+          ^^^^^^^^^^^^^^^
+  File "/home/pi/work/plc_sampling.py", line 241, in job
+    select_data = select_data_from_mysql(db_connection)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/pi/work/plc_sampling.py", line 45, in select_data_from_mysql
+    cursor = connection.cursor()
+             ^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'cursor'
+```
+
+あれ？電力不足？#2
+
+```terminal
+pi@raspberrypi02:~ $ vcgencmd get_throttled
+throttled=0x50000
+```
+
+プログラム改造後
+
+```terminal
++++++++++++++++++++++++++++++++++++++++++
+Machine Number = 2
++++++++++++++++++++++++++++++++++++++++++
++++++++++ data base data +++++++++++
+[{'press_mode': 0, 'all_pump_on': 0, 'billet_counter': 5212, 'die_name': 'CP9680T', 'alarm': 0, 'die_stack_is_outside': +++++++++ data base data +++++++++++
+PLC :close plc connection
+{'press_mode': 0, 'all_pump_on': 0, 'container_temp': [450, 450, 400, 400], 'billet_counter': 5212, 'alarm': 0, 'die_name': 'CP9680T', 'die_stack_is_outside': 1}
++++++++++ data PLC data +++++++++++
+========= True:Overwirte False:Insert ============
+True
+========= True:Overwirte False:Insert ============
+**** Overwrite ****
+Database: Data was updated
+Database: connection closed successfully
+Database: connection Normal
++++++++++++++++++++++++++++++++++++++++++
+Machine Number = 2
++++++++++++++++++++++++++++++++++++++++++
+client_loop: send disconnect: Connection reset
+PS C:\Users\odaseiji>
+```
+
+プログラムが落ちる事を検出する前に、ターミナル接続が落ちた。
