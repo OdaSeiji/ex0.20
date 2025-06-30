@@ -37,41 +37,41 @@
       <!-- ************    1st Row  *********************** -->
       <h1 class="translation">Wash Dies and Rask</h1>
       <div class="button-container after_press_dies">
-        <div class="sub__wrapper">
-          <div class="after-press-dies__div">
-            <table class="after_press_dies__table" id="after_press_dies__table">
-              <caption class="table__caption">
-                After Press Dies List
-              </caption>
-              <thead>
-                <th>id</th>
-                <th>P Date</th>
-                <th>
-                  Die Number
-                  <input
-                    class="fillter-letters"
-                    id="after-press-die-number-sort__text"
-                    type="text"
-                  />
-                </th>
-                <th>P/T</th>
-                <th>Tms</th>
-                <th>NG</th>
-                <th>Action</th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>21</td>
-                  <td>05/27</td>
-                  <td>ABC12BDE-V02D</td>
-                  <td>〇</td>
-                  <td>2</td>
-                  <td>NG</td>
-                  <td>Wash</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="sub__wrapper after-press-dies__wrapper">
+          <!-- <div class="after-press-dies__div"> -->
+          <table class="after_press_dies__table" id="after_press_dies__table">
+            <caption class="table__caption">
+              After Press Dies List
+            </caption>
+            <thead>
+              <th>id</th>
+              <th>&#x2191;Date</th>
+              <th>
+                Die Number
+                <input
+                  class="fillter-letters"
+                  id="after-press-die-number-sort__text"
+                  type="text"
+                />
+              </th>
+              <th>P/T</th>
+              <th>Tms</th>
+              <th>NG</th>
+              <th>&#x2191;Act</th>
+            </thead>
+            <tbody>
+              <tr>
+                <td>21</td>
+                <td>05/27</td>
+                <td>ABC12BDE-V02D</td>
+                <td>〇</td>
+                <td>2</td>
+                <td>NG</td>
+                <td>Wash</td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- </div> -->
         </div>
 
         <div class="arrow-img__wrapper">
@@ -216,7 +216,7 @@
       <h1 class="translation">After washing</h1>
       <div class="button-container racking__wrapper">
         <div class="sub__wrapper" id="washing-die-list__div">
-          <table class="washing-dies__table" id="washing_dies-2__table">
+          <table class="washing-dies-2__table" id="washing-dies-2__table">
             <caption class="table__caption washing-dies__caption">
               Washing Dies List
             </caption>
@@ -230,10 +230,9 @@
                     class="fillter-letters"
                     id="washing-die-number-sort-2__text"
                     type="text"
-                    disabled
                   />
                 </th>
-                <th>Tnk</th>
+                <th>&#x2191;Tnk</th>
                 <th>I Date</th>
                 <!-- <td>Status</td> -->
               </tr>
@@ -251,7 +250,7 @@
         </div>
 
         <div id="after-wash-arrow__wrapper" class="arrow-img__wrapper">
-          <div id="wash-arrow-inner__wrapper">
+          <div id="wash-arrow-inner__wrapper" class="arrow-img__wrapper">
             <img
               id="right-arrow-2__img"
               src="./img/right_arrow-inactive.png"
@@ -259,6 +258,7 @@
             />
             <img
               id="left-arrow-2__img"
+              class="left-arrow__img"
               src="./img/right_arrow-inactive.png"
               alt="arrow"
             />
@@ -301,7 +301,6 @@
                     class="fillter-letters"
                     id="racking-die-number-sort-2__text"
                     type="text"
-                    disabled
                   />
                 </th>
                 <th>R Date</th>
@@ -323,7 +322,7 @@
       <h1 class="translation">Die Fixing</h1>
       <div class="button-container">
         <div id="fix-die__list" class="sub__wrapper">
-          <table id="fixing-die__table" class="">
+          <table id="fixing-die__table" class="fixing-die__table">
             <caption class="table__caption racking-dies__caption">
               Dies List
             </caption>
@@ -340,6 +339,8 @@
                 </th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>die Status id</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -355,13 +356,14 @@
 
         <div class="sub__wrapper inactive__div" id="fix-content__div">
           <div id="radio__button" class="radio__button">
-            <button id="grind__button">Griding</button>
-            <button id="wire-cut__button" class="inactive__button">
+            <button id="grind__button" disabled>Griding</button>
+            <button id="wire-cut__button" class="" disabled>
               Wire Cutting
             </button>
+            <button id="measure__button" disabled>Measuring</button>
             <div id="line__div"></div>
           </div>
-          <div class="">
+          <div class="fix-input__div">
             <div class="input__wrapper">
               <div class="title__wrapper">Fixing Date</div>
               <input id="fixing-date__input" type="date" class="save-data" />
@@ -408,7 +410,7 @@
       <h1 class="translation">Die history</h1>
       <div class="button-container">
         <div class="sub__wrapper" id="all-dies__div">
-          <table id="all-dies__table" class="all-dies__table">
+          <table id="all-dies-status__table" class="all-dies-status__table">
             <caption class="table__caption racking-dies__caption">
               All Dies List
             </caption>
@@ -418,7 +420,11 @@
                 <th>dies_id</th>
                 <th>
                   Die Number
-                  <input class="fillter-letters" id="" type="text" />
+                  <input
+                    class="fillter-letters"
+                    id="die-history-filter__input"
+                    type="text"
+                  />
                 </th>
                 <th>P/T</th>
                 <th>P Date</th>
@@ -448,12 +454,13 @@
               <th>id</th>
               <th>Date</th>
               <th>Status</th>
+              <th>I</th>
             </thead>
             <tbody></tbody>
           </table>
         </div>
 
-        <div class="sub__wrapper picture__wrapper">
+        <div id="die-history-img__div" class="sub__wrapper picture__wrapper">
           <div class="caption__div">Pictures</div>
           <div
             class="die-fix__wrapper grid-container"
@@ -488,6 +495,7 @@
                 <th class="sort__th">Wash count</th>
                 <th>Total Length</th>
                 <th>Total wash</th>
+                <th>die dim</th>
               </tr>
             </thead>
             <tbody>
@@ -498,6 +506,7 @@
                 <td>24/05/01</td>
                 <td>Grinding</td>
                 <td>25/06/06</td>
+                <td>300</td>
               </tr>
             </tbody>
           </table>
@@ -556,6 +565,36 @@
         </div>
       </div>
     </main>
+
+    <div id="modal" style="display: none">
+      <img src="" alt="big_pic" id="modal-img" />
+      <div class="modal-button__wrapper">
+        <button id="close-modal__button">Close</button>
+        <button id="delete-picture__button">Delete</button>
+      </div>
+    </div>
+
+    <div id="history-modal" style="display: none">
+      <img src="" alt="big_pic" id="history-modal-img" />
+      <div class="modal-button__wrapper">
+        <button id="hitory-close-modal__button">Close</button>
+        <!-- <button id="delete-picture__button">Delete</button> -->
+      </div>
+    </div>
+
+    <div id="delete-confirm" style="display: none">
+      <button id="delete-picture-confirm__button">Delete</button>
+      <button id="close-confirm__button">Calcel</button>
+    </div>
+
+    <div id="modal-2" style="display: none">
+      <img src="" alt="big_pic" id="modal-2-img" />
+      <div class="modal-button__wrapper">
+        <button id="close-modal-2__button">Close</button>
+        <!-- <button id="delete-picture-2__button">Delete</button> -->
+      </div>
+    </div>
+
     <script src="./lib/jquery.min.js"></script>
     <script src="./scr/DieMaitenanceV3.js"></script>
   </body>

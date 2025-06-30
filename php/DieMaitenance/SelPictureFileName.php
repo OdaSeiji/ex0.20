@@ -15,31 +15,29 @@
           )
         );
 
-      $sql = "
-WITH all_data_table AS(
-    SELECT
-        t_dies_status_filename.file_name
-    FROM
-        t_dies_status_filename
-    WHERE
-        t_dies_status_filename.t_dies_status_id = :die_status_id_1
-    UNION
-    SELECT
-        t_dies_status.file_url AS file_name
-    FROM
-        t_dies_status
-    WHERE
-        t_dies_status.id = :die_status_id_2
-)
-SELECT
-    *
-FROM
-    all_data_table
-WHERE
-    all_data_table.file_name IS NOT NULL
-
-      
-      ";
+        $sql = "
+            WITH all_data_table AS(
+            SELECT
+                t_dies_status_filename.file_name
+            FROM
+                t_dies_status_filename
+            WHERE
+                t_dies_status_filename.t_dies_status_id = :die_status_id_1
+            UNION
+            SELECT
+                t_dies_status.file_url AS file_name
+            FROM
+                t_dies_status
+            WHERE
+                t_dies_status.id = :die_status_id_2
+            )
+            SELECT
+            *
+            FROM
+            all_data_table
+            WHERE
+            all_data_table.file_name IS NOT NULL
+        ";
 
       $prepare = $dbh->prepare($sql);
       // $_POST["targetId"] = 1;

@@ -115,7 +115,8 @@ select
   ifnull(washing_count_after_nitriding_by_dies_id.washing_count_after_nitriding, 0)
     as washing_count_after_nitriding,
   ifnull(total_profile_length_by_dies_id.total_profile_length, 0) as total_profile_length,
-  ifnull(total_washing_count_by_dies_id.count, 0) as total_washing_count
+  ifnull(total_washing_count_by_dies_id.count, 0) as total_washing_count,
+  m_dies_diamater.die_diamater
 from m_dies
 left join profile_length_after_nitriding_by_dies_id
   on m_dies.id = profile_length_after_nitriding_by_dies_id.dies_id
@@ -125,6 +126,8 @@ left join total_profile_length_by_dies_id
   on total_profile_length_by_dies_id.dies_id = m_dies.id
 left JOIN total_washing_count_by_dies_id
   on total_washing_count_by_dies_id.dies_id = m_dies.id
+left join m_dies_diamater
+  on m_dies.die_diamater_id = m_dies_diamater.id
 order by profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding desc
 
       ";

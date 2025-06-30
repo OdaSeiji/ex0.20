@@ -1564,3 +1564,360 @@ order by profile_length_after_nitriding_by_dies_id.length_km_after_nitiriding de
 
 次は、表のソート機能。
 汎用的に、実装完了。で、一回も窒化していない金型が有るらしい。なので、単純に窒化の記録を一覧表示し、型番で検索できるようにする。
+
+なんでか、after press table が表示されなくなる問題が発生。いま、改めてみてみると、なんとも無駄の多いというか、理解の苦しむ`SQL`になっているので、改定する。
+
+ここは、現場に有る金型で、洗うか、ラッキング記録の無い金型。
+
+- 型別の最新の押出の後に、洗い、ラッキングの情報が無い金型。
+  まずは、型別の最新の押出の抽出。それらの金型の洗いか、ラッキングの最新情報が有れば、表示しない。
+
+```sql
+WITH latest_press_date_by_die_id AS(
+  SELECT
+    t1.id as press_id,
+    t1.dies_id,
+    t1.pressing_type_id,
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND AS press_date_at
+  FROM
+    t_press AS t1
+  WHERE
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND = (
+      SELECT
+        MAX(t2.press_date_at + INTERVAL TIME_TO_SEC(t2.press_start_at) SECOND)
+      FROM
+        t_press AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+  ORDER BY
+    t1.dies_id
+), latest_washing_or_racking_date_by_die_id as (
+  SELECT
+    t1.id as t_dies_status_id,
+    t1.dies_id,
+    t1.do_sth_at,
+    t1.die_status_id
+  FROM
+    t_dies_status AS t1
+  WHERE
+    t1.do_sth_at = (
+      SELECT
+        MAX(t2.do_sth_at)
+      FROM
+        t_dies_status AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.die_status_id IN(@washing, @racking)
+      and t2.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+)
+select
+  latest_press_date_by_die_id.dies_id,
+  latest_press_date_by_die_id.press_date_at,
+  latest_washing_or_racking_date_by_die_id.die_status_id,
+  latest_washing_or_racking_date_by_die_id.do_sth_at
+from latest_press_date_by_die_id
+left join latest_washing_or_racking_date_by_die_id
+  on latest_press_date_by_die_id.dies_id = latest_washing_or_racking_date_by_die_id.dies_id
+where latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
+;
+WITH latest_press_date_by_die_id AS(
+  SELECT
+    t1.id as press_id,
+    t1.dies_id,
+    t1.pressing_type_id,
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND AS press_date_at
+  FROM
+    t_press AS t1
+  WHERE
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND = (
+      SELECT
+        MAX(t2.press_date_at + INTERVAL TIME_TO_SEC(t2.press_start_at) SECOND)
+      FROM
+        t_press AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+  ORDER BY
+    t1.dies_id
+), latest_washing_or_racking_date_by_die_id as (
+  SELECT
+    t1.id as t_dies_status_id,
+    t1.dies_id,
+    t1.do_sth_at,
+    t1.die_status_id
+  FROM
+    t_dies_status AS t1
+  WHERE
+    t1.do_sth_at = (
+      SELECT
+        MAX(t2.do_sth_at)
+      FROM
+        t_dies_status AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.die_status_id IN(@washing, @racking)
+      and t2.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+)
+select
+  latest_press_date_by_die_id.dies_id,
+  latest_press_date_by_die_id.press_date_at,
+  latest_washing_or_racking_date_by_die_id.die_status_id,
+  latest_washing_or_racking_date_by_die_id.do_sth_at
+from latest_press_date_by_die_id
+left join latest_washing_or_racking_date_by_die_id
+  on latest_press_date_by_die_id.dies_id = latest_washing_or_racking_date_by_die_id.dies_id
+where latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
+;
+
+```
+
+この SQL で押出後に、洗浄、または、ラッキングをしていない金型がリストアップされた。軸にしているのは die_id。もう一つ必要なのが、その押出を含め、前回の洗浄から何回目の押出になっているのか？また、その押出後に、NG 判定がされているのか？
+つまり、最新の洗浄記録から、何回押出したのかを型別に出す SQL。
+
+```sql
+with latest_washing_date_by_dies_id as(
+  select
+    t1.dies_id as dies_id,
+    t1.do_sth_at as washing_date
+  from
+    t_dies_status as t1
+  where
+    t1.die_status_id = @washing
+  AND t1.do_sth_at = (
+      select
+        max(t2.do_sth_at)
+      from
+        t_dies_status as t2
+      where
+        t2.die_status_id = @washing
+      and t2.dies_id = t1.dies_id
+    )
+)
+select
+  t3.dies_id,
+  count(*) as pree_count_no_wash
+from
+  t_press as t3
+  left join
+    latest_washing_date_by_dies_id
+  on  t3.dies_id = latest_washing_date_by_dies_id.dies_id
+where
+  latest_washing_date_by_dies_id.washing_date < t3.press_date_at + INTERVAL TIME_TO_SEC(t3.press_start_at) SECOND
+group by
+  t3.dies_id
+```
+
+これで型別の洗浄後の押出回数。
+
+```sql
+set @washing = 4;
+with ranked_washing as (
+  select
+    t1.dies_id,
+    t1.do_sth_at as washing_date,
+    row_number() over (partition by t1.dies_id order by t1.do_sth_at desc) as rn
+  from
+    t_dies_status t1
+  where
+    t1.die_status_id = @washing
+),
+latest_washing_date_by_dies_id as (
+  select dies_id, washing_date
+  from ranked_washing
+  where rn = 1
+)
+select
+  t3.dies_id,
+  count(*) as press_count_no_wash
+from t_press as t3
+left join latest_washing_date_by_dies_id latest
+  on t3.dies_id = latest.dies_id
+where latest.washing_date < t3.press_date_at + interval time_to_sec(t3.press_start_at) second
+group by t3.dies_id
+;
+```
+
+こっちの方が早いか。
+残るは、押出後に NG 判定されている金型の抽出。
+
+```sql
+set @washing = 4;
+set @ng_surface = 31;
+set @ng_dimension = 32;
+
+WITH latest_press_date_by_die_id AS(
+  SELECT
+    t1.id as press_id,
+    t1.dies_id,
+    t1.pressing_type_id,
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND AS press_date_at
+  FROM
+    t_press AS t1
+  WHERE
+    t1.press_date_at + INTERVAL TIME_TO_SEC(t1.press_start_at) SECOND = (
+      SELECT
+        MAX(t2.press_date_at + INTERVAL TIME_TO_SEC(t2.press_start_at) SECOND)
+      FROM
+        t_press AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.press_date_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+  ORDER BY
+    t1.dies_id
+), latest_washing_date_by_dies_id as(
+  select
+    t1.dies_id as dies_id,
+    t1.do_sth_at as washing_date
+  from
+    t_dies_status as t1
+  where
+    t1.die_status_id = @washing
+  AND t1.do_sth_at = (
+      select
+        max(t2.do_sth_at)
+      from
+        t_dies_status as t2
+      where
+        t2.die_status_id = @washing
+      and t2.dies_id = t1.dies_id
+    )
+), latest_washing_or_racking_date_by_die_id as (
+  SELECT
+    t1.id as t_dies_status_id,
+    t1.dies_id,
+    t1.do_sth_at,
+    t1.die_status_id
+  FROM
+    t_dies_status AS t1
+  WHERE
+    t1.do_sth_at = (
+      SELECT
+        MAX(t2.do_sth_at)
+      FROM
+        t_dies_status AS t2
+      WHERE
+        t1.dies_id = t2.dies_id
+      AND t2.die_status_id IN(@washing, @racking)
+      and t2.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+    )
+  and t1.do_sth_at >= DATE_SUB(NOW(), INTERVAL 1 YEAR)
+), after_press_ng_dies_id as (
+select
+  t_dies_status.dies_id,
+  t_dies_status.die_status_id
+from t_dies_status
+left join latest_press_date_by_die_id
+  on t_dies_status.dies_id = latest_press_date_by_die_id.dies_id
+where t_dies_status.die_status_id IN (@ng_surface, @ng_dimension)
+  AND
+  t_dies_status.do_sth_at > latest_press_date_by_die_id.press_date_at
+),  after_press_dies as (
+  select
+    latest_press_date_by_die_id.dies_id,
+    latest_press_date_by_die_id.press_date_at,
+    latest_press_date_by_die_id.pressing_type_id
+
+  from latest_press_date_by_die_id
+  left join latest_washing_or_racking_date_by_die_id
+    on latest_press_date_by_die_id.dies_id = latest_washing_or_racking_date_by_die_id.dies_id
+  where latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
+), latest_washing_by_die_id as (
+  select
+    t1.dies_id,
+    t1.do_sth_at as washing_date,
+    row_number() over (partition by t1.dies_id order by t1.do_sth_at desc) as rn
+  from
+    t_dies_status t1
+  where
+    t1.die_status_id = @washing
+), press_count_after_wash as (
+  select
+    t3.dies_id,
+    count(*) as press_count_no_wash
+  from t_press as t3
+  left join latest_washing_date_by_dies_id latest
+    on t3.dies_id = latest.dies_id
+  where latest.washing_date < t3.press_date_at + interval time_to_sec(t3.press_start_at) second
+  group by t3.dies_id
+)
+select
+  after_press_dies.dies_id,
+  DATE_FORMAT(after_press_dies.press_date_at,'%m/%d') as press_date_at,
+  m_dies.die_number,
+  m_pressing_type.pressing_type,
+  press_count_after_wash.press_count_no_wash,
+  if(after_press_ng_dies_id.die_status_id is not null,"NG","OK"),
+      case
+    	when after_press_dies.pressing_type_id = 1
+  			then if(after_press_ng_dies_id.die_status_id IS NOT NULL, 'Wash', 'Rack')
+    	when m_pressing_type.id = 2
+  			then if((after_press_ng_dies_id.die_status_id IS not NULL) or (press_count_no_wash > 1), 'Wash', 'Rack')
+    	when m_pressing_type.id = 3
+			  then if((after_press_ng_dies_id.die_status_id IS not NULL) or (press_count_no_wash > 1), 'Wash', 'Rack')
+      end as action
+from after_press_dies
+left join press_count_after_wash
+  on after_press_dies.dies_id = press_count_after_wash.dies_id
+left join after_press_ng_dies_id
+  on after_press_dies.dies_id = after_press_ng_dies_id.dies_id
+left join m_dies
+  on after_press_dies.dies_id = m_dies.id
+left join m_pressing_type
+  on after_press_dies.pressing_type_id = m_pressing_type.id
+order by date_format(after_press_dies.press_date_at, '%y%m%d') desc, m_dies.die_number asc
+;
+```
+
+こうなるか。。。これで、漸く、V3 の改造の話が出来るようになった。しっかし、このキーボードダメだな。。中途半端に 60%キーボードとか作ると、機能が不足して、成立していない。V3 は窒化の全金型検索の所が動かない問題から。。。。ちゃんと動くね、、、ただ、並び替えが型順になっているのか？並び替えも、ok。次は、窒化の条件。型の大きさによっても変わる。
+
+窒化後の金型の閾値による色付けも完了。
+次は、V3 の作成の継続。
+表の読み出しは、出来るようになった。次は、1 段目のアクティベート。
+アクティベートと、その他の要素のアクティベート、ディスアクティベートも OK。次は、検索してみるか。
+
+検索は出来るようになったが、あいまい検索できるようにしたい。任意の一文字は.で示すらしい。検索は出来るようになった。
+
+Action にソート機能を追加。active でソートすると、どうせ戻したくなる。戻すには日付順なのだが、日付が、年が入っていないため、その年内だけの比較になってしまう。年をまたぐことも出来ない。という事で、これは、年も入った日付で戻すカラムが必要になる。
+
+やったけど、完全には同じにならない。ソートの順番が違う。。。まあこのぐらいは許してもらうか。。。
+
+次は、WashingTankList のフィルター。フィルター類、1 段目は完了。
+
+次は、保存。
+ようやく、washing モードの保存だけできた。
+クリックしてセレクトできるのは、一つの表だけにしないとね。出来るようになった。
+
+戻す方も出来るようになったが、色を付けてやらないと、全然分からない。色付けまで、完了。
+次は、ラッキングのテーブルとのやり取り。
+ラッキングテーブルの戻し側が色が塗られない。
+戻し側も色塗りが出来るようになった。1 段目は完成かな。。。
+
+`washing tank table`のソート問題なし。`racking tank table`のソートも実装。次は、右ボタンのアクティベート。
+
+ハイライト出来るようになった。
+2 段目まで完成か。
+3 段目、ボタンのアクティベーションがめんどくさい。アクティベーション完了。次はファイルのアップロード。これは、コピペで問題なし次は、4 つ以上の写真が表現できるようにする。アップロードした写真の処理完了。次は、Save ボタンのアクティベーション。
+
+`save`の動作は出来たが、アクティベーションが良くない。修正完了。次は、読み出しの方。写真の読み出しは出来るようになった。でも、データがあるのと、ないのとの違いが分からない。
+
+`save`のアクティベーションがまだ問題。処理内容を選んでいなくても、アクティブになってしまう。それと、フィルターが効かない。どちらも OK。
+
+次は、金型別の押出を含めた履歴の表示。画像を保存しているかどうかの表示も出したい。
+画像の有無の表示は出来るようになった。でも、これ保存するとき、修正と言うか、更新が出来ないですね。。。これは次のバージョンの時に考えましょうか。。。
+
+次は金型の履歴をクリックした時に画像を表示する。
+
+金型履歴をクリックすると、一つ上の選択した写真が見えなくなる。そして、二度と表示しなくなる。
+
+問題解決。次は表示している写真を大きく見せる所。
