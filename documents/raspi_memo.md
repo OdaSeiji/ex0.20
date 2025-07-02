@@ -533,4 +533,3 @@ sudo apt install rsyslog
 ```
 
 が必要のようだが、これ、どうやってインストールするか。。。
-`raspi`の wifi の問題。Edimax EW-7811Un が有れば、解決するか？

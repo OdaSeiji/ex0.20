@@ -21,7 +21,7 @@
       </div>
       <div>
         <div>
-          <div id="summary__table_record">??? items</div>
+          <div id="summary__table_record"></div>
         </div>
       </div>
       <div>
@@ -420,7 +420,11 @@
                 <th>dies_id</th>
                 <th>
                   Die Number
-                  <input class="fillter-letters" id="" type="text" />
+                  <input
+                    class="fillter-letters"
+                    id="die-history-filter__input"
+                    type="text"
+                  />
                 </th>
                 <th>P/T</th>
                 <th>P Date</th>
@@ -450,12 +454,13 @@
               <th>id</th>
               <th>Date</th>
               <th>Status</th>
+              <th>I</th>
             </thead>
             <tbody></tbody>
           </table>
         </div>
 
-        <div class="sub__wrapper picture__wrapper">
+        <div id="die-history-img__div" class="sub__wrapper picture__wrapper">
           <div class="caption__div">Pictures</div>
           <div
             class="die-fix__wrapper grid-container"
@@ -580,6 +585,14 @@
     <div id="delete-confirm" style="display: none">
       <button id="delete-picture-confirm__button">Delete</button>
       <button id="close-confirm__button">Calcel</button>
+    </div>
+
+    <div id="modal-2" style="display: none">
+      <img src="" alt="big_pic" id="modal-2-img" />
+      <div class="modal-button__wrapper">
+        <button id="close-modal-2__button">Close</button>
+        <!-- <button id="delete-picture-2__button">Delete</button> -->
+      </div>
     </div>
 
     <script src="./lib/jquery.min.js"></script>
