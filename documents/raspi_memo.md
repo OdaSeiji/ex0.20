@@ -533,3 +533,4 @@ sudo apt install rsyslog
 ```
 
 が必要のようだが、これ、どうやってインストールするか。。。
+Edimax EW-7811Un が欲しいな。
