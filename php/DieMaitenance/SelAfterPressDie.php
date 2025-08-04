@@ -16,6 +16,7 @@
         );
 
       $dbh->query("SET @washing = 4");
+      $dbh->query("SET @racking = 10");
       $dbh->query("SET @ng_surface = 31");
       $dbh->query("SET @ng_dimension = 32");
       
@@ -98,7 +99,10 @@ where t_dies_status.die_status_id IN (@ng_surface, @ng_dimension)
   from latest_press_date_by_die_id
   left join latest_washing_or_racking_date_by_die_id
     on latest_press_date_by_die_id.dies_id = latest_washing_or_racking_date_by_die_id.dies_id
-  where latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
+  where 
+    latest_washing_or_racking_date_by_die_id.do_sth_at is NULL
+    or
+    latest_press_date_by_die_id.press_date_at > latest_washing_or_racking_date_by_die_id.do_sth_at
 ), latest_washing_by_die_id as (
   select
     t1.dies_id,
@@ -123,7 +127,7 @@ select
   DATE_FORMAT(after_press_dies.press_date_at,'%m/%d') as press_date_at,
   m_dies.die_number,
   m_pressing_type.pressing_type,
-  press_count_after_wash.press_count_no_wash,
+  IFNULL(press_count_after_wash.press_count_no_wash, 1) as press_count_no_wash,
   if(after_press_ng_dies_id.die_status_id is not null,'NG','OK'),
       case 
     	when after_press_dies.pressing_type_id = 1
