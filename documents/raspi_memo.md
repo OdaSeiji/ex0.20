@@ -534,3 +534,39 @@ sudo apt install rsyslog
 
 が必要のようだが、これ、どうやってインストールするか。。。
 Edimax EW-7811Un が欲しいな。
+
+# 20250924
+
+`RaspberryPi`が戻ってきたので、久しぶりにセットアップした。ログインの仕方も忘れたのでメモ。
+
+```terminal
+PS C:\Users\hbier> ssh pi@raspberrypi01.local
+The authenticity of host 'raspberrypi01.local (fe80::ae9e:feb4:e6bc:5ecb%29)' can't be established.
+ED25519 key fingerprint is SHA256:v31EsmNQAE85PGXX7qcUOizygyaLDaSRlyW6ETagITc.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added 'raspberrypi01.local' (ED25519) to the list of known hosts.
+pi@raspberrypi01.local's password:
+Linux raspberrypi01 6.12.25+rpt-rpi-v7 #1 SMP Raspbian 1:6.12.25-1+rpt1 (2025-04-30) armv7l
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Tue May 13 09:22:56 2025
+pi@raspberrypi01:~ $
+```
+
+でログイン出来た。まずは、`OS`のアップデートかな。
+
+```terminal
+pi@raspberrypi01:~ $ sudo apt update && sudo apt full-upgrade -y && sudo apt autoremove -y && sudo apt clean && sudo reboot
+Get:1 http://raspbian.raspberrypi.com/raspbian bookworm InRelease [15.0 kB]
+Hit:2 http://archive.raspberrypi.com/debian bookworm InRelease
+Fetched 15.0 kB in 3s (5,023 B/s)
+Reading package lists... 52%
+```
+
+で連続して、`update`が出来る。
