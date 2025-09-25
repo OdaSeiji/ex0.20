@@ -35,7 +35,7 @@ $sql = "
 with latest_nitriding_date_by_dies_id as (
   SELECT
     m_dies.id as dies_id,
-    IFNULL(t10.nitriding_date_at, DATE_FORMAT('2021-1-1', '%Y-%m-%d')) as nitriding_date_at
+    IFNULL(t10.nitriding_date_at, DATE_FORMAT('2021-1-1', '%y-%m-%d')) as nitriding_date_at
   from m_dies
   left join (
     select 

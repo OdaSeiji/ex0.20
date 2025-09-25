@@ -534,3 +534,7 @@ sudo apt install rsyslog
 
 が必要のようだが、これ、どうやってインストールするか。。。
 Edimax EW-7811Un が欲しいな。
+
+別途、WiFi ドングル
+https://www.bureau-mikami.jp/raspberry-pi%E3%81%AE%E9%80%9A%E4%BF%A1%E7%92%B0%E5%A2%83%E6%94%B9%E5%96%84-%E5%A4%96%E4%BB%98%E3%81%91usb-wifi%E3%83%89%E3%83%B3%E3%82%B0%E3%83%AB%E3%81%AE%E6%B4%BB%E7%94%A8/?utm_source=chatgpt.com
+の情報も参考。
