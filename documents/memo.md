@@ -1953,3 +1953,38 @@ Action にソート機能を追加。active でソートすると、どうせ戻
 登録する仮のテーブルを作る。
 
 そのテーブルを、m_production＿number にコピーする
+
+# 2025/10/25
+
+金型洗浄をリクエスト、承認するフローを作る。イメージは下図だがどうすればいいか。テーブルの作成が必要。
+
+![](./img/20251025-01.png)
+
+まずは、このテーブルを作る。
+
+```terminal
+CREATE TABLE t_application (
+    -- Application Information
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Application ID',
+    application_datetime DATETIME NOT NULL COMMENT 'Application Timestamp',
+    applicant_id INT NOT NULL COMMENT 'Applicant ID (Foreign Key to m_staff.id)',
+    die_id INT NOT NULL COMMENT 'Applied Die ID (Foreign Key to m_dies.id)',
+    reason TEXT NOT NULL COMMENT 'Application Reason',
+
+    -- Approval Information
+    approver_id INT COMMENT 'Approver ID (Foreign Key to m_staff.id, NULL if unapproved)',
+    confirmation_datetime DATETIME COMMENT 'Confirmation Timestamp (Date/time of Approval or Rejection)',
+    approval_result ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending' COMMENT 'Approval Result (Pending, Approved, Rejected)',
+
+    -- Foreign Key Constraints Setup
+
+    -- Link to Applicant ID (m_staff.id)
+    FOREIGN KEY (applicant_id) REFERENCES m_staff(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+
+    -- Link to Approver ID (m_staff.id)
+    FOREIGN KEY (approver_id) REFERENCES m_staff(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+
+    -- Link to Applied Die ID (m_dies.id)
+    FOREIGN KEY (die_id) REFERENCES m_dies(id) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+```

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/toppage.css" />
+    <link rel="stylesheet" href="./css/DieWashRequest.css" />
+    <!-- <link rel="stylesheet" href="./css/DieMaitenance.css" /> -->
+    <title>Request Washing for Die</title>
+  </head>
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">
+          Request Washing for Die
+        </div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record"></div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+
+    <main>
+      <h1 class="translation">Request: Washing for Die</h1>
+      <div class="button-container">
+        <div class="sub__wrapper" id="applicant__wrapper">
+          <div class="top-part__wrapper">
+            <div class="input__wrapper">
+              <div class="title__wrapper">
+                <div class="title__letters">Applicant</div>
+              </div>
+              <select
+                name=""
+                id="applicant__select"
+                class="save-data required-input"
+              >
+                <option class="centered-option" value="0">-</option>
+                <option value="1">test</option>
+              </select>
+            </div>
+
+            <div class="input__wrapper">
+              <div class="title__wrapper">Input Date</div>
+              <input id="washing_date__input" class="save-data" type="date" />
+            </div>
+
+            <div class="input__wrapper">
+              <div class="title__wrapper">
+                <div class="title__letters">Die Name</div>
+              </div>
+              <select
+                name=""
+                id="dies-name__select"
+                class="save-data required-input"
+              >
+                <option class="centered-option" value="0">-</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="input__wrapper">
+            <div class="title__wrapper" id="reason__wrapper">
+              Reson for washing
+            </div>
+            <textarea
+              id="reson-for-washing__textarea"
+              class="save-data"
+            ></textarea>
+          </div>
+          <button disabled id="applicant__button">Applicant</button>
+        </div>
+      </div>
+      <h1 class="translation">Approval Washing for Die</h1>
+      <div class="button-container">
+        <div class="sub__wrapper" id="applicant__wrapper">
+          <table
+            id="approval__table"
+            class="racking-dies__table inactive__table"
+          >
+            <caption class="table__caption racking-dies__caption">
+              Approval List
+            </caption>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>
+                  Die Number
+                  <input
+                    class="fillter-letters"
+                    id="racking-die-number-sort__text"
+                    type="text"
+                  />
+                </th>
+                <th>Applicant</th>
+                <th>Date</th>
+                <th>Reason</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr></tr>
+            </tbody>
+          </table>
+          <div class="approval-button__wrapper">
+            <button id="close-modal__button">Active</button>
+            <button disabled id="close-modal__button">Approve</button>
+            <button disabled id="delete-picture__button">Reject</button>
+            <button disabled id="display-history__button">All History</button>
+          </div>
+        </div>
+      </div>
+    </main>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./scr/DieWashRequest.js"></script>
+  </body>
+</html>
