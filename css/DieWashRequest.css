@@ -4,6 +4,8 @@ main {
 
 textarea {
   background-color: #ffddae;
+  width: 280px;
+  height: 40px;
 }
 
 .sub__wrapper {
@@ -80,6 +82,9 @@ caption {
     background-color: #b4d9df;
     border-color: #b4d9df;
   }
+  tbody {
+    height: 200px;
+  }
   select,
   input,
   textarea,
@@ -108,18 +113,65 @@ caption {
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 120px;
+    width: 250px;
   }
   th:nth-child(4),
   td:nth-child(4) {
     width: 100px;
   }
+  td:nth-child(4) {
+    text-align: center;
+  }
   th:nth-child(5),
   td:nth-child(5) {
-    width: 200px;
+    width: 280px;
   }
   th:nth-child(6),
   td:nth-child(6) {
     width: 100px;
   }
+}
+
+/* modal window */
+#modal {
+  width: 800px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 2px solid #ccc;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-button__wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+#approval__modal {
+  width: 800px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  border: 2px solid #ccc;
+  padding: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.input-code__wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.pass-code__input {
+  height: 50px;
+  width: 50px;
+  text-align: center;
+  font-size: 24pt;
 }

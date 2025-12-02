@@ -120,10 +120,37 @@
             <button disabled id="close-modal__button">Approve</button>
             <button disabled id="delete-picture__button">Reject</button>
             <button disabled id="display-history__button">All History</button>
+            <button id="test__button">test</button>
           </div>
         </div>
       </div>
     </main>
+
+    <div id="modal" style="display: none">
+      <h1 class="translation">Confirm: Do you want to resister?</h1>
+      <!-- <div id="modal" style="display: none"> -->
+      <!-- <img src="" alt="big_pic" id="modal-img" /> -->
+      <div class="modal-button__wrapper">
+        <button id="modal-close__button">Close</button>
+        <button id="modal-resister__button">Resister</button>
+      </div>
+    </div>
+
+    <div id="approval__modal">
+      <h1 class="translation">Confirm: Input Pass code</h1>
+      <div class="input-code__wrapper">
+        <div class="input-code-inner__wrapper">
+          <input id="no1_letter" class="pass-code__input" type="text" />
+          <input id="no2_letter" class="pass-code__input" type="text" />
+        </div>
+      </div>
+      <div class="modal-button__wrapper">
+        <button id="approval-close__button">Close</button>
+        <button disabled id="m-ok__button">OK</button>
+      </div>
+    </div>
+    <!-- $("#modal-resister__button").prop("disabled", false); -->
+
     <script src="./lib/jquery.min.js"></script>
     <script src="./scr/DieWashRequest.js"></script>
   </body>

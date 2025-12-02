@@ -7,6 +7,8 @@ let tableFilterConfig = {
   filterText: "",
 };
 
+const codeNumber = Math.floor(Math.random() * 90) + 10; // 10〜99
+
 function resetTimeout() {
   // Display the washing tank when there is no activity for a certain period of time.
   // const button = document.querySelector("#wash-mode__button");
@@ -69,10 +71,13 @@ $(function () {
   const today = new Date();
   const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
 
+  console.log(codeNumber);
+
   $("#washing_date__input").val(formattedDate);
 
   makeStaffSelect();
   makeDiesSelect();
+  makeApprovalTalbe();
 
   $("#applicant__wrapper select, #applicant__wrapper textarea").on(
     "keyup change",
@@ -160,19 +165,132 @@ function collectFormData() {
 }
 
 $("#applicant__button").on("click", function () {
-  console.log("Hello");
+  $("#modal").show();
+});
 
-  const data = collectFormData();
+$(document).on("click", "#modal-close__button", function () {
+  $("#modal").fadeOut();
+});
 
-  $.ajax({
-    url: "/submit_application.php", // バックエンドのURL
-    method: "POST",
-    data: data,
-    success: function (response) {
-      console.log("登録成功:", response);
-    },
-    error: function (xhr, status, error) {
-      console.error("登録失敗:", error);
-    },
+$(document).on("click", "#modal-resister__button", function () {
+  const fileName = "./php/DieWashRequest/InsWashingRequest.php";
+  const sendData = collectFormData();
+  const today = new Date();
+  const formattedDate = today.toISOString().slice(0, 10); // YYYY-MM-DD形式
+
+  myAjax.myAjax(fileName, sendData);
+
+  $("#applicant__wrapper select").val(0).css("background-color", "#ffddae");
+  $("#washing_date__input").val(formattedDate);
+  $("#reson-for-washing__textarea").val("").css("background-color", "#ffddae");
+
+  makeApprovalTalbe();
+
+  $("#modal").fadeOut();
+});
+
+$(document).on("click", "#test__button", function () {
+  makeApprovalTalbe();
+});
+
+function makeApprovalTalbe() {
+  var fileName = "./php/DieWashRequest/SelApplicaitonList.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#approval__table tbody"));
+}
+
+function makeAfterPressTalbe() {
+  var fileName = "./php/DieMaitenance/SelAfterPressDie.php";
+  var sendData = {
+    machine: "Dummy",
+  };
+
+  myAjax.myAjax(fileName, sendData);
+  summaryTable = ajaxReturnData;
+  fillTableBody(ajaxReturnData, $("#after_press_dies__table tbody"));
+}
+
+$(document).on("click", "#approval__table tbody tr", function () {
+  $(this).toggleClass("selected-record");
+  const selectedCount = $("#approval__table tbody tr.selected-record").length;
+  console.log("hello: ", selectedCount);
+  console.log(selectedCount);
+
+  // $(".approval-button__wrapper button").prop("disabled", "false");
+  if (selectedCount == 0) {
+    $(".approval-button__wrapper button").prop("disabled", true);
+  } else {
+    $(".approval-button__wrapper button").prop("disabled", false);
+  }
+});
+
+$(document).ready(function () {
+  $(document).on("click", "#approval-close__button", function () {
+    $("#approval__modal").fadeOut();
   });
+});
+
+$(document).on("keyup", "#no1_letter", function () {
+  const flag = checkCode1(Number($(this).val()));
+  $("#no2_letter").focus();
+  if (flag) {
+    $(this).css("border", "1px solid #377a94");
+  } else {
+    $(this).css("border", "2px solid red");
+  }
+});
+
+$(document).on("keydown", "#no1_letter", function () {});
+
+function checkCode1(value) {
+  const firstDigit = Math.floor(codeNumber / 10);
+  if (firstDigit === value) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+$(document).on("keyup", "#no2_letter", function () {
+  const flag = checkCode2(Number($(this).val()));
+  if (flag) {
+    $(this).css("border", "1px solid #377a94");
+  } else {
+    $(this).css("border", "2px solid red");
+  }
+
+  if (areBothBordersMatched()) {
+    $("#m-ok__button").prop("disabled", false);
+  } else {
+    $("#m-ok__button").prop("disabled", true);
+  }
+  $("#approval-close__button").focus();
+});
+
+$(document).on("keydown", "#no2_letter", function () {});
+
+function checkCode2(value) {
+  const firstDigit = Math.floor(codeNumber % 10);
+  if (firstDigit === value) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+function areBothBordersMatched() {
+  const targetColor = "rgb(55, 122, 148)"; // #377a94 のRGB表現
+  const input1Color = $("#no1_letter").css("border-color");
+  const input2Color = $("#no2_letter").css("border-color");
+  return input1Color === targetColor && input2Color === targetColor;
+}
+
+$(document).on("focus", "#no1_letter, #no2_letter", function () {
+  // console.log("hello");
+  $(this).val("");
 });

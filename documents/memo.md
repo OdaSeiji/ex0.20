@@ -1967,19 +1967,19 @@ CREATE TABLE t_application (
     -- Application Information
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Application ID',
     application_datetime DATETIME NOT NULL COMMENT 'Application Timestamp',
-    applicant_id INT NOT NULL COMMENT 'Applicant ID (Foreign Key to m_staff.id)',
+    staff_id INT NOT NULL COMMENT 'Applicant ID (Foreign Key to m_staff.id)',
     die_id INT NOT NULL COMMENT 'Applied Die ID (Foreign Key to m_dies.id)',
     reason TEXT NOT NULL COMMENT 'Application Reason',
 
     -- Approval Information
     approver_id INT COMMENT 'Approver ID (Foreign Key to m_staff.id, NULL if unapproved)',
     confirmation_datetime DATETIME COMMENT 'Confirmation Timestamp (Date/time of Approval or Rejection)',
-    approval_result ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending' COMMENT 'Approval Result (Pending, Approved, Rejected)',
+    approval_result ENUM('Pending', 'Approved', 'Rejected') DEFAULT NULL COMMENT 'Approval Result (Pending, Approved, Rejected)',
 
     -- Foreign Key Constraints Setup
 
     -- Link to Applicant ID (m_staff.id)
-    FOREIGN KEY (applicant_id) REFERENCES m_staff(id) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (staff_id) REFERENCES m_staff(id) ON DELETE RESTRICT ON UPDATE CASCADE,
 
     -- Link to Approver ID (m_staff.id)
     FOREIGN KEY (approver_id) REFERENCES m_staff(id) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -1988,3 +1988,5 @@ CREATE TABLE t_application (
     FOREIGN KEY (die_id) REFERENCES m_dies(id) ON DELETE RESTRICT ON UPDATE CASCADE
 );
 ```
+
+作ったはいいけど、登録を確認するダイアログが有った方がいい。
