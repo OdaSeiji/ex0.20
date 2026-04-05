@@ -7,362 +7,151 @@
     <link rel="stylesheet" href="./css/DieIssue.css" />
 
     <title>Die Issue List</title>
-    <style>
-      body {
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          sans-serif;
-        margin: 0;
-        padding: 0;
-        background: #f4f7fb;
-        color: #333;
-      }
-
-      .page {
-        max-width: 1200px;
-        margin: 20px auto;
-        background: #ffffff;
-        border-radius: 6px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        padding: 16px 20px 20px;
-      }
-
-      .page-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 12px;
-        color: #1f4f82;
-      }
-
-      .top-bar {
-        display: flex;
-        justify-content: flex-end;
-        gap: 16px;
-        margin-bottom: 10px;
-        align-items: center;
-      }
-
-      .field-inline {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 13px;
-      }
-
-      .field-inline label {
-        min-width: 70px;
-        text-align: right;
-        color: #555;
-      }
-
-      select,
-      input[type="text"],
-      input[type="date"],
-      textarea {
-        font-size: 13px;
-        padding: 4px 6px;
-        border-radius: 3px;
-        border: 1px solid #c5d3e0;
-        min-width: 140px;
-        box-sizing: border-box;
-      }
-
-      textarea {
-        resize: vertical;
-      }
-
-      .layout {
-        display: grid;
-        grid-template-columns: 2fr 1.4fr;
-        gap: 16px;
-      }
-
-      /* 左側：一覧テーブル */
-      .panel {
-        border: 1px solid #d0d9e6;
-        border-radius: 4px;
-        background: #f9fbff;
-        padding: 8px 10px 10px;
-      }
-
-      .panel-title {
-        font-size: 14px;
-        font-weight: 600;
-        margin-bottom: 6px;
-        color: #1f4f82;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 12px;
-        background: #ffffff;
-      }
-
-      th,
-      td {
-        border: 1px solid #d0d9e6;
-        padding: 4px 6px;
-        text-align: left;
-        white-space: nowrap;
-      }
-
-      th {
-        background: #e6effa;
-        font-weight: 600;
-      }
-
-      .col-die-number {
-        width: 150px;
-      }
-      .col-title {
-        width: 180px;
-      }
-      .col-date {
-        width: 80px;
-        text-align: center;
-      }
-      .col-status {
-        width: 90px;
-        text-align: center;
-      }
-      .col-action {
-        width: 80px;
-        text-align: center;
-      }
-
-      .status-badge {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-size: 11px;
-        color: #fff;
-      }
-      .status-pending {
-        background: #999;
-      }
-      .status-approved {
-        background: #2e8b57;
-      }
-      .status-rejected {
-        background: #c0392b;
-      }
-
-      .btn {
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 3px;
-        border: 1px solid transparent;
-        cursor: pointer;
-        background: #2f7ed8;
-        color: #fff;
-      }
-      .btn:disabled {
-        opacity: 0.5;
-        cursor: default;
-      }
-      .btn-secondary {
-        background: #ffffff;
-        color: #2f7ed8;
-        border-color: #2f7ed8;
-      }
-
-      /* 右側：入力フォーム */
-      .form-panel {
-        border: 1px solid #d0d9e6;
-        border-radius: 4px;
-        background: #f9fbff;
-        padding: 10px 12px 12px;
-        font-size: 13px;
-      }
-
-      .form-row {
-        margin-bottom: 8px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-
-      .form-row label {
-        display: inline-block;
-        width: 100px;
-        text-align: right;
-        color: #555;
-      }
-
-      .form-row textarea {
-        width: 100%;
-        min-height: 70px;
-      }
-
-      .form-row .wide {
-        flex: 1;
-      }
-
-      .form-actions {
-        margin-top: 10px;
-        text-align: right;
-      }
-
-      .btn-primary {
-        background: #2f7ed8;
-        color: #fff;
-        border-color: #2f7ed8;
-        padding: 5px 14px;
-        font-size: 13px;
-      }
-    </style>
   </head>
   <body>
-    <div class="page">
-      <div class="page-title">Die Issue List</div>
+    <!-- <div class="page-title">Die Issue List</div> -->
+    <h1 class="translation">Die Issue List</h1>
 
-      <!-- 上部：Staff / Input Date -->
-      <div class="top-bar">
-        <div class="field-inline">
-          <label for="staff">Staff</label>
-          <select id="staff" name="staff">
-            <option value="">-</option>
-            <option value="1">山田</option>
-            <option value="2">佐藤</option>
-          </select>
-        </div>
-        <div class="field-inline">
-          <label for="inputDate">Input Date</label>
-          <input
-            type="date"
-            id="inputDate"
-            name="inputDate"
-            value="2026-04-04"
-          />
-        </div>
+    <!-- 上部：Staff / Input Date -->
+    <div class="top-bar">
+      <div class="field-inline">
+        <label for="staff">Staff</label>
+        <select id="staff" name="staff">
+          <option value="">-</option>
+          <option value="1">山田</option>
+          <option value="2">佐藤</option>
+        </select>
+      </div>
+      <div class="field-inline">
+        <label for="inputDate">Input Date</label>
+        <input type="date" id="inputDate" name="inputDate" value="2026-04-04" />
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- 左側：Issues List -->
+      <div class="panel">
+        <div class="panel-title">Issues List</div>
+        <table>
+          <thead>
+            <tr>
+              <th>id</th>
+              <th class="col-die-number">Die Number</th>
+              <th class="col-title">Issue Title</th>
+              <th class="col-date">Date</th>
+              <th class="col-status">Approval</th>
+              <th class="col-action">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td></td>
+              <td>CP9663R-V01D</td>
+              <td>寸法が安定しない</td>
+              <td class="col-date">04/01</td>
+              <td class="col-status">
+                <span class="status-badge status-pending">pending</span>
+              </td>
+              <td class="col-action">
+                <span class="status-badge not-applicable">
+                  not_applicable
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>VP500M-V01D</td>
+              <td>バリ発生が多い</td>
+              <td class="col-date">03/28</td>
+              <td class="col-status">
+                <span class="status-badge status-green">approved</span>
+              </td>
+              <td class="col-action">
+                <span class="status-badge status-blue"> in_progress </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>CKZ50T4-V01D</td>
+              <td>ガタつきがある</td>
+              <td class="col-date">03/21</td>
+              <td class="col-status">
+                <span class="status-badge status-red">rejected</span>
+              </td>
+              <td class="col-action">
+                <span class="status-badge not-applicable">
+                  not_applicable
+                </span>
+              </td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>CP96A0R-V01D</td>
+              <td>表面傷が頻発</td>
+              <td class="col-date">03/18</td>
+              <td class="col-status">
+                <span class="status-badge status-green">approved</span>
+              </td>
+              <td class="col-action">
+                <span class="status-badge status-green"> complete </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="layout">
-        <!-- 左側：Issues List -->
-        <div class="panel">
-          <div class="panel-title">Issues List</div>
-          <table>
-            <thead>
-              <tr>
-                <th class="col-die-number">Die Number</th>
-                <th class="col-title">Issue Title</th>
-                <th class="col-date">Date</th>
-                <th class="col-status">Approval</th>
-                <th class="col-action">Complete</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>CP9663R-V01D</td>
-                <td>寸法が安定しない</td>
-                <td class="col-date">04/01</td>
-                <td class="col-status">
-                  <span class="status-badge status-pending">pending</span>
-                </td>
-                <td class="col-action">
-                  <span class="status-badge not-applicable">
-                    not_applicable
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td>VP500M-V01D</td>
-                <td>バリ発生が多い</td>
-                <td class="col-date">03/28</td>
-                <td class="col-status">
-                  <span class="status-badge status-approved">approved</span>
-                </td>
-                <td class="col-action">
-                  <span class="status-badge not-applicable"> in_progress </span>
-                </td>
-              </tr>
-              <tr>
-                <td>CKZ50T4-V01D</td>
-                <td>ガタつきがある</td>
-                <td class="col-date">03/21</td>
-                <td class="col-status">
-                  <span class="status-badge status-rejected">rejected</span>
-                </td>
-                <td class="col-action">
-                  <button class="btn btn-secondary">Re-apply</button>
-                </td>
-              </tr>
-              <tr>
-                <td>CP96A0R-V01D</td>
-                <td>表面傷が頻発</td>
-                <td class="col-date">03/18</td>
-                <td class="col-status">
-                  <span class="status-badge status-pending">pending</span>
-                </td>
-                <td class="col-action">
-                  <button class="btn">Approve</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- 右側：Issue 登録フォーム -->
+      <div class="form-panel">
+        <div class="panel-title">Issue Resistration</div>
+        <div class="form-row">
+          <label for="dieNumber">Die Number</label>
+          <select id="dieNumber" name="dieNumber" class="wide">
+            <option value="">-</option>
+            <option>CP9663R-V01D</option>
+            <option>VP500M-V01D</option>
+            <option>CKZ50T4-V01D</option>
+          </select>
         </div>
 
-        <!-- 右側：Issue 登録フォーム -->
-        <div class="form-panel">
-          <div class="panel-title">Issue Resistration</div>
-          <div class="form-row">
-            <label for="dieNumber">Die Number</label>
-            <select id="dieNumber" name="dieNumber" class="wide">
-              <option value="">-</option>
-              <option>CP9663R-V01D</option>
-              <option>VP500M-V01D</option>
-              <option>CKZ50T4-V01D</option>
-            </select>
-          </div>
+        <div class="form-row">
+          <label for="issueTitle">Issue Title</label>
+          <input type="text" id="issueTitle" name="issueTitle" class="wide" />
+        </div>
 
-          <div class="form-row">
-            <label for="issueTitle">Issue Title</label>
-            <input type="text" id="issueTitle" name="issueTitle" class="wide" />
-          </div>
+        <div class="form-row">
+          <label for="issueDetail">Issue Detail</label>
+          <textarea id="issueDetail" name="issueDetail" class="wide"></textarea>
+        </div>
 
-          <div class="form-row">
-            <label for="issueDetail">Issue Detail</label>
-            <textarea
-              id="issueDetail"
-              name="issueDetail"
-              class="wide"
-            ></textarea>
-          </div>
+        <div class="form-row">
+          <label for="priority">Priority</label>
+          <select id="priority" name="priority">
+            <option value="2">Medium</option>
+            <option value="1">High</option>
+            <option value="3">Low</option>
+          </select>
+        </div>
 
-          <div class="form-row">
-            <label for="priority">Priority</label>
-            <select id="priority" name="priority">
-              <option value="2">Medium</option>
-              <option value="1">High</option>
-              <option value="3">Low</option>
-            </select>
-          </div>
+        <div class="form-row">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="open">Open</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
 
-          <div class="form-row">
-            <label for="status">Status</label>
-            <select id="status" name="status">
-              <option value="open">Open</option>
-              <option value="in_progress">In Progress</option>
-              <option value="resolved">Resolved</option>
-            </select>
-          </div>
+        <div class="form-row">
+          <label for="approvalStatus">Approval Status</label>
+          <select id="approvalStatus" name="approvalStatus">
+            <option value="pending">pending</option>
+            <option value="approved">approved</option>
+            <option value="rejected">rejected</option>
+          </select>
+        </div>
 
-          <div class="form-row">
-            <label for="approvalStatus">Approval Status</label>
-            <select id="approvalStatus" name="approvalStatus">
-              <option value="pending">pending</option>
-              <option value="approved">approved</option>
-              <option value="rejected">rejected</option>
-            </select>
-          </div>
-
-          <div class="form-actions">
-            <button class="btn btn-primary">Register Issue</button>
-          </div>
+        <div class="form-actions">
+          <button class="btn btn-primary">Register Issue</button>
         </div>
       </div>
     </div>
