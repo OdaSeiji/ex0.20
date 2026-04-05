@@ -1200,7 +1200,7 @@ $(document).on(
           $("#washing__div select").val("0").addClass("required-input");
 
           $("#after_press_dies__table .selected-record").removeClass(
-            "selected-record"
+            "selected-record",
           );
 
           // make staff select
@@ -1217,12 +1217,12 @@ $(document).on(
           $("#racking__div").addClass("inactive__div");
 
           $("#after_press_dies__table .selected-record").removeClass(
-            "selected-record"
+            "selected-record",
           );
           break;
       }
     }
-  }
+  },
 );
 ```
 
@@ -1990,3 +1990,201 @@ CREATE TABLE t_application (
 ```
 
 作ったはいいけど、登録を確認するダイアログが有った方がいい。
+
+# 2026/04/04
+
+久しぶりのプログラミング。金型保全をした時の記録をする画面を作りたい。
+
+- 登録画面
+- 閲覧画面
+
+でも、考えてみれば、閲覧が自由にできるようになっていて、そこに新規追加というのが流れだろう。
+
+![](./img/20260404-01.png)
+
+この画面、なんか使いにくい。最新の情報しか表示されないからかな。
+`m_die_status`があまり使いやすくないからね。これ、型修理用のテーブルを作ってはどうかな。
+
+```
+CREATE TABLE t_die_clinical_record (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    record_date     DATE NOT NULL,
+    staff_id        INT NOT NULL,
+    memo            TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    -- 外部キー
+    CONSTRAINT fk_clinical_record_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+    CONSTRAINT fk_clinical_record_staff
+        FOREIGN KEY (staff_id)
+        REFERENCES m_staff(id)
+);
+```
+
+金型修理専用の記録テーブル。
+それと、添付ファイルはこっちに保存
+
+```sql
+CREATE TABLE t_die_clinical_record_attachment (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    clinical_record_id  INT NOT NULL,
+    file_name           VARCHAR(255) NOT NULL,
+    description         VARCHAR(500),  -- 添付ファイルの説明
+    attached_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_attachment_clinical_record
+        FOREIGN KEY (clinical_record_id)
+        REFERENCES t_die_clinical_record(id)
+);
+```
+
+テーブルの作成は完成。次は、フォームの設計。
+
+- 写真やキャプチャーなどが張り込めるようにしたい
+- 型を選んだら、前回の修理者の名前が一番先に出るようにしたい。
+- 型番を入力しなくて済むようなインターフェイスがいい
+- 最近入力している修理履歴の一覧が見れるといい。
+- 選択したら過去の履歴が即座に出るべき（選択ミスをなるべく防ぐため）
+- 指示が出た方がいい
+
+金型の不具合をまとめるテーブルを作成した方がいい。
+
+```sql
+CREATE TABLE t_die_issue (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_title     VARCHAR(255) NOT NULL,
+    issue_detail    TEXT,
+    reported_by     INT NOT NULL,
+    reported_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status          VARCHAR(50) DEFAULT 'open',
+    priority        TINYINT DEFAULT 2,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_issue_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_issue_staff
+        FOREIGN KEY (reported_by)
+        REFERENCES m_staff(id)
+);
+```
+
+という事で、上位のテーブルは以下のように改造する。
+
+```sql
+CREATE TABLE t_die_clinical_record (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_id        INT,  -- 課題へのリンク（任意）
+    record_date     DATE NOT NULL,
+    staff_id        INT NOT NULL,
+    memo            TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_clinical_record_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_clinical_record_staff
+        FOREIGN KEY (staff_id)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_clinical_record_issue
+        FOREIGN KEY (issue_id)
+        REFERENCES t_die_issue(id)
+);
+```
+
+まとめると、
+
+```sql
+CREATE TABLE t_die_issue (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_title     VARCHAR(255) NOT NULL,
+    issue_detail    TEXT,
+    reported_by     INT NOT NULL,
+    reported_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- 承認フロー
+    approval_status VARCHAR(50) DEFAULT 'pending',   -- pending / approved / rejected
+    approved_by     INT,
+    approved_at     DATETIME,
+    -- 完了フロー
+    completion_status VARCHAR(50) DEFAULT 'not_applicable',
+        -- not_applicable（対象外：承認されていない）
+        -- in_progress（対応中）
+        -- request_complete（完了申請中）
+        -- completed（完了）
+    completed_by     INT,
+    completed_at     DATETIME,
+    status          VARCHAR(50) DEFAULT 'open',
+    priority        TINYINT DEFAULT 2,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_issue_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_issue_staff
+        FOREIGN KEY (reported_by)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_issue_approved_by
+        FOREIGN KEY (approved_by)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_issue_completed_by
+        FOREIGN KEY (completed_by)
+        REFERENCES m_staff(id)
+);
+
+CREATE TABLE t_die_clinical_record (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_id        INT,  -- 課題へのリンク（任意）
+    record_date     DATE NOT NULL,
+    staff_id        INT NOT NULL,
+    memo            TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_clinical_record_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_clinical_record_staff
+        FOREIGN KEY (staff_id)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_clinical_record_issue
+        FOREIGN KEY (issue_id)
+        REFERENCES t_die_issue(id)
+);
+
+
+CREATE TABLE t_die_clinical_record_attachment (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    clinical_record_id  INT NOT NULL,
+    file_name           VARCHAR(255) NOT NULL,
+    description         VARCHAR(500),  -- 添付ファイルの説明
+    attached_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_attachment_clinical_record
+        FOREIGN KEY (clinical_record_id)
+        REFERENCES t_die_clinical_record(id)
+);
+
+```
+
+# 2026/04/05
+
+`Copilot`に描かせてみたら、以下のような感じになった。
+![](./img/20260405-01.png)
+これはこれで見習う所が多い。特に**Approval**のところとか**Action**のところとか、とても見やすい。
