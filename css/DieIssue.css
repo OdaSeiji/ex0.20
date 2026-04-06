@@ -73,7 +73,13 @@ textarea {
   border: 1px solid #d0d9e6;
   border-radius: 4px;
   background: #f9fbff;
-  padding: 8px 10px 10px;
+  padding: 15px 10px 15px 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* margin-top: 10px; */
+  /* margin-bottom: 10px; */
+  margin: 10px;
 }
 
 .panel-title {
@@ -123,6 +129,9 @@ th {
 } */
 
 #issues-list__table {
+  tbody {
+    height: 150px;
+  }
   /* background-color: #28a745; */
   th:nth-child(2),
   td:nth-child(2) {
@@ -130,7 +139,7 @@ th {
   }
   th:nth-child(3),
   td:nth-child(3) {
-    width: 180px;
+    width: 290px;
   }
   th:nth-child(4),
   td:nth-child(4) {
@@ -139,13 +148,30 @@ th {
   }
   th:nth-child(5),
   td:nth-child(5) {
-    width: 100px;
+    width: 80px;
     text-align: center;
   }
   th:nth-child(6),
   td:nth-child(6) {
     width: 120px;
     text-align: center;
+  }
+  th:nth-child(7),
+  td:nth-child(7) {
+    width: 140px;
+    text-align: center;
+  }
+  th:nth-child(8),
+  td:nth-child(8) {
+    width: 80px;
+    text-align: center;
+  }
+  th:nth-child(9),
+  td:nth-child(9) {
+    width: 180px;
+  }
+  td:nth-child(9) {
+    text-align: left;
   }
 }
 
@@ -206,8 +232,9 @@ th {
   border: 1px solid #d0d9e6;
   border-radius: 4px;
   background: #f9fbff;
-  padding: 10px 12px 12px;
+  padding: 15px 10px 15px 10px;
   font-size: 13px;
+  margin: 10px;
 }
 
 .form-row {

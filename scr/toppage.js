@@ -30,6 +30,12 @@ $(document).on("click", "#billet-charge__button", function () {
   window.open("./PressBilletCharge-SelectMachine.html");
 });
 
+// die issue
+$(document).on("click", "#die-issue__button", function () {
+  window.open("./DieIssue.html");
+  // console.log("hello");
+});
+
 // die maitenance
 $(document).on("click", "#die-maitenance__button", function () {
   window.open("./DieMaitenanceV3.html");

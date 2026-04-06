@@ -28,130 +28,160 @@
       </div>
     </div>
 
-    <div class="layout">
-      <!-- 左側：Issues List -->
-      <div class="panel">
-        <table id="issues-list__table">
-          <thead>
-            <tr>
-              <th>id</th>
-              <th class="col-die-number">Die Number</th>
-              <th class="col-title">Issue Title</th>
-              <th class="col-date">Date</th>
-              <th class="col-status">Approval</th>
-              <th class="col-action">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td></td>
-              <td>CP9663R-V01D</td>
-              <td>寸法が安定しない</td>
-              <td class="col-date">04/01</td>
-              <td class="col-status">
-                <span class="status-badge status-pending">pending</span>
-              </td>
-              <td class="col-action">
-                <span class="status-badge not-applicable">
-                  not_applicable
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>VP500M-V01D</td>
-              <td>バリ発生が多い</td>
-              <td class="col-date">03/28</td>
-              <td class="col-status">
-                <span class="status-badge status-green">approved</span>
-              </td>
-              <td class="col-action">
-                <span class="status-badge status-blue"> in_progress </span>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>CKZ50T4-V01D</td>
-              <td>ガタつきがある</td>
-              <td class="col-date">03/21</td>
-              <td class="col-status">
-                <span class="status-badge status-red">rejected</span>
-              </td>
-              <td class="col-action">
-                <span class="status-badge not-applicable">
-                  not_applicable
-                </span>
-              </td>
-            </tr>
-            <tr>
-              <td></td>
-              <td>CP96A0R-V01D</td>
-              <td>表面傷が頻発</td>
-              <td class="col-date">03/18</td>
-              <td class="col-status">
-                <span class="status-badge status-green">approved</span>
-              </td>
-              <td class="col-action">
-                <span class="status-badge status-green"> complete </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- 左側：Issues List -->
+    <div class="panel">
+      <table id="issues-list__table">
+        <thead>
+          <tr>
+            <th>id</th>
+            <th class="col-die-number">Die Number</th>
+            <th class="col-title">Issue Title</th>
+            <th class="col-date">Date</th>
+            <th class="col-date">Priority</th>
+            <th class="col-status">Approval</th>
+            <th class="col-action">Status</th>
+            <th class="col-action">Press</th>
+            <th class="col-action">Staff</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>CP9663R-V01D</td>
+            <td>Dimensional instability</td>
+            <td class="col-date">04/01</td>
+            <td>
+              <span class="status-badge status-green">Low</span>
+            </td>
+            <td class="col-status">
+              <span class="status-badge status-pending">pending</span>
+            </td>
+            <td class="col-action">
+              <span class="status-badge not-applicable"> not_applicable </span>
+            </td>
+            <td>0</td>
+            <td>ABCDEF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>VP500M-V01D</td>
+            <td>Weld lines appear</td>
+            <td class="col-date">03/28</td>
+            <td>
+              <span class="status-badge status-red">High</span>
+            </td>
+            <td class="col-status">
+              <span class="status-badge status-green">approved</span>
+            </td>
+            <td class="col-action">
+              <span class="status-badge status-blue"> in_progress </span>
+            </td>
+            <td>2</td>
+            <td>ABCDEF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>CKZ50T4-V01D</td>
+            <td>Dimensions out of spec</td>
+            <td class="col-date">03/21</td>
+            <td>
+              <span class="status-badge status-yellow">Medium</span>
+            </td>
+            <td class="col-status">
+              <span class="status-badge status-red">rejected</span>
+            </td>
+            <td class="col-action">
+              <span class="status-badge not-applicable"> not_applicable </span>
+            </td>
+            <td>0</td>
+            <td>ABCDEF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>CP96A0R-V01D</td>
+            <td>Molding defect</td>
+            <td class="col-date">03/18</td>
+            <td><span class="status-badge status-yellow">Medium</span></td>
+            <td class="col-status">
+              <span class="status-badge status-green">approved</span>
+            </td>
+            <td class="col-action">
+              <span class="status-badge status-green"> complete </span>
+            </td>
+            <td>3</td>
+            <td>ABCDEF</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>CP96A0R-V01D</td>
+            <td>Molding defect</td>
+            <td class="col-date">03/18</td>
+            <td><span class="status-badge status-yellow">Medium</span></td>
+            <td class="col-status">
+              <span class="status-badge status-green">approved</span>
+            </td>
+            <td class="col-action">
+              <span class="status-badge status-green"> complete </span>
+            </td>
+            <td>3</td>
+            <td>ABCDEF</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 右側：Issue 登録フォーム -->
+    <div class="form-panel">
+      <div class="panel-title">Issue Resistration</div>
+      <div class="form-row">
+        <label for="dieNumber">Die Number</label>
+        <select id="dieNumber" name="dieNumber" class="wide">
+          <option value="">-</option>
+          <option>CP9663R-V01D</option>
+          <option>VP500M-V01D</option>
+          <option>CKZ50T4-V01D</option>
+        </select>
       </div>
 
-      <!-- 右側：Issue 登録フォーム -->
-      <div class="form-panel">
-        <div class="panel-title">Issue Resistration</div>
-        <div class="form-row">
-          <label for="dieNumber">Die Number</label>
-          <select id="dieNumber" name="dieNumber" class="wide">
-            <option value="">-</option>
-            <option>CP9663R-V01D</option>
-            <option>VP500M-V01D</option>
-            <option>CKZ50T4-V01D</option>
-          </select>
-        </div>
+      <div class="form-row">
+        <label for="issueTitle">Issue Title</label>
+        <input type="text" id="issueTitle" name="issueTitle" class="wide" />
+      </div>
 
-        <div class="form-row">
-          <label for="issueTitle">Issue Title</label>
-          <input type="text" id="issueTitle" name="issueTitle" class="wide" />
-        </div>
+      <div class="form-row">
+        <label for="issueDetail">Issue Detail</label>
+        <textarea id="issueDetail" name="issueDetail" class="wide"></textarea>
+      </div>
 
-        <div class="form-row">
-          <label for="issueDetail">Issue Detail</label>
-          <textarea id="issueDetail" name="issueDetail" class="wide"></textarea>
-        </div>
+      <div class="form-row">
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority">
+          <option value="2">Medium</option>
+          <option value="1">High</option>
+          <option value="3">Low</option>
+        </select>
+      </div>
 
-        <div class="form-row">
-          <label for="priority">Priority</label>
-          <select id="priority" name="priority">
-            <option value="2">Medium</option>
-            <option value="1">High</option>
-            <option value="3">Low</option>
-          </select>
-        </div>
+      <div class="form-row">
+        <label for="status">Status</label>
+        <select id="status" name="status">
+          <option value="open">Open</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
 
-        <div class="form-row">
-          <label for="status">Status</label>
-          <select id="status" name="status">
-            <option value="open">Open</option>
-            <option value="in_progress">In Progress</option>
-            <option value="resolved">Resolved</option>
-          </select>
-        </div>
+      <div class="form-row">
+        <label for="approvalStatus">Approval Status</label>
+        <select id="approvalStatus" name="approvalStatus">
+          <option value="pending">pending</option>
+          <option value="approved">approved</option>
+          <option value="rejected">rejected</option>
+        </select>
+      </div>
 
-        <div class="form-row">
-          <label for="approvalStatus">Approval Status</label>
-          <select id="approvalStatus" name="approvalStatus">
-            <option value="pending">pending</option>
-            <option value="approved">approved</option>
-            <option value="rejected">rejected</option>
-          </select>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn btn-primary">Register Issue</button>
-        </div>
+      <div class="form-actions">
+        <button class="btn btn-primary">Register Issue</button>
       </div>
     </div>
   </body>
