@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>修理記録入力</title>
+
+    <style>
+      body {
+        font-family: "Noto Sans JP", sans-serif;
+        background: #e8f2f8;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+      header {
+        background: #2b6ca3;
+        color: #fff;
+        padding: 12px 20px;
+        font-size: 20px;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 6px;
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      }
+
+      .card h2 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        color: #2b6ca3;
+      }
+
+      label {
+        display: block;
+        margin-top: 12px;
+        font-weight: bold;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        border: 1px solid #c8d4dd;
+        border-radius: 4px;
+      }
+
+      input[type="file"] {
+        margin-top: 8px;
+      }
+
+      .image-list img {
+        width: 120px;
+        margin-right: 8px;
+        border-radius: 4px;
+      }
+
+      button.primary {
+        background: #2b6ca3;
+        color: #fff;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 4px;
+        margin-top: 10px;
+      }
+
+      button.secondary {
+        background: #8aaac4;
+        color: #fff;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 4px;
+        margin-right: 10px;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>修理記録入力</header>
+
+    <div class="container">
+      <!-- ▼▼▼ ここが動的に切り替わる部分 ▼▼▼ -->
+
+      <!-- 1回目の場合：過去の修理記録が存在しない -->
+      <div class="card" id="before-first">
+        <h2>Before（不具合情報）</h2>
+        <p>成形後の寸法が規格外になる。</p>
+        <div class="image-list">
+          <img src="issue1.jpg" />
+          <img src="issue2.jpg" />
+        </div>
+      </div>
+
+      <!-- 2回目以降の場合：前回の修理結果を表示 -->
+      <div class="card" id="before-repeat" style="display: none">
+        <h2>前回の修理結果（参考）</h2>
+        <div class="image-list">
+          <img src="after_prev1.jpg" />
+          <img src="after_prev2.jpg" />
+        </div>
+        <p>前回コメント：ゲート部調整で改善したが、寸法がまだ不安定。</p>
+
+        <h2 style="margin-top: 20px">今回のBefore（必須）</h2>
+        <input type="file" multiple />
+      </div>
+
+      <!-- ▼▼▼ 共通の修理内容入力 ▼▼▼ -->
+      <div class="card">
+        <h2>修理内容</h2>
+
+        <label>修理完了日</label>
+        <input type="date" />
+
+        <label>修理者</label>
+        <input type="text" value="田中" />
+
+        <label>修理コメント</label>
+        <textarea rows="4"></textarea>
+
+        <label>修理写真（During / After）</label>
+        <input type="file" multiple />
+      </div>
+
+      <!-- ▼▼▼ ボタン（1回目と2回目以降で切り替え） ▼▼▼ -->
+      <div class="card">
+        <!-- 1回目：保存のみ -->
+        <button class="primary" id="btn-save-first">保存する</button>
+
+        <!-- 2回目以降：保存＋完了申請 -->
+        <button class="secondary" id="btn-save-repeat" style="display: none">
+          保存する
+        </button>
+        <button class="primary" id="btn-apply-repeat" style="display: none">
+          完了申請する
+        </button>
+      </div>
+    </div>
+
+    <script>
+      /*
+  ▼▼▼ ここで「1回目 or 2回目以降」を切り替える ▼▼▼
+  実際の実装では、過去の修理記録があるかどうかで判定する。
+*/
+
+      const isFirst = false; // ← ここを true にすると1回目、false で2回目以降
+
+      if (isFirst) {
+        document.getElementById("before-first").style.display = "block";
+        document.getElementById("before-repeat").style.display = "none";
+
+        document.getElementById("btn-save-first").style.display =
+          "inline-block";
+        document.getElementById("btn-save-repeat").style.display = "none";
+        document.getElementById("btn-apply-repeat").style.display = "none";
+      } else {
+        document.getElementById("before-first").style.display = "none";
+        document.getElementById("before-repeat").style.display = "block";
+
+        document.getElementById("btn-save-first").style.display = "none";
+        document.getElementById("btn-save-repeat").style.display =
+          "inline-block";
+        document.getElementById("btn-apply-repeat").style.display =
+          "inline-block";
+      }
+    </script>
+  </body>
+</html>
