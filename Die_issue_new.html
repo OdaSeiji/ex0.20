@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>New Issue Registration</title>
+    <link rel="stylesheet" href="die_issue.css" />
+  </head>
+
+  <body>
+    <header>New Issue Registration</header>
+
+    <div class="container">
+      <div class="card">
+        <h2>Basic Information</h2>
+
+        <!-- ▼ Select2風 Die Number -->
+        <label>Die Number</label>
+        <div class="select2box">
+          <input
+            type="text"
+            id="dieInput"
+            placeholder="Type to search..."
+            autocomplete="off"
+          />
+          <div id="dieList" class="select2list"></div>
+        </div>
+
+        <label>Issue Title</label>
+        <input type="text" placeholder="e.g., Dimensional instability" />
+
+        <label>Issue Description</label>
+        <textarea
+          rows="4"
+          placeholder="Describe the issue in detail"
+        ></textarea>
+
+        <label>Before Photo</label>
+        <input type="file" id="fileInput" multiple />
+
+        <!-- ▼ Preview area -->
+        <div id="preview" class="preview-area"></div>
+      </div>
+
+      <div class="card">
+        <h2>Assignment</h2>
+
+        <label>Applicant</label>
+        <input type="text" placeholder="e.g., Sato" />
+
+        <label>Assignee</label>
+        <input type="text" placeholder="e.g., Tanaka" />
+      </div>
+
+      <div class="bottom-area">
+        <button class="primary">Submit</button>
+      </div>
+    </div>
+
+    <script>
+      /* ▼ 拡張子判定（Apache＋Chrome対応） */
+      function isImageFile(file) {
+        const name = file.name.toLowerCase();
+        return (
+          name.endsWith(".jpg") ||
+          name.endsWith(".jpeg") ||
+          name.endsWith(".png") ||
+          name.endsWith(".gif") ||
+          name.endsWith(".bmp") ||
+          name.endsWith(".webp") ||
+          name.endsWith(".heic")
+        );
+      }
+
+      /* ▼ 追加アップロード＋削除対応 */
+      document.addEventListener("DOMContentLoaded", () => {
+        const fileInput = document.getElementById("fileInput");
+        const preview = document.getElementById("preview");
+        let fileList = [];
+
+        fileInput.addEventListener("change", () => {
+          fileList = fileList.concat(Array.from(fileInput.files));
+          renderPreview();
+        });
+
+        function renderPreview() {
+          preview.innerHTML = "";
+
+          fileList.forEach((file, index) => {
+            const item = document.createElement("div");
+            item.className = "preview-item";
+
+            item.addEventListener("click", () => {
+              if (confirm("Do you want to delete this file?")) {
+                fileList.splice(index, 1);
+                renderPreview();
+              }
+            });
+
+            if (isImageFile(file)) {
+              const img = document.createElement("img");
+              img.src = URL.createObjectURL(file);
+              img.onload = () => URL.revokeObjectURL(img.src);
+              item.appendChild(img);
+            } else {
+              item.textContent = file.name;
+            }
+
+            preview.appendChild(item);
+          });
+        }
+
+        /* ▼ Select2風 Die Number */
+        const dieInput = document.getElementById("dieInput");
+        const dieListBox = document.getElementById("dieList");
+        let dieList = [];
+
+        fetch("./php/die_issue_php/get_die_numbers.php")
+          .then((res) => res.json())
+          .then((list) => {
+            dieList = list;
+          });
+
+        dieInput.addEventListener("input", () => {
+          const keyword = dieInput.value.toLowerCase();
+          const filtered = dieList.filter((d) =>
+            d.toLowerCase().includes(keyword),
+          );
+
+          dieListBox.innerHTML = "";
+          filtered.forEach((die) => {
+            const item = document.createElement("div");
+            item.className = "select2item";
+            item.textContent = die;
+
+            item.addEventListener("click", () => {
+              dieInput.value = die;
+              dieListBox.style.display = "none";
+            });
+
+            dieListBox.appendChild(item);
+          });
+
+          dieListBox.style.display = filtered.length ? "block" : "none";
+        });
+
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest(".select2box")) {
+            dieListBox.style.display = "none";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

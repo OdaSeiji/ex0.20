@@ -2188,3 +2188,7 @@ CREATE TABLE t_die_clinical_record_attachment (
 `Copilot`に描かせてみたら、以下のような感じになった。
 ![](./img/20260405-01.png)
 これはこれで見習う所が多い。特に**Approval**のところとか**Action**のところとか、とても見やすい。
+
+# 2026/04/11
+
+![](./img/20260411-01.png)
