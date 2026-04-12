@@ -2195,6 +2195,8 @@ CREATE TABLE t_die_clinical_record_attachment (
 
 # 2026/04/12
 
+テーブルは以下の二つをまず追加。
+
 ```sql
 CREATE TABLE t_die_issue (
     id INT AUTO_INCREMENT PRIMARY KEY,

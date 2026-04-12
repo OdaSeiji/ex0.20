@@ -1,10 +1,19 @@
 <?php
-$pdo = new PDO("mysql:host=localhost;dbname=extrusion;charset=utf8", "webuser", "");
+$pdo = new PDO(
+    "mysql:host=localhost;dbname=extrusion;charset=utf8",
+    "webuser",
+    ""
+);
 
-$sql = "SELECT staff_name FROM m_staff ORDER BY staff_name";
+$sql = "SELECT id, staff_name FROM m_staff ORDER BY staff_name";
 $stmt = $pdo->query($sql);
 
-$result = $stmt->fetchAll(PDO::FETCH_COLUMN);
+$rows = [];
+while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $rows[] = [
+        "id" => $r["id"],
+        "name" => $r["staff_name"]
+    ];
+}
 
-header("Content-Type: application/json");
-echo json_encode($result);
+echo json_encode($rows);

@@ -13,7 +13,7 @@
       <div class="card">
         <h2>Basic Information</h2>
 
-        <!-- ▼ Select2-style Die Number input -->
+        <!-- ▼ Select2-style Die Number -->
         <label>Die Number</label>
         <div class="select2box">
           <input
@@ -24,34 +24,24 @@
           />
           <div id="dieList" class="select2list"></div>
         </div>
+        <input type="hidden" id="dieId" />
 
         <label>Issue Title</label>
-        <input
-          type="text"
-          id="issueTitle"
-          placeholder="e.g., Dimensional instability"
-        />
+        <input type="text" id="issueTitle" />
 
         <label>Issue Description</label>
-        <textarea
-          id="issueDesc"
-          rows="4"
-          placeholder="Describe the issue in detail"
-        ></textarea>
+        <textarea id="issueDesc" rows="4"></textarea>
 
         <label>Before Photo</label>
-        <input type="file" id="fileInput" multiple />
+        <input type="file" id="fileInput" name="files[]" multiple />
 
-        <!-- ▼ Preview area for uploaded images/files -->
         <div id="preview" class="preview-area"></div>
       </div>
 
       <div class="card">
         <h2>Assignment</h2>
 
-        <!-- Applicant is automatically determined, so removed -->
-
-        <!-- ▼ Select2-style Assignee input -->
+        <!-- ▼ Select2-style Assignee -->
         <label>Assignee</label>
         <div class="select2box">
           <input
@@ -62,18 +52,18 @@
           />
           <div id="assigneeList" class="select2list"></div>
         </div>
+        <input type="hidden" id="assigneeId" />
       </div>
 
       <div class="bottom-area">
-        <button class="primary">Submit</button>
+        <button id="submitBtn" class="primary" disabled>Submit</button>
       </div>
     </div>
 
     <script>
-      /* ---------------------------------------------
-   Check if file is an image (extension-based)
-   This avoids MIME type issues on Apache + Chrome
---------------------------------------------- */
+      // ---------------------------------------------
+      // Image preview handling
+      // ---------------------------------------------
       function isImageFile(file) {
         const name = file.name.toLowerCase();
         return (
@@ -87,37 +77,33 @@
         );
       }
 
-      /* ---------------------------------------------
-   Image preview handling (add, display, delete)
---------------------------------------------- */
       document.addEventListener("DOMContentLoaded", () => {
         const fileInput = document.getElementById("fileInput");
         const preview = document.getElementById("preview");
+        const submitBtn = document.getElementById("submitBtn");
+
         let fileList = [];
 
-        // Add new files to the list
         fileInput.addEventListener("change", () => {
           fileList = fileList.concat(Array.from(fileInput.files));
           renderPreview();
+          validateForm();
         });
 
-        // Render preview thumbnails
         function renderPreview() {
           preview.innerHTML = "";
-
           fileList.forEach((file, index) => {
             const item = document.createElement("div");
             item.className = "preview-item";
 
-            // Click to delete file
             item.addEventListener("click", () => {
-              if (confirm("Do you want to delete this file?")) {
+              if (confirm("Delete this file?")) {
                 fileList.splice(index, 1);
                 renderPreview();
+                validateForm();
               }
             });
 
-            // Display image thumbnail or file name
             if (isImageFile(file)) {
               const img = document.createElement("img");
               img.src = URL.createObjectURL(file);
@@ -131,37 +117,35 @@
           });
         }
 
-        /* ---------------------------------------------
-     Select2-style Die Number (prefix search)
-     Data source: ./php/die_issue_php/get_die_numbers.php
-  --------------------------------------------- */
+        // ---------------------------------------------
+        // Load Die Numbers (ID + name)
+        // ---------------------------------------------
         const dieInput = document.getElementById("dieInput");
         const dieListBox = document.getElementById("dieList");
+        const dieId = document.getElementById("dieId");
         let dieList = [];
 
-        // Load die numbers from PHP
         fetch("./php/die_issue_php/get_die_numbers.php")
           .then((res) => res.json())
-          .then((list) => {
-            dieList = list;
-          });
+          .then((list) => (dieList = list));
 
-        // Filter by prefix match
         dieInput.addEventListener("input", () => {
           const keyword = dieInput.value.toLowerCase();
           const filtered = dieList.filter((d) =>
-            d.toLowerCase().startsWith(keyword),
+            d.die_number.toLowerCase().startsWith(keyword),
           );
 
           dieListBox.innerHTML = "";
-          filtered.forEach((die) => {
+          filtered.forEach((d) => {
             const item = document.createElement("div");
             item.className = "select2item";
-            item.textContent = die;
+            item.textContent = d.die_number;
 
             item.addEventListener("click", () => {
-              dieInput.value = die;
+              dieInput.value = d.die_number;
+              dieId.value = d.id;
               dieListBox.style.display = "none";
+              validateForm();
             });
 
             dieListBox.appendChild(item);
@@ -170,37 +154,35 @@
           dieListBox.style.display = filtered.length ? "block" : "none";
         });
 
-        /* ---------------------------------------------
-     Select2-style Assignee (prefix search)
-     Data source: ./php/die_issue_php/get_staff_names.php
-  --------------------------------------------- */
+        // ---------------------------------------------
+        // Load Staff (ID + name)
+        // ---------------------------------------------
         const assigneeInput = document.getElementById("assigneeInput");
         const assigneeListBox = document.getElementById("assigneeList");
+        const assigneeId = document.getElementById("assigneeId");
         let staffList = [];
 
-        // Load staff names from PHP
         fetch("./php/die_issue_php/get_staff_names.php")
           .then((res) => res.json())
-          .then((list) => {
-            staffList = list;
-          });
+          .then((list) => (staffList = list));
 
-        // Filter by prefix match
         assigneeInput.addEventListener("input", () => {
           const keyword = assigneeInput.value.toLowerCase();
           const filtered = staffList.filter((s) =>
-            s.toLowerCase().startsWith(keyword),
+            s.name.toLowerCase().startsWith(keyword),
           );
 
           assigneeListBox.innerHTML = "";
-          filtered.forEach((name) => {
+          filtered.forEach((s) => {
             const item = document.createElement("div");
             item.className = "select2item";
-            item.textContent = name;
+            item.textContent = s.name;
 
             item.addEventListener("click", () => {
-              assigneeInput.value = name;
+              assigneeInput.value = s.name;
+              assigneeId.value = s.id;
               assigneeListBox.style.display = "none";
+              validateForm();
             });
 
             assigneeListBox.appendChild(item);
@@ -209,14 +191,57 @@
           assigneeListBox.style.display = filtered.length ? "block" : "none";
         });
 
-        /* ---------------------------------------------
-     Close dropdowns when clicking outside
-  --------------------------------------------- */
-        document.addEventListener("click", (e) => {
-          if (!e.target.closest(".select2box")) {
-            dieListBox.style.display = "none";
-            assigneeListBox.style.display = "none";
-          }
+        // ---------------------------------------------
+        // Form validation (enable/disable Submit)
+        // ---------------------------------------------
+        function validateForm() {
+          const isValid =
+            dieId.value.trim() !== "" &&
+            issueTitle.value.trim() !== "" &&
+            issueDesc.value.trim() !== "" &&
+            assigneeId.value.trim() !== "";
+
+          submitBtn.disabled = !isValid;
+        }
+
+        issueTitle.addEventListener("input", validateForm);
+        issueDesc.addEventListener("input", validateForm);
+
+        // ---------------------------------------------
+        // Submit (POST to save_issue.php)
+        // ---------------------------------------------
+        document.getElementById("submitBtn").addEventListener("click", () => {
+          const fd = new FormData();
+          fd.append("die_id", dieId.value);
+          fd.append("issue_title", issueTitle.value);
+          fd.append("issue_description", issueDesc.value);
+          fd.append("assignee_id", assigneeId.value);
+
+          fileList.forEach((f) => fd.append("files[]", f));
+
+          fetch("./php/die_issue_php/save_issue.php", {
+            method: "POST",
+            body: fd,
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              alert("Issue saved. ID = " + data.issue_id);
+
+              // Clear inputs
+              dieInput.value = "";
+              dieId.value = "";
+              issueTitle.value = "";
+              issueDesc.value = "";
+              assigneeInput.value = "";
+              assigneeId.value = "";
+
+              // Clear files
+              fileList = [];
+              preview.innerHTML = "";
+
+              // Disable submit again
+              submitBtn.disabled = true;
+            });
         });
       });
     </script>
