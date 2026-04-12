@@ -2192,3 +2192,39 @@ CREATE TABLE t_die_clinical_record_attachment (
 # 2026/04/11
 
 ![](./img/20260411-01.png)
+
+# 2026/04/12
+
+```sql
+CREATE TABLE t_die_issue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    die_id INT NOT NULL,               -- FK to m_dies.id
+    issue_title VARCHAR(255) NOT NULL,
+    issue_description TEXT,
+
+    assignee_id INT NOT NULL,          -- FK to m_staff.id
+    applicant_id INT NOT NULL,         -- FK to m_staff.id (fixed value = 4)
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (die_id) REFERENCES m_dies(id),
+    FOREIGN KEY (assignee_id) REFERENCES m_staff(id),
+    FOREIGN KEY (applicant_id) REFERENCES m_staff(id)
+);
+```
+
+```sql
+CREATE TABLE t_die_issue_attachment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    issue_id INT NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (issue_id) REFERENCES t_die_issue(id)
+);
+```
+
+![](./img/20260412-01.png)
