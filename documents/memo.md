@@ -2243,3 +2243,55 @@ CREATE TABLE t_die_issue_attachment (
 - 除却済み
 
 この情報は、`m_dies`にありそうだな。。。というか、m_diesに無ければいけない。と言うことでチェックするとない。
+
+家に帰ってきて、`sql`を実行すると以下の実行が必要
+
+```sql
+ALTER TABLE t_die_issue
+ADD COLUMN approval_status VARCHAR(20) DEFAULT 'pending';
+```
+
+もう一つ、
+
+```sql
+ALTER TABLE t_die_issue
+ADD COLUMN priority VARCHAR(10) DEFAULT 'middle';
+```
+
+で優先順位を決める。
+
+```
+ALTER TABLE t_die_issue
+ADD COLUMN approver_id INT NULL AFTER approval_status;
+```
+
+```
+ALTER TABLE t_die_issue
+ADD COLUMN approval_date DATETIME NULL AFTER approver_id;
+```
+
+昨日の更新が済んでいなかったかな。。。
+何とか、終わったが、、、
+
+```sql
+MariaDB [extrusion]> desc t_die_issue;
++-------------------+--------------+------+-----+---------------------+-------------------------------+
+| Field             | Type         | Null | Key | Default             | Extra                         |
++-------------------+--------------+------+-----+---------------------+-------------------------------+
+| id                | int(11)      | NO   | PRI | NULL                | auto_increment                |
+| die_id            | int(11)      | NO   | MUL | NULL                |                               |
+| issue_title       | varchar(255) | NO   |     | NULL                |                               |
+| issue_description | text         | YES  |     | NULL                |                               |
+| assignee_id       | int(11)      | NO   | MUL | NULL                |                               |
+| applicant_id      | int(11)      | NO   | MUL | NULL                |                               |
+| created_at        | datetime     | YES  |     | current_timestamp() |                               |
+| updated_at        | datetime     | YES  |     | current_timestamp() | on update current_timestamp() |
+| approval_status   | varchar(20)  | YES  |     | pending             |                               |
+| approver_id       | int(11)      | YES  |     | NULL                |                               |
+| approval_date     | datetime     | YES  |     | NULL                |                               |
+| priority          | varchar(10)  | YES  |     | middle              |                               |
++-------------------+--------------+------+-----+---------------------+-------------------------------+
+12 rows in set (0.020 sec)
+
+MariaDB [extrusion]>
+```

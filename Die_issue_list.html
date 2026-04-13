@@ -1,130 +1,215 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <title>Die Issue List</title>
-    <link rel="stylesheet" href="die_issue.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    />
 
     <style>
+      /* ============================
+         添付画面と同じブルー系配色
+      ============================ */
+
+      body {
+        background-color: #e8f0f8; /* 添付画面の背景色 */
+      }
+
+      h2 {
+        color: #2b6ca3; /* 添付画面の見出し色 */
+        font-weight: bold;
+        margin-bottom: 20px;
+      }
+
+      /* テーブル全体 */
       table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
+        background: #ffffff;
+        border: 1px solid #c5d1dd;
       }
-      th,
-      td {
-        border: 1px solid #ccc;
-        padding: 8px;
+
+      /* テーブルヘッダー */
+      thead.table-light {
+        background-color: #dce8f5 !important; /* 添付画面の淡いブルー */
+        color: #2b6ca3;
+        font-weight: bold;
+        border-bottom: 2px solid #c5d1dd;
       }
+
+      /* 行ホバー */
+      tr:hover {
+        background-color: #edf4fb !important; /* ほんのり青く */
+        cursor: pointer;
+      }
+
+      /* 枠線 */
+      td,
       th {
-        background: #f0f0f0;
+        border-color: #c5d1dd !important;
       }
-      .filter-box {
-        margin-top: 20px;
-        margin-bottom: 10px;
+
+      /* ラベル */
+      label {
+        font-weight: bold;
+        color: #2b6ca3;
+      }
+
+      /* フィルタ UI */
+      .form-select,
+      .form-control {
+        border-color: #2b6ca3;
+      }
+
+      /* ============================
+         承認ステータス色
+      ============================ */
+      .status-approved {
+        color: #0a7d00;
+        font-weight: bold;
+      }
+      .status-pending {
+        color: #b8860b;
+        font-weight: bold;
+      }
+      .status-rejected {
+        color: #b00000;
+        font-weight: bold;
+      }
+
+      /* ============================
+         優先度色
+      ============================ */
+      .priority-high {
+        color: #b00000;
+        font-weight: bold;
+      }
+      .priority-middle {
+        color: #b8860b;
+        font-weight: bold;
+      }
+      .priority-low {
+        color: #0a7d00;
+        font-weight: bold;
       }
     </style>
   </head>
 
-  <body>
-    <header>Die Issue List</header>
+  <body class="container mt-4">
+    <h2>Die Issue List</h2>
 
-    <div class="container">
-      <!-- ▼ Die Number フィルター -->
-      <div class="filter-box">
-        <label>Filter by Die Number:</label>
+    <!-- Filters -->
+    <div class="row mb-3">
+      <div class="col-md-3">
+        <label>Approval Status</label>
+        <select id="filterApproval" class="form-select">
+          <option value="">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label>Priority</label>
+        <select id="filterPriority" class="form-select">
+          <option value="">All</option>
+          <option value="high">High</option>
+          <option value="middle">Middle</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+
+      <div class="col-md-3">
+        <label>Die Number</label>
         <input
           type="text"
           id="filterDie"
-          placeholder="Type Die Number..."
-          style="width: 200px"
+          class="form-control"
+          placeholder="e.g. D-1234"
         />
       </div>
-
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Die Number</th>
-            <th>Issue Title</th>
-            <th>Assignee</th>
-            <th>Approval</th>
-            <th>Repairs</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody id="issueTableBody"></tbody>
-      </table>
     </div>
 
+    <!-- Table -->
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Die Number</th>
+          <th>Issue Title</th>
+          <th>Assignee</th>
+          <th>Approval</th>
+          <th>Priority</th>
+          <th>Repairs</th>
+          <th>Tests</th>
+          <th>Created At</th>
+        </tr>
+      </thead>
+      <tbody id="issueTableBody"></tbody>
+    </table>
+
     <script>
-      // ---------------------------------------------
-      // Approval status color formatting
-      // ---------------------------------------------
-      function renderApprovalStatus(status) {
-        switch (status) {
-          case "pending":
-            return `<span style="color: orange; font-weight: bold;">Pending</span>`;
-          case "approved":
-            return `<span style="color: green; font-weight: bold;">Approved</span>`;
-          case "rejected":
-            return `<span style="color: red; font-weight: bold;">Rejected</span>`;
-          default:
-            return status;
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        let issueList = [];
-
-        // ---------------------------------------------
-        // Load issue list from PHP
-        // ---------------------------------------------
+      function loadIssues() {
         fetch("./php/die_issue_php/get_issue_list.php")
           .then((res) => res.json())
-          .then((list) => {
-            issueList = list;
-            renderTable(issueList);
+          .then((data) => {
+            const tbody = document.getElementById("issueTableBody");
+            tbody.innerHTML = "";
+
+            const filterApproval =
+              document.getElementById("filterApproval").value;
+            const filterPriority =
+              document.getElementById("filterPriority").value;
+            const filterDie = document
+              .getElementById("filterDie")
+              .value.toLowerCase();
+
+            data.forEach((row) => {
+              if (filterApproval && row.approval_status !== filterApproval)
+                return;
+              if (filterPriority && row.priority !== filterPriority) return;
+              if (
+                filterDie &&
+                !row.die_number.toLowerCase().includes(filterDie)
+              )
+                return;
+
+              const tr = document.createElement("tr");
+
+              tr.innerHTML = `
+                <td>${row.id}</td>
+                <td>${row.die_number}</td>
+                <td>${row.issue_title}</td>
+                <td>${row.assignee}</td>
+
+                <td class="status-${row.approval_status}">
+                    ${row.approval_status}
+                </td>
+
+                <td class="priority-${row.priority}">
+                    ${row.priority}
+                </td>
+
+                <td>${row.repair_count}</td>
+                <td>${row.test_count}</td>
+                <td>${row.created_at}</td>
+              `;
+
+              tr.onclick = () => {
+                window.location.href = `die_issue_approval.html?id=${row.id}`;
+              };
+
+              tbody.appendChild(tr);
+            });
           });
+      }
 
-        const tbody = document.getElementById("issueTableBody");
-        const filterDie = document.getElementById("filterDie");
+      document.getElementById("filterApproval").onchange = loadIssues;
+      document.getElementById("filterPriority").onchange = loadIssues;
+      document.getElementById("filterDie").onkeyup = loadIssues;
 
-        // ---------------------------------------------
-        // Render table
-        // ---------------------------------------------
-        function renderTable(list) {
-          tbody.innerHTML = "";
-          list.forEach((row) => {
-            const tr = document.createElement("tr");
-
-            tr.innerHTML = `
-        <td>${row.id}</td>
-        <td>${row.die_number}</td>
-        <td>${row.issue_title}</td>
-        <td>${row.assignee_name}</td>
-        <td>${renderApprovalStatus(row.approval_status)}</td>
-        <td>${row.repair_count}</td>
-        <td>${row.created_at}</td>
-      `;
-
-            tbody.appendChild(tr);
-          });
-        }
-
-        // ---------------------------------------------
-        // Die Number 前方一致フィルター
-        // ---------------------------------------------
-        filterDie.addEventListener("input", () => {
-          const keyword = filterDie.value.toLowerCase();
-
-          const filtered = issueList.filter((row) =>
-            row.die_number.toLowerCase().startsWith(keyword),
-          );
-
-          renderTable(filtered);
-        });
-      });
+      loadIssues();
     </script>
   </body>
 </html>

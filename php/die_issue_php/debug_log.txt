@@ -1,0 +1,31 @@
+issue_id=3
+issue_id=4
+SQL ERROR: Array
+(
+    [0] => 42S22
+    [1] => 1054
+    [2] => Unknown column 'approver_id' in 'field list'
+)
+
+issue_id=2
+SQL ERROR: Array
+(
+    [0] => 42S22
+    [1] => 1054
+    [2] => Unknown column 'approver_id' in 'field list'
+)
+
+issue_id=2
+SQL ERROR: Array
+(
+    [0] => 42S22
+    [1] => 1054
+    [2] => Unknown column 'approver_id' in 'field list'
+)
+
+issue_id=4
+UPDATE OK, rowCount=1
+issue_id=3
+UPDATE OK, rowCount=1
+issue_id=1
+UPDATE OK, rowCount=1

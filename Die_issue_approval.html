@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Issue Approval</title>
+    <link rel="stylesheet" href="die_issue.css" />
+
+    <style>
+      .card {
+        background: #fff;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .info-row {
+        margin-bottom: 10px;
+      }
+
+      .info-label {
+        font-weight: bold;
+        color: #333;
+      }
+
+      .photo-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .photo-item img {
+        width: 140px;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+      }
+
+      .action-area {
+        margin-top: 25px;
+        display: flex;
+        gap: 20px;
+      }
+
+      button.approve {
+        background: #2b7cff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      button.reject {
+        background: #d9534f;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>Issue Approval</header>
+
+    <div class="container">
+      <!-- ▼ Card 1：文字情報 -->
+      <div class="card" id="cardInfo">
+        <h2>Issue Information</h2>
+
+        <div class="info-row">
+          <span class="info-label">Die Number:</span>
+          <span id="dieNumber"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Issue Title:</span>
+          <span id="issueTitle"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Issue Description:</span><br />
+          <div id="issueDesc" style="margin-left: 10px"></div>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Priority:</span> <span id="priority"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Approval Status:</span>
+          <span id="approvalStatus"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Assignee:</span> <span id="assignee"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Applicant:</span>
+          <span id="applicant"></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Created At:</span>
+          <span id="createdAt"></span>
+        </div>
+      </div>
+
+      <!-- ▼ Card 2：Before Photos -->
+      <div class="card">
+        <h2>Before Photos</h2>
+        <div id="beforePhotos" class="photo-area"></div>
+      </div>
+
+      <!-- ▼ Approve / Reject -->
+      <div class="card">
+        <h2>Approval Action</h2>
+
+        <div class="action-area">
+          <button class="approve" id="btnApprove">Approve</button>
+          <button class="reject" id="btnReject">Reject</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // URL パラメータから issue_id を取得
+      const urlParams = new URLSearchParams(window.location.search);
+      const issueId = urlParams.get("id");
+
+      console.log("issueId =", issueId);
+
+      // ---------------------------------------------
+      // Issue 詳細を取得
+      // ---------------------------------------------
+      fetch("./php/die_issue_php/get_issue_detail.php?id=" + issueId)
+        .then((res) => res.json())
+        .then((data) => {
+          document.getElementById("dieNumber").textContent = data.die_number;
+          document.getElementById("issueTitle").textContent = data.issue_title;
+          document.getElementById("issueDesc").textContent =
+            data.issue_description;
+          document.getElementById("priority").textContent = data.priority;
+          document.getElementById("approvalStatus").textContent =
+            data.approval_status;
+          document.getElementById("assignee").textContent = data.assignee_name;
+          document.getElementById("applicant").textContent =
+            data.applicant_name;
+          document.getElementById("createdAt").textContent = data.created_at;
+
+          // Before Photos
+          const beforeArea = document.getElementById("beforePhotos");
+          data.before_files.forEach((f) => {
+            const div = document.createElement("div");
+            div.className = "photo-item";
+
+            const img = document.createElement("img");
+            img.src = "./upload/01_die_issue_files/" + f.saved_name;
+
+            img.onclick = () => window.open(img.src, "_blank");
+
+            div.appendChild(img);
+            beforeArea.appendChild(div);
+          });
+        });
+
+      // ---------------------------------------------
+      // Approve
+      // ---------------------------------------------
+      document.getElementById("btnApprove").onclick = () => {
+        if (!confirm("Approve this issue?")) return;
+
+        fetch("./php/die_issue_php/approve_issue.php", {
+          method: "POST",
+          body: new URLSearchParams({ issue_id: issueId }),
+        })
+          .then((res) => res.json())
+          .then(() => {
+            alert("Approved.");
+            window.location.href = "die_issue_list.html"; // ← 一覧へ戻る
+          });
+      };
+
+      // ---------------------------------------------
+      // Reject
+      // ---------------------------------------------
+      document.getElementById("btnReject").onclick = () => {
+        if (!confirm("Reject this issue?")) return;
+
+        fetch("./php/die_issue_php/reject_issue.php", {
+          method: "POST",
+          body: new URLSearchParams({ issue_id: issueId }),
+        })
+          .then((res) => res.json())
+          .then(() => {
+            alert("Rejected.");
+            window.location.href = "die_issue_list.html"; // ← 一覧へ戻る（重要）
+          });
+      };
+    </script>
+  </body>
+</html>

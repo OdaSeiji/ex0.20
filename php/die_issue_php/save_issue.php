@@ -1,90 +1,103 @@
 <?php
-// ---------------------------------------------
-// Database connection
-// ---------------------------------------------
-$pdo = new PDO(
-    "mysql:host=localhost;dbname=extrusion;charset=utf8",
-    "webuser",
-    ""
-);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+header("Content-Type: application/json");
 
 // ---------------------------------------------
-// Receive POST data
+// DB Connection
 // ---------------------------------------------
-$die_id          = $_POST["die_id"] ?? null;
-$issue_title     = $_POST["issue_title"] ?? "";
-$issue_desc      = $_POST["issue_description"] ?? "";
-$assignee_id     = $_POST["assignee_id"] ?? null;
-
-// Applicant is fixed value = 4
-$applicant_id = 4;
-
-// ---------------------------------------------
-// Basic validation
-// ---------------------------------------------
-if (!$die_id || !$assignee_id || $issue_title === "") {
-    echo json_encode([
-        "status" => "error",
-        "message" => "Missing required fields."
-    ]);
+try {
+    $pdo = new PDO(
+        "mysql:host=localhost;dbname=extrusion;charset=utf8",
+        "webuser",
+        ""
+    );
+} catch (PDOException $e) {
+    echo json_encode(["error" => "DB Connection failed"]);
     exit;
 }
 
 // ---------------------------------------------
-// Insert into t_die_issue
+// Receive POST data
+// ---------------------------------------------
+$die_id            = $_POST["die_id"] ?? "";
+$issue_title       = $_POST["issue_title"] ?? "";
+$issue_description = $_POST["issue_description"] ?? "";
+$assignee_id       = $_POST["assignee_id"] ?? "";
+$priority          = $_POST["priority"] ?? "middle";
+
+// applicant_id は固定（ログイン機能ができるまで）
+$applicant_id = 4;
+
+// ---------------------------------------------
+// Validate required fields
+// ---------------------------------------------
+if ($die_id === "" || $issue_title === "" || $issue_description === "" || $assignee_id === "") {
+    echo json_encode(["error" => "Missing required fields"]);
+    exit;
+}
+
+// ---------------------------------------------
+// INSERT into t_die_issue
 // ---------------------------------------------
 $sql = "INSERT INTO t_die_issue 
-        (die_id, issue_title, issue_description, assignee_id, applicant_id)
-        VALUES (:die_id, :title, :description, :assignee_id, :applicant_id)";
+        (die_id, issue_title, issue_description, assignee_id, applicant_id, priority)
+        VALUES (:die_id, :title, :description, :assignee_id, :applicant_id, :priority)";
 
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(":die_id", $die_id, PDO::PARAM_INT);
 $stmt->bindValue(":title", $issue_title, PDO::PARAM_STR);
-$stmt->bindValue(":description", $issue_desc, PDO::PARAM_STR);
+$stmt->bindValue(":description", $issue_description, PDO::PARAM_STR);
 $stmt->bindValue(":assignee_id", $assignee_id, PDO::PARAM_INT);
 $stmt->bindValue(":applicant_id", $applicant_id, PDO::PARAM_INT);
+$stmt->bindValue(":priority", $priority, PDO::PARAM_STR);
+
 $stmt->execute();
 
+// Newly created issue ID
 $issue_id = $pdo->lastInsertId();
 
 // ---------------------------------------------
-// File upload handling
+// Handle file uploads
 // ---------------------------------------------
-$uploadDir = "../../upload/01_die_issue_files/";
+$upload_dir = "../../upload/01_die_issue_files/";
 
-if (!file_exists($uploadDir)) {
-    mkdir($uploadDir, 0777, true);
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
 }
 
-if (isset($_FILES["files"]["tmp_name"]) && is_array($_FILES["files"]["tmp_name"])) {
+if (!empty($_FILES["files"]["name"][0])) {
 
-    foreach ($_FILES["files"]["tmp_name"] as $index => $tmpPath) {
+    for ($i = 0; $i < count($_FILES["files"]["name"]); $i++) {
 
-        if (!is_uploaded_file($tmpPath)) {
-            continue;
+        $orig_name = $_FILES["files"]["name"][$i];
+        $tmp_name  = $_FILES["files"]["tmp_name"][$i];
+
+        // Unique file name
+        $ext = pathinfo($orig_name, PATHINFO_EXTENSION);
+        $save_name = "issue_" . $issue_id . "_" . uniqid() . "." . $ext;
+
+        $save_path = $upload_dir . $save_name;
+
+        if (move_uploaded_file($tmp_name, $save_path)) {
+
+            // Insert into t_die_issue_attachment
+            $sql2 = "INSERT INTO t_die_issue_attachment 
+                     (issue_id, original_name, saved_name)
+                     VALUES (:issue_id, :orig, :save)";
+
+            $stmt2 = $pdo->prepare($sql2);
+            $stmt2->bindValue(":issue_id", $issue_id, PDO::PARAM_INT);
+            $stmt2->bindValue(":orig", $orig_name, PDO::PARAM_STR);
+            $stmt2->bindValue(":save", $save_name, PDO::PARAM_STR);
+            $stmt2->execute();
         }
-
-        $originalName = $_FILES["files"]["name"][$index];
-
-        $newFileName = $issue_id . "_" . uniqid() . "_" . $originalName;
-        $savePath = $uploadDir . $newFileName;
-
-        move_uploaded_file($tmpPath, $savePath);
-
-        $sql = "INSERT INTO t_die_issue_attachment 
-                (issue_id, file_name, file_path)
-                VALUES (:issue_id, :file_name, :file_path)";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(":issue_id", $issue_id, PDO::PARAM_INT);
-        $stmt->bindValue(":file_name", $originalName, PDO::PARAM_STR);
-        $stmt->bindValue(":file_path", $newFileName, PDO::PARAM_STR);
-        $stmt->execute();
     }
 }
 
 // ---------------------------------------------
-// Return JSON response
+// Return JSON
 // ---------------------------------------------
 echo json_encode([
     "status" => "success",

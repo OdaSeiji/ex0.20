@@ -32,6 +32,14 @@
         <label>Issue Description</label>
         <textarea id="issueDesc" rows="4"></textarea>
 
+        <!-- ▼ Priority -->
+        <label>Priority</label>
+        <select id="priority">
+          <option value="low">Low</option>
+          <option value="middle" selected>Middle</option>
+          <option value="high">High</option>
+        </select>
+
         <label>Before Photo</label>
         <input type="file" id="fileInput" name="files[]" multiple />
 
@@ -216,6 +224,7 @@
           fd.append("issue_title", issueTitle.value);
           fd.append("issue_description", issueDesc.value);
           fd.append("assignee_id", assigneeId.value);
+          fd.append("priority", priority.value);
 
           fileList.forEach((f) => fd.append("files[]", f));
 
@@ -234,6 +243,7 @@
               issueDesc.value = "";
               assigneeInput.value = "";
               assigneeId.value = "";
+              priority.value = "middle";
 
               // Clear files
               fileList = [];
