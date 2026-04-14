@@ -24,16 +24,15 @@ try {
 $die_id            = $_POST["die_id"] ?? "";
 $issue_title       = $_POST["issue_title"] ?? "";
 $issue_description = $_POST["issue_description"] ?? "";
-$assignee_id       = $_POST["assignee_id"] ?? "";
-$priority          = $_POST["priority"] ?? "middle";
+$priority          = $_POST["priority"] ?? 2;
 
-// applicant_id は固定（ログイン機能ができるまで）
-$applicant_id = 4;
+// reported_by はログイン機能ができるまで固定
+$reported_by = 4;
 
 // ---------------------------------------------
 // Validate required fields
 // ---------------------------------------------
-if ($die_id === "" || $issue_title === "" || $issue_description === "" || $assignee_id === "") {
+if ($die_id === "" || $issue_title === "" || $issue_description === "") {
     echo json_encode(["error" => "Missing required fields"]);
     exit;
 }
@@ -42,16 +41,15 @@ if ($die_id === "" || $issue_title === "" || $issue_description === "" || $assig
 // INSERT into t_die_issue
 // ---------------------------------------------
 $sql = "INSERT INTO t_die_issue 
-        (die_id, issue_title, issue_description, assignee_id, applicant_id, priority)
-        VALUES (:die_id, :title, :description, :assignee_id, :applicant_id, :priority)";
+        (die_id, issue_title, issue_description, reported_by, priority)
+        VALUES (:die_id, :title, :description, :reported_by, :priority)";
 
 $stmt = $pdo->prepare($sql);
 $stmt->bindValue(":die_id", $die_id, PDO::PARAM_INT);
 $stmt->bindValue(":title", $issue_title, PDO::PARAM_STR);
 $stmt->bindValue(":description", $issue_description, PDO::PARAM_STR);
-$stmt->bindValue(":assignee_id", $assignee_id, PDO::PARAM_INT);
-$stmt->bindValue(":applicant_id", $applicant_id, PDO::PARAM_INT);
-$stmt->bindValue(":priority", $priority, PDO::PARAM_STR);
+$stmt->bindValue(":reported_by", $reported_by, PDO::PARAM_INT);
+$stmt->bindValue(":priority", $priority, PDO::PARAM_INT);
 
 $stmt->execute();
 

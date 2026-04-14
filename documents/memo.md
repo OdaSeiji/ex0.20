@@ -2295,3 +2295,135 @@ MariaDB [extrusion]> desc t_die_issue;
 
 MariaDB [extrusion]>
 ```
+
+# 2026/04/14
+
+まずは、テーブルは以下のようにする。
+
+```sql
+CREATE TABLE t_die_issue (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_title     VARCHAR(255) NOT NULL,
+    issue_description TEXT,
+
+    reported_by     INT NOT NULL,
+    reported_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- 承認フロー
+    approval_status VARCHAR(50) DEFAULT 'pending',   -- pending / approved / rejected
+    approved_by     INT,
+    approved_at     DATETIME,
+
+    -- 完了フロー
+    completion_status VARCHAR(50) DEFAULT 'not_applicable',
+        -- not_applicable（承認前）
+        -- in_progress（対応中）
+        -- request_complete（完了申請中）
+        -- completed（完了）
+    completed_by     INT,
+    completed_at     DATETIME,
+
+    -- 全体ステータス
+    status          VARCHAR(50) DEFAULT 'open',
+
+    priority        TINYINT DEFAULT 2,
+
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_issue_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_issue_reported_by
+        FOREIGN KEY (reported_by)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_issue_approved_by
+        FOREIGN KEY (approved_by)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_issue_completed_by
+        FOREIGN KEY (completed_by)
+        REFERENCES m_staff(id)
+);
+```
+
+それと、関連しそうな二つのテーブルをを退避
+
+```sql
+MariaDB [extrusion]> desc t_die_clinical_record;
++-------------+----------+------+-----+---------------------+-------------------------------+
+| Field       | Type     | Null | Key | Default             | Extra                         |
++-------------+----------+------+-----+---------------------+-------------------------------+
+| id          | int(11)  | NO   | PRI | NULL                | auto_increment                |
+| die_id      | int(11)  | NO   | MUL | NULL                |                               |
+| issue_id    | int(11)  | YES  | MUL | NULL                |                               |
+| record_date | date     | NO   |     | NULL                |                               |
+| staff_id    | int(11)  | NO   | MUL | NULL                |                               |
+| memo        | text     | YES  |     | NULL                |                               |
+| created_at  | datetime | YES  |     | current_timestamp() |                               |
+| updated_at  | datetime | YES  |     | current_timestamp() | on update current_timestamp() |
++-------------+----------+------+-----+---------------------+-------------------------------+
+8 rows in set (0.031 sec)
+
+MariaDB [extrusion]> desc t_die_clinical_record_attachment;
++--------------------+--------------+------+-----+---------------------+----------------+
+| Field              | Type         | Null | Key | Default             | Extra          |
++--------------------+--------------+------+-----+---------------------+----------------+
+| id                 | int(11)      | NO   | PRI | NULL                | auto_increment |
+| clinical_record_id | int(11)      | NO   | MUL | NULL                |                |
+| file_name          | varchar(255) | NO   |     | NULL                |                |
+| description        | varchar(500) | YES  |     | NULL                |                |
+| attached_at        | datetime     | YES  |     | current_timestamp() |                |
++--------------------+--------------+------+-----+---------------------+----------------+
+5 rows in set (0.035 sec)
+```
+
+それから関連の3つのテーブルを削除
+
+```sql
+DROP TABLE t_die_clinical_record_attachment;
+DROP TABLE t_die_clinical_record;
+drop table t_die_issue;
+```
+
+カルテの2つのテーブルを作る
+
+```sql
+CREATE TABLE t_die_clinical_record (
+    id              INT AUTO_INCREMENT PRIMARY KEY,
+    die_id          INT NOT NULL,
+    issue_id        INT,  -- 課題へのリンク（任意）
+    record_date     DATE NOT NULL,
+    staff_id        INT NOT NULL,
+    memo            TEXT,
+    created_at      DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_clinical_record_die
+        FOREIGN KEY (die_id)
+        REFERENCES m_dies(id),
+
+    CONSTRAINT fk_clinical_record_staff
+        FOREIGN KEY (staff_id)
+        REFERENCES m_staff(id),
+
+    CONSTRAINT fk_clinical_record_issue
+        FOREIGN KEY (issue_id)
+        REFERENCES t_die_issue(id)
+);
+
+
+CREATE TABLE t_die_clinical_record_attachment (
+    id                  INT AUTO_INCREMENT PRIMARY KEY,
+    clinical_record_id  INT NOT NULL,
+    file_name           VARCHAR(255) NOT NULL,
+    description         VARCHAR(500),  -- 添付ファイルの説明
+    attached_at         DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_attachment_clinical_record
+        FOREIGN KEY (clinical_record_id)
+        REFERENCES t_die_clinical_record(id)
+);
+```
