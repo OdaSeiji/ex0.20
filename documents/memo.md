@@ -2437,3 +2437,5 @@ ALTER TABLE t_die_clinical_record
 ALTER TABLE t_die_clinical_record
     DROP COLUMN die_id;
 ```
+
+テーブルのカラムの削除完了。
