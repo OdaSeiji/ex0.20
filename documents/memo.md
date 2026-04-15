@@ -2427,3 +2427,13 @@ CREATE TABLE t_die_clinical_record_attachment (
         REFERENCES t_die_clinical_record(id)
 );
 ```
+
+t_die_clinical_recordからdie_idを削除する
+
+```sql
+ALTER TABLE t_die_clinical_record
+    DROP FOREIGN KEY fk_clinical_record_die;
+
+ALTER TABLE t_die_clinical_record
+    DROP COLUMN die_id;
+```

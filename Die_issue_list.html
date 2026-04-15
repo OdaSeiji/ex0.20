@@ -3,213 +3,219 @@
   <head>
     <meta charset="UTF-8" />
     <title>Die Issue List</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    />
 
     <style>
-      /* ============================
-         添付画面と同じブルー系配色
-      ============================ */
-
       body {
-        background-color: #e8f0f8; /* 添付画面の背景色 */
+        background-color: #e8f0f8;
+        font-family: sans-serif;
       }
 
       h2 {
-        color: #2b6ca3; /* 添付画面の見出し色 */
+        color: #2b6ca3;
         font-weight: bold;
-        margin-bottom: 20px;
       }
 
-      /* テーブル全体 */
-      table {
+      .container {
+        width: 95%;
+        margin: 20px auto;
+      }
+
+      .card {
         background: #ffffff;
         border: 1px solid #c5d1dd;
+        border-radius: 6px;
+        padding: 20px;
       }
 
-      /* テーブルヘッダー */
-      thead.table-light {
-        background-color: #dce8f5 !important; /* 添付画面の淡いブルー */
+      .table-header {
+        background-color: #dce8f5;
         color: #2b6ca3;
         font-weight: bold;
-        border-bottom: 2px solid #c5d1dd;
       }
 
-      /* 行ホバー */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        border: 1px solid #c5d1dd;
+        padding: 8px 10px;
+        text-align: left;
+      }
+
       tr:hover {
-        background-color: #edf4fb !important; /* ほんのり青く */
-        cursor: pointer;
+        background-color: #f2f7fc;
       }
 
-      /* 枠線 */
-      td,
-      th {
-        border-color: #c5d1dd !important;
-      }
-
-      /* ラベル */
-      label {
-        font-weight: bold;
-        color: #2b6ca3;
-      }
-
-      /* フィルタ UI */
-      .form-select,
-      .form-control {
-        border-color: #2b6ca3;
-      }
-
-      /* ============================
-         承認ステータス色
-      ============================ */
-      .status-approved {
-        color: #0a7d00;
-        font-weight: bold;
-      }
-      .status-pending {
-        color: #b8860b;
-        font-weight: bold;
-      }
-      .status-rejected {
-        color: #b00000;
+      .btn-new {
+        background-color: #2b6ca3;
+        color: white;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 4px;
         font-weight: bold;
       }
 
-      /* ============================
-         優先度色
-      ============================ */
-      .priority-high {
-        color: #b00000;
-        font-weight: bold;
+      .btn-new:hover {
+        background-color: #1f527d;
       }
-      .priority-middle {
-        color: #b8860b;
-        font-weight: bold;
+
+      .text-right {
+        text-align: right;
       }
-      .priority-low {
-        color: #0a7d00;
-        font-weight: bold;
+
+      /* Action buttons */
+      .btn-action {
+        background-color: #2b6ca3;
+        color: white;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+        margin-right: 4px;
+      }
+      .btn-action:hover {
+        background-color: #1f527d;
+      }
+
+      .btn-repair {
+        background-color: #6c8ebf;
+        color: white;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+        margin-right: 4px;
+      }
+      .btn-repair:hover {
+        background-color: #56729a;
+      }
+
+      .btn-delete {
+        background-color: #c0392b;
+        color: white;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+      }
+      .btn-delete:hover {
+        background-color: #922b21;
       }
     </style>
   </head>
 
-  <body class="container mt-4">
-    <h2>Die Issue List</h2>
+  <body>
+    <div class="container">
+      <h2>Die Issue List</h2>
 
-    <!-- Filters -->
-    <div class="row mb-3">
-      <div class="col-md-3">
-        <label>Approval Status</label>
-        <select id="filterApproval" class="form-select">
-          <option value="">All</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-        </select>
+      <!-- 新規追加ボタン -->
+      <div class="text-right">
+        <button class="btn-new" onclick="location.href = 'die_issue.html'">
+          ＋ New Issue
+        </button>
       </div>
 
-      <div class="col-md-3">
-        <label>Priority</label>
-        <select id="filterPriority" class="form-select">
-          <option value="">All</option>
-          <option value="high">High</option>
-          <option value="middle">Middle</option>
-          <option value="low">Low</option>
-        </select>
-      </div>
-
-      <div class="col-md-3">
-        <label>Die Number</label>
-        <input
-          type="text"
-          id="filterDie"
-          class="form-control"
-          placeholder="e.g. D-1234"
-        />
+      <div class="card">
+        <table>
+          <thead>
+            <tr class="table-header">
+              <th>ID</th>
+              <th>Die Number</th>
+              <th>Title</th>
+              <th>Reported By</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Repairs</th>
+              <th>Created</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="issueTableBody">
+            <!-- JS で行を追加 -->
+          </tbody>
+        </table>
       </div>
     </div>
 
-    <!-- Table -->
-    <table class="table table-bordered table-hover">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Die Number</th>
-          <th>Issue Title</th>
-          <th>Assignee</th>
-          <th>Approval</th>
-          <th>Priority</th>
-          <th>Repairs</th>
-          <th>Tests</th>
-          <th>Created At</th>
-        </tr>
-      </thead>
-      <tbody id="issueTableBody"></tbody>
-    </table>
-
     <script>
-      function loadIssues() {
-        fetch("./php/die_issue_php/get_issue_list.php")
-          .then((res) => res.json())
-          .then((data) => {
-            const tbody = document.getElementById("issueTableBody");
-            tbody.innerHTML = "";
+      // 一覧データ取得
+      fetch("./php/die_issue_php/get_issue_list.php")
+        .then((res) => res.json())
+        .then((data) => {
+          const tbody = document.getElementById("issueTableBody");
+          tbody.innerHTML = "";
 
-            const filterApproval =
-              document.getElementById("filterApproval").value;
-            const filterPriority =
-              document.getElementById("filterPriority").value;
-            const filterDie = document
-              .getElementById("filterDie")
-              .value.toLowerCase();
+          data.forEach((row) => {
+            const tr = document.createElement("tr");
 
-            data.forEach((row) => {
-              if (filterApproval && row.approval_status !== filterApproval)
-                return;
-              if (filterPriority && row.priority !== filterPriority) return;
-              if (
-                filterDie &&
-                !row.die_number.toLowerCase().includes(filterDie)
-              )
-                return;
+            tr.innerHTML = `
+                    <td>${row.id}</td>
+                    <td>${row.die_number}</td>
+                    <td>${row.issue_title}</td>
+                    <td>${row.reported_by_name ?? ""}</td>
+                    <td>${row.approval_status}</td>
+                    <td>${row.priority}</td>
+                    <td>${row.repair_count}</td>
+                    <td>${row.created_at}</td>
+                    <td>
 
-              const tr = document.createElement("tr");
+                        <!-- Approve ボタン（approved 以外のときだけ表示） -->
+                        ${
+                          row.approval_status !== "approved"
+                            ? `<button class="btn-action" onclick="goApprove(${row.id})">Approve</button>`
+                            : ``
+                        }
 
-              tr.innerHTML = `
-                <td>${row.id}</td>
-                <td>${row.die_number}</td>
-                <td>${row.issue_title}</td>
-                <td>${row.assignee}</td>
+                        <!-- Repair ボタン（approved のときだけ表示） -->
+                        ${
+                          row.approval_status === "approved"
+                            ? `<button class="btn-repair" onclick="goRepair(${row.id})">Repair</button>`
+                            : ``
+                        }
 
-                <td class="status-${row.approval_status}">
-                    ${row.approval_status}
-                </td>
+                        <!-- Delete ボタン（pending のときだけ表示） -->
+                        ${
+                          row.approval_status === "pending"
+                            ? `<button class="btn-delete" onclick="deleteIssue(${row.id})">Delete</button>`
+                            : ``
+                        }
 
-                <td class="priority-${row.priority}">
-                    ${row.priority}
-                </td>
+                    </td>
+                `;
 
-                <td>${row.repair_count}</td>
-                <td>${row.test_count}</td>
-                <td>${row.created_at}</td>
-              `;
-
-              tr.onclick = () => {
-                window.location.href = `die_issue_approval.html?id=${row.id}`;
-              };
-
-              tbody.appendChild(tr);
-            });
+            tbody.appendChild(tr);
           });
+        })
+        .catch((err) => {
+          console.error("Error:", err);
+        });
+
+      // 承認画面へ
+      function goApprove(id) {
+        location.href = `die_issue_approval.html?id=${id}`;
       }
 
-      document.getElementById("filterApproval").onchange = loadIssues;
-      document.getElementById("filterPriority").onchange = loadIssues;
-      document.getElementById("filterDie").onkeyup = loadIssues;
+      // 修理記録一覧へ
+      function goRepair(id) {
+        location.href = `repair_record_list.html?issue_id=${id}`;
+      }
 
-      loadIssues();
+      // 削除
+      function deleteIssue(id) {
+        if (!confirm("Are you sure you want to delete this issue?")) return;
+
+        fetch(`./php/die_issue_php/delete_issue.php?id=${id}`)
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.status === "success") {
+              alert("Deleted.");
+              location.reload();
+            } else {
+              alert("Error: " + result.error);
+            }
+          });
+      }
     </script>
   </body>
 </html>

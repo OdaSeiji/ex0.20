@@ -1,259 +1,267 @@
 <!doctype html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>New Issue Registration</title>
-    <link rel="stylesheet" href="die_issue.css" />
+    <title>New Die Issue</title>
+
+    <style>
+      body {
+        background-color: #e8f0f8;
+        font-family: sans-serif;
+      }
+
+      h2 {
+        color: #2b6ca3;
+        font-weight: bold;
+      }
+
+      .container {
+        width: 90%;
+        margin: 20px auto;
+      }
+
+      .card {
+        background: #ffffff;
+        border: 1px solid #c5d1dd;
+        border-radius: 6px;
+        padding: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #2b6ca3;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        margin-bottom: 15px;
+        border: 1px solid #c5d1dd;
+        border-radius: 4px;
+      }
+
+      textarea {
+        height: 120px;
+      }
+
+      .btn-save {
+        background-color: #2b6ca3;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .btn-save:hover {
+        background-color: #1f527d;
+      }
+
+      .btn-back {
+        background-color: #6c8ebf;
+        color: white;
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .btn-back:hover {
+        background-color: #56729a;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .preview-area img {
+        width: 120px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #c5d1dd;
+        border-radius: 4px;
+      }
+
+      /* Select2風 */
+      .select2box {
+        position: relative;
+      }
+
+      .select2list {
+        position: absolute;
+        top: 38px;
+        left: 0;
+        width: 100%;
+        background: white;
+        border: 1px solid #c5d1dd;
+        border-radius: 4px;
+        max-height: 180px;
+        overflow-y: auto;
+        display: none;
+        z-index: 10;
+      }
+
+      .select2item {
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .select2item:hover {
+        background-color: #e8f0f8;
+      }
+    </style>
   </head>
 
   <body>
-    <header>New Issue Registration</header>
-
     <div class="container">
-      <div class="card">
-        <h2>Basic Information</h2>
+      <h2>New Die Issue</h2>
 
-        <!-- ▼ Select2-style Die Number -->
-        <label>Die Number</label>
-        <div class="select2box">
-          <input
-            type="text"
-            id="dieInput"
-            placeholder="Type to search..."
-            autocomplete="off"
-          />
-          <div id="dieList" class="select2list"></div>
-        </div>
-        <input type="hidden" id="dieId" />
-
-        <label>Issue Title</label>
-        <input type="text" id="issueTitle" />
-
-        <label>Issue Description</label>
-        <textarea id="issueDesc" rows="4"></textarea>
-
-        <!-- ▼ Priority -->
-        <label>Priority</label>
-        <select id="priority">
-          <option value="low">Low</option>
-          <option value="middle" selected>Middle</option>
-          <option value="high">High</option>
-        </select>
-
-        <label>Before Photo</label>
-        <input type="file" id="fileInput" name="files[]" multiple />
-
-        <div id="preview" class="preview-area"></div>
+      <!-- 戻るボタン -->
+      <div class="text-right" style="margin-bottom: 10px">
+        <button
+          class="btn-back"
+          onclick="location.href = 'die_issue_list.html'"
+        >
+          ← Back to List
+        </button>
       </div>
 
       <div class="card">
-        <h2>Assignment</h2>
+        <form id="issueForm" enctype="multipart/form-data">
+          <!-- 金型選択（Select2風） -->
+          <label>Die</label>
+          <div class="select2box">
+            <input
+              type="text"
+              id="dieInput"
+              placeholder="Type to search..."
+              autocomplete="off"
+            />
+            <input type="hidden" name="die_id" id="dieId" />
+            <div id="dieListBox" class="select2list"></div>
+          </div>
 
-        <!-- ▼ Select2-style Assignee -->
-        <label>Assignee</label>
-        <div class="select2box">
-          <input
-            type="text"
-            id="assigneeInput"
-            placeholder="Type to search..."
-            autocomplete="off"
-          />
-          <div id="assigneeList" class="select2list"></div>
-        </div>
-        <input type="hidden" id="assigneeId" />
-      </div>
+          <label>Issue Title</label>
+          <input type="text" name="issue_title" required />
 
-      <div class="bottom-area">
-        <button id="submitBtn" class="primary" disabled>Submit</button>
+          <label>Issue Description</label>
+          <textarea name="issue_description" required></textarea>
+
+          <label>Priority</label>
+          <select name="priority">
+            <option value="1">High</option>
+            <option value="2" selected>Middle</option>
+            <option value="3">Low</option>
+          </select>
+
+          <label>Attachments</label>
+          <input type="file" name="files[]" multiple accept="image/*" />
+
+          <div class="preview-area" id="previewArea"></div>
+
+          <button type="submit" class="btn-save">Save Issue</button>
+        </form>
       </div>
     </div>
 
     <script>
-      // ---------------------------------------------
-      // Image preview handling
-      // ---------------------------------------------
-      function isImageFile(file) {
-        const name = file.name.toLowerCase();
-        return (
-          name.endsWith(".jpg") ||
-          name.endsWith(".jpeg") ||
-          name.endsWith(".png") ||
-          name.endsWith(".gif") ||
-          name.endsWith(".bmp") ||
-          name.endsWith(".webp") ||
-          name.endsWith(".heic")
+      let dieList = [];
+
+      // 金型一覧取得（./php/die_issue_php/ に統一）
+      fetch("./php/die_issue_php/get_die_list.php")
+        .then((res) => res.json())
+        .then((data) => {
+          dieList = data; // [{id:1, die_number:"CP9001"}, ...]
+        });
+
+      const dieInput = document.getElementById("dieInput");
+      const dieId = document.getElementById("dieId");
+      const dieListBox = document.getElementById("dieListBox");
+
+      // 入力イベント（前方一致フィルター）
+      dieInput.addEventListener("input", () => {
+        const keyword = dieInput.value.toLowerCase();
+        const filtered = dieList.filter((d) =>
+          d.die_number.toLowerCase().startsWith(keyword),
         );
-      }
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const fileInput = document.getElementById("fileInput");
-        const preview = document.getElementById("preview");
-        const submitBtn = document.getElementById("submitBtn");
+        dieListBox.innerHTML = "";
+        filtered.forEach((die) => {
+          const item = document.createElement("div");
+          item.className = "select2item";
+          item.textContent = die.die_number;
 
-        let fileList = [];
+          item.addEventListener("click", () => {
+            dieInput.value = die.die_number;
+            dieId.value = die.id;
+            dieListBox.style.display = "none";
+          });
 
-        fileInput.addEventListener("change", () => {
-          fileList = fileList.concat(Array.from(fileInput.files));
-          renderPreview();
-          validateForm();
+          dieListBox.appendChild(item);
         });
 
-        function renderPreview() {
+        dieListBox.style.display = filtered.length ? "block" : "none";
+      });
+
+      // フォーカス外れたら閉じる
+      document.addEventListener("click", (e) => {
+        if (!dieListBox.contains(e.target) && e.target !== dieInput) {
+          dieListBox.style.display = "none";
+        }
+      });
+
+      // 添付ファイルプレビュー
+      document
+        .querySelector("input[name='files[]']")
+        .addEventListener("change", function () {
+          const preview = document.getElementById("previewArea");
           preview.innerHTML = "";
-          fileList.forEach((file, index) => {
-            const item = document.createElement("div");
-            item.className = "preview-item";
 
-            item.addEventListener("click", () => {
-              if (confirm("Delete this file?")) {
-                fileList.splice(index, 1);
-                renderPreview();
-                validateForm();
-              }
-            });
-
-            if (isImageFile(file)) {
+          [...this.files].forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
               const img = document.createElement("img");
-              img.src = URL.createObjectURL(file);
-              img.onload = () => URL.revokeObjectURL(img.src);
-              item.appendChild(img);
-            } else {
-              item.textContent = file.name;
-            }
-
-            preview.appendChild(item);
+              img.src = e.target.result;
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
           });
-        }
-
-        // ---------------------------------------------
-        // Load Die Numbers (ID + name)
-        // ---------------------------------------------
-        const dieInput = document.getElementById("dieInput");
-        const dieListBox = document.getElementById("dieList");
-        const dieId = document.getElementById("dieId");
-        let dieList = [];
-
-        fetch("./php/die_issue_php/get_die_numbers.php")
-          .then((res) => res.json())
-          .then((list) => (dieList = list));
-
-        dieInput.addEventListener("input", () => {
-          const keyword = dieInput.value.toLowerCase();
-          const filtered = dieList.filter((d) =>
-            d.die_number.toLowerCase().startsWith(keyword),
-          );
-
-          dieListBox.innerHTML = "";
-          filtered.forEach((d) => {
-            const item = document.createElement("div");
-            item.className = "select2item";
-            item.textContent = d.die_number;
-
-            item.addEventListener("click", () => {
-              dieInput.value = d.die_number;
-              dieId.value = d.id;
-              dieListBox.style.display = "none";
-              validateForm();
-            });
-
-            dieListBox.appendChild(item);
-          });
-
-          dieListBox.style.display = filtered.length ? "block" : "none";
         });
 
-        // ---------------------------------------------
-        // Load Staff (ID + name)
-        // ---------------------------------------------
-        const assigneeInput = document.getElementById("assigneeInput");
-        const assigneeListBox = document.getElementById("assigneeList");
-        const assigneeId = document.getElementById("assigneeId");
-        let staffList = [];
+      // フォーム送信
+      document
+        .getElementById("issueForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
 
-        fetch("./php/die_issue_php/get_staff_names.php")
-          .then((res) => res.json())
-          .then((list) => (staffList = list));
+          if (!dieId.value) {
+            alert("Please select a Die.");
+            return;
+          }
 
-        assigneeInput.addEventListener("input", () => {
-          const keyword = assigneeInput.value.toLowerCase();
-          const filtered = staffList.filter((s) =>
-            s.name.toLowerCase().startsWith(keyword),
-          );
-
-          assigneeListBox.innerHTML = "";
-          filtered.forEach((s) => {
-            const item = document.createElement("div");
-            item.className = "select2item";
-            item.textContent = s.name;
-
-            item.addEventListener("click", () => {
-              assigneeInput.value = s.name;
-              assigneeId.value = s.id;
-              assigneeListBox.style.display = "none";
-              validateForm();
-            });
-
-            assigneeListBox.appendChild(item);
-          });
-
-          assigneeListBox.style.display = filtered.length ? "block" : "none";
-        });
-
-        // ---------------------------------------------
-        // Form validation (enable/disable Submit)
-        // ---------------------------------------------
-        function validateForm() {
-          const isValid =
-            dieId.value.trim() !== "" &&
-            issueTitle.value.trim() !== "" &&
-            issueDesc.value.trim() !== "" &&
-            assigneeId.value.trim() !== "";
-
-          submitBtn.disabled = !isValid;
-        }
-
-        issueTitle.addEventListener("input", validateForm);
-        issueDesc.addEventListener("input", validateForm);
-
-        // ---------------------------------------------
-        // Submit (POST to save_issue.php)
-        // ---------------------------------------------
-        document.getElementById("submitBtn").addEventListener("click", () => {
-          const fd = new FormData();
-          fd.append("die_id", dieId.value);
-          fd.append("issue_title", issueTitle.value);
-          fd.append("issue_description", issueDesc.value);
-          fd.append("assignee_id", assigneeId.value);
-          fd.append("priority", priority.value);
-
-          fileList.forEach((f) => fd.append("files[]", f));
+          const formData = new FormData(this);
 
           fetch("./php/die_issue_php/save_issue.php", {
             method: "POST",
-            body: fd,
+            body: formData,
           })
             .then((res) => res.json())
-            .then((data) => {
-              alert("Issue saved. ID = " + data.issue_id);
-
-              // Clear inputs
-              dieInput.value = "";
-              dieId.value = "";
-              issueTitle.value = "";
-              issueDesc.value = "";
-              assigneeInput.value = "";
-              assigneeId.value = "";
-              priority.value = "middle";
-
-              // Clear files
-              fileList = [];
-              preview.innerHTML = "";
-
-              // Disable submit again
-              submitBtn.disabled = true;
+            .then((result) => {
+              if (result.status === "success") {
+                alert("Issue saved.");
+                location.href = "die_issue_list.html";
+              } else {
+                alert("Error: " + result.error);
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("Communication error.");
             });
         });
-      });
     </script>
   </body>
 </html>

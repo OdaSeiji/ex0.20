@@ -1,31 +1,271 @@
-issue_id=3
-issue_id=4
-SQL ERROR: Array
+
+===== NEW REQUEST =====
+POST:
+Array
 (
-    [0] => 42S22
-    [1] => 1054
-    [2] => Unknown column 'approver_id' in 'field list'
+    [repair_date] => 2026-04-23
+    [repair_comment] => tesadfsafdsa
+    [issue_id] => 1
 )
 
-issue_id=2
-SQL ERROR: Array
+FILES:
+Array
 (
-    [0] => 42S22
-    [1] => 1054
-    [2] => Unknown column 'approver_id' in 'field list'
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php8EAC.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
 )
 
-issue_id=2
-SQL ERROR: Array
+lastInsertId: 5
+ATTACH INSERT ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'original_name' in 'field list'
+
+===== NEW REQUEST =====
+POST:
+Array
 (
-    [0] => 42S22
-    [1] => 1054
-    [2] => Unknown column 'approver_id' in 'field list'
+    [repair_date] => 2026-04-23
+    [repair_comment] => tesadfsafdsa
+    [issue_id] => 1
 )
 
-issue_id=4
-UPDATE OK, rowCount=1
-issue_id=3
-UPDATE OK, rowCount=1
-issue_id=1
-UPDATE OK, rowCount=1
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6794.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 6
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-06
+    [repair_comment] => fdsafdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6DCA.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 7
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-06
+    [repair_comment] => fdsafdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpFC11.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 8
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-07
+    [repair_comment] => fdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php4902.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 1
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-09
+    [repair_comment] => dfdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => PXL_20250924_062913690.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php13A6.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 160226
+                )
+
+        )
+
+)
+
+lastInsertId: 2

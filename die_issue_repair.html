@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Repair Record</title>
+
+    <style>
+      body {
+        background-color: #e8f0f8;
+        font-family: sans-serif;
+      }
+
+      h2 {
+        color: #2b6ca3;
+        font-weight: bold;
+      }
+
+      .container {
+        width: 90%;
+        margin: 20px auto;
+      }
+
+      .card {
+        background: #ffffff;
+        border: 1px solid #c5d1dd;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #2b6ca3;
+      }
+
+      input,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 4px;
+        margin-bottom: 15px;
+        border: 1px solid #c5d1dd;
+        border-radius: 4px;
+      }
+
+      textarea {
+        height: 120px;
+      }
+
+      .btn-save {
+        background-color: #2b6ca3;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .btn-save:hover {
+        background-color: #1f527d;
+      }
+
+      .btn-back {
+        background-color: #6c8ebf;
+        color: white;
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .btn-back:hover {
+        background-color: #56729a;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
+      .preview-area img {
+        width: 120px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #c5d1dd;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>Repair Record</h2>
+
+      <!-- 戻るボタン -->
+      <div class="text-right" style="margin-bottom: 10px">
+        <button
+          class="btn-back"
+          onclick="location.href = 'die_issue_list.html'"
+        >
+          ← Back to List
+        </button>
+      </div>
+
+      <!-- Issue 情報表示 -->
+      <div class="card" id="issueInfo">Loading issue info...</div>
+
+      <!-- 修理記録入力 -->
+      <div class="card">
+        <form id="repairForm" enctype="multipart/form-data">
+          <label>Repair Date</label>
+          <input type="date" name="repair_date" required />
+
+          <label>Repair Comment</label>
+          <textarea name="repair_comment" required></textarea>
+
+          <label>Repair Photos</label>
+          <input type="file" name="files[]" multiple accept="image/*" />
+
+          <div class="preview-area" id="previewArea"></div>
+
+          <button type="submit" class="btn-save">Save Repair Record</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const issueId = urlParams.get("issue_id");
+
+      if (!issueId) {
+        alert("Issue ID is missing.");
+        location.href = "die_issue_list.html";
+      }
+
+      // Issue 情報取得
+      fetch(`./php/die_issue_php/get_issue_detail.php?id=${issueId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          const box = document.getElementById("issueInfo");
+
+          if (data.error) {
+            box.innerHTML = "Issue not found.";
+            return;
+          }
+
+          box.innerHTML = `
+                <div><b>Die:</b> ${data.die_number}</div>
+                <div><b>Title:</b> ${data.issue_title}</div>
+                <div><b>Status:</b> ${data.approval_status}</div>
+                <div><b>Priority:</b> ${data.priority}</div>
+                <div><b>Reported By:</b> ${data.reported_by_name}</div>
+            `;
+        });
+
+      // 添付ファイルプレビュー
+      document
+        .querySelector("input[name='files[]']")
+        .addEventListener("change", function () {
+          const preview = document.getElementById("previewArea");
+          preview.innerHTML = "";
+
+          [...this.files].forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              const img = document.createElement("img");
+              img.src = e.target.result;
+              preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+          });
+        });
+
+      // 修理記録保存
+      document
+        .getElementById("repairForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          formData.append("issue_id", issueId);
+
+          fetch("./php/die_issue_php/save_repair_record.php", {
+            method: "POST",
+            body: formData,
+          })
+            .then((res) => res.json())
+            .then((result) => {
+              if (result.status === "success") {
+                alert("Repair record saved.");
+                // location.href = "die_issue_list.html";
+              } else {
+                alert("Error: " + result.error);
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("Communication error.");
+            });
+        });
+    </script>
+  </body>
+</html>
