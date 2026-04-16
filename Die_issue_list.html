@@ -191,9 +191,9 @@
           console.error("Error:", err);
         });
 
-      // 承認画面へ
+      // 承認画面へ（★ issue_id に統一）
       function goApprove(id) {
-        location.href = `die_issue_approval.html?id=${id}`;
+        location.href = `die_issue_approval.html?issue_id=${id}`;
       }
 
       // 修理記録一覧へ

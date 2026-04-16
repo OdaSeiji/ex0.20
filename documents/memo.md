@@ -2447,3 +2447,20 @@ ALTER TABLE t_die_clinical_record
 このRepairという表現は正しくない。測定結果をまとめるのも、ここに入れるべき。また、この画面をして、金型を選択したら、履歴が見れるようになっていないと。
 ![image](./img/20260416-02.png)
 ここの入力も修理内容か否か、区別するか。。。？この画面、`Save Regiser Record`を押しても、画面遷移しない。
+
+```sql
+CREATE TABLE t_die_issue_attachment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    issue_id INT NOT NULL,
+    original_name VARCHAR(255) NOT NULL,
+    saved_name VARCHAR(255) NOT NULL,
+    uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_issue_attachment_issue
+        FOREIGN KEY (issue_id)
+        REFERENCES t_die_issue(id)
+        ON DELETE CASCADE
+);
+```
+
+このテーブルが無いと、issueに添付ファイルを貼れない。

@@ -1,0 +1,180 @@
+Array
+(
+    [die_id] => 1048
+    [title] => roundness ng
+    [priority] => high
+    [assignee] => 46
+    [description] => 真円度不良
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => spencer-plouzek-9MBK-eldjIQ-unsplash.jpg
+                    [1] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6454.tmp
+                    [1] => C:\xampp\tmp\php6465.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 66867
+                    [1] => 193981
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 1048
+    [issue_title] => 真円度NG
+    [issue_description] => 真円度が出ていない
+    [priority] => high
+    [assignee] => 62
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                    [1] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpC7F4.tmp
+                    [1] => C:\xampp\tmp\phpC7F5.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 200575
+                    [1] => 193981
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 117
+    [issue_title] => estesafdsada
+    [issue_description] => fdsafdsafdsa
+    [priority] => low
+    [assignee] => 36
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                    [1] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpECEF.tmp
+                    [1] => C:\xampp\tmp\phpECF0.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                    [1] => 200575
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 76
+    [issue_title] => aaaaafdsa
+    [issue_description] => fdsafdsawaewfads
+    [priority] => low
+    [assignee] => 36
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                    [1] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php870B.tmp
+                    [1] => C:\xampp\tmp\php871C.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 200575
+                    [1] => 193981
+                )
+
+        )
+
+)

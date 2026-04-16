@@ -1,19 +1,21 @@
 <?php
-$pdo = new PDO(
-    "mysql:host=localhost;dbname=extrusion;charset=utf8",
-    "webuser",
-    ""
-);
+header("Content-Type: application/json");
 
-$sql = "SELECT id, staff_name FROM m_staff ORDER BY staff_name";
-$stmt = $pdo->query($sql);
-
-$rows = [];
-while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $rows[] = [
-        "id" => $r["id"],
-        "name" => $r["staff_name"]
-    ];
+try {
+    $pdo = new PDO(
+        "mysql:host=localhost;dbname=extrusion;charset=utf8",
+        "webuser",
+        ""
+    );
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo json_encode(["error" => "DB connection failed"]);
+    exit;
 }
 
-echo json_encode($rows);
+$sql = "SELECT id, staff_name FROM m_staff ORDER BY staff_name";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute();
+
+echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));

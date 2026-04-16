@@ -19,6 +19,7 @@ if ($issue_id === "") {
     exit;
 }
 
+/* --- Issue 本体情報 --- */
 $sql = "
 SELECT 
     i.*,
@@ -44,5 +45,25 @@ if (!$data) {
     echo json_encode(["error" => "Issue not found"]);
     exit;
 }
+
+/* --- 添付ファイル一覧を取得 --- */
+$sql2 = "
+SELECT 
+    id,
+    original_name,
+    saved_name
+FROM t_die_issue_attachment
+WHERE issue_id = :issue_id
+ORDER BY id ASC
+";
+
+$stmt2 = $pdo->prepare($sql2);
+$stmt2->bindValue(":issue_id", $issue_id, PDO::PARAM_INT);
+$stmt2->execute();
+
+$attachments = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+/* --- JSON に追加 --- */
+$data["before_photos"] = $attachments;
 
 echo json_encode($data);

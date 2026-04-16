@@ -1,4 +1,7 @@
 <?php
+file_put_contents("debug_save_issue.txt", print_r($_POST, true), FILE_APPEND);
+file_put_contents("debug_save_issue.txt", print_r($_FILES, true), FILE_APPEND);
+
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 

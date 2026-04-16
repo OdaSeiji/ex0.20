@@ -33,18 +33,14 @@
       }
 
       input,
-      select,
-      textarea {
+      textarea,
+      select {
         width: 100%;
         padding: 8px;
         margin-top: 4px;
         margin-bottom: 15px;
         border: 1px solid #c5d1dd;
         border-radius: 4px;
-      }
-
-      textarea {
-        height: 120px;
       }
 
       .btn-save {
@@ -60,57 +56,40 @@
         background-color: #1f527d;
       }
 
-      .btn-back {
-        background-color: #6c8ebf;
-        color: white;
-        padding: 6px 14px;
-        border: none;
-        border-radius: 4px;
-        font-weight: bold;
-      }
-
-      .btn-back:hover {
-        background-color: #56729a;
-      }
-
-      .text-right {
-        text-align: right;
-      }
-
-      .preview-area img {
-        width: 120px;
-        margin-right: 10px;
-        margin-bottom: 10px;
-        border: 1px solid #c5d1dd;
-        border-radius: 4px;
-      }
-
       /* Select2風 */
-      .select2box {
+      .dropdown {
         position: relative;
       }
 
-      .select2list {
+      .dropdown-list {
         position: absolute;
-        top: 38px;
+        top: 100%;
         left: 0;
-        width: 100%;
+        right: 0;
         background: white;
         border: 1px solid #c5d1dd;
-        border-radius: 4px;
-        max-height: 180px;
+        max-height: 200px;
         overflow-y: auto;
         display: none;
-        z-index: 10;
+        z-index: 1000;
       }
 
-      .select2item {
-        padding: 6px 10px;
+      .dropdown-item {
+        padding: 8px;
         cursor: pointer;
       }
 
-      .select2item:hover {
-        background-color: #e8f0f8;
+      .dropdown-item:hover {
+        background: #cfe2f3;
+      }
+
+      .preview-img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-right: 10px;
       }
     </style>
   </head>
@@ -119,149 +98,185 @@
     <div class="container">
       <h2>New Die Issue</h2>
 
-      <!-- 戻るボタン -->
-      <div class="text-right" style="margin-bottom: 10px">
-        <button
-          class="btn-back"
-          onclick="location.href = 'die_issue_list.html'"
-        >
-          ← Back to List
-        </button>
-      </div>
-
       <div class="card">
-        <form id="issueForm" enctype="multipart/form-data">
-          <!-- 金型選択（Select2風） -->
-          <label>Die</label>
-          <div class="select2box">
-            <input
-              type="text"
-              id="dieInput"
-              placeholder="Type to search..."
-              autocomplete="off"
-            />
-            <input type="hidden" name="die_id" id="dieId" />
-            <div id="dieListBox" class="select2list"></div>
-          </div>
+        <!-- Die Number -->
+        <label>Die Number</label>
+        <div class="dropdown">
+          <input type="text" id="dieInput" placeholder="Type to search..." />
+          <div id="dieDropdown" class="dropdown-list"></div>
+        </div>
+        <input type="hidden" id="dieId" />
 
-          <label>Issue Title</label>
-          <input type="text" name="issue_title" required />
+        <!-- Title -->
+        <label>Issue Title</label>
+        <input type="text" id="title" />
 
-          <label>Issue Description</label>
-          <textarea name="issue_description" required></textarea>
+        <!-- Priority -->
+        <label>Priority</label>
+        <select id="priority">
+          <option value="low">Low</option>
+          <option value="middle">Middle</option>
+          <option value="high">High</option>
+        </select>
 
-          <label>Priority</label>
-          <select name="priority">
-            <option value="1">High</option>
-            <option value="2" selected>Middle</option>
-            <option value="3">Low</option>
-          </select>
+        <!-- Assignee -->
+        <label>Assignee</label>
+        <select id="assignee"></select>
 
-          <label>Attachments</label>
-          <input type="file" name="files[]" multiple accept="image/*" />
+        <!-- Description -->
+        <label>Description</label>
+        <textarea id="description" rows="4"></textarea>
 
-          <div class="preview-area" id="previewArea"></div>
+        <!-- Attachments -->
+        <label>Attachments</label>
+        <input type="file" id="files" multiple accept="image/*" />
+        <div id="previewArea" style="display: flex; margin-top: 10px"></div>
 
-          <button type="submit" class="btn-save">Save Issue</button>
-        </form>
+        <button class="btn-save" onclick="saveIssue()">Save</button>
       </div>
     </div>
 
     <script>
       let dieList = [];
+      let currentIndex = -1;
 
-      // 金型一覧取得（./php/die_issue_php/ に統一）
+      // 金型一覧取得
       fetch("./php/die_issue_php/get_die_list.php")
         .then((res) => res.json())
+        .then((data) => (dieList = data));
+
+      // スタッフ一覧取得（id + staff_name）
+      fetch("./php/die_issue_php/get_staff_names.php")
+        .then((res) => res.json())
         .then((data) => {
-          dieList = data; // [{id:1, die_number:"CP9001"}, ...]
+          const sel = document.getElementById("assignee");
+          data.forEach((s) => {
+            const opt = document.createElement("option");
+            opt.value = s.id;
+            opt.textContent = s.staff_name;
+            sel.appendChild(opt);
+          });
         });
 
-      const dieInput = document.getElementById("dieInput");
-      const dieId = document.getElementById("dieId");
-      const dieListBox = document.getElementById("dieListBox");
+      /* Select2風 Die Number */
+      const input = document.getElementById("dieInput");
+      const dropdown = document.getElementById("dieDropdown");
 
-      // 入力イベント（前方一致フィルター）
-      dieInput.addEventListener("input", () => {
-        const keyword = dieInput.value.toLowerCase();
+      input.addEventListener("input", function () {
+        const keyword = input.value.toLowerCase();
+        dropdown.innerHTML = "";
+        currentIndex = -1;
+
+        if (!keyword) {
+          dropdown.style.display = "none";
+          return;
+        }
+
         const filtered = dieList.filter((d) =>
           d.die_number.toLowerCase().startsWith(keyword),
         );
 
-        dieListBox.innerHTML = "";
-        filtered.forEach((die) => {
+        filtered.forEach((d) => {
           const item = document.createElement("div");
-          item.className = "select2item";
-          item.textContent = die.die_number;
-
-          item.addEventListener("click", () => {
-            dieInput.value = die.die_number;
-            dieId.value = die.id;
-            dieListBox.style.display = "none";
-          });
-
-          dieListBox.appendChild(item);
+          item.className = "dropdown-item";
+          item.textContent = d.die_number;
+          item.onclick = () => selectDie(d);
+          dropdown.appendChild(item);
         });
 
-        dieListBox.style.display = filtered.length ? "block" : "none";
+        dropdown.style.display = filtered.length ? "block" : "none";
       });
 
-      // フォーカス外れたら閉じる
-      document.addEventListener("click", (e) => {
-        if (!dieListBox.contains(e.target) && e.target !== dieInput) {
-          dieListBox.style.display = "none";
+      // キー操作
+      input.addEventListener("keydown", function (e) {
+        const items = dropdown.querySelectorAll(".dropdown-item");
+        if (items.length === 0) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          currentIndex = (currentIndex + 1) % items.length;
+          updateHighlight(items);
+        }
+
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          currentIndex = (currentIndex - 1 + items.length) % items.length;
+          updateHighlight(items);
+        }
+
+        if (e.key === "Enter") {
+          e.preventDefault();
+          if (currentIndex >= 0) {
+            items[currentIndex].click();
+          }
         }
       });
 
-      // 添付ファイルプレビュー
-      document
-        .querySelector("input[name='files[]']")
-        .addEventListener("change", function () {
-          const preview = document.getElementById("previewArea");
-          preview.innerHTML = "";
+      function updateHighlight(items) {
+        items.forEach((item, index) => {
+          item.style.background = index === currentIndex ? "#cfe2f3" : "white";
+        });
+      }
 
-          [...this.files].forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const img = document.createElement("img");
-              img.src = e.target.result;
-              preview.appendChild(img);
-            };
-            reader.readAsDataURL(file);
+      function selectDie(d) {
+        input.value = d.die_number;
+        document.getElementById("dieId").value = d.id;
+        dropdown.style.display = "none";
+      }
+
+      /* 添付ファイルプレビュー */
+      document.getElementById("files").addEventListener("change", function () {
+        const area = document.getElementById("previewArea");
+        area.innerHTML = "";
+
+        [...this.files].forEach((file) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.className = "preview-img";
+            area.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      /* 保存処理 */
+      function saveIssue() {
+        if (!document.getElementById("dieId").value) {
+          alert("Please select a die number from the list.");
+          return;
+        }
+
+        const fd = new FormData();
+        fd.append("die_id", document.getElementById("dieId").value);
+        fd.append("issue_title", document.getElementById("title").value);
+        fd.append(
+          "issue_description",
+          document.getElementById("description").value,
+        );
+        fd.append("priority", document.getElementById("priority").value);
+        fd.append("assignee", document.getElementById("assignee").value);
+
+        const files = document.getElementById("files").files;
+        for (let i = 0; i < files.length; i++) {
+          fd.append("files[]", files[i]);
+        }
+
+        fetch("./php/die_issue_php/save_issue.php", {
+          method: "POST",
+          body: fd,
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.status === "success") {
+              alert("Saved.");
+              location.href = "die_issue_list.html";
+            } else {
+              alert("Error: " + result.error);
+            }
           });
-        });
-
-      // フォーム送信
-      document
-        .getElementById("issueForm")
-        .addEventListener("submit", function (e) {
-          e.preventDefault();
-
-          if (!dieId.value) {
-            alert("Please select a Die.");
-            return;
-          }
-
-          const formData = new FormData(this);
-
-          fetch("./php/die_issue_php/save_issue.php", {
-            method: "POST",
-            body: formData,
-          })
-            .then((res) => res.json())
-            .then((result) => {
-              if (result.status === "success") {
-                alert("Issue saved.");
-                location.href = "die_issue_list.html";
-              } else {
-                alert("Error: " + result.error);
-              }
-            })
-            .catch((err) => {
-              console.error(err);
-              alert("Communication error.");
-            });
-        });
+      }
     </script>
   </body>
 </html>

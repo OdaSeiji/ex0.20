@@ -25,6 +25,7 @@
         border: 1px solid #c5d1dd;
         border-radius: 6px;
         padding: 20px;
+        margin-top: 10px;
       }
 
       table {
@@ -45,17 +46,9 @@
         font-weight: bold;
       }
 
-      .btn-new {
-        background-color: #2b6ca3;
-        color: white;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 4px;
-        font-weight: bold;
-      }
-
-      .btn-new:hover {
-        background-color: #1f527d;
+      tr:hover {
+        background-color: #f2f7fc;
+        cursor: pointer;
       }
 
       .btn-back {
@@ -67,12 +60,67 @@
         font-weight: bold;
       }
 
-      .btn-back:hover {
-        background-color: #56729a;
+      .btn-new {
+        background-color: #2b6ca3;
+        color: white;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
       }
 
-      .text-right {
-        text-align: right;
+      .label-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #2b6ca3;
+        margin-top: 10px;
+      }
+
+      .detail-box {
+        background: #ffffff;
+        border: 1px solid #c5d1dd;
+        border-radius: 6px;
+        padding: 15px;
+        margin-top: 20px;
+      }
+
+      /* モーダル */
+      #imgModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      #modalContent {
+        background: white;
+        padding: 20px;
+        border-radius: 6px;
+        max-width: 90%;
+        max-height: 90%;
+        text-align: center;
+      }
+
+      #modalImg {
+        max-width: 100%;
+        max-height: 80vh;
+        border-radius: 4px;
+      }
+
+      .modal-btn {
+        background: #2b6ca3;
+        color: white;
+        padding: 8px 20px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin: 5px;
       }
     </style>
   </head>
@@ -81,19 +129,18 @@
     <div class="container">
       <h2>Repair Record List</h2>
 
-      <div class="text-right" style="margin-bottom: 10px">
+      <div style="margin-bottom: 10px">
         <button class="btn-back" onclick="history.back()">← Back</button>
-      </div>
-
-      <div class="text-right" style="margin-bottom: 10px">
         <button class="btn-new" id="newBtn">＋ New Repair Record</button>
       </div>
+
+      <!-- 金型番号表示 -->
+      <div class="label-title" id="dieNumberLabel">Die Number: ...</div>
 
       <div class="card">
         <table>
           <thead>
             <tr class="table-header">
-              <th>ID</th>
               <th>Repair Date</th>
               <th>Memo</th>
               <th>Repaired By</th>
@@ -103,11 +150,28 @@
           <tbody id="repairTableBody"></tbody>
         </table>
       </div>
+
+      <!-- 詳細表示エリア -->
+      <div id="detailArea" class="detail-box" style="display: none"></div>
+    </div>
+
+    <!-- モーダル -->
+    <div id="imgModal">
+      <div id="modalContent">
+        <img id="modalImg" src="" />
+        <br /><br />
+        <button class="modal-btn" onclick="prevImg()">Prev</button>
+        <button class="modal-btn" onclick="nextImg()">Next</button>
+        <button class="modal-btn" onclick="closeModal()">Close</button>
+      </div>
     </div>
 
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const issueId = urlParams.get("issue_id");
+
+      let currentFiles = []; // 現在の修理記録の添付ファイル一覧
+      let currentIndex = 0; // モーダルで表示中の画像インデックス
 
       if (!issueId) {
         alert("Issue ID missing.");
@@ -118,6 +182,14 @@
       document.getElementById("newBtn").onclick = () => {
         location.href = `die_issue_repair.html?issue_id=${issueId}`;
       };
+
+      // 金型番号を取得して表示
+      fetch(`./php/die_issue_php/get_issue_info.php?id=${issueId}`)
+        .then((res) => res.json())
+        .then((info) => {
+          document.getElementById("dieNumberLabel").innerText =
+            `Die Number: ${info.die_number}`;
+        });
 
       // 修理記録一覧取得
       fetch(
@@ -132,19 +204,86 @@
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-                    <td>${rec.id}</td>
                     <td>${rec.record_date}</td>
                     <td>${rec.memo}</td>
                     <td>${rec.repaired_by_name}</td>
                     <td>${rec.attachment_count}</td>
                 `;
 
+            tr.onclick = () => showDetail(rec);
+
             tbody.appendChild(tr);
           });
-        })
-        .catch((err) => {
-          console.error("Error:", err);
         });
+
+      // 詳細表示（サムネイル対応）
+      function showDetail(rec) {
+        const detail = document.getElementById("detailArea");
+        detail.style.display = "block";
+
+        detail.innerHTML = `
+            <h3>Repair Detail</h3>
+            <p><b>Date:</b> ${rec.record_date}</p>
+            <p><b>Staff:</b> ${rec.repaired_by_name}</p>
+            <p><b>Memo:</b><br>${rec.memo}</p>
+            <p><b>Attachments:</b></p>
+            <div id="thumbArea" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+        `;
+
+        fetch(
+          `./php/die_issue_php/get_repair_attachments.php?record_id=${rec.id}`,
+        )
+          .then((res) => res.json())
+          .then((files) => {
+            currentFiles = files;
+            const thumbArea = document.getElementById("thumbArea");
+
+            if (files.length === 0) {
+              thumbArea.innerHTML = "<p>No attachments.</p>";
+              return;
+            }
+
+            files.forEach((f, index) => {
+              const img = document.createElement("img");
+              img.src = `/ex0.20/upload/02_repair_files/${f.file_name}`;
+              img.style.width = "120px";
+              img.style.height = "120px";
+              img.style.objectFit = "cover";
+              img.style.border = "1px solid #ccc";
+              img.style.borderRadius = "4px";
+              img.style.cursor = "pointer";
+
+              img.onclick = () => openModal(index);
+
+              thumbArea.appendChild(img);
+            });
+          });
+      }
+
+      /* モーダル制御 */
+      function openModal(index) {
+        currentIndex = index;
+        document.getElementById("modalImg").src =
+          `/ex0.20/upload/02_repair_files/${currentFiles[index].file_name}`;
+        document.getElementById("imgModal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("imgModal").style.display = "none";
+      }
+
+      function nextImg() {
+        if (currentFiles.length === 0) return;
+        currentIndex = (currentIndex + 1) % currentFiles.length;
+        openModal(currentIndex);
+      }
+
+      function prevImg() {
+        if (currentFiles.length === 0) return;
+        currentIndex =
+          (currentIndex - 1 + currentFiles.length) % currentFiles.length;
+        openModal(currentIndex);
+      }
     </script>
   </body>
 </html>
