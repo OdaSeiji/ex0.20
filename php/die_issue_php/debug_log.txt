@@ -471,3 +471,53 @@ Array
 )
 
 lastInsertId: 1
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-15
+    [repair_comment] => fdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                    [1] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php4A32.tmp
+                    [1] => C:\xampp\tmp\php4A33.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 200575
+                    [1] => 193981
+                )
+
+        )
+
+)
+
+lastInsertId: 2
