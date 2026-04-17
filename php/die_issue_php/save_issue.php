@@ -28,14 +28,12 @@ $die_id            = $_POST["die_id"] ?? "";
 $issue_title       = $_POST["issue_title"] ?? "";
 $issue_description = $_POST["issue_description"] ?? "";
 $priority          = $_POST["priority"] ?? 2;
-
-// reported_by はログイン機能ができるまで固定
-$reported_by = 4;
+$reported_by       = $_POST["reported_by"] ?? "";   // ← 修正ポイント
 
 // ---------------------------------------------
 // Validate required fields
 // ---------------------------------------------
-if ($die_id === "" || $issue_title === "" || $issue_description === "") {
+if ($die_id === "" || $issue_title === "" || $issue_description === "" || $reported_by === "") {
     echo json_encode(["error" => "Missing required fields"]);
     exit;
 }

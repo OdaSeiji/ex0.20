@@ -67,7 +67,6 @@
         text-align: right;
       }
 
-      /* Action buttons */
       .btn-action {
         background-color: #2b6ca3;
         color: white;
@@ -109,7 +108,6 @@
     <div class="container">
       <h2>Die Issue List</h2>
 
-      <!-- 新規追加ボタン -->
       <div class="text-right">
         <button class="btn-new" onclick="location.href = 'die_issue.html'">
           ＋ New Issue
@@ -120,10 +118,9 @@
         <table>
           <thead>
             <tr class="table-header">
-              <th>ID</th>
               <th>Die Number</th>
               <th>Title</th>
-              <th>Reported By</th>
+              <th>Assignee</th>
               <th>Status</th>
               <th>Priority</th>
               <th>Repairs</th>
@@ -131,15 +128,20 @@
               <th>Action</th>
             </tr>
           </thead>
-          <tbody id="issueTableBody">
-            <!-- JS で行を追加 -->
-          </tbody>
+          <tbody id="issueTableBody"></tbody>
         </table>
       </div>
     </div>
 
     <script>
-      // 一覧データ取得
+      // Priority 数値 → 文字列変換
+      function formatPriority(p) {
+        if (p == 1) return "High";
+        if (p == 2) return "Middle";
+        if (p == 3) return "Low";
+        return p;
+      }
+
       fetch("./php/die_issue_php/get_issue_list.php")
         .then((res) => res.json())
         .then((data) => {
@@ -150,58 +152,44 @@
             const tr = document.createElement("tr");
 
             tr.innerHTML = `
-                    <td>${row.id}</td>
-                    <td>${row.die_number}</td>
-                    <td>${row.issue_title}</td>
-                    <td>${row.reported_by_name ?? ""}</td>
-                    <td>${row.approval_status}</td>
-                    <td>${row.priority}</td>
-                    <td>${row.repair_count}</td>
-                    <td>${row.created_at}</td>
-                    <td>
-
-                        <!-- Approve ボタン（approved 以外のときだけ表示） -->
-                        ${
-                          row.approval_status !== "approved"
-                            ? `<button class="btn-action" onclick="goApprove(${row.id})">Approve</button>`
-                            : ``
-                        }
-
-                        <!-- Repair ボタン（approved のときだけ表示） -->
-                        ${
-                          row.approval_status === "approved"
-                            ? `<button class="btn-repair" onclick="goRepair(${row.id})">Repair</button>`
-                            : ``
-                        }
-
-                        <!-- Delete ボタン（pending のときだけ表示） -->
-                        ${
-                          row.approval_status === "pending"
-                            ? `<button class="btn-delete" onclick="deleteIssue(${row.id})">Delete</button>`
-                            : ``
-                        }
-
-                    </td>
-                `;
+                <td>${row.die_number}</td>
+                <td>${row.issue_title}</td>
+                <td>${row.assignee ?? ""}</td>
+                <td>${row.approval_status}</td>
+                <td>${formatPriority(row.priority)}</td>
+                <td>${row.repair_count}</td>
+                <td>${row.created_at}</td>
+                <td>
+                    ${
+                      row.approval_status !== "approved"
+                        ? `<button class="btn-action" onclick="goApprove(${row.id})">Approve</button>`
+                        : ``
+                    }
+                    ${
+                      row.approval_status === "approved"
+                        ? `<button class="btn-repair" onclick="goRepair(${row.id})">Repair</button>`
+                        : ``
+                    }
+                    ${
+                      row.approval_status === "pending"
+                        ? `<button class="btn-delete" onclick="deleteIssue(${row.id})">Delete</button>`
+                        : ``
+                    }
+                </td>
+            `;
 
             tbody.appendChild(tr);
           });
-        })
-        .catch((err) => {
-          console.error("Error:", err);
         });
 
-      // 承認画面へ（★ issue_id に統一）
       function goApprove(id) {
         location.href = `die_issue_approval.html?issue_id=${id}`;
       }
 
-      // 修理記録一覧へ
       function goRepair(id) {
         location.href = `repair_record_list.html?issue_id=${id}`;
       }
 
-      // 削除
       function deleteIssue(id) {
         if (!confirm("Are you sure you want to delete this issue?")) return;
 

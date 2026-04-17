@@ -178,3 +178,223 @@ Array
         )
 
 )
+Array
+(
+    [die_id] => 813
+    [issue_title] => testestst
+    [issue_description] => fdsagdsafdaf
+    [priority] => low
+    [assignee] => 72
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                    [1] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                    [2] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                    [2] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpF5CE.tmp
+                    [1] => C:\xampp\tmp\phpF5CF.tmp
+                    [2] => C:\xampp\tmp\phpF5DF.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                    [2] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                    [1] => 200575
+                    [2] => 193981
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 964
+    [issue_title] => 11sstes
+    [issue_description] => fdsafdsafd
+    [priority] => low
+    [assignee] => 70
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                    [1] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php3C44.tmp
+                    [1] => C:\xampp\tmp\php3C55.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 200575
+                    [1] => 193981
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 882
+    [issue_title] => fdsafds
+    [issue_description] => fdsafdsafdsafds
+    [priority] => low
+    [reported_by] => 67
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => spencer-plouzek-9MBK-eldjIQ-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php4CAF.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 66867
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 746
+    [issue_title] => testeassss
+    [issue_description] => fdsafdsafd
+    [priority] => middle
+    [reported_by] => 70
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => dushawn-jovic--RJ1EY1uacI-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php2855.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 193981
+                )
+
+        )
+
+)
+Array
+(
+    [die_id] => 665
+    [issue_title] => aaaafdsaf
+    [issue_description] => fdsafdsafdsa
+    [priority] => 2
+    [reported_by] => 90
+)
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                    [1] => zeke-tucker-O6cnWhTs3Gc-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php1C70.tmp
+                    [1] => C:\xampp\tmp\php1C71.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                    [1] => 200575
+                )
+
+        )
+
+)

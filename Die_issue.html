@@ -114,9 +114,9 @@
         <!-- Priority -->
         <label>Priority</label>
         <select id="priority">
-          <option value="low">Low</option>
-          <option value="middle">Middle</option>
-          <option value="high">High</option>
+          <option value="3">Low</option>
+          <option value="2">Middle</option>
+          <option value="1">High</option>
         </select>
 
         <!-- Assignee -->
@@ -256,7 +256,7 @@
           document.getElementById("description").value,
         );
         fd.append("priority", document.getElementById("priority").value);
-        fd.append("assignee", document.getElementById("assignee").value);
+        fd.append("reported_by", document.getElementById("assignee").value);
 
         const files = document.getElementById("files").files;
         for (let i = 0; i < files.length; i++) {
@@ -280,3 +280,4 @@
     </script>
   </body>
 </html>
+<!-- old -->

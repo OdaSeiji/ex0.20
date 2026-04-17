@@ -18,14 +18,20 @@ SELECT
     d.die_number,
     i.issue_title,
 
-    -- 担当者は reported_by を使用
+    -- Assignee（reported_by の staff_name）
     s.staff_name AS assignee,
 
     i.approval_status,
+
+    -- priority はそのまま返す（low/middle/high）
     i.priority,
+
     i.created_at,
 
-    (SELECT COUNT(*) FROM t_die_clinical_record r WHERE r.issue_id = i.id) AS repair_count
+    -- 修理件数
+    (SELECT COUNT(*) 
+     FROM t_die_clinical_record r 
+     WHERE r.issue_id = i.id) AS repair_count
 
 FROM t_die_issue i
 LEFT JOIN m_dies d ON i.die_id = d.id

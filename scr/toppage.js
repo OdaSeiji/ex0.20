@@ -32,7 +32,7 @@ $(document).on("click", "#billet-charge__button", function () {
 
 // die issue
 $(document).on("click", "#die-issue__button", function () {
-  window.open("./DieIssue.html");
+  window.open("./die_issue_list.html");
   // console.log("hello");
 });
 
