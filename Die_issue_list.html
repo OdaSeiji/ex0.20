@@ -63,10 +63,24 @@
         background-color: #1f527d;
       }
 
+      .btn-back {
+        background-color: #6c8ebf;
+        color: white;
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+      }
+
+      .btn-back:hover {
+        background-color: #56729a;
+      }
+
       .text-right {
         text-align: right;
       }
 
+      /* Action buttons */
       .btn-action {
         background-color: #2b6ca3;
         color: white;
@@ -101,6 +115,38 @@
       .btn-delete:hover {
         background-color: #922b21;
       }
+
+      /* Badge Styles */
+      .badge {
+        padding: 4px 8px;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        display: inline-block;
+        font-size: 0.85rem;
+      }
+
+      /* Priority */
+      .badge-high {
+        background-color: #b84a4a;
+      }
+      .badge-middle {
+        background-color: #d8b04c;
+      }
+      .badge-low {
+        background-color: #4a7cb8;
+      }
+
+      /* Status */
+      .badge-status-pending {
+        background-color: #d8c75a;
+      }
+      .badge-status-approved {
+        background-color: #4a9b6a;
+      }
+      .badge-status-rejected {
+        background-color: #b84a4a;
+      }
     </style>
   </head>
 
@@ -108,7 +154,26 @@
     <div class="container">
       <h2>Die Issue List</h2>
 
-      <div class="text-right">
+      <!-- ★ Top Menu に戻るボタン -->
+      <div class="text-right" style="margin-bottom: 10px">
+        <button class="btn-back" onclick="location.href = 'index.html'">
+          ← Top Menu
+        </button>
+      </div>
+
+      <!-- ★ 型番検索ボックス + New Issue -->
+      <div class="text-right" style="margin-bottom: 10px">
+        <input
+          type="text"
+          id="searchDie"
+          placeholder="Search Die Number..."
+          style="
+            padding: 6px;
+            border: 1px solid #c5d1dd;
+            border-radius: 4px;
+            margin-right: 10px;
+          "
+        />
         <button class="btn-new" onclick="location.href = 'die_issue.html'">
           ＋ New Issue
         </button>
@@ -124,6 +189,7 @@
               <th>Status</th>
               <th>Priority</th>
               <th>Repairs</th>
+              <th>Press Cnt</th>
               <th>Created</th>
               <th>Action</th>
             </tr>
@@ -134,14 +200,35 @@
     </div>
 
     <script>
-      // Priority 数値 → 文字列変換
-      function formatPriority(p) {
-        if (p == 1) return "High";
-        if (p == 2) return "Middle";
-        if (p == 3) return "Low";
+      /* Priority 数値 → バッジ */
+      function formatPriorityBadge(p) {
+        if (p == 1) return `<span class="badge badge-high">High</span>`;
+        if (p == 2) return `<span class="badge badge-middle">Middle</span>`;
+        if (p == 3) return `<span class="badge badge-low">Low</span>`;
         return p;
       }
 
+      /* Status → バッジ */
+      function formatStatusBadge(s) {
+        if (s === "pending")
+          return `<span class="badge badge-status-pending">Pending</span>`;
+        if (s === "approved")
+          return `<span class="badge badge-status-approved">Approved</span>`;
+        if (s === "rejected")
+          return `<span class="badge badge-status-rejected">Rejected</span>`;
+        return s;
+      }
+
+      /* ★ Created を yy-mm-dd に変換 */
+      function formatDateYYMMDD(dateStr) {
+        const d = new Date(dateStr);
+        const yy = String(d.getFullYear()).slice(-2);
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yy}-${mm}-${dd}`;
+      }
+
+      /* 一覧データ取得 */
       fetch("./php/die_issue_php/get_issue_list.php")
         .then((res) => res.json())
         .then((data) => {
@@ -155,10 +242,11 @@
                 <td>${row.die_number}</td>
                 <td>${row.issue_title}</td>
                 <td>${row.assignee ?? ""}</td>
-                <td>${row.approval_status}</td>
-                <td>${formatPriority(row.priority)}</td>
+                <td>${formatStatusBadge(row.approval_status)}</td>
+                <td>${formatPriorityBadge(row.priority)}</td>
                 <td>${row.repair_count}</td>
-                <td>${row.created_at}</td>
+                <td>${row.press_cnt}</td>
+                <td>${formatDateYYMMDD(row.created_at)}</td>
                 <td>
                     ${
                       row.approval_status !== "approved"
@@ -182,12 +270,25 @@
           });
         });
 
+      /* ★ 型番前方一致フィルタ */
+      document
+        .getElementById("searchDie")
+        .addEventListener("input", function () {
+          const keyword = this.value.toLowerCase();
+          const rows = document.querySelectorAll("#issueTableBody tr");
+
+          rows.forEach((row) => {
+            const dieNumber = row.children[0].textContent.toLowerCase();
+            row.style.display = dieNumber.startsWith(keyword) ? "" : "none";
+          });
+        });
+
       function goApprove(id) {
         location.href = `die_issue_approval.html?issue_id=${id}`;
       }
 
       function goRepair(id) {
-        location.href = `repair_record_list.html?issue_id=${id}`;
+        location.href = `die_issue_repair.html?issue_id=${id}`;
       }
 
       function deleteIssue(id) {

@@ -56,6 +56,24 @@
         background-color: #1f527d;
       }
 
+      /* 戻るボタン */
+      .btn-back {
+        background-color: #6c8ebf;
+        color: white;
+        padding: 6px 14px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .btn-back:hover {
+        background-color: #56729a;
+      }
+
+      .text-right {
+        text-align: right;
+      }
+
       /* Select2風 */
       .dropdown {
         position: relative;
@@ -98,6 +116,16 @@
     <div class="container">
       <h2>New Die Issue</h2>
 
+      <!-- ★ 戻るボタン -->
+      <div class="text-right">
+        <button
+          class="btn-back"
+          onclick="location.href = 'die_issue_list.html'"
+        >
+          ← Back to List
+        </button>
+      </div>
+
       <div class="card">
         <!-- Die Number -->
         <label>Die Number</label>
@@ -138,14 +166,24 @@
 
     <script>
       let dieList = [];
+      let usedDieIds = [];
       let currentIndex = -1;
 
-      // 金型一覧取得
+      /* 使用済み die_id を取得 */
+      fetch("./php/die_issue_php/get_used_die_ids.php")
+        .then((res) => res.json())
+        .then((data) => {
+          usedDieIds = data.map((id) => Number(id));
+        });
+
+      /* 金型一覧取得 */
       fetch("./php/die_issue_php/get_die_list.php")
         .then((res) => res.json())
-        .then((data) => (dieList = data));
+        .then((data) => {
+          dieList = data;
+        });
 
-      // スタッフ一覧取得（id + staff_name）
+      /* スタッフ一覧取得 */
       fetch("./php/die_issue_php/get_staff_names.php")
         .then((res) => res.json())
         .then((data) => {
@@ -187,7 +225,7 @@
         dropdown.style.display = filtered.length ? "block" : "none";
       });
 
-      // キー操作
+      /* キー操作 */
       input.addEventListener("keydown", function (e) {
         const items = dropdown.querySelectorAll(".dropdown-item");
         if (items.length === 0) return;
@@ -218,7 +256,16 @@
         });
       }
 
+      /* ★ 金型選択時の「登録済み」チェック */
       function selectDie(d) {
+        if (usedDieIds.includes(Number(d.id))) {
+          alert("この金型は既に登録済みです。");
+          input.value = "";
+          document.getElementById("dieId").value = "";
+          dropdown.style.display = "none";
+          return;
+        }
+
         input.value = d.die_number;
         document.getElementById("dieId").value = d.id;
         dropdown.style.display = "none";
@@ -280,4 +327,3 @@
     </script>
   </body>
 </html>
-<!-- old -->

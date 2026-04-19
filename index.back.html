@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Extrusion Group Page</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/index.css" />
+  </head>
+
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div id="header-title__div" class="translation">Extrusion Page</div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">??? items</div>
+        </div>
+      </div>
+      <div>
+        <img
+          id="window-close__img"
+          src="./img/back-button.drawio.png"
+          alt="close button"
+        />
+      </div>
+    </header>
+    <main>
+      <iframe src="./toppage.html" iframeborder="0"></iframe>
+    </main>
+    <dialog id="delete__dialog">
+      <div>
+        <div id="dialog_title__wrapper">
+          <div>Delete? Tẩy xóa?</div>
+        </div>
+        <button id="dialog-cancel__button">
+          Cancel <br />
+          Hủy bỏ
+        </button>
+        <div id="dialog_input__wapper">
+          <div id="dialog_input__title">Emploee No</div>
+          <input id="emploee_number" type="text" />
+        </div>
+        <button id="dialog-delete__button" disabled>Del</button>
+      </div>
+    </dialog>
+    <script src="./lib/jquery.min.js"></script>
+    <!-- <script src="./lib/base.js"></script> -->
+    <script src="./scr/index.js"></script>
+  </body>
+</html>

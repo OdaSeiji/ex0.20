@@ -7,15 +7,13 @@ try {
         "webuser",
         ""
     );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
-    echo json_encode(["error" => "DB connection failed"]);
+    echo json_encode(["error" => $e->getMessage()]);
     exit;
 }
 
-$sql = "SELECT id, staff_name FROM m_staff ORDER BY staff_name";
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute();
+/* ★ leave_at が NULL（現役スタッフ）のみ取得 */
+$sql = "SELECT id, staff_name FROM m_staff WHERE leave_at IS NULL ORDER BY staff_name";
+$stmt = $pdo->query($sql);
 
 echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
