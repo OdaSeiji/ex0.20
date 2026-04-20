@@ -1,0 +1,601 @@
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-23
+    [repair_comment] => tesadfsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php8EAC.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 5
+ATTACH INSERT ERROR: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'original_name' in 'field list'
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-23
+    [repair_comment] => tesadfsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6794.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 6
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-06
+    [repair_comment] => fdsafdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6DCA.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 7
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-06
+    [repair_comment] => fdsafdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpFC11.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 8
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-07
+    [repair_comment] => fdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => nikita-kozlov-BI0-Qvaa1vU-unsplash.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php4902.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 85721
+                )
+
+        )
+
+)
+
+lastInsertId: 1
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-09
+    [repair_comment] => dfdsafdsafdsa
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => PXL_20250924_062913690.jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php13A6.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 160226
+                )
+
+        )
+
+)
+
+lastInsertId: 2
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-16
+    [repair_comment] => Checkig status
+last time, 7,8,9 dimension is too small
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Image (10).jpg
+                    [1] => image (8).png
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Image (10).jpg
+                    [1] => image (8).png
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/png
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpF926.tmp
+                    [1] => C:\xampp\tmp\php879.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 3794909
+                    [1] => 690553
+                )
+
+        )
+
+)
+
+lastInsertId: 1
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-16
+    [repair_comment] => Keep Checking
+
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => image (12).jpg
+                    [1] => image (11).jpg
+                    [2] => image (9).png
+                )
+
+            [full_path] => Array
+                (
+                    [0] => image (12).jpg
+                    [1] => image (11).jpg
+                    [2] => image (9).png
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                    [1] => image/jpeg
+                    [2] => image/png
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php19F3.tmp
+                    [1] => C:\xampp\tmp\php1BC9.tmp
+                    [2] => C:\xampp\tmp\php1D9F.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                    [1] => 0
+                    [2] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 263046
+                    [1] => 406146
+                    [2] => 186489
+                )
+
+        )
+
+)
+
+lastInsertId: 2
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-17
+    [repair_comment] => ワークの様子。
+特にヒケは見られない。
+
+肉抜き穴の寸法が小さい問題は、型の問題か？要確認
+寸法16：15.6~15.7（16）
+寸法10：9.6（10）
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Image (13).jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Image (13).jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php6B46.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 3600251
+                )
+
+        )
+
+)
+
+lastInsertId: 3
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-17
+    [repair_comment] => ワークの様子。
+特にヒケは見られない。
+
+肉抜き穴の寸法が小さい問題は、型の問題か？要確認
+寸法16：15.6~15.7（16）
+寸法10：9.6（10）
+    [issue_id] => 1
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Image (13).jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Image (13).jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php7171.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 3600251
+                )
+
+        )
+
+)
+
+lastInsertId: 4
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-13
+    [repair_comment] => 金型改造の方向性
+    [issue_id] => 2
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => 画像 (4).png
+                )
+
+            [full_path] => Array
+                (
+                    [0] => 画像 (4).png
+                )
+
+            [type] => Array
+                (
+                    [0] => image/png
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\php340.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 132541
+                )
+
+        )
+
+)
+
+lastInsertId: 5
+
+===== NEW REQUEST =====
+POST:
+Array
+(
+    [repair_date] => 2026-04-14
+    [repair_comment] => 金型の様子
+    [issue_id] => 2
+)
+
+FILES:
+Array
+(
+    [files] => Array
+        (
+            [name] => Array
+                (
+                    [0] => Image (14).jpg
+                )
+
+            [full_path] => Array
+                (
+                    [0] => Image (14).jpg
+                )
+
+            [type] => Array
+                (
+                    [0] => image/jpeg
+                )
+
+            [tmp_name] => Array
+                (
+                    [0] => C:\xampp\tmp\phpF604.tmp
+                )
+
+            [error] => Array
+                (
+                    [0] => 0
+                )
+
+            [size] => Array
+                (
+                    [0] => 6419020
+                )
+
+        )
+
+)
+
+lastInsertId: 6
