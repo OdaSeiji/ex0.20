@@ -73,6 +73,21 @@
         background-color: #56729a;
       }
 
+      /* ★ Repair Completion Request Button */
+      .btn-complete {
+        background-color: #4a9b6a;
+        color: white;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 4px;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+
+      .btn-complete:hover {
+        background-color: #3a7d55;
+      }
+
       .text-right {
         text-align: right;
       }
@@ -91,7 +106,7 @@
     <div class="container">
       <h2>Repair Record</h2>
 
-      <!-- 戻るボタン -->
+      <!-- Back Button -->
       <div class="text-right" style="margin-bottom: 10px">
         <button
           class="btn-back"
@@ -103,10 +118,10 @@
         </button>
       </div>
 
-      <!-- Issue 情報表示 -->
+      <!-- Issue Info -->
       <div class="card" id="issueInfo">Loading issue info...</div>
 
-      <!-- 修理記録入力 -->
+      <!-- Repair Record Form -->
       <div class="card">
         <form id="repairForm" enctype="multipart/form-data">
           <label>Repair Date</label>
@@ -121,6 +136,15 @@
           <div class="preview-area" id="previewArea"></div>
 
           <button type="submit" class="btn-save">Save Repair Record</button>
+
+          <!-- ★ Repair Completion Request Button -->
+          <button
+            type="button"
+            class="btn-complete"
+            onclick="requestCompletion()"
+          >
+            Request Completion
+          </button>
         </form>
       </div>
     </div>
@@ -134,7 +158,7 @@
         location.href = "die_issue_list.html";
       }
 
-      // Issue 情報取得
+      // Load Issue Info
       fetch(`./php/die_issue_php/get_issue_detail.php?id=${issueId}`)
         .then((res) => res.json())
         .then((data) => {
@@ -154,7 +178,7 @@
             `;
         });
 
-      // 添付ファイルプレビュー
+      // Preview Images
       document
         .querySelector("input[name='files[]']")
         .addEventListener("change", function () {
@@ -172,7 +196,7 @@
           });
         });
 
-      // 修理記録保存
+      // Save Repair Record
       document
         .getElementById("repairForm")
         .addEventListener("submit", function (e) {
@@ -199,6 +223,29 @@
               alert("Communication error.");
             });
         });
+
+      // ★ Repair Completion Request
+      function requestCompletion() {
+        if (!confirm("Submit repair completion request?")) return;
+
+        fetch("./php/die_issue_php/request_completion.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            issue_id: issueId,
+            completed_by: 4, // ← Replace with logged-in user ID if needed
+          }),
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.status === "success") {
+              alert("Completion request submitted.");
+              location.href = "die_issue_list.html"; // ★ ページ遷移
+            } else {
+              alert("Error: " + result.error);
+            }
+          });
+      }
     </script>
   </body>
 </html>

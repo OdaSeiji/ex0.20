@@ -76,7 +76,6 @@
         background-color: #56729a;
       }
 
-      /* ★ 追加：Maintenance Timeline ボタン */
       .btn-timeline {
         background-color: #4a79b8;
         color: white;
@@ -95,7 +94,6 @@
         text-align: right;
       }
 
-      /* Action buttons */
       .btn-action {
         background-color: #2b6ca3;
         color: white;
@@ -131,7 +129,19 @@
         background-color: #922b21;
       }
 
-      /* Badge Styles */
+      /* ★ 完了確認ボタン */
+      .btn-complete {
+        background-color: #4a9b6a;
+        color: white;
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+        margin-right: 4px;
+      }
+      .btn-complete:hover {
+        background-color: #3a7d55;
+      }
+
       .badge {
         padding: 4px 8px;
         border-radius: 6px;
@@ -141,7 +151,6 @@
         font-size: 0.85rem;
       }
 
-      /* Priority */
       .badge-high {
         background-color: #b84a4a;
       }
@@ -152,7 +161,6 @@
         background-color: #4a7cb8;
       }
 
-      /* Status */
       .badge-status-pending {
         background-color: #d8c75a;
       }
@@ -169,14 +177,12 @@
     <div class="container">
       <h2>Die Issue List</h2>
 
-      <!-- ★ Top Menu に戻るボタン -->
       <div class="text-right" style="margin-bottom: 10px">
         <button class="btn-back" onclick="location.href = 'index.html'">
           ← Top Menu
         </button>
       </div>
 
-      <!-- ★ 型番検索ボックス + New Issue + Timeline -->
       <div class="text-right" style="margin-bottom: 10px">
         <input
           type="text"
@@ -194,7 +200,6 @@
           ＋ New Issue
         </button>
 
-        <!-- ★ 追加：Maintenance Timeline ボタン -->
         <button
           class="btn-timeline"
           onclick="location.href = 'die_maintenance_timeline.html'"
@@ -224,7 +229,6 @@
     </div>
 
     <script>
-      /* Priority 数値 → バッジ */
       function formatPriorityBadge(p) {
         if (p == 1) return `<span class="badge badge-high">High</span>`;
         if (p == 2) return `<span class="badge badge-middle">Middle</span>`;
@@ -232,7 +236,6 @@
         return p;
       }
 
-      /* Status → バッジ */
       function formatStatusBadge(s) {
         if (s === "pending")
           return `<span class="badge badge-status-pending">Pending</span>`;
@@ -243,7 +246,6 @@
         return s;
       }
 
-      /* ★ Created を yy-mm-dd に変換 */
       function formatDateYYMMDD(dateStr) {
         const d = new Date(dateStr);
         const yy = String(d.getFullYear()).slice(-2);
@@ -252,7 +254,6 @@
         return `${yy}-${mm}-${dd}`;
       }
 
-      /* 一覧データ取得 */
       fetch("./php/die_issue_php/get_issue_list.php")
         .then((res) => res.json())
         .then((data) => {
@@ -262,39 +263,60 @@
           data.forEach((row) => {
             const tr = document.createElement("tr");
 
+            let actionButtons = "";
+
+            /* ★ 完了申請が来ている場合 → 完了確認ボタン */
+            if (row.completion_status === "completion_requested") {
+              actionButtons += `
+                <button class="btn-complete" onclick="approveCompletion(${row.id})">
+                  完了確認
+                </button>
+              `;
+            }
+
+            /* 承認前 → Approve */
+            if (row.approval_status !== "approved") {
+              actionButtons += `
+                <button class="btn-action" onclick="goApprove(${row.id})">
+                  Approve
+                </button>
+              `;
+            }
+
+            /* 承認済み → Repair */
+            if (row.approval_status === "approved") {
+              actionButtons += `
+                <button class="btn-repair" onclick="goRepair(${row.id})">
+                  Repair
+                </button>
+              `;
+            }
+
+            /* Pending → Delete */
+            if (row.approval_status === "pending") {
+              actionButtons += `
+                <button class="btn-delete" onclick="deleteIssue(${row.id})">
+                  Delete
+                </button>
+              `;
+            }
+
             tr.innerHTML = `
-                <td>${row.die_number}</td>
-                <td>${row.issue_title}</td>
-                <td>${row.assignee ?? ""}</td>
-                <td>${formatStatusBadge(row.approval_status)}</td>
-                <td>${formatPriorityBadge(row.priority)}</td>
-                <td>${row.repair_count}</td>
-                <td>${row.press_cnt}</td>
-                <td>${formatDateYYMMDD(row.created_at)}</td>
-                <td>
-                    ${
-                      row.approval_status !== "approved"
-                        ? `<button class="btn-action" onclick="goApprove(${row.id})">Approve</button>`
-                        : ``
-                    }
-                    ${
-                      row.approval_status === "approved"
-                        ? `<button class="btn-repair" onclick="goRepair(${row.id})">Repair</button>`
-                        : ``
-                    }
-                    ${
-                      row.approval_status === "pending"
-                        ? `<button class="btn-delete" onclick="deleteIssue(${row.id})">Delete</button>`
-                        : ``
-                    }
-                </td>
+              <td>${row.die_number}</td>
+              <td>${row.issue_title}</td>
+              <td>${row.assignee ?? ""}</td>
+              <td>${formatStatusBadge(row.approval_status)}</td>
+              <td>${formatPriorityBadge(row.priority)}</td>
+              <td>${row.repair_count}</td>
+              <td>${row.press_cnt}</td>
+              <td>${formatDateYYMMDD(row.created_at)}</td>
+              <td>${actionButtons}</td>
             `;
 
             tbody.appendChild(tr);
           });
         });
 
-      /* ★ 型番前方一致フィルタ */
       document
         .getElementById("searchDie")
         .addEventListener("input", function () {
@@ -329,7 +351,26 @@
             }
           });
       }
+
+      /* ★ 完了承認処理 */
+      function approveCompletion(id) {
+        if (!confirm("この修理を完了として確定しますか？")) return;
+
+        fetch("./php/die_issue_php/approve_completion.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ issue_id: id }),
+        })
+          .then((res) => res.json())
+          .then((result) => {
+            if (result.status === "success") {
+              alert("修理が正式に完了しました。");
+              location.reload();
+            } else {
+              alert("Error: " + result.error);
+            }
+          });
+      }
     </script>
   </body>
 </html>
-<!-- old -->

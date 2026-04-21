@@ -21,6 +21,7 @@ try {
     - assignee（leave_at IS NULL の現役スタッフのみ）
     - approval_status
     - priority
+    - completion_status   ← ★ これが必要！
     - created_at
     - repair_count（t_die_clinical_record）
     - press_cnt（Issue.created_at 以降の t_press の件数）
@@ -37,6 +38,7 @@ SELECT
 
     i.approval_status,
     i.priority,
+    i.completion_status,   -- ★ 追加！
     i.created_at,
 
     -- 修理回数
@@ -46,7 +48,7 @@ SELECT
         WHERE r.issue_id = i.id
     ) AS repair_count,
 
-    -- ★ press cnt（created 以降の生産回数）
+    -- press cnt（created 以降の生産回数）
     (
         SELECT COUNT(*)
         FROM t_press p
@@ -59,7 +61,7 @@ LEFT JOIN m_dies d
     ON i.die_id = d.id
 LEFT JOIN m_staff s 
     ON i.reported_by = s.id
-    AND s.leave_at IS NULL   -- ★退職者は除外
+    AND s.leave_at IS NULL   -- 退職者は除外
 
 ORDER BY i.id DESC
 ";

@@ -2478,3 +2478,31 @@ git rm -r --cached .\php\die_issue_php\*.txt
 
 - 立上げ完了のフローが無い
 - 移管済みの金型か、新規立ち上げの金型か
+
+以下のsqlでdie_conditionを文字列に変更。ここに
+
+- 壊れている
+- 修理中
+- 正常
+
+を入れていく。
+
+```sql
+ALTER TABLE m_dies
+  CHANGE die_condition_id die_condition VARCHAR(20);
+```
+
+もう一つ、
+
+```sql
+ALTER TABLE m_dies
+ADD die_lifecycle_status VARCHAR(30) DEFAULT 'arrived';
+```
+
+で、
+
+- 到着
+- 立上
+- 移管
+- 寿命
+  を示すものを入れる。
