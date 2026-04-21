@@ -2464,3 +2464,17 @@ CREATE TABLE t_die_issue_attachment (
 ```
 
 このテーブルが無いと、issueに添付ファイルを貼れない。
+
+# 2026/04/21
+
+Maitenance Timeline画面、情報が過去にさかのぼるにつれ、文字の高さが下がっていくのはだめだね。
+gitの管理対象から、アップロードされる写真と、phpのデバッグログを外す。
+
+```tarminal
+git rm --cached .\upload\
+
+git rm -r --cached .\php\die_issue_php\*.txt
+```
+
+- 立上げ完了のフローが無い
+- 移管済みの金型か、新規立ち上げの金型か
