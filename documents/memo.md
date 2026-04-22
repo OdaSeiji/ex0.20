@@ -2506,3 +2506,28 @@ ADD die_lifecycle_status VARCHAR(30) DEFAULT 'arrived';
 - 移管
 - 寿命
   を示すものを入れる。
+
+# 2026/04/22
+
+Heiuさんから電話
+
+- `Issue title`はリスト化した方がいい。項目は`{量産金型, 新型}`。_つまり、登録の際に迷いが無いようにしないと、自由につけちゃうから意味のない情報になるという意味_
+- `Priority`は全て`High`になってしまう。なら、一時的に使うのをやめる。
+- `Description`ここも何を記入するのか決めた方がいい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260422-01.png" width="300">
+  <figcaption>図1:現状使っている報告書</figcaption>
+</figure>
+
+押出現場で現在使われている上記フォーマットは、品質評価結果。この結果に対して、修理内容を記録する。
+
+<p align="center">
+  <img src="./img/20260422-03.png" width="300">
+</p>
+
+なので、以下の画面を登録するときに、図1を取り込めばいいのではないか？
+
+<p align="center">
+  <img src="./img/20260422-04.png" width="300">
+</p>
