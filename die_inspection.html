@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inspection</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #0078d4;
+        padding-bottom: 5px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+      }
+
+      table td {
+        padding: 10px;
+        vertical-align: top;
+      }
+
+      table td:first-child {
+        width: 240px;
+        font-weight: bold;
+        background: #f0f6ff;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+      }
+
+      textarea {
+        height: 100px;
+        resize: vertical;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        padding-top: 8px;
+      }
+
+      .buttons {
+        margin-top: 25px;
+        display: flex;
+        gap: 15px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-save {
+        background: #0078d4;
+        color: #fff;
+      }
+      .btn-clear {
+        background: #ccc;
+      }
+      .btn-back {
+        background: #666;
+        color: #fff;
+      }
+
+      /* 必須マーク */
+      .required {
+        color: red;
+        font-weight: bold;
+        margin-left: 4px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <h1 data-key="title">🧾 Inspection（検査記録入力）</h1>
+
+      <!-- 基本情報 -->
+      <div class="section-title" data-key="section_basic">基本情報</div>
+      <table>
+        <tr>
+          <td data-key="id_label">検査記録ID</td>
+          <td><input type="text" value="Auto Numbering" disabled /></td>
+        </tr>
+        <tr>
+          <td data-key="die_id_label">金型ID（die_id）</td>
+          <td><input type="text" id="die_id" value="" disabled /></td>
+        </tr>
+        <tr>
+          <td>
+            <span data-key="press_id_label">押出記録ID（press_id）</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <select id="press_id">
+              <option data-key="press_select">Select (last 7 days)</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+
+      <!-- 検査情報 -->
+      <div class="section-title" data-key="section_inspection">検査情報</div>
+      <table>
+        <tr>
+          <td>
+            <span data-key="inspection_date_label">検査日</span>
+            <span class="required">*</span>
+          </td>
+          <td><input type="date" id="inspection_date" /></td>
+        </tr>
+        <tr>
+          <td>
+            <span data-key="inspected_by_label">検査担当者</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <select id="inspected_by">
+              <option data-key="staff_select">Select</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span data-key="result_label">検査結果</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="result" value="OK" />
+                <span data-key="ok">OK</span></label
+              >
+              <label
+                ><input type="radio" name="result" value="NG" />
+                <span data-key="ng">NG</span></label
+              >
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td data-key="comment_label">検査コメント</td>
+          <td>
+            <textarea
+              id="inspection_comment"
+              placeholder="Enter inspection details (size, appearance, temperature...)"
+            ></textarea>
+          </td>
+        </tr>
+      </table>
+
+      <!-- 添付ファイル -->
+      <div class="section-title" data-key="section_file">添付ファイル</div>
+      <table>
+        <tr>
+          <td>
+            <span data-key="file_label">添付ファイル</span>
+            <span class="required">*</span>
+          </td>
+          <td><input type="file" id="file" /></td>
+        </tr>
+      </table>
+
+      <!-- 必須注意文 -->
+      <p
+        id="required_note"
+        style="color: red; font-weight: bold; margin-top: 20px"
+        data-key="required_note"
+      >
+        * 印の項目は入力が必要です
+      </p>
+
+      <!-- 操作ボタン -->
+      <div class="buttons">
+        <button class="btn btn-save" onclick="saveData()" data-key="btn_save">
+          保存
+        </button>
+        <button
+          class="btn btn-clear"
+          onclick="location.reload()"
+          data-key="btn_clear"
+        >
+          クリア
+        </button>
+        <button
+          class="btn btn-back"
+          onclick="history.back()"
+          data-key="btn_back"
+        >
+          一覧へ戻る
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const dict = {
+        ja: {
+          title: "🧾 Inspection（検査記録入力）",
+          section_basic: "基本情報",
+          id_label: "検査記録ID",
+          die_id_label: "金型ID（die_id）",
+          press_id_label: "押出記録ID（press_id）",
+          press_select: "選択してください（過去1週間）",
+
+          section_inspection: "検査情報",
+          inspection_date_label: "検査日",
+          inspected_by_label: "検査担当者",
+          staff_select: "選択してください",
+          result_label: "検査結果",
+          ok: "OK",
+          ng: "NG",
+          comment_label: "検査コメント",
+
+          section_file: "添付ファイル",
+          file_label: "添付ファイル",
+
+          required_note: "* 印の項目は入力が必要です",
+
+          btn_save: "保存",
+          btn_clear: "クリア",
+          btn_back: "一覧へ戻る",
+        },
+
+        vi: {
+          title: "🧾 Kiểm tra (Nhập dữ liệu kiểm tra)",
+          section_basic: "Thông tin cơ bản",
+          id_label: "Mã kiểm tra",
+          die_id_label: "Mã khuôn (die_id)",
+          press_id_label: "Mã ép đùn (press_id)",
+          press_select: "Vui lòng chọn (trong 1 tuần qua)",
+
+          section_inspection: "Thông tin kiểm tra",
+          inspection_date_label: "Ngày kiểm tra",
+          inspected_by_label: "Người kiểm tra",
+          staff_select: "Vui lòng chọn",
+          result_label: "Kết quả kiểm tra",
+          ok: "OK",
+          ng: "NG",
+          comment_label: "Ghi chú kiểm tra",
+
+          section_file: "Tệp đính kèm",
+          file_label: "Tệp đính kèm",
+
+          required_note: "Các mục có dấu * là bắt buộc",
+
+          btn_save: "Lưu",
+          btn_clear: "Xóa",
+          btn_back: "Quay lại danh sách",
+        },
+      };
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          el.textContent = dict[lang][key];
+        });
+        localStorage.setItem("lang", lang);
+      }
+
+      window.onload = () => {
+        const saved = localStorage.getItem("lang") || "ja";
+        setLang(saved);
+        loadInitialData();
+      };
+
+      function loadInitialData() {
+        fetch("./php/die_inspection_php/load_inspection_data.php")
+          .then((res) => res.json())
+          .then((data) => {
+            const pressSelect = document.getElementById("press_id");
+            data.press_list.forEach((p) => {
+              const opt = document.createElement("option");
+              opt.value = p.id;
+              opt.textContent = `${p.id} / ${p.press_date_at} / ${p.die_number}`;
+              pressSelect.appendChild(opt);
+            });
+
+            const staffSelect = document.getElementById("inspected_by");
+            data.staff_list.forEach((s) => {
+              const opt = document.createElement("option");
+              opt.value = s.id;
+              opt.textContent = s.staff_name;
+              staffSelect.appendChild(opt);
+            });
+          });
+      }
+
+      function saveData() {
+        const press_id = document.getElementById("press_id").value;
+        const inspection_date =
+          document.getElementById("inspection_date").value;
+        const inspected_by = document.getElementById("inspected_by").value;
+        const inspection_comment =
+          document.getElementById("inspection_comment").value;
+        const file = document.getElementById("file").files[0];
+
+        const result = document.querySelector("input[name='result']:checked");
+        if (!result) {
+          alert("検査結果を選択してください");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("press_id", press_id);
+        formData.append("inspection_date", inspection_date);
+        formData.append("inspected_by", inspected_by);
+        formData.append("inspection_result", result.value);
+        formData.append("inspection_comment", inspection_comment);
+        formData.append("file", file);
+
+        fetch("./php/die_inspection_php/save_inspection.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("保存しました");
+              location.reload();
+            } else {
+              alert("エラー: " + data.message);
+            }
+          });
+      }
+    </script>
+  </body>
+</html>
