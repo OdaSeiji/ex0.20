@@ -2668,3 +2668,346 @@ NG の診断に対して行われる治療内容を記録。
 AIに描かせたけど、余り正しくない。表現したいことはなんとなくわかるが、、、
 
 ![](./img/20260423-03.png)
+
+AIはこの様な作画はあまり上手ではないですね。流れは、こうなるはず。なので、まずは、`Inspection`ページをちゃんと作る。
+
+<p align="center">
+  <img src="./img/20260423-05.svg" width="800">
+</p>
+
+## テーブル
+
+## 1. t_die_inspection（検査記録）
+
+金型の押出後に行う 検査データ を記録するテーブル。
+1回の押出に対して1つの検査記録が作成される。
+
+## t_die_inspection
+
+<div align="center">
+
+| カラム名           | 型       | 説明                               |
+| ------------------ | -------- | ---------------------------------- |
+| id                 | PK       | 検査記録ID                         |
+| die_id             | FK       | 金型ID                             |
+| press_id           | FK       | 押出記録ID（t_press）              |
+| issue_id           | FK       | 修理台帳（t_die_issue_id）         |
+| inspection_date    | DATE     | 検査日                             |
+| inspected_by       | FK       | 検査担当者（staff_id）             |
+| inspection_result  | VARCHAR  | 検査結果（OK / NG）                |
+| inspection_comment | TEXT     | 寸法・外観・温度などの検査コメント |
+| created_at         | DATETIME | 作成日時                           |
+| updated_at         | DATETIME | 更新日時                           |
+
+</div>
+
+## 2. t_die_diagnosis（診断記録）
+
+検査結果をもとに行う 診断結果 を記録するテーブル。
+1つの検査記録に対して複数の診断（一次・二次・最終）が可能。
+
+## t_die_diagnosis
+
+<div align="center">
+
+| カラム名          | 型       | 説明                                   |
+| ----------------- | -------- | -------------------------------------- |
+| id                | PK       | 診断記録ID                             |
+| inspection_id     | FK       | 対応する検査記録ID（t_die_inspection） |
+| diagnosis_date    | DATE     | 診断日                                 |
+| diagnosed_by      | FK       | 診断担当者（staff_id）                 |
+| diagnosis_result  | VARCHAR  | 診断結果（OK / NG / Retire）           |
+| diagnosis_comment | TEXT     | 原因分析・判断理由など                 |
+| created_at        | DATETIME | 作成日時                               |
+| updated_at        | DATETIME | 更新日時                               |
+
+</div>
+
+## 3. t_die_attachment（添付ファイル）
+
+検査・診断のどちらにも紐づけられる 添付ファイル管理テーブル。
+画像・PDF・動画など、複数ファイルを柔軟に保存できる。
+
+## t_die_attachment
+
+<div align="center">
+
+| カラム名      | 型        | 説明                       |
+| ------------- | --------- | -------------------------- |
+| id            | PK        | 添付ID                     |
+| inspection_id | FK NULL可 | 検査に紐づく場合           |
+| diagnosis_id  | FK NULL可 | 診断に紐づく場合           |
+| file_name     | VARCHAR   | 保存ファイル名（ユニーク） |
+| original_name | VARCHAR   | 元のファイル名             |
+| file_type     | VARCHAR   | MIMEタイプなど             |
+| description   | TEXT      | ファイルの説明（任意）     |
+| uploaded_at   | DATETIME  | アップロード日時           |
+
+</div>
+
+## 4. t_press（押出記録）
+
+※既存テーブルとして参照されるため、仕様も併記します。
+
+## t_press
+
+<div align="center">
+
+| カラム名      | 型       | 説明             |
+| ------------- | -------- | ---------------- |
+| id            | PK       | 押出記録ID       |
+| die_id        | FK       | 金型ID           |
+| press_date    | DATE     | 押出日           |
+| pressed_by    | FK       | 押出担当者       |
+| press_comment | TEXT     | 押出時のコメント |
+| created_at    | DATETIME | 作成日時         |
+| updated_at    | DATETIME | 更新日時         |
+
+</div>
+
+🟦 ER関係まとめ（Markdown）
+t_press (1) ── (1) t_die_inspection (1) ── (N) t_die_diagnosis
+│
+└── (N) t_die_attachment
+t_die_diagnosis (1) ────────────────┘
+
+### テーブル
+
+この時点で使うテーブルは３つ
+
+- t_die_inspection
+- t_die_diagnosis
+- t_die_attachment
+
+で、もう一つ必要。
+
+- t_die_clinical_record
+
+## t_die_clinical_record
+
+## t_die_clinical_record
+
+<div align="center">
+
+| カラム名         | 型       | 説明                             |
+| ---------------- | -------- | -------------------------------- |
+| id               | PK       | 治療記録ID                       |
+| diagnosis_id     | FK       | 対応する診断記録ID               |
+| treatment_date   | DATE     | 治療日                           |
+| treated_by       | FK       | 修正担当者（staff_id）           |
+| treatment_method | TEXT     | 修正方法（研磨、調整、溶接など） |
+| treatment_detail | TEXT     | 修正内容の詳細                   |
+| treatment_result | VARCHAR  | 結果（OK / NG）                  |
+| created_at       | DATETIME | 作成日時                         |
+| updated_at       | DATETIME | 更新日時                         |
+
+</div>
+ER図
+<p align="center">
+  <img src="./img/20260423-07.png" width="800">
+</p>
+つまり、最終的にテーブルは5つ。
+
+- t_die_inspection
+- t_die_diagnosis
+- t_die_attachment
+- t_die_clinical_record
+- t_die_issue
+
+## t_die_attachment
+
+<div align="center">
+
+| カラム名           | 型           | NULL | 説明                                              |
+| ------------------ | ------------ | ---- | ------------------------------------------------- |
+| id                 | int(11)      | NO   | 添付ID（PK）                                      |
+| issue_id           | int(11)      | YES  | 問題（t_die_issue）に紐づく場合                   |
+| inspection_id      | int(11)      | YES  | 検査（t_die_inspection）に紐づく場合              |
+| diagnosis_id       | int(11)      | YES  | 診断（t_die_diagnosis）に紐づく場合               |
+| clinical_record_id | int(11)      | YES  | 治療（t_die_clinical_record）に紐づく場合         |
+| file_name          | varchar(255) | NO   | 保存ファイル名（ユニーク）                        |
+| original_name      | varchar(255) | NO   | 元のファイル名                                    |
+| file_type          | varchar(100) | YES  | MIMEタイプ（image/jpeg, pdf など）                |
+| description        | text         | YES  | ファイルの説明（任意）                            |
+| uploaded_at        | datetime     | NO   | アップロード日時（デフォルト：CURRENT_TIMESTAMP） |
+
+</div>
+
+そうすると現状要らないテーブルが出てくるので、消す。
+
+```terminal
+MariaDB [extrusion]> show tables like 't_die%';
++----------------------------------+
+| Tables_in_extrusion (t_die%)     |
++----------------------------------+
+| t_die_clinical_record            |
+| t_die_clinical_record_attachment |
+| t_die_issue                      |
+| t_die_issue_attachment           |
+| t_dies_status                    |
+| t_dies_status_filename           |
++----------------------------------+
+6 rows in set (0.003 sec)
+
+MariaDB [extrusion]>
+```
+
+この中の`t_die_issue_attachment`はいらない
+
+```sql
+MariaDB [extrusion]> drop table t_die_issue_attachment;
+Query OK, 0 rows affected (0.012 sec)
+
+MariaDB [extrusion]>
+```
+
+## 今後の動き
+
+1. diagnosisでng判定した場合、t_die_issueに登録。次にt_die_inspectionに登録
+2. diagnosisでng判定しない場合、t_die_issueには登録しない。
+
+<p align="center">
+  <img src="./img/20260423-08.png" width="800">
+</p>
+
+生成AIの提案
+
+# 🧾 Inspection（検査記録入力）
+
+## 基本情報
+
+| 項目                       | 入力形式           | 備考                                                             |
+| -------------------------- | ------------------ | ---------------------------------------------------------------- |
+| 検査記録ID                 | 自動採番           | （表示のみ）                                                     |
+| 金型ID（die_id）           | t_press_idから取得 | （内部処理）                                                     |
+| 押出記録ID（press_id）     | ドロップダウン     | 押出履歴から選択（過去１週間分の押出記録の中から選択） 、必須    |
+| 修理台帳ID（die_issue_id） | 自動採番           | t_die_diagnosisの判定がngの時、t_die_issueにレコードを追加し採番 |
+
+---
+
+## 検査情報
+
+| 項目                               | 入力形式       | 備考                                  |
+| ---------------------------------- | -------------- | ------------------------------------- |
+| 検査日（inspection_date）          | 日付入力       | デフォルト：当日 、必須               |
+| 検査担当者（inspected_by）         | ドロップダウン | staff_idから選択（在籍者のみ） 、必須 |
+| 検査結果（inspection_result）      | ラジオボタン   | OK / NG 、必須                        |
+| 検査コメント（inspection_comment） | テキストエリア | 寸法・外観・温度などを記録            |
+
+---
+
+## 添付ファイル
+
+| 項目         | 入力形式             | 備考                                           |
+| ------------ | -------------------- | ---------------------------------------------- |
+| 添付ファイル | ファイルアップロード | 写真・PDFなど（t_die_attachmentに保存） 、必須 |
+
+---
+
+## 操作ボタン
+
+- [保存]（Save）必要な項目の入力が終わっているとき
+- [クリア]（Clear）
+- [一覧へ戻る]（Back to List）
+
+---
+
+## 表示例（カードUI）
+
+## 表の作成
+
+- t_die_inspection（検査記録）
+- t_die_attachment（添付ファイル）
+- t_die_issue（NG 時に自動生成される修理台帳）
+  を作る
+
+```sql
+CREATE TABLE t_die_inspection (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    die_id INT NOT NULL,
+    press_id INT NOT NULL,
+    die_issue_id INT DEFAULT NULL,
+    inspection_date DATE NOT NULL,
+    inspected_by INT NOT NULL,
+    inspection_result ENUM('OK','NG') NOT NULL,
+    inspection_comment TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (die_id) REFERENCES m_dies(id),
+    FOREIGN KEY (press_id) REFERENCES t_press(id),
+    FOREIGN KEY (inspected_by) REFERENCES m_staff(id)
+);
+```
+
+```sql
+CREATE TABLE t_die_issue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    die_id INT NOT NULL,
+    issue_title VARCHAR(255) NOT NULL,
+    issue_description TEXT,
+    reported_by INT NOT NULL,
+    reported_at DATETIME NOT NULL,
+    status ENUM('open','in_progress','closed') NOT NULL DEFAULT 'open',
+    priority TINYINT NOT NULL DEFAULT 2,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (die_id) REFERENCES m_dies(id),
+    FOREIGN KEY (reported_by) REFERENCES m_staff(id)
+);
+```
+
+```sql
+CREATE TABLE t_die_diagnosis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    inspection_id INT NOT NULL,
+    diagnosed_by INT NOT NULL,
+    diagnosis_date DATE NOT NULL,
+    diagnosis_result ENUM('OK','NG') NOT NULL,
+    diagnosis_comment TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (inspection_id) REFERENCES t_die_inspection(id),
+    FOREIGN KEY (diagnosed_by) REFERENCES m_staff(id)
+);
+```
+
+これは既にあるから実行しなくていいか。
+
+```sql
+CREATE TABLE t_die_clinical_record (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    diagnosis_id INT NOT NULL,
+    treated_by INT NOT NULL,
+    treatment_date DATE NOT NULL,
+    treatment_comment TEXT,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id),
+    FOREIGN KEY (treated_by) REFERENCES m_staff(id)
+);
+```
+
+そして最後にこれを実行
+
+```sql
+CREATE TABLE t_die_attachment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    issue_id INT NULL,
+    inspection_id INT NULL,
+    diagnosis_id INT NULL,
+    clinical_record_id INT NULL,
+
+    file_name VARCHAR(255) NOT NULL,       -- 保存ファイル名（ユニーク推奨）
+    original_name VARCHAR(255) NOT NULL,   -- 元のファイル名
+    file_type VARCHAR(100) NULL,           -- MIMEタイプ（image/jpeg, pdf など）
+    description TEXT NULL,                 -- 任意の説明文
+    uploaded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- 外部キー（存在するテーブルに合わせて設定）
+    FOREIGN KEY (issue_id) REFERENCES t_die_issue(id),
+    FOREIGN KEY (inspection_id) REFERENCES t_die_inspection(id),
+    FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id),
+    FOREIGN KEY (clinical_record_id) REFERENCES t_die_clinical_record(id)
+);
+```
