@@ -2531,3 +2531,140 @@ Heiuさんから電話
 <p align="center">
   <img src="./img/20260422-04.png" width="300">
 </p>
+
+# 2026/04/23
+
+`m_dies`に金型の生涯を示すカラムを追加する。
+
+```sql
+ALTER TABLE m_dies
+ADD status VARCHAR(20) DEFAULT 'new';
+```
+
+### `m_dies.status`
+
+<div align="center">
+
+| status  |              意味              |
+| :-----: | :----------------------------: |
+|   new   | 新規登録、まだ診断されていない |
+| active  |  現役で使用中（健康or治療中）  |
+| retired |              退役              |
+|  lost   |              不明              |
+
+</div>
+
+### `m_dies.die_condition`
+
+<div align="center">
+
+|     condition     |              意味              |
+| :---------------: | :----------------------------: |
+|      normal       |        健康（治療不要）        |
+|    diagnosing     |             診断中             |
+|    need_repair    |       診断ng→治療が必要        |
+|     repairing     |             治療中             |
+|     followup      |             再診中             |
+| awaiting_approval | 退院判定待ち（管理者承認待ち） |
+|     completed     |          完了（退院）          |
+
+</div>
+
+### 検討中のテーブル構成
+
+## 1. m_dies（患者：金型マスタ）
+
+金型そのもの。
+金型の「生涯ステータス（status）」と「健康状態（die_condition）」を保持。
+
+### m_dies
+
+- id (PK)
+- die_number
+- status -- new / active / retired
+- die_condition -- diagnosing / need_repair / repairing / followup / awaiting_approval / normal
+- created_at
+- updated_at
+
+## 2. t_die_diagnosis（診断：旧 t_die_cycle）
+
+押出結果（t_press）をもとに診断するテーブル。
+
+### t_die_diagnosis
+
+- id (PK)
+- die_id (FK → m_dies.id)
+- press_id (FK → t_press.id)
+- diagnosis_result -- OK / NG
+- diagnosis_comment
+- diagnosed_by (FK → m_staff.id)
+- created_at
+
+## 3. t_die_clinical_record（治療カルテ）
+
+NG の診断に対して行われる治療内容を記録。
+
+### t_die_clinical_record
+
+- id (PK)
+- diagnosis_id (FK → t_die_diagnosis.id)
+- record_date
+- staff_id (FK → m_staff.id)
+- memo
+- created_at
+- updated_at
+
+## 4. t_die_clinical_record_attachment（治療カルテの添付）
+
+治療写真・資料などを保存。
+
+### t_die_clinical_record_attachment
+
+- id (PK)
+- clinical_record_id (FK → t_die_clinical_record.id)
+- file_path
+- created_at
+
+## 5. t_die_clinical_evaluation（再診：治療後評価）
+
+治療後の再診（Follow-up）。
+
+### t_die_clinical_evaluation
+
+- id (PK)
+- clinical_record_id (FK → t_die_clinical_record.id)
+- evaluation_result -- OK / NG
+- evaluation_comment
+- evaluated_by (FK → m_staff.id)
+- created_at
+
+## 6. t_die_manager_approval（退院判定：管理者承認）
+
+再診 OK の後、管理者が最終承認するテーブル。
+
+### t_die_manager_approval
+
+- id (PK)
+- cycle_id (FK → t_die_diagnosis.id)
+- approved_by (FK → m_staff.id)
+- approved_at
+- approval_comment
+
+### テーブル一覧まとめ
+
+- m_dies
+- t_die_diagnosis
+- t_die_clinical_record
+- t_die_clinical_record_attachment
+- t_die_clinical_evaluation
+- t_die_manager_approval
+
+### ER図
+
+![](./img/20260423-01.png)
+
+### 状態遷移図
+
+AIに描かせたけど、余り正しくない。表現したいことはなんとなくわかるが、、、
+
+![](./img/20260423-03.png)
