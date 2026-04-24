@@ -2672,7 +2672,7 @@ AIに描かせたけど、余り正しくない。表現したいことはなん
 AIはこの様な作画はあまり上手ではないですね。流れは、こうなるはず。なので、まずは、`Inspection`ページをちゃんと作る。
 
 <p align="center">
-  <img src="./img/20260423-05.svg" width="800">
+  <img src="./img/20260424-01.svg" width="800">
 </p>
 
 ## テーブル
@@ -3011,3 +3011,68 @@ CREATE TABLE t_die_attachment (
     FOREIGN KEY (clinical_record_id) REFERENCES t_die_clinical_record(id)
 );
 ```
+
+# 2026/04/24
+
+デュアルブートの環境構築
+
+- https://minto.tech/dual-boot-windows-linux-ubuntu-setup-guide/
+  まず最優先でおすすめ（図解・文章ともに分かりやすい）
+- https://www.choge-blog.com/programming/windows-linux-dualboot/
+  次におすすめ（文章がとても平易）
+- https://www.youtube.com/watch?v=IIJqI9G9N-M
+  動画で見たい場合（文章が苦手なら）
+- https://relax-tech.net/windows-ubuntu-dual-boot/
+  実際の作業をそのまま真似したい人向け
+
+と設定しているのに。
+
+```sql
+mysql> GRANT ALL PRIVILEGES
+    -> ON *.*
+    -> TO 'root'@'10.21.118.30'
+    -> IDENTIFIED BY 'rootのパスワード'
+    -> WITH GRANT OPTION;
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> SELECT User, Host
+    -> FROM mysql.user
+    -> WHERE User = 'root';
++------+----------------+
+| User | Host           |
++------+----------------+
+| root | 10.21.118.30   |
+| root | 127.0.0.1      |
+| root | 192.168.172.30 |
+| root | ::1            |
+| root | localhost      |
++------+----------------+
+5 rows in set (0.09 sec)
+
+mysql> exit
+```
+
+```terminal
+PS C:\Users\odaseiji> mysql -h 10.163.50.17 -u root -p
+Enter password: ********
+ERROR 1045 (28000): Access denied for user 'root'@'10.21.118.30' (using password: YES)
+```
+
+ログインできない。
+やばい
+
+```terminal
+mysql> GRANT ALL PRIVILEGES
+    -> ON *.*
+    -> TO 'root'@'10.21.118.30'
+    -> IDENTIFIED BY 'rootのパスワード'
+    -> WITH GRANT OPTION;
+Query OK, 0 rows affected (0.10 sec)
+```
+
+として設定してしまっている。対策完了。
+
+- Hieuさんから、修正内容をどのように記録するか？修理内容が後から見ると、分からない。
