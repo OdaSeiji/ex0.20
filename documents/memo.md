@@ -3076,3 +3076,60 @@ Query OK, 0 rows affected (0.10 sec)
 として設定してしまっている。対策完了。
 
 - Hieuさんから、修正内容をどのように記録するか？修理内容が後から見ると、分からない。
+
+まず、inspection入力に寸法と、形状がOKかNGかを入力する所を加えたい。
+
+```sql
+ALTER TABLE t_die_inspection
+    ADD COLUMN dimension_result ENUM('OK','NG') AFTER inspection_result,
+    ADD COLUMN shape_result ENUM('OK','NG') AFTER dimension_result;
+```
+
+# 2026/04/25
+
+テーブルの構成は現在のサーバーの物を基準として問題が無い。ただし、以下を修正する。
+
+```sql
+ALTER TABLE t_die_diagnosis
+ADD COLUMN issue_id INT NULL AFTER inspection_id,
+ADD CONSTRAINT fk_diagnosis_issue
+    FOREIGN KEY (issue_id)
+    REFERENCES t_die_issue(id);
+
+```
+
+そして、ここが肝なので、フロー図にした。
+
+![](./img/20260425-01.svg)
+
+それと、ER図。少し表記が変ですけど。
+
+![](./img/20260424-02.png)
+
+めんどくさい動きが、以下
+
+> t_die_issueに同じdie_idが有って、t_die_issue.completed_atに日付が入っていない時は、
+> t_die_diagnosis.issue_idは一致したt_die_issueのidを使う事。
+> そうでない時はt_die_issueに新規のレコードを追加する事。
+
+この動きをフローにしてほしい。確認したいです。
+
+もう一か所、テーブルの修正。die_idが欲しいそうです。
+
+```sql
+ALTER TABLE t_die_diagnosis
+ADD COLUMN die_id INT NOT NULL AFTER inspection_id;
+```
+
+# 2026/04/26
+
+このままでは、diagnosisの承認が出来ないので、テーブルの改造。
+
+```sql
+ALTER TABLE t_die_diagnosis
+ADD COLUMN approval_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending' AFTER diagnosis_comment,
+ADD COLUMN approved_by INT NULL AFTER approval_status,
+ADD COLUMN approved_at DATETIME NULL AFTER approved_by;
+```
+
+OK

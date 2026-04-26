@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Inspection List</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background: #e8f1ff;
+        font-weight: bold;
+      }
+
+      tr:hover {
+        background: #f0f8ff;
+        cursor: pointer;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <!-- ★ メニューへ戻るボタン -->
+      <div style="text-align: right; margin-bottom: 10px">
+        <button
+          onclick="location.href = 'index.html'"
+          style="
+            background: #2b6ca3;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          "
+        >
+          ← メニューへ戻る
+        </button>
+      </div>
+
+      <h1 data-key="title">📋 Inspection List（検査一覧）</h1>
+
+      <table id="inspectionTable">
+        <thead>
+          <tr>
+            <th data-key="col_date">Inspection Date</th>
+            <th data-key="col_die">Die Number</th>
+            <th data-key="col_result">Result</th>
+            <th data-key="col_dimension">Dimension</th>
+            <th data-key="col_shape">Shape</th>
+            <th data-key="col_staff">Staff</th>
+            <th data-key="col_action">Diagnosis</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      /* 多言語辞書 */
+      const dict = {
+        ja: {
+          title: "📋 Inspection List（検査一覧）",
+          col_date: "検査日",
+          col_die: "金型番号",
+          col_result: "検査結果",
+          col_dimension: "寸法",
+          col_shape: "形状",
+          col_staff: "担当者",
+          col_action: "診断へ",
+        },
+        vi: {
+          title: "📋 Danh sách kiểm tra",
+          col_date: "Ngày kiểm tra",
+          col_die: "Mã khuôn",
+          col_result: "Kết quả",
+          col_dimension: "Kích thước",
+          col_shape: "Hình dạng",
+          col_staff: "Người kiểm tra",
+          col_action: "Chẩn đoán",
+        },
+      };
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          el.textContent = dict[lang][key];
+        });
+        localStorage.setItem("lang", lang);
+      }
+
+      window.onload = function () {
+        const saved = localStorage.getItem("lang") || "ja";
+        setLang(saved);
+        loadInspectionList();
+      };
+
+      /* 一覧データ読み込み */
+      function loadInspectionList() {
+        fetch("./php/die_inspection_php/load_inspection_list.php")
+          .then((res) => res.json())
+          .then((data) => {
+            const tbody = document.querySelector("#inspectionTable tbody");
+            tbody.innerHTML = "";
+
+            data.forEach((row) => {
+              const tr = document.createElement("tr");
+
+              tr.innerHTML = `
+                  <td>${row.inspection_date}</td>
+                  <td>${row.die_number}</td>
+                  <td>${row.inspection_result}</td>
+                  <td>${row.dimension_result}</td>
+                  <td>${row.shape_result}</td>
+                  <td>${row.staff_name}</td>
+                  <td>
+                      ${
+                        row.diagnosis_count > 0
+                          ? "<span style='color: green; font-weight: bold;'>診断済み</span>"
+                          : '<button class="btn" onclick="goDiagnosis(' +
+                            row.id +
+                            '); event.stopPropagation();">診断</button>'
+                      }
+                  </td>
+              `;
+
+              tr.onclick = () => goDiagnosis(row.id);
+
+              tbody.appendChild(tr);
+            });
+          });
+      }
+
+      function goDiagnosis(inspection_id) {
+        window.location.href = `die_diagnosis.html?inspection_id=${inspection_id}`;
+      }
+    </script>
+  </body>
+</html>

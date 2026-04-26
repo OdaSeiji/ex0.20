@@ -116,11 +116,23 @@
         color: #fff;
       }
 
-      /* 必須マーク */
+      .btn-save:disabled {
+        background: #9bbbd4;
+        cursor: not-allowed;
+      }
+
       .required {
         color: red;
         font-weight: bold;
         margin-left: 4px;
+      }
+
+      #preview_area img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -137,22 +149,24 @@
       <!-- 基本情報 -->
       <div class="section-title" data-key="section_basic">基本情報</div>
       <table>
-        <tr>
+        <!-- <tr>
           <td data-key="id_label">検査記録ID</td>
           <td><input type="text" value="Auto Numbering" disabled /></td>
         </tr>
         <tr>
           <td data-key="die_id_label">金型ID（die_id）</td>
           <td><input type="text" id="die_id" value="" disabled /></td>
-        </tr>
+        </tr> -->
         <tr>
           <td>
             <span data-key="press_id_label">押出記録ID（press_id）</span>
             <span class="required">*</span>
           </td>
           <td>
-            <select id="press_id">
-              <option data-key="press_select">Select (last 7 days)</option>
+            <select id="press_id" onchange="validateForm()">
+              <option value="" data-key="press_select">
+                Select (last 7 days)
+              </option>
             </select>
           </td>
         </tr>
@@ -166,7 +180,9 @@
             <span data-key="inspection_date_label">検査日</span>
             <span class="required">*</span>
           </td>
-          <td><input type="date" id="inspection_date" /></td>
+          <td>
+            <input type="date" id="inspection_date" onchange="validateForm()" />
+          </td>
         </tr>
         <tr>
           <td>
@@ -174,29 +190,102 @@
             <span class="required">*</span>
           </td>
           <td>
-            <select id="inspected_by">
-              <option data-key="staff_select">Select</option>
+            <select id="inspected_by" onchange="validateForm()">
+              <option value="" data-key="staff_select">Select</option>
             </select>
           </td>
         </tr>
+
+        <!-- 検査結果（全体） -->
         <tr>
           <td>
-            <span data-key="result_label">検査結果</span>
+            <span data-key="result_label">検査結果（全体）</span>
             <span class="required">*</span>
           </td>
           <td>
             <div class="radio-group">
               <label
-                ><input type="radio" name="result" value="OK" />
+                ><input
+                  type="radio"
+                  name="result"
+                  value="OK"
+                  onchange="validateForm()"
+                />
                 <span data-key="ok">OK</span></label
               >
               <label
-                ><input type="radio" name="result" value="NG" />
+                ><input
+                  type="radio"
+                  name="result"
+                  value="NG"
+                  onchange="validateForm()"
+                />
                 <span data-key="ng">NG</span></label
               >
             </div>
           </td>
         </tr>
+
+        <!-- 寸法 -->
+        <tr>
+          <td>
+            <span data-key="dimension_label">寸法</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <div class="radio-group">
+              <label
+                ><input
+                  type="radio"
+                  name="dimension_result"
+                  value="OK"
+                  onchange="validateForm()"
+                />
+                <span data-key="ok">OK</span></label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="dimension_result"
+                  value="NG"
+                  onchange="validateForm()"
+                />
+                <span data-key="ng">NG</span></label
+              >
+            </div>
+          </td>
+        </tr>
+
+        <!-- 形状 -->
+        <tr>
+          <td>
+            <span data-key="shape_label">形状</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <div class="radio-group">
+              <label
+                ><input
+                  type="radio"
+                  name="shape_result"
+                  value="OK"
+                  onchange="validateForm()"
+                />
+                <span data-key="ok">OK</span></label
+              >
+              <label
+                ><input
+                  type="radio"
+                  name="shape_result"
+                  value="NG"
+                  onchange="validateForm()"
+                />
+                <span data-key="ng">NG</span></label
+              >
+            </div>
+          </td>
+        </tr>
+
         <tr>
           <td data-key="comment_label">検査コメント</td>
           <td>
@@ -216,7 +305,26 @@
             <span data-key="file_label">添付ファイル</span>
             <span class="required">*</span>
           </td>
-          <td><input type="file" id="file" /></td>
+          <td>
+            <input
+              type="file"
+              id="file"
+              multiple
+              onchange="
+                previewFiles();
+                validateForm();
+              "
+            />
+            <div
+              id="preview_area"
+              style="
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-top: 10px;
+              "
+            ></div>
+          </td>
         </tr>
       </table>
 
@@ -231,7 +339,13 @@
 
       <!-- 操作ボタン -->
       <div class="buttons">
-        <button class="btn btn-save" onclick="saveData()" data-key="btn_save">
+        <button
+          class="btn btn-save"
+          id="saveBtn"
+          onclick="saveData()"
+          disabled
+          data-key="btn_save"
+        >
           保存
         </button>
         <button
@@ -251,7 +365,69 @@
       </div>
     </div>
 
+    <!-- モーダル -->
+    <div
+      id="imgModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      "
+    >
+      <div
+        style="
+          background: white;
+          padding: 20px;
+          border-radius: 6px;
+          max-width: 90%;
+          max-height: 90%;
+          text-align: center;
+        "
+      >
+        <img
+          id="modalImg"
+          src=""
+          style="max-width: 100%; max-height: 70vh; border-radius: 4px"
+        />
+        <br /><br />
+        <button
+          id="deleteBtn"
+          style="
+            background: #d9534f;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+            margin-right: 10px;
+          "
+        >
+          削除
+        </button>
+
+        <button
+          onclick="closeModal()"
+          style="
+            background: #2b6ca3;
+            color: white;
+            padding: 8px 20px;
+            border: none;
+            border-radius: 4px;
+          "
+        >
+          閉じる
+        </button>
+      </div>
+    </div>
+
     <script>
+      /* 多言語辞書 */
       const dict = {
         ja: {
           title: "🧾 Inspection（検査記録入力）",
@@ -265,7 +441,9 @@
           inspection_date_label: "検査日",
           inspected_by_label: "検査担当者",
           staff_select: "選択してください",
-          result_label: "検査結果",
+          result_label: "検査結果（全体）",
+          dimension_label: "寸法",
+          shape_label: "形状",
           ok: "OK",
           ng: "NG",
           comment_label: "検査コメント",
@@ -292,7 +470,9 @@
           inspection_date_label: "Ngày kiểm tra",
           inspected_by_label: "Người kiểm tra",
           staff_select: "Vui lòng chọn",
-          result_label: "Kết quả kiểm tra",
+          result_label: "Kết quả kiểm tra (tổng thể)",
+          dimension_label: "Kích thước",
+          shape_label: "Hình dạng",
           ok: "OK",
           ng: "NG",
           comment_label: "Ghi chú kiểm tra",
@@ -308,6 +488,7 @@
         },
       };
 
+      /* 言語切り替え */
       function setLang(lang) {
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
@@ -316,12 +497,14 @@
         localStorage.setItem("lang", lang);
       }
 
+      /* 初期処理 */
       window.onload = () => {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
         loadInitialData();
       };
 
+      /* 初期データ読み込み */
       function loadInitialData() {
         fetch("./php/die_inspection_php/load_inspection_data.php")
           .then((res) => res.json())
@@ -344,6 +527,88 @@
           });
       }
 
+      /* サムネイル表示 */
+      let currentFile = null;
+
+      function previewFile() {
+        const file = document.getElementById("file").files[0];
+        const preview = document.getElementById("preview_area");
+        preview.innerHTML = "";
+        currentFile = null;
+
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+          const div = document.createElement("div");
+          div.textContent = file.name;
+          preview.appendChild(div);
+          return;
+        }
+
+        currentFile = file;
+        const reader = new FileReader();
+        reader.onload = function (event) {
+          const img = document.createElement("img");
+          img.src = event.target.result;
+          img.onclick = () => openModal(event.target.result);
+          preview.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      /* モーダル */
+      function openModal(src) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("imgModal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("imgModal").style.display = "none";
+      }
+
+      document.getElementById("deleteBtn").onclick = function () {
+        document.getElementById("file").value = "";
+        document.getElementById("preview_area").innerHTML = "";
+        currentFile = null;
+        closeModal();
+        validateForm();
+      };
+
+      /* 必須項目チェック */
+      function validateForm() {
+        const press_id = document.getElementById("press_id").value;
+        const inspection_date =
+          document.getElementById("inspection_date").value;
+        const inspected_by = document.getElementById("inspected_by").value;
+        const file = document.getElementById("file").files.length;
+
+        const result = document.querySelector("input[name='result']:checked");
+        const dimension = document.querySelector(
+          "input[name='dimension_result']:checked",
+        );
+        const shape = document.querySelector(
+          "input[name='shape_result']:checked",
+        );
+
+        const saveBtn = document.getElementById("saveBtn");
+
+        if (
+          press_id &&
+          inspection_date &&
+          inspected_by &&
+          file > 0 &&
+          result &&
+          dimension &&
+          shape
+        ) {
+          saveBtn.disabled = false;
+        } else {
+          saveBtn.disabled = true;
+        }
+      }
+
+      /* 保存処理 */
+      /* 保存処理（複数ファイル対応） */
       function saveData() {
         const press_id = document.getElementById("press_id").value;
         const inspection_date =
@@ -351,21 +616,30 @@
         const inspected_by = document.getElementById("inspected_by").value;
         const inspection_comment =
           document.getElementById("inspection_comment").value;
-        const file = document.getElementById("file").files[0];
 
         const result = document.querySelector("input[name='result']:checked");
-        if (!result) {
-          alert("検査結果を選択してください");
-          return;
-        }
+        const dimension = document.querySelector(
+          "input[name='dimension_result']:checked",
+        );
+        const shape = document.querySelector(
+          "input[name='shape_result']:checked",
+        );
+
+        const files = document.getElementById("file").files;
 
         const formData = new FormData();
         formData.append("press_id", press_id);
         formData.append("inspection_date", inspection_date);
         formData.append("inspected_by", inspected_by);
         formData.append("inspection_result", result.value);
+        formData.append("dimension_result", dimension.value);
+        formData.append("shape_result", shape.value);
         formData.append("inspection_comment", inspection_comment);
-        formData.append("file", file);
+
+        // ★ 複数ファイルを送信
+        for (let i = 0; i < files.length; i++) {
+          formData.append("file[]", files[i]);
+        }
 
         fetch("./php/die_inspection_php/save_inspection.php", {
           method: "POST",
@@ -379,7 +653,75 @@
             } else {
               alert("エラー: " + data.message);
             }
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("通信エラーが発生しました");
           });
+      }
+
+      // 複数プレビュー対応
+      function previewFiles() {
+        const files = document.getElementById("file").files;
+        const preview = document.getElementById("preview_area");
+        preview.innerHTML = "";
+
+        Array.from(files).forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const box = document.createElement("div");
+            box.style.position = "relative";
+
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.style.width = "120px";
+            img.style.height = "120px";
+            img.style.objectFit = "cover";
+            img.style.border = "1px solid #ccc";
+            img.style.borderRadius = "6px";
+            img.style.cursor = "pointer";
+
+            img.onclick = () => openPreviewModal(e.target.result);
+
+            // 削除ボタン
+            const del = document.createElement("button");
+            del.textContent = "×";
+            del.style.position = "absolute";
+            del.style.top = "0";
+            del.style.right = "0";
+            del.style.background = "red";
+            del.style.color = "white";
+            del.style.border = "none";
+            del.style.borderRadius = "50%";
+            del.style.cursor = "pointer";
+
+            del.onclick = () => removeFile(index);
+
+            box.appendChild(img);
+            box.appendChild(del);
+            preview.appendChild(box);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      // 選択した画像を削除する
+      function removeFile(index) {
+        const input = document.getElementById("file");
+        const dt = new DataTransfer();
+
+        Array.from(input.files)
+          .filter((_, i) => i !== index)
+          .forEach((f) => dt.items.add(f));
+
+        input.files = dt.files;
+
+        previewFiles();
+        validateForm();
+      }
+      // 既存モーダルを使用する
+      function openPreviewModal(src) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("imgModal").style.display = "flex";
       }
     </script>
   </body>

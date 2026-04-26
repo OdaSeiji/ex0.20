@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Diagnosis List（診断一覧）</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background: #e8f1ff;
+        font-weight: bold;
+      }
+
+      tr:hover {
+        background: #f0f8ff;
+        cursor: pointer;
+      }
+
+      .btn {
+        padding: 6px 12px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: white;
+      }
+
+      .approve {
+        background: #28a745;
+      }
+      .reject {
+        background: #dc3545;
+      }
+
+      .pending {
+        color: orange;
+        font-weight: bold;
+      }
+      .approved {
+        color: green;
+        font-weight: bold;
+      }
+      .rejected {
+        color: red;
+        font-weight: bold;
+      }
+
+      #detailPanel {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #fafafa;
+        display: none;
+      }
+
+      #detailPanel h3 {
+        margin-top: 0;
+      }
+
+      .thumb {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      /* モーダル */
+      #modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      #modalContent {
+        position: relative;
+        text-align: center;
+      }
+
+      #modalImg {
+        max-width: 90vw;
+        max-height: 80vh;
+        border-radius: 10px;
+      }
+
+      .modal-btn {
+        padding: 10px 15px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .close-btn {
+        background: #dc3545;
+        margin-top: 15px;
+      }
+
+      .nav-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+
+      #prevBtn {
+        left: -60px;
+      }
+      #nextBtn {
+        right: -60px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ★ 上部バー（戻る＋言語切替） -->
+    <div
+      style="display: flex; justify-content: space-between; margin-bottom: 15px"
+    >
+      <button
+        onclick="location.href = 'index.html'"
+        style="
+          background: #2b6ca3;
+          color: white;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 4px;
+          cursor: pointer;
+        "
+      >
+        ← <span data-key="back_top">トップへ戻る</span>
+      </button>
+
+      <div>
+        <button
+          onclick="setLang('ja')"
+          style="
+            background: #2b6ca3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+          "
+        >
+          日本語
+        </button>
+        <button
+          onclick="setLang('vi')"
+          style="
+            background: #2b6ca3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 6px;
+          "
+        >
+          Tiếng Việt
+        </button>
+      </div>
+    </div>
+
+    <script>
+      /* -------------------------
+         言語辞書
+      ------------------------- */
+      const dict = {
+        ja: {
+          title: "📝 Diagnosis List（診断一覧）",
+          col_date: "診断日",
+          col_die: "金型番号",
+          col_inspection: "検査日",
+          col_staff: "診断者",
+          col_result: "診断結果",
+          col_status: "承認状態",
+          col_action: "操作",
+
+          detail_title: "診断詳細",
+          detail_date: "診断日:",
+          detail_die: "金型番号:",
+          detail_inspection: "検査日:",
+          detail_staff: "診断者:",
+          detail_result: "診断結果:",
+          detail_comment: "コメント:",
+          detail_attach: "添付ファイル",
+
+          btn_close: "閉じる",
+          back_top: "トップへ戻る",
+
+          status_pending: "未承認",
+          status_approved: "承認済み",
+          status_rejected: "差戻し",
+
+          btn_approve: "承認",
+          btn_reject: "差戻し",
+        },
+
+        vi: {
+          title: "📝 Danh sách chẩn đoán",
+          col_date: "Ngày chẩn đoán",
+          col_die: "Số khuôn",
+          col_inspection: "Ngày kiểm tra",
+          col_staff: "Người chẩn đoán",
+          col_result: "Kết quả",
+          col_status: "Trạng thái",
+          col_action: "Thao tác",
+
+          detail_title: "Chi tiết chẩn đoán",
+          detail_date: "Ngày chẩn đoán:",
+          detail_die: "Số khuôn:",
+          detail_inspection: "Ngày kiểm tra:",
+          detail_staff: "Người chẩn đoán:",
+          detail_result: "Kết quả:",
+          detail_comment: "Ghi chú:",
+          detail_attach: "Tệp đính kèm",
+
+          btn_close: "Đóng",
+          back_top: "Về trang chủ",
+
+          status_pending: "Chưa duyệt",
+          status_approved: "Đã duyệt",
+          status_rejected: "Trả lại",
+
+          btn_approve: "Duyệt",
+          btn_reject: "Trả lại",
+        },
+      };
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          el.textContent = dict[lang][key];
+        });
+
+        localStorage.setItem("diagnosis_lang", lang);
+      }
+
+      // 初期言語設定
+      (function () {
+        const saved = localStorage.getItem("diagnosis_lang") || "ja";
+        setLang(saved);
+      })();
+    </script>
+
+    <script>
+      // ★ 管理者キー認証
+      let isAdmin = false;
+
+      (function () {
+        const url = new URL(window.location.href);
+        const key = url.searchParams.get("key");
+
+        const ADMIN_KEY = "ADMIN_KEY_2026";
+
+        if (key === ADMIN_KEY) {
+          isAdmin = true;
+        }
+      })();
+    </script>
+
+    <div class="container">
+      <h1 data-key="title">📝 Diagnosis List（診断一覧）</h1>
+
+      <table id="diagnosisTable">
+        <thead>
+          <tr>
+            <th data-key="col_date">診断日</th>
+            <th data-key="col_die">金型番号</th>
+            <th data-key="col_inspection">検査日</th>
+            <th data-key="col_staff">診断者</th>
+            <th data-key="col_result">診断結果</th>
+            <th data-key="col_status">承認状態</th>
+            <th data-key="col_action">操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <!-- ▼ 診断詳細パネル ▼ -->
+      <div id="detailPanel">
+        <h3 data-key="detail_title">診断詳細</h3>
+        <p>
+          <strong data-key="detail_date">診断日:</strong>
+          <span id="detail_date"></span>
+        </p>
+        <p>
+          <strong data-key="detail_die">金型番号:</strong>
+          <span id="detail_die"></span>
+        </p>
+        <p>
+          <strong data-key="detail_inspection">検査日:</strong>
+          <span id="detail_inspection"></span>
+        </p>
+        <p>
+          <strong data-key="detail_staff">診断者:</strong>
+          <span id="detail_staff"></span>
+        </p>
+        <p>
+          <strong data-key="detail_result">診断結果:</strong>
+          <span id="detail_result"></span>
+        </p>
+        <p>
+          <strong data-key="detail_comment">コメント:</strong><br />
+          <span id="detail_comment"></span>
+        </p>
+
+        <h3 data-key="detail_attach">添付ファイル</h3>
+        <div id="attachmentArea"></div>
+      </div>
+    </div>
+
+    <!-- モーダル -->
+    <div id="modal">
+      <div id="modalContent">
+        <button id="prevBtn" class="modal-btn nav-btn" onclick="prevImage()">
+          ◀
+        </button>
+        <img id="modalImg" src="" />
+        <button id="nextBtn" class="modal-btn nav-btn" onclick="nextImage()">
+          ▶
+        </button>
+        <br />
+        <button
+          class="modal-btn close-btn"
+          onclick="closeModal()"
+          data-key="btn_close"
+        >
+          閉じる
+        </button>
+      </div>
+    </div>
+
+    <script>
+      window.onload = function () {
+        loadDiagnosisList();
+      };
+
+      function loadDiagnosisList() {
+        fetch("./php/die_inspection_php/load_diagnosis_list.php")
+          .then((res) => res.json())
+          .then((data) => {
+            const tbody = document.querySelector("#diagnosisTable tbody");
+            tbody.innerHTML = "";
+
+            const lang = localStorage.getItem("diagnosis_lang") || "ja";
+
+            data.forEach((row) => {
+              const tr = document.createElement("tr");
+
+              let statusLabel = "";
+              if (row.approval_status === "pending") {
+                statusLabel = `<span class='pending'>${dict[lang].status_pending}</span>`;
+              } else if (row.approval_status === "approved") {
+                statusLabel = `<span class='approved'>${dict[lang].status_approved}</span>`;
+              } else if (row.approval_status === "rejected") {
+                statusLabel = `<span class='rejected'>${dict[lang].status_rejected}</span>`;
+              }
+
+              tr.innerHTML = `
+                    <td>${row.diagnosis_date}</td>
+                    <td>${row.die_number}</td>
+                    <td>${row.inspection_date}</td>
+                    <td>${row.staff_name}</td>
+                    <td>${row.diagnosis_result}</td>
+                    <td>${statusLabel}</td>
+                    <td>
+                        ${
+                          isAdmin
+                            ? row.approval_status === "pending"
+                              ? `
+                                    <button class="btn approve" onclick="approve(${row.id}); event.stopPropagation();">${dict[lang].btn_approve}</button>
+                                    <button class="btn reject" onclick="reject(${row.id}); event.stopPropagation();">${dict[lang].btn_reject}</button>
+                                  `
+                              : "-"
+                            : "-"
+                        }
+                    </td>
+                `;
+
+              tr.addEventListener("click", () => {
+                showDetail(row);
+              });
+
+              tbody.appendChild(tr);
+            });
+          });
+      }
+
+      function showDetail(row) {
+        document.getElementById("detail_date").textContent = row.diagnosis_date;
+        document.getElementById("detail_die").textContent = row.die_number;
+        document.getElementById("detail_inspection").textContent =
+          row.inspection_date;
+        document.getElementById("detail_staff").textContent = row.staff_name;
+        document.getElementById("detail_result").textContent =
+          row.diagnosis_result;
+        document.getElementById("detail_comment").textContent =
+          row.diagnosis_comment;
+
+        document.getElementById("detailPanel").style.display = "block";
+
+        loadAttachments(row.id);
+      }
+
+      /* 添付ファイル読み込み */
+      let modalImages = [];
+      let modalIndex = 0;
+
+      function loadAttachments(diagnosis_id) {
+        fetch(
+          `./php/die_inspection_php/get_diagnosis_attachments.php?diagnosis_id=${diagnosis_id}`,
+        )
+          .then((res) => res.json())
+          .then((files) => {
+            const area = document.getElementById("attachmentArea");
+            area.innerHTML = "";
+
+            modalImages = [];
+
+            files.forEach((f, index) => {
+              const imgPath = `./uploads/diagnosis/${f.diagnosis_id}/${f.file_name}`;
+              modalImages.push(imgPath);
+
+              const img = document.createElement("img");
+              img.src = imgPath;
+              img.className = "thumb";
+
+              img.onclick = () => openModal(index);
+
+              area.appendChild(img);
+            });
+          });
+      }
+
+      /* モーダル制御 */
+      function openModal(index) {
+        modalIndex = index;
+        document.getElementById("modalImg").src = modalImages[modalIndex];
+        document.getElementById("modal").style.display = "flex";
+      }
+
+      function closeModal() {
+        document.getElementById("modal").style.display = "none";
+      }
+
+      function nextImage() {
+        if (modalImages.length === 0) return;
+        modalIndex = (modalIndex + 1) % modalImages.length;
+        document.getElementById("modalImg").src = modalImages[modalIndex];
+      }
+
+      function prevImage() {
+        if (modalImages.length === 0) return;
+        modalIndex = (modalIndex - 1 + modalImages.length) % modalImages.length;
+        document.getElementById("modalImg").src = modalImages[modalIndex];
+      }
+
+      /* 承認・差戻し */
+      function approve(id) {
+        const lang = localStorage.getItem("diagnosis_lang") || "ja";
+        if (!confirm(dict[lang].btn_approve + "しますか？")) return;
+
+        fetch("./php/die_inspection_php/approve_diagnosis.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `id=${id}&admin_id=1`,
+        })
+          .then((res) => res.json())
+          .then(() => loadDiagnosisList());
+      }
+
+      function reject(id) {
+        const lang = localStorage.getItem("diagnosis_lang") || "ja";
+        if (!confirm(dict[lang].btn_reject + "しますか？")) return;
+
+        fetch("./php/die_inspection_php/reject_diagnosis.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `id=${id}&admin_id=1`,
+        })
+          .then((res) => res.json())
+          .then(() => loadDiagnosisList());
+      }
+    </script>
+  </body>
+</html>
+<!-- old -->

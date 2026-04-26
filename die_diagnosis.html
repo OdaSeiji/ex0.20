@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Diagnosis</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        margin-top: 25px;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #0078d4;
+        padding-bottom: 5px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+      }
+
+      table td {
+        padding: 10px;
+        vertical-align: top;
+      }
+
+      table td:first-child {
+        width: 240px;
+        font-weight: bold;
+        background: #f0f6ff;
+      }
+
+      textarea {
+        width: 100%;
+        height: 100px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        resize: vertical;
+      }
+
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        padding-top: 8px;
+      }
+
+      .buttons {
+        margin-top: 25px;
+        display: flex;
+        gap: 15px;
+      }
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-save {
+        background: #0078d4;
+        color: #fff;
+      }
+      .btn-back {
+        background: #666;
+        color: #fff;
+      }
+
+      .required {
+        color: red;
+        font-weight: bold;
+        margin-left: 4px;
+      }
+
+      #preview_area img,
+      #inspection_images img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .history-box {
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <button
+        onclick="location.href = 'die_inspection_list.html'"
+        style="
+          background: #2b6ca3;
+          color: white;
+          padding: 8px 16px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          float: right;
+        "
+      >
+        ← 検査一覧へ戻る
+      </button>
+
+      <h1 data-key="title">🩺 Diagnosis（診断）</h1>
+
+      <!-- ① Inspection Information -->
+      <div class="section-title" data-key="section_inspection">検査情報</div>
+      <table>
+        <tr>
+          <td data-key="date_label">検査日</td>
+          <td id="inspection_date"></td>
+        </tr>
+        <tr>
+          <td data-key="die_label">金型番号</td>
+          <td id="die_number"></td>
+        </tr>
+        <tr>
+          <td data-key="result_label">検査結果</td>
+          <td id="inspection_result"></td>
+        </tr>
+        <tr>
+          <td data-key="dimension_label">寸法</td>
+          <td id="dimension_result"></td>
+        </tr>
+        <tr>
+          <td data-key="shape_label">形状</td>
+          <td id="shape_result"></td>
+        </tr>
+        <tr>
+          <td data-key="comment_label">検査コメント</td>
+          <td id="inspection_comment"></td>
+        </tr>
+
+        <!-- ★ Inspection Images -->
+        <tr>
+          <td data-key="inspection_images_label">検査画像</td>
+          <td>
+            <div
+              id="inspection_images"
+              style="display: flex; gap: 10px; flex-wrap: wrap"
+            ></div>
+          </td>
+        </tr>
+      </table>
+
+      <!-- ② Press Information -->
+      <div class="section-title" data-key="section_press">押出情報（実績）</div>
+      <table>
+        <tr>
+          <td>Press Date</td>
+          <td id="press_date_at"></td>
+        </tr>
+        <tr>
+          <td>Press Start</td>
+          <td id="press_start_at"></td>
+        </tr>
+        <tr>
+          <td>Press Finish</td>
+          <td id="press_finish_at"></td>
+        </tr>
+        <tr>
+          <td>Actual Ram Speed</td>
+          <td id="actual_ram_speed"></td>
+        </tr>
+        <tr>
+          <td>Pressing Type</td>
+          <td id="pressing_type"></td>
+        </tr>
+        <tr>
+          <td>Actual Billet Qty</td>
+          <td id="actual_billet_qty"></td>
+        </tr>
+      </table>
+
+      <!-- ③ Press Directive -->
+      <div class="section-title" data-key="section_directive">
+        押出指示（計画値）
+      </div>
+      <table>
+        <tr>
+          <td>Discard Thickness</td>
+          <td id="discard_thickness"></td>
+        </tr>
+        <tr>
+          <td>Directive Ram Speed</td>
+          <td id="directive_ram_speed"></td>
+        </tr>
+        <tr>
+          <td>Billet Temperature</td>
+          <td id="billet_temperature"></td>
+        </tr>
+        <tr>
+          <td>Billet Taper Heating</td>
+          <td id="billet_taper_heating"></td>
+        </tr>
+        <tr>
+          <td>Die Temperature</td>
+          <td id="die_temperature"></td>
+        </tr>
+        <tr>
+          <td>Die Heating Time</td>
+          <td id="die_heating_time"></td>
+        </tr>
+        <tr>
+          <td>Stretch Ratio</td>
+          <td id="stretch_ratio"></td>
+        </tr>
+      </table>
+
+      <!-- ④ Diagnosis Input -->
+      <div class="section-title" data-key="section_diagnosis">診断入力</div>
+      <table>
+        <tr>
+          <td>
+            <span data-key="diag_result_label">診断結果</span>
+            <span class="required">*</span>
+          </td>
+          <td>
+            <div class="radio-group">
+              <label
+                ><input type="radio" name="diagnosis_result" value="OK" />
+                <span data-key="ok">OK</span></label
+              >
+              <label
+                ><input type="radio" name="diagnosis_result" value="NG" />
+                <span data-key="ng">NG</span></label
+              >
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td data-key="diag_staff_label">診断者</td>
+          <td>
+            <select id="diagnosed_by" name="diagnosed_by" required>
+              <option value="">選択してください</option>
+            </select>
+          </td>
+        </tr>
+
+        <tr>
+          <td data-key="diag_comment_label">診断コメント</td>
+          <td><textarea id="diagnosis_comment"></textarea></td>
+        </tr>
+
+        <tr>
+          <td data-key="file_label">添付ファイル</td>
+          <td>
+            <!-- <input type="file" id="file" multiple /> -->
+            <input
+              type="file"
+              id="diagnosis_images"
+              name="files[]"
+              multiple
+              onchange="
+                previewDiagnosisFiles();
+                validateForm();
+              "
+            />
+
+            <div
+              id="diagnosis_preview_area"
+              style="
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-top: 10px;
+              "
+            ></div>
+          </td>
+        </tr>
+      </table>
+
+      <div class="buttons">
+        <button
+          class="btn btn-save"
+          onclick="saveDiagnosis()"
+          data-key="btn_save"
+        >
+          保存
+        </button>
+        <button
+          class="btn btn-back"
+          onclick="history.back()"
+          data-key="btn_back"
+        >
+          戻る
+        </button>
+      </div>
+
+      <!-- ⑤ Diagnosis History -->
+      <div class="section-title" data-key="section_history">過去の診断履歴</div>
+      <div id="history_area"></div>
+    </div>
+
+    <!-- ★ Modal for image preview -->
+    <div
+      id="imgModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <img
+        id="modalImage"
+        style="
+          max-width: 90%;
+          max-height: 90%;
+          border-radius: 8px;
+          box-shadow: 0 0 10px #000;
+        "
+      />
+    </div>
+
+    <!-- ★ Issue 登録モーダル -->
+    <div
+      id="issueModal"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: white;
+          width: 420px;
+          padding: 20px;
+          border-radius: 8px;
+        "
+      >
+        <h3>Issue 登録</h3>
+
+        <label>Issue Title<span style="color: red">*</span></label>
+        <label>Issue 種類</label>
+        <select id="issue_title" style="width: 100%; padding: 6px">
+          <option value="新型立上">新型立上</option>
+          <option value="量産型修理">量産型修理</option>
+        </select>
+
+        <label>Issue Description</label>
+        <textarea
+          id="issue_description"
+          style="width: 100%; height: 80px"
+        ></textarea>
+
+        <label>Priority</label>
+        <select id="issue_priority" style="width: 100%; padding: 6px">
+          <option value="1">High</option>
+          <option value="2" selected>Medium</option>
+          <option value="3">Low</option>
+        </select>
+
+        <div style="margin-top: 15px; text-align: right">
+          <button
+            onclick="closeIssueModal()"
+            style="
+              padding: 8px 14px;
+              background: #777;
+              color: white;
+              border: none;
+              border-radius: 5px;
+            "
+          >
+            キャンセル
+          </button>
+
+          <button
+            onclick="saveIssueFromModal()"
+            style="
+              padding: 8px 14px;
+              background: #0078d4;
+              color: white;
+              border: none;
+              border-radius: 5px;
+            "
+          >
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // URL パラメータ取得
+      const url = new URL(window.location.href);
+      const inspection_id = url.searchParams.get("inspection_id");
+      let die_id = url.searchParams.get("die_id");
+
+      /* 多言語辞書 */
+      const dict = {
+        ja: {
+          title: "🩺 Diagnosis（診断）",
+          section_inspection: "検査情報",
+          section_press: "押出情報（実績）",
+          section_directive: "押出指示（計画値）",
+          section_diagnosis: "診断入力",
+          section_history: "過去の診断履歴",
+
+          date_label: "検査日",
+          die_label: "金型番号",
+          result_label: "検査結果",
+          dimension_label: "寸法",
+          shape_label: "形状",
+          comment_label: "検査コメント",
+          inspection_images_label: "検査画像",
+
+          diag_result_label: "診断結果",
+          diag_staff_label: "診断者",
+          diag_comment_label: "診断コメント",
+          file_label: "添付ファイル",
+
+          ok: "OK",
+          ng: "NG",
+
+          btn_save: "保存",
+          btn_back: "戻る",
+        },
+        vi: {
+          title: "🩺 Chẩn đoán",
+          section_inspection: "Thông tin kiểm tra",
+          section_press: "Thông tin ép (thực tế)",
+          section_directive: "Chỉ thị ép (kế hoạch)",
+          section_diagnosis: "Nhập chẩn đoán",
+          section_history: "Lịch sử chẩn đoán",
+
+          date_label: "Ngày kiểm tra",
+          die_label: "Mã khuôn",
+          result_label: "Kết quả kiểm tra",
+          dimension_label: "Kích thước",
+          shape_label: "Hình dạng",
+          comment_label: "Ghi chú kiểm tra",
+          inspection_images_label: "Hình kiểm tra",
+
+          diag_result_label: "Kết quả chẩn đoán",
+          diag_staff_label: "Người chẩn đoán",
+          diag_comment_label: "Ghi chú chẩn đoán",
+          file_label: "Tệp đính kèm",
+
+          ok: "OK",
+          ng: "NG",
+
+          btn_save: "Lưu",
+          btn_back: "Quay lại",
+        },
+      };
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          el.textContent = dict[lang][key];
+        });
+        localStorage.setItem("lang", lang);
+      }
+
+      window.onload = function () {
+        const saved = localStorage.getItem("lang") || "ja";
+        setLang(saved);
+
+        loadDiagnosisData();
+        loadStaffList(); // ★ 診断者プルダウンをロード
+      };
+
+      /* ★ 診断者一覧をロード */
+      function loadStaffList() {
+        fetch("./php/die_inspection_php/get_staff_list.php")
+          .then((res) => res.json())
+          .then((data) => {
+            const select = document.getElementById("diagnosed_by");
+            select.innerHTML = '<option value="">選択してください</option>';
+
+            data.forEach((staff) => {
+              const opt = document.createElement("option");
+              opt.value = staff.id;
+              opt.textContent = staff.staff_name;
+              select.appendChild(opt);
+            });
+          })
+          .catch((err) => console.error("loadStaffList error:", err));
+      }
+
+      /* ★ モーダル表示 */
+      function showModal(src) {
+        const modal = document.getElementById("imgModal");
+        const modalImg = document.getElementById("modalImage");
+
+        modalImg.src = src;
+        modal.style.display = "flex";
+
+        modal.onclick = () => {
+          modal.style.display = "none";
+        };
+      }
+      /* ★ Issue モーダル制御 */
+      function closeIssueModal() {
+        document.getElementById("issueModal").style.display = "none";
+      }
+
+      /* ★ NG 時の Issue チェック → モーダル表示 */
+      function saveDiagnosis() {
+        const result = document.querySelector(
+          "input[name='diagnosis_result']:checked",
+        );
+        if (!result) {
+          alert("診断結果を選択してください");
+          return;
+        }
+
+        const diagnosis_result = result.value;
+
+        if (diagnosis_result === "NG") {
+          fetch("./php/die_inspection_php/issue_check.php?die_id=" + die_id)
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.need_new_issue === true) {
+                document.getElementById("issueModal").style.display = "flex";
+              } else {
+                saveDiagnosisToDB(data.issue_id);
+              }
+            });
+        } else {
+          saveDiagnosisToDB(null);
+        }
+      }
+      /* ★ Issue モーダルから保存 */
+      function saveIssueFromModal() {
+        const title = document.getElementById("issue_title").value;
+        const desc = document.getElementById("issue_description").value;
+        const priority = document.getElementById("issue_priority").value;
+
+        if (title.trim() === "") {
+          alert("Issue Title は必須です");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("die_id", die_id);
+        formData.append("issue_title", title);
+        formData.append("issue_description", desc);
+        formData.append("priority", priority);
+
+        fetch("./php/die_inspection_php/save_issue_from_modal.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "ok") {
+              saveDiagnosisToDB(data.issue_id);
+            } else {
+              alert("Issue 登録に失敗しました");
+            }
+          });
+      }
+      /* ★ Diagnosis 保存 */
+      function saveDiagnosisToDB(issue_id) {
+        console.log("saveDiagnosis 内の die_id =", die_id);
+
+        const formData = new FormData();
+        formData.append("inspection_id", inspection_id);
+        formData.append("die_id", die_id);
+        formData.append(
+          "diagnosis_result",
+          document.querySelector("input[name='diagnosis_result']:checked")
+            .value,
+        );
+        formData.append(
+          "diagnosis_comment",
+          document.getElementById("diagnosis_comment").value,
+        );
+        formData.append(
+          "diagnosed_by",
+          document.getElementById("diagnosed_by").value,
+        ); // ★ 追加
+        formData.append("issue_id", issue_id);
+
+        const files = document.getElementById("diagnosis_images").files;
+        for (let i = 0; i < files.length; i++) {
+          formData.append("files[]", files[i]);
+        }
+
+        fetch("./php/die_inspection_php/save_diagnosis.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            alert("診断を保存しました");
+            location.reload();
+          });
+      }
+      /* ★ loadDiagnosisData */
+      function loadDiagnosisData() {
+        fetch(
+          "./php/die_inspection_php/load_diagnosis_data.php?inspection_id=" +
+            inspection_id,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            die_id = data.inspection.die_id;
+
+            // ① Inspection
+            document.getElementById("inspection_date").textContent =
+              data.inspection.inspection_date;
+            document.getElementById("inspection_result").textContent =
+              data.inspection.inspection_result;
+            document.getElementById("dimension_result").textContent =
+              data.inspection.dimension_result;
+            document.getElementById("shape_result").textContent =
+              data.inspection.shape_result;
+            document.getElementById("inspection_comment").textContent =
+              data.inspection.inspection_comment;
+            document.getElementById("die_number").textContent =
+              data.inspection.die_number;
+
+            // 画像
+            const imgArea = document.getElementById("inspection_images");
+            imgArea.innerHTML = "";
+            data.inspection_images.forEach((path) => {
+              const img = document.createElement("img");
+              img.src = path;
+              img.onclick = () => showModal(path);
+              imgArea.appendChild(img);
+            });
+
+            // ② Press
+            document.getElementById("press_date_at").textContent =
+              data.press.press_date_at;
+            document.getElementById("press_start_at").textContent =
+              data.press.press_start_at;
+            document.getElementById("press_finish_at").textContent =
+              data.press.press_finish_at;
+            document.getElementById("actual_ram_speed").textContent =
+              data.press.actual_ram_speed;
+            document.getElementById("pressing_type").textContent =
+              data.press.pressing_type_id;
+            document.getElementById("actual_billet_qty").textContent =
+              data.press.actual_billet_quantities;
+
+            // ③ Directive
+            document.getElementById("discard_thickness").textContent =
+              data.directive.discard_thickness;
+            document.getElementById("directive_ram_speed").textContent =
+              data.directive.ram_speed;
+            document.getElementById("billet_temperature").textContent =
+              data.directive.billet_temperature;
+            document.getElementById("billet_taper_heating").textContent =
+              data.directive.billet_taper_heating;
+            document.getElementById("die_temperature").textContent =
+              data.directive.die_temperature;
+            document.getElementById("die_heating_time").textContent =
+              data.directive.die_heating_time;
+            document.getElementById("stretch_ratio").textContent =
+              data.directive.stretch_ratio;
+
+            // ④ History
+            const historyArea = document.getElementById("history_area");
+            historyArea.innerHTML = "";
+
+            data.history.forEach((h) => {
+              const box = document.createElement("div");
+              box.className = "history-box";
+              box.innerHTML = `
+              <b>${h.diagnosis_result}</b> (${h.created_at})<br>
+              Issue ID: ${h.issue_id ?? "なし"}<br>
+              ${h.diagnosis_comment}
+          `;
+              historyArea.appendChild(box);
+            });
+          })
+          .catch((err) => {
+            console.error("loadDiagnosisData error:", err);
+            alert("データ読み込みに失敗しました");
+          });
+      }
+
+      // 複数サムネイル表示
+      function previewDiagnosisFiles() {
+        const files = document.getElementById("diagnosis_images").files;
+        const preview = document.getElementById("diagnosis_preview_area");
+        preview.innerHTML = "";
+
+        Array.from(files).forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const box = document.createElement("div");
+            box.style.position = "relative";
+
+            const img = document.createElement("img");
+            img.src = e.target.result;
+            img.style.width = "120px";
+            img.style.height = "120px";
+            img.style.objectFit = "cover";
+            img.style.border = "1px solid #ccc";
+            img.style.borderRadius = "6px";
+            img.style.cursor = "pointer";
+
+            img.onclick = () => openDiagnosisModal(e.target.result);
+
+            // 削除ボタン
+            const del = document.createElement("button");
+            del.textContent = "×";
+            del.style.position = "absolute";
+            del.style.top = "0";
+            del.style.right = "0";
+            del.style.background = "red";
+            del.style.color = "white";
+            del.style.border = "none";
+            del.style.borderRadius = "50%";
+            del.style.cursor = "pointer";
+
+            del.onclick = () => removeDiagnosisFile(index);
+
+            box.appendChild(img);
+            box.appendChild(del);
+            preview.appendChild(box);
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      // 選択した画像を削除
+      function removeDiagnosisFile(index) {
+        const input = document.getElementById("diagnosis_images");
+        const dt = new DataTransfer();
+
+        Array.from(input.files)
+          .filter((_, i) => i !== index)
+          .forEach((f) => dt.items.add(f));
+
+        input.files = dt.files;
+
+        previewDiagnosisFiles();
+        validateForm();
+      }
+      // モーダル表示
+      function openDiagnosisModal(src) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("imgModal").style.display = "flex";
+      }
+    </script>
+  </body>
+</html>
