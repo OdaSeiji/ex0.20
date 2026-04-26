@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420">
+
+  <!-- Styles -->
+  <style>
+    .table-box { fill:#ffffff; stroke:#333333; stroke-width:1.2; }
+    .table-header { fill:#e0f0ff; font-weight:bold; }
+    .table-header-green { fill:#e4f7e4; font-weight:bold; }
+    .table-header-orange { fill:#ffe9d6; font-weight:bold; }
+    .table-title { font-family:Segoe UI, sans-serif; font-size:14px; }
+    .table-text { font-family:Segoe UI, sans-serif; font-size:12px; }
+    .pk { font-weight:bold; }
+    .fk { fill:#0066aa; }
+    .label { font-family:Segoe UI, sans-serif; font-size:11px; fill:#333333; }
+    .card-line { stroke:#333333; stroke-width:1.2; marker-end:url(#arrow); }
+  </style>
+
+  <!-- Arrow marker -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4"
+            orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,4 L0,8 z" fill="#333333" />
+    </marker>
+  </defs>
+
+  <!-- t_die_inspection -->
+  <g transform="translate(40,40)">
+    <!-- box -->
+    <rect x="0" y="0" width="280" height="220" class="table-box" rx="4" ry="4"/>
+    <!-- header -->
+    <rect x="0" y="0" width="280" height="30" class="table-header"/>
+    <text x="10" y="20" class="table-title">t_die_inspection</text>
+
+    <!-- fields -->
+    <text x="10" y="55" class="table-text pk">id (PK)</text>
+    <text x="10" y="75" class="table-text fk">die_id (FK)</text>
+    <text x="10" y="95" class="table-text fk">press_id (FK)</text>
+    <text x="10" y="115" class="table-text">inspection_date</text>
+    <text x="10" y="135" class="table-text">inspected_by (FK)</text>
+    <text x="10" y="155" class="table-text">inspection_result</text>
+    <text x="10" y="175" class="table-text">inspection_comment</text>
+    <text x="10" y="195" class="table-text">created_at</text>
+    <text x="10" y="215" class="table-text">updated_at</text>
+  </g>
+
+  <!-- t_die_diagnosis -->
+  <g transform="translate(360,40)">
+    <!-- box -->
+    <rect x="0" y="0" width="280" height="220" class="table-box" rx="4" ry="4"/>
+    <!-- header -->
+    <rect x="0" y="0" width="280" height="30" class="table-header-green"/>
+    <text x="10" y="20" class="table-title">t_die_diagnosis</text>
+
+    <!-- fields -->
+    <text x="10" y="55" class="table-text pk">id (PK)</text>
+    <text x="10" y="75" class="table-text fk">inspection_id (FK)</text>
+    <text x="10" y="95" class="table-text">diagnosis_date</text>
+    <text x="10" y="115" class="table-text">diagnosed_by (FK)</text>
+    <text x="10" y="135" class="table-text">diagnosis_result</text>
+    <text x="10" y="155" class="table-text">diagnosis_comment</text>
+    <text x="10" y="175" class="table-text">created_at</text>
+    <text x="10" y="195" class="table-text">updated_at</text>
+  </g>
+
+  <!-- t_die_clinical_record -->
+  <g transform="translate(680,40)">
+    <!-- box -->
+    <rect x="0" y="0" width="280" height="220" class="table-box" rx="4" ry="4"/>
+    <!-- header -->
+    <rect x="0" y="0" width="280" height="30" class="table-header-orange"/>
+    <text x="10" y="20" class="table-title">t_die_clinical_record</text>
+
+    <!-- fields -->
+    <text x="10" y="55" class="table-text pk">id (PK)</text>
+    <text x="10" y="75" class="table-text fk">diagnosis_id (FK)</text>
+    <text x="10" y="95" class="table-text">treatment_date</text>
+    <text x="10" y="115" class="table-text">treated_by (FK)</text>
+    <text x="10" y="135" class="table-text">treatment_method</text>
+    <text x="10" y="155" class="table-text">treatment_detail</text>
+    <text x="10" y="175" class="table-text">treatment_result</text>
+    <text x="10" y="195" class="table-text">created_at</text>
+    <text x="10" y="215" class="table-text">updated_at</text>
+  </g>
+
+  <!-- Relationship: t_die_inspection (1) -> (0..N) t_die_diagnosis -->
+  <line x1="320" y1="150" x2="360" y2="150" class="card-line"/>
+  <text x="325" y="140" class="label">1</text>
+  <text x="340" y="170" class="label">0..N</text>
+  <text x="345" y="130" class="label">inspection_id (FK)</text>
+
+  <!-- Relationship: t_die_diagnosis (1) -> (0..N) t_die_clinical_record -->
+  <line x1="640" y1="150" x2="680" y2="150" class="card-line"/>
+  <text x="645" y="140" class="label">1</text>
+  <text x="660" y="170" class="label">0..N</text>
+  <text x="650" y="130" class="label">diagnosis_id (FK)</text>
+
+</svg>
