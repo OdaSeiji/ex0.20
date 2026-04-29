@@ -1,7 +1,8 @@
 <?php
+
 $host = "localhost";
 $dbname = "extrusion";
-$user = "root";
+$user = "webuser";
 $pass = "";  // XAMPP のデフォルトは空
 
 try {

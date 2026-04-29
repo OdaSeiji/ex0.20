@@ -3134,4 +3134,25 @@ ADD COLUMN approved_at DATETIME NULL AFTER approved_by;
 
 OK
 
-# 2026/04/27
+# 2026/04/29
+
+`t_die_issue`に要らないデータが入っている。削除できるか？
+
+```sql
+MariaDB [extrusion]> delete from t_die_clinical_record_attachment;
+Query OK, 10 rows affected (0.006 sec)
+
+MariaDB [extrusion]> delete from t_die_clinical_record;
+Query OK, 7 rows affected (0.006 sec)
+```
+
+ついでに使わないテーブルも削除する。不完全だが一つは消せた。
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record_attachment;
+Query OK, 0 rows affected (0.016 sec)
+
+MariaDB [extrusion]> drop table t_die_clinical_record;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+MariaDB [extrusion]>
+```

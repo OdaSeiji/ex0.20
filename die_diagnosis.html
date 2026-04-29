@@ -128,6 +128,43 @@
         margin-bottom: 10px;
         border: 1px solid #ddd;
       }
+      /* ===== モーダル全体 ===== */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      /* ===== モーダル画像 ===== */
+      .modal-image {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #000;
+      }
+
+      /* ===== 閉じるボタン ===== */
+      .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        font-size: 28px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        z-index: 10000;
+      }
     </style>
   </head>
 
@@ -345,29 +382,10 @@
     </div>
 
     <!-- ★ Modal for image preview -->
-    <div
-      id="imgModal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        justify-content: center;
-        align-items: center;
-      "
-    >
-      <img
-        id="modalImage"
-        style="
-          max-width: 90%;
-          max-height: 90%;
-          border-radius: 8px;
-          box-shadow: 0 0 10px #000;
-        "
-      />
+    <!-- ★ Modal for image preview -->
+    <div id="imgModal" class="modal" onclick="closeImageModal(event)">
+      <button class="modal-close" onclick="closeImageModal(event)">×</button>
+      <img id="modalImage" class="modal-image" />
     </div>
 
     <!-- ★ Issue 登録モーダル -->
@@ -649,7 +667,8 @@
           .then((res) => res.json())
           .then((data) => {
             alert("診断を保存しました");
-            location.reload();
+            // location.reload();
+            location.href = "die_inspection_list.html";
           });
       }
       /* ★ loadDiagnosisData */
@@ -799,6 +818,13 @@
       function openDiagnosisModal(src) {
         document.getElementById("modalImg").src = src;
         document.getElementById("imgModal").style.display = "flex";
+      }
+      // モーダルを閉じる
+      function closeImageModal(event) {
+        // 画像をクリックしたときは閉じない
+        if (event.target.id === "modalImage") return;
+
+        document.getElementById("imgModal").style.display = "none";
       }
     </script>
   </body>

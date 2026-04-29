@@ -34,13 +34,28 @@
         font-weight: bold;
       }
 
-      .menu-container {
+      /* ★ 段ごとに固定レイアウト */
+      .menu-row {
         width: 90%;
         max-width: 900px;
-        margin: 30px auto;
+        margin: 20px auto;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
         gap: 20px;
+      }
+
+      /* 1段目：2列固定 */
+      .row-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* 2段目：1列固定 */
+      .row-1 {
+        grid-template-columns: 1fr;
+      }
+
+      /* 3段目：3列固定 */
+      .row-3 {
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .menu-card {
@@ -82,49 +97,47 @@
 
     <h1 id="title">Top Menu</h1>
 
-    <div class="menu-container">
-      <!-- 既存：ビレット投入 -->
+    <!-- ★ 1段目（2列） -->
+    <div class="menu-row row-2">
       <div
         class="menu-card"
         onclick="location.href = 'PressBilletCharge-SelectMachine.html'"
       >
-        <div class="menu-title" data-key="billet_title">Billet Charge</div>
+        <div class="menu-title" data-key="billet_title">ビレット投入</div>
         <div class="menu-desc" data-key="billet_desc">
           ビレット投入に関するページ
         </div>
       </div>
 
-      <!-- 既存：金型メンテナンス -->
       <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
         <div class="menu-title" data-key="maintenance_title">
-          Die Maintenance
+          金型メンテナンス
         </div>
         <div class="menu-desc" data-key="maintenance_desc">
           金型メンテナンスに関するページ
         </div>
       </div>
+    </div>
 
-      <!-- 既存：金型修正 -->
+    <!-- ★ 2段目（1列） -->
+    <div class="menu-row row-1">
       <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
-        <div class="menu-title" data-key="issue_title">
-          Die Issue Management
-        </div>
+        <div class="menu-title" data-key="issue_title">テーマ一覧</div>
         <div class="menu-desc" data-key="issue_desc">
-          金型修正に関するページ
+          金型修正テーマの一覧ページ
         </div>
       </div>
+    </div>
 
-      <!-- 検査入力 -->
+    <!-- ★ 3段目（3列） -->
+    <div class="menu-row row-3">
       <div class="menu-card" onclick="location.href = 'die_inspection.html'">
-        <div class="menu-title" data-key="inspection_title">
-          Inspection Input
-        </div>
+        <div class="menu-title" data-key="inspection_title">検査入力</div>
         <div class="menu-desc" data-key="inspection_desc">
           検査記録を入力するページ
         </div>
       </div>
 
-      <!-- 検査一覧、診断 -->
       <div
         class="menu-card"
         onclick="location.href = 'die_inspection_list.html'"
@@ -137,7 +150,6 @@
         </div>
       </div>
 
-      <!-- ★ 新規追加：診断一覧 -->
       <div class="menu-card" onclick="location.href = 'diagnosis_list.html'">
         <div class="menu-title" data-key="diagnosis_list_title">診断一覧</div>
         <div class="menu-desc" data-key="diagnosis_list_desc">
@@ -151,45 +163,32 @@
       const dict = {
         ja: {
           title: "トップメニュー",
-
           billet_title: "ビレット投入",
           billet_desc: "ビレット投入に関するページ",
-
           maintenance_title: "金型メンテナンス",
           maintenance_desc: "金型メンテナンスに関するページ",
-
-          issue_title: "金型修正管理",
-          issue_desc: "金型修正に関するページ",
-
+          issue_title: "テーマ一覧",
+          issue_desc: "金型修正テーマの一覧ページ",
           inspection_title: "検査入力",
           inspection_desc: "検査記録を入力するページ",
-
           inspection_list_title: "検査一覧、診断",
           inspection_list_desc: "検査記録および診断記録の一覧ページ",
-
           diagnosis_list_title: "診断一覧",
           diagnosis_list_desc: "診断記録の一覧ページ",
         },
-
         vi: {
           title: "Menu Chính",
-
           billet_title: "Nạp Billet",
           billet_desc: "Trang liên quan đến việc nạp billet",
-
           maintenance_title: "Bảo trì khuôn",
           maintenance_desc: "Trang liên quan đến bảo trì khuôn",
-
-          issue_title: "Quản lý sửa khuôn",
-          issue_desc: "Trang liên quan đến sửa chữa khuôn",
-
+          issue_title: "Danh sách chủ đề",
+          issue_desc: "Trang danh sách các chủ đề sửa khuôn",
           inspection_title: "Nhập kiểm tra",
           inspection_desc: "Trang nhập dữ liệu kiểm tra",
-
           inspection_list_title: "Danh sách kiểm tra & chẩn đoán",
           inspection_list_desc:
             "Trang danh sách các bản ghi kiểm tra và chẩn đoán",
-
           diagnosis_list_title: "Danh sách chẩn đoán",
           diagnosis_list_desc: "Trang danh sách các bản ghi chẩn đoán",
         },
@@ -197,17 +196,15 @@
 
       function setLang(lang) {
         document.getElementById("title").textContent = dict[lang].title;
-
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
           el.textContent = dict[lang][key];
         });
-
         localStorage.setItem("lang", lang);
       }
 
       window.onload = function () {
-        const saved = localStorage.getItem("lang") || "vi";
+        const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
       };
     </script>
