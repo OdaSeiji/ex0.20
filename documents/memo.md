@@ -3135,3 +3135,12 @@ ADD COLUMN approved_at DATETIME NULL AFTER approved_by;
 OK
 
 # 2026/04/27
+
+# 2026/05/01
+
+診断が終わったら、処方箋（修理方法）の指定。
+修理完了後の報告。
+
+一覧表に進捗管理。
+
+金型を一つ選んでテストで運用。
