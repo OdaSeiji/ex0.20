@@ -1,0 +1,147 @@
+<mxfile host="Electron">
+  <diagram name="ページ-1" id="MNXeS41HtPXbn-GjKeLc">
+    <mxGraphModel dx="2054" dy="1361" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-1" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#D5E8D4;fontColor=#333333;strokeColor=#666666;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜測定業務＞&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・測定班が実行&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜入力項目＞&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・測定者名&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・測定日は自動入力&lt;br&gt;&lt;div&gt;・測定結果をWeb上に画像を張り付ける&lt;/div&gt;&lt;div&gt;・測定結果のExcelリンクを張る（少し後か）&lt;/div&gt;&lt;div&gt;・形状OK/NG&lt;/div&gt;&lt;div&gt;・寸法OK/NG&lt;/div&gt;&lt;div&gt;・結果OK･NG&lt;/div&gt;&lt;div&gt;・メモを入力する（なくてもいい）&lt;/div&gt;&lt;div&gt;・結果を入力する&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜バックグラウンドの動き＞&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・t_die_inspectionを使う。&lt;/div&gt;" vertex="1">
+          <mxGeometry height="220" width="280" x="160" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-3" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#D5E8D4;fontColor=#333333;strokeColor=#666666;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜診断業務＞&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・金型班が実行&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜入力項目＞&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・診断者名&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・診断日は自動入力&lt;br&gt;&lt;div&gt;・測定結果を見て診断をする&lt;/div&gt;&lt;div&gt;・次回押出時の対策を入力する&lt;/div&gt;&lt;div&gt;　修理が必要な場合、修理内容を入力する&lt;/div&gt;&lt;div&gt;　ストレッチ、押出速度などならそれを書く&lt;/div&gt;&lt;div&gt;・メモを入力する&lt;/div&gt;&lt;div&gt;・形状、寸法、結果&lt;/div&gt;&lt;div&gt;・メモを入力する（なくてもいい）&lt;/div&gt;&lt;div&gt;・結果を入力する&lt;/div&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="200" width="280" x="160" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-5" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-6" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="676.9999999999995" />
+              <mxPoint x="520" y="1100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜診断確認業務＞&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・責任者が実行&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・診断内容が正しいか？&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・次回押出条件は正しいか？&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜入力項目＞&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・診断内容の適正性Yes/No&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・修理内容の適正性Yes/No&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・診断者に戻すYes/No&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・戻す場合は、戻す理由&lt;/div&gt;" vertex="1">
+          <mxGeometry height="166" width="280" x="160" y="594" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-8" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#D5E8D4;fontColor=#333333;strokeColor=#666666;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜修理した場合＞&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・修理内容の記録&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜入力項目＞&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・修理者&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;div&gt;・修理内容の絵、写真を添付&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="280" x="160" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-10" edge="1" parent="1" source="YvplD9BNVVbtjxDr2HSC-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="YvplD9BNVVbtjxDr2HSC-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜修理報告の確認＞&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・責任者が実行&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・修理報告が適正であるか？&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(237, 237, 237)); background-color: transparent;&quot;&gt;・修理報告者に戻すYes/No&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;・戻す場合は、戻す理由&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="280" x="160" y="950" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;spacingLeft=3;spacingTop=3;spacingBottom=3;verticalAlign=top;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;＜押出＞&lt;/span&gt;" vertex="1">
+          <mxGeometry height="40" width="280" x="160" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-13" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="修理しない場合" vertex="1">
+          <mxGeometry height="30" width="100" x="440" y="650" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-14" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="修理する場合" vertex="1">
+          <mxGeometry height="30" width="100" x="300" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-15" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;Web管理する業務のフロー&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="320" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-16" parent="1" style="strokeWidth=1;html=1;shape=mxgraph.flowchart.annotation_2;align=left;labelPosition=right;pointerEvents=1;rotation=-180;" value="" vertex="1">
+          <mxGeometry height="270" width="20" x="470" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-17" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="ここまでは、同じテーブルで管理" vertex="1">
+          <mxGeometry height="30" width="220" x="500" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-18" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;miterlimit=10;" value="t_die_diagnosis" vertex="1">
+          <mxGeometry height="296" width="160" x="940" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-14" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="id" vertex="1">
+          <mxGeometry height="30" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-22" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="die_issue_id(default null)" vertex="1">
+          <mxGeometry height="30" width="160" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-20" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="die_id" vertex="1">
+          <mxGeometry height="30" width="160" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-19" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="inspection_date" vertex="1">
+          <mxGeometry height="30" width="160" y="116" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-1" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="inspection_staff" vertex="1">
+          <mxGeometry height="30" width="160" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="YvplD9BNVVbtjxDr2HSC-21" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="inspection_result" vertex="1">
+          <mxGeometry height="30" width="160" y="176" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-2" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="diagnosis_date" vertex="1">
+          <mxGeometry height="30" width="160" y="206" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-4" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="diagnosis_result" vertex="1">
+          <mxGeometry height="30" width="160" y="236" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-3" parent="YvplD9BNVVbtjxDr2HSC-18" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" vertex="1">
+          <mxGeometry height="30" width="160" y="266" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-5" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;" value="t_die_fix" vertex="1">
+          <mxGeometry height="116" width="160" x="1180" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-6" parent="fum-Jc4ZcWwDDeDTlPar-5" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="id" vertex="1">
+          <mxGeometry height="30" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-7" parent="fum-Jc4ZcWwDDeDTlPar-5" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="die_diagnosis_id" vertex="1">
+          <mxGeometry height="30" width="160" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-8" parent="fum-Jc4ZcWwDDeDTlPar-5" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="fix_note" vertex="1">
+          <mxGeometry height="30" width="160" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-9" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;" value="t_die_attachment" vertex="1">
+          <mxGeometry height="116" width="160" x="1400" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-10" parent="fum-Jc4ZcWwDDeDTlPar-9" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="id" vertex="1">
+          <mxGeometry height="30" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-11" parent="fum-Jc4ZcWwDDeDTlPar-9" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="die_fix_id" vertex="1">
+          <mxGeometry height="30" width="160" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-12" parent="fum-Jc4ZcWwDDeDTlPar-9" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="Item 3" vertex="1">
+          <mxGeometry height="30" width="160" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-13" edge="1" parent="1" source="fum-Jc4ZcWwDDeDTlPar-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="fum-Jc4ZcWwDDeDTlPar-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-15" edge="1" parent="1" source="fum-Jc4ZcWwDDeDTlPar-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="fum-Jc4ZcWwDDeDTlPar-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-16" parent="1" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;align=center;fontSize=14;" value="t_die_issue" vertex="1">
+          <mxGeometry height="176" width="160" x="700" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-17" parent="fum-Jc4ZcWwDDeDTlPar-16" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="id" vertex="1">
+          <mxGeometry height="30" width="160" y="26" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-18" parent="fum-Jc4ZcWwDDeDTlPar-16" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="die_id" vertex="1">
+          <mxGeometry height="30" width="160" y="56" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-19" parent="fum-Jc4ZcWwDDeDTlPar-16" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="dimensin(Yes/No)" vertex="1">
+          <mxGeometry height="30" width="160" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-21" parent="fum-Jc4ZcWwDDeDTlPar-16" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="shape(Yes/No)" vertex="1">
+          <mxGeometry height="30" width="160" y="116" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-20" parent="fum-Jc4ZcWwDDeDTlPar-16" style="text;strokeColor=none;fillColor=none;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=12;whiteSpace=wrap;html=1;" value="title" vertex="1">
+          <mxGeometry height="30" width="160" y="146" as="geometry" />
+        </mxCell>
+        <mxCell id="fum-Jc4ZcWwDDeDTlPar-23" edge="1" parent="1" source="fum-Jc4ZcWwDDeDTlPar-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="fum-Jc4ZcWwDDeDTlPar-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

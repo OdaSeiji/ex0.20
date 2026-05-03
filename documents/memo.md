@@ -3144,3 +3144,533 @@ OK
 一覧表に進捗管理。
 
 金型を一つ選んでテストで運用。
+
+# 2026/05/02
+
+ちょっと、もう一度整理したい。まずは、業務の流れから。
+
+<div style="text-align: center;">
+  <img src="./img/flow2.drawio.svg" alt="代替テキスト">
+</div>
+
+これをもとに、`ER`図を作ると、以下のようになるか。少しめんどくさいのが、普段は、`t_die_diagnosis`に値を先に入力し、診断の結果NGとなると、`t_die_issue`に新規に登録する。
+
+<div style="text-align: center;">
+  <img src="./img/20260502-01.svg" alt="代替テキスト">
+</div>
+となると、すべてのテーブルを作り直した方が早いので、
+作り直す。
+
+# 2026/05/03
+
+# 新しいテーブルを計画する
+
+新しいテーブルは以下の6個＋`m_dies`の計7個のファイル。
+
+- t_die_inspection
+- t_die_issue
+- t_die_diagnosis
+- t_die_fix
+- t_die_next_condition
+- t_die_attachment
+
+```sql
+DROP TABLE IF EXISTS t_die_inspection;
+
+CREATE TABLE t_die_inspection (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    die_id INT NOT NULL,
+    inspection_date DATETIME NOT NULL,
+    inspection_staff VARCHAR(50),
+    dimension_result ENUM('OK','NG') NOT NULL,
+    shape_result ENUM('OK','NG') NOT NULL,
+    overall_result ENUM('OK','NG') NOT NULL,
+    memo TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_inspection_die
+        FOREIGN KEY (die_id) REFERENCES m_dies(id)
+);
+```
+
+```sql
+DROP TABLE IF EXISTS t_die_issue;
+
+CREATE TABLE t_die_issue (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    die_id INT NOT NULL,
+    issue_title VARCHAR(200) NOT NULL,
+    issue_detail TEXT,
+    priority TINYINT DEFAULT 3,
+    status ENUM('open','closed') DEFAULT 'open',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_issue_die
+        FOREIGN KEY (die_id) REFERENCES m_dies(id)
+);
+```
+
+```sql
+DROP TABLE IF EXISTS t_die_diagnosis;
+
+CREATE TABLE t_die_diagnosis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    inspection_id INT NOT NULL,
+    die_issue_id INT NULL,
+    diagnosis_date DATETIME NOT NULL,
+    diagnosis_staff VARCHAR(50),
+
+    dimension_judgement ENUM('OK','NG') NOT NULL,
+    shape_judgement ENUM('OK','NG') NOT NULL,
+    overall_judgement ENUM('OK','NG') NOT NULL,
+
+    ng_action TINYINT NOT NULL COMMENT '1:様子見る, 2:修理, 3:修理+条件変更, 4:条件変更',
+    condition_change TEXT,
+    repair_required BOOLEAN DEFAULT FALSE,
+
+    approval_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    approver_id VARCHAR(50),
+    approval_date DATETIME,
+    reject_reason TEXT,
+
+    memo TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_diag_inspection
+        FOREIGN KEY (inspection_id) REFERENCES t_die_inspection(id),
+
+    CONSTRAINT fk_diag_issue
+        FOREIGN KEY (die_issue_id) REFERENCES t_die_issue(id)
+);
+```
+
+```sql
+DROP TABLE IF EXISTS t_die_fix;
+
+CREATE TABLE t_die_fix (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    diagnosis_id INT NOT NULL,
+
+    -- 修理計画（Plan）
+    plan_fix_date DATETIME,
+    plan_fix_staff_id INT,  -- m_staff.id
+    plan_fix_content TEXT,
+
+    plan_approval_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    plan_approver_id INT,   -- m_staff.id
+    plan_approval_date DATETIME,
+    plan_reject_reason TEXT,
+
+    -- 修理実行（Actual）
+    actual_fix_date DATETIME,
+    actual_fix_staff_id INT,  -- m_staff.id
+    actual_fix_content TEXT,
+    fix_result TEXT,
+
+    actual_approval_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    actual_approver_id INT,   -- m_staff.id
+    actual_approval_date DATETIME,
+    actual_reject_reason TEXT,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    -- 外部キー
+    CONSTRAINT fk_fix_diagnosis
+        FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id),
+
+    CONSTRAINT fk_plan_fix_staff
+        FOREIGN KEY (plan_fix_staff_id) REFERENCES m_staff(id),
+
+    CONSTRAINT fk_plan_approver
+        FOREIGN KEY (plan_approver_id) REFERENCES m_staff(id),
+
+    CONSTRAINT fk_actual_fix_staff
+        FOREIGN KEY (actual_fix_staff_id) REFERENCES m_staff(id),
+
+    CONSTRAINT fk_actual_approver
+        FOREIGN KEY (actual_approver_id) REFERENCES m_staff(id)
+);
+
+```
+
+```sql
+DROP TABLE IF EXISTS t_die_next_condition;
+
+CREATE TABLE t_die_next_condition (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    diagnosis_id INT NOT NULL,
+    condition_detail TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_next_diagnosis
+        FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id)
+);
+
+```
+
+```sql
+DROP TABLE IF EXISTS t_die_attachment;
+
+CREATE TABLE t_die_attachment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    file_path VARCHAR(255) NOT NULL,
+    file_type VARCHAR(50),
+
+    diagnosis_id INT NULL,
+    fix_id INT NULL,
+    issue_id INT NULL,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_attach_diagnosis
+        FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id),
+
+    CONSTRAINT fk_attach_fix
+        FOREIGN KEY (fix_id) REFERENCES t_die_fix(id),
+
+    CONSTRAINT fk_attach_issue
+        FOREIGN KEY (issue_id) REFERENCES t_die_issue(id)
+);
+```
+
+## 予めテーブルを消しておく
+
+でドロップできるかやってみる。
+
+```terminal
+MariaDB [extrusion]> drop table t_die_attachment;
+Query OK, 0 rows affected (0.063 sec)
+
+MariaDB [extrusion]> drop table t_die_diagnosis;
+Query OK, 0 rows affected (0.014 sec)
+
+MariaDB [extrusion]> drop table t_die_inspection;
+Query OK, 0 rows affected (0.007 sec)
+
+MariaDB [extrusion]> drop table t_die_issue;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+MariaDB [extrusion]>
+```
+
+`t_die_issue`が消せない。この時は、以下のように進む
+
+```sql
+MariaDB [extrusion]> drop table t_die_issue;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+MariaDB [extrusion]> SELECT
+    ->     table_name,
+    ->     column_name,
+    ->     constraint_name
+    -> FROM information_schema.KEY_COLUMN_USAGE
+    -> WHERE referenced_table_name = 't_die_issue'
+    ->   AND referenced_column_name = 'id'
+    ->   AND table_schema = 'extrusion';
++------------------------+-------------+---------------------------+
+| table_name             | column_name | constraint_name           |
++------------------------+-------------+---------------------------+
+| t_die_clinical_record  | issue_id    | fk_clinical_record_issue  |
+| t_die_issue_attachment | issue_id    | fk_issue_attachment_issue |
++------------------------+-------------+---------------------------+
+2 rows in set (0.016 sec)
+
+MariaDB [extrusion]>
+```
+
+なので、
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record;
+Query OK, 0 rows affected (0.018 sec)
+
+MariaDB [extrusion]> drop table t_die_issue_attachment;
+Query OK, 0 rows affected (0.006 sec)
+
+MariaDB [extrusion]>
+```
+
+とした後に
+
+```sql
+MariaDB [extrusion]> drop table t_die_issue;
+Query OK, 0 rows affected (0.014 sec)
+```
+
+とすればいい。これで、以下のテーブルだけになるはず。
+
+```sql
+MariaDB [extrusion]> show tables like 't_die%';
++------------------------------+
+| Tables_in_extrusion (t_die%) |
++------------------------------+
+| t_dies_status                |
+| t_dies_status_filename       |
++------------------------------+
+2 rows in set (0.003 sec)
+```
+
+### エラーが出る
+
+上記の様に進めようとしたら、
+
+```sql
+MariaDB [extrusion]>  drop table t_die_clinical_record;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+```
+
+となり、t_die_clinical_recordも消せない。
+
+```sql
+MariaDB [extrusion]> SELECT
+    ->     table_name,
+    ->     column_name,
+    ->     constraint_name
+    -> FROM information_schema.KEY_COLUMN_USAGE
+    -> WHERE referenced_table_name = 't_die_clinical_record'
+    ->   AND table_schema = 'extrusion';
++----------------------------------+--------------------+-------------------------------+
+| table_name                       | column_name        | constraint_name               |
++----------------------------------+--------------------+-------------------------------+
+| t_die_clinical_record_attachment | clinical_record_id | fk_attachment_clinical_record |
++----------------------------------+--------------------+-------------------------------+
+1 row in set (0.175 sec)
+
+MariaDB [extrusion]>
+```
+
+となり、`t_die_clinical_record_attachment`が効いている。なので、先にこっちを消す
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record_attachment;
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [extrusion]>
+```
+
+その後に、`t_die_clinical_record`と`t_die_issue`を消す。
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record;
+Query OK, 0 rows affected (0.007 sec)
+MariaDB [extrusion]> drop table t_die_issue;
+Query OK, 0 rows affected (0.010 sec)
+
+MariaDB [extrusion]> show tables like 't_die%';
++------------------------------+
+| Tables_in_extrusion (t_die%) |
++------------------------------+
+| t_dies_status                |
+| t_dies_status_filename       |
++------------------------------+
+2 rows in set (0.003 sec)
+
+MariaDB [extrusion]>
+
+```
+
+# テーブルの消し方（まとめ）
+
+```terminal
+MariaDB [extrusion]> drop table t_die_attachment;
+Query OK, 0 rows affected (0.063 sec)
+
+MariaDB [extrusion]> drop table t_die_diagnosis;
+Query OK, 0 rows affected (0.014 sec)
+
+MariaDB [extrusion]> drop table t_die_inspection;
+Query OK, 0 rows affected (0.007 sec)
+
+MariaDB [extrusion]> drop table t_die_issue;
+ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails
+MariaDB [extrusion]>
+```
+
+多分、こっちを先
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record_attachment;
+Query OK, 0 rows affected (0.009 sec)
+
+MariaDB [extrusion]>
+```
+
+その後以下二つ
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record;
+Query OK, 0 rows affected (0.018 sec)
+
+MariaDB [extrusion]> drop table t_die_issue_attachment;
+Query OK, 0 rows affected (0.006 sec)
+
+MariaDB [extrusion]>
+```
+
+そして、
+その後に、`t_die_clinical_record`と`t_die_issue`を消す。
+
+```sql
+MariaDB [extrusion]> drop table t_die_clinical_record;
+Query OK, 0 rows affected (0.007 sec)
+MariaDB [extrusion]> drop table t_die_issue;
+Query OK, 0 rows affected (0.010 sec)
+
+MariaDB [extrusion]> show tables like 't_die%';
++------------------------------+
+| Tables_in_extrusion (t_die%) |
++------------------------------+
+| t_dies_status                |
+| t_dies_status_filename       |
++------------------------------+
+2 rows in set (0.003 sec)
+
+MariaDB [extrusion]>
+
+```
+
+## テーブルを作る
+
+さっきのテーブルを作るSQLを順に実行していく。
+
+```sql
+MariaDB [extrusion]> # -------------------------------------
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_inspection;
+Query OK, 0 rows affected, 1 warning (0.001 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_inspection (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     die_id INT NOT NULL,
+    ->     inspection_date DATETIME NOT NULL,
+    ->     inspection_staff VARCHAR(50),
+    ->     dimension_result ENUM('OK','NG') NOT NULL,
+    ->     shape_result ENUM('OK','NG') NOT NULL,
+    ->     overall_result ENUM('OK','NG') NOT NULL,
+    ->     memo TEXT,
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_inspection_die
+    ->         FOREIGN KEY (die_id) REFERENCES m_dies(id)
+    -> );
+Query OK, 0 rows affected (0.029 sec)
+
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_issue;
+Query OK, 0 rows affected, 1 warning (0.001 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_issue (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     die_id INT NOT NULL,
+    ->     issue_title VARCHAR(200) NOT NULL,
+    ->     issue_detail TEXT,
+    ->     priority TINYINT DEFAULT 3,
+    ->     status ENUM('open','closed') DEFAULT 'open',
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_issue_die
+    ->         FOREIGN KEY (die_id) REFERENCES m_dies(id)
+    -> );
+Query OK, 0 rows affected (0.029 sec)
+
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_diagnosis;
+Query OK, 0 rows affected, 1 warning (0.001 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_diagnosis (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     inspection_id INT NOT NULL,
+    ->     die_issue_id INT NULL,
+    ->     diagnosis_date DATETIME NOT NULL,
+    ->     diagnosis_staff VARCHAR(50),
+    ->
+    ->     dimension_judgement ENUM('OK','NG') NOT NULL,
+    ->     shape_judgement ENUM('OK','NG') NOT NULL,
+    ->     overall_judgement ENUM('OK','NG') NOT NULL,
+    ->
+    ->     ng_action TINYINT NOT NULL COMMENT '1:様子見る, 2:修理, 3:修理+条件変更, 4:条件変更',
+    ->     condition_change TEXT,
+    ->     repair_required BOOLEAN DEFAULT FALSE,
+    ->
+    ->     approval_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    ->     approver_id VARCHAR(50),
+    ->     approval_date DATETIME,
+    ->     reject_reason TEXT,
+    ->
+    ->     memo TEXT,
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_diag_inspection
+    ->         FOREIGN KEY (inspection_id) REFERENCES t_die_inspection(id),
+    ->
+    ->     CONSTRAINT fk_diag_issue
+    ->         FOREIGN KEY (die_issue_id) REFERENCES t_die_issue(id)
+    -> );
+Query OK, 0 rows affected (0.032 sec)
+
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_fix;
+Query OK, 0 rows affected, 1 warning (0.000 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_fix (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     diagnosis_id INT NOT NULL,
+    ->     fix_date DATETIME NOT NULL,
+    ->     fix_staff VARCHAR(50),
+    ->     fix_content TEXT,
+    ->
+    ->     approval_status ENUM('pending','approved','rejected') DEFAULT 'pending',
+    ->     approver_id VARCHAR(50),
+    ->     approval_date DATETIME,
+    ->     reject_reason TEXT,
+    ->
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_fix_diagnosis
+    ->         FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id)
+    -> );
+Query OK, 0 rows affected (0.042 sec)
+
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_next_condition;
+Query OK, 0 rows affected, 1 warning (0.001 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_next_condition (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     diagnosis_id INT NOT NULL,
+    ->     condition_detail TEXT NOT NULL,
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_next_diagnosis
+    ->         FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id)
+    -> );
+Query OK, 0 rows affected (0.033 sec)
+
+MariaDB [extrusion]> DROP TABLE IF EXISTS t_die_attachment;
+Query OK, 0 rows affected, 1 warning (0.000 sec)
+
+MariaDB [extrusion]>
+MariaDB [extrusion]> CREATE TABLE t_die_attachment (
+    ->     id INT AUTO_INCREMENT PRIMARY KEY,
+    ->     file_path VARCHAR(255) NOT NULL,
+    ->     file_type VARCHAR(50),
+    ->
+    ->     diagnosis_id INT NULL,
+    ->     fix_id INT NULL,
+    ->     issue_id INT NULL,
+    ->
+    ->     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     CONSTRAINT fk_attach_diagnosis
+    ->         FOREIGN KEY (diagnosis_id) REFERENCES t_die_diagnosis(id),
+    ->
+    ->     CONSTRAINT fk_attach_fix
+    ->         FOREIGN KEY (fix_id) REFERENCES t_die_fix(id),
+    ->
+    ->     CONSTRAINT fk_attach_issue
+    ->         FOREIGN KEY (issue_id) REFERENCES t_die_issue(id)
+    -> );
+Query OK, 0 rows affected (0.033 sec)
+
+MariaDB [extrusion]>
+```
+
+実行成功。

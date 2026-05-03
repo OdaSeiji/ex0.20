@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>Inspection</title>
+    <title>測定入力（Inspection）</title>
 
     <style>
       body {
@@ -43,386 +43,253 @@
         padding-left: 10px;
       }
 
-      .section-title {
-        font-size: 18px;
-        margin-top: 25px;
-        margin-bottom: 10px;
-        border-bottom: 2px solid #0078d4;
-        padding-bottom: 5px;
-      }
-
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-      }
-
-      table td {
-        padding: 10px;
-        vertical-align: top;
-      }
-
-      table td:first-child {
-        width: 240px;
+      label {
         font-weight: bold;
-        background: #f0f6ff;
+        margin-top: 15px;
+        display: block;
       }
 
-      input[type="text"],
-      input[type="date"],
+      input,
       select,
       textarea {
         width: 100%;
         padding: 8px;
+        margin-top: 5px;
         border: 1px solid #ccc;
-        border-radius: 6px;
+        border-radius: 5px;
         font-size: 14px;
       }
 
       textarea {
-        height: 100px;
         resize: vertical;
       }
 
-      .radio-group {
-        display: flex;
-        gap: 20px;
-        padding-top: 8px;
-      }
-
-      .buttons {
-        margin-top: 25px;
-        display: flex;
-        gap: 15px;
-      }
-
       .btn {
-        padding: 10px 20px;
-        border-radius: 6px;
+        padding: 10px 18px;
+        background: #0078d4;
+        color: white;
         border: none;
+        border-radius: 5px;
         cursor: pointer;
+        margin-top: 20px;
+        font-size: 15px;
+      }
+
+      .btn:hover {
+        background: #005fa3;
+      }
+
+      .back-btn {
+        background: #2b6ca3;
+        margin-bottom: 15px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        margin-top: 25px;
+        border-left: 4px solid #0078d4;
+        padding-left: 8px;
+      }
+
+      .info-box {
+        background: #e8f1ff;
+        padding: 10px;
+        border-radius: 5px;
+        margin-top: 10px;
         font-size: 14px;
       }
 
-      .btn-save {
-        background: #0078d4;
-        color: #fff;
-      }
-      .btn-clear {
-        background: #ccc;
-      }
-      .btn-back {
-        background: #666;
-        color: #fff;
+      .die-number-box {
+        font-family: "Roboto Mono", monospace;
+        width: 200px;
+        margin: 6px 0 12px 0;
       }
 
-      .btn-save:disabled {
-        background: #9bbbd4;
-        cursor: not-allowed;
+      .die-card {
+        background: #ffffff;
+        border: 2px solid #1e88e5;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        font-family: "Roboto Mono", monospace;
       }
 
-      .required {
-        color: red;
+      .die-row {
+        margin-bottom: 6px;
+      }
+
+      .die-label {
         font-weight: bold;
-        margin-left: 4px;
+        color: #0d47a1;
       }
 
-      #preview_area img {
-        width: 120px;
-        height: 120px;
+      .die-value {
+        color: #000;
+      }
+
+      .preview-area {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .preview-item img {
+        width: 100px;
+        height: 100px;
         object-fit: cover;
         border-radius: 6px;
+        border: 1px solid #ccc;
         cursor: pointer;
+      }
+
+      .img-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        justify-content: center;
+        align-items: center;
+      }
+
+      .modal-content {
+        max-width: 90%;
+        max-height: 90%;
+        border-radius: 6px;
+      }
+
+      .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        font-size: 40px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .preview-item {
+        position: relative;
+        display: inline-block;
+      }
+
+      .thumb-delete-btn {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        font-size: 16px;
+        line-height: 22px;
+        text-align: center;
+        cursor: pointer;
+        z-index: 10;
       }
     </style>
   </head>
 
   <body>
+    <!-- 多言語ボタン -->
     <div class="lang-buttons">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
     <div class="container">
-      <h1 data-key="title">🧾 Inspection（検査記録入力）</h1>
-
-      <!-- 基本情報 -->
-      <div class="section-title" data-key="section_basic">基本情報</div>
-      <table>
-        <!-- <tr>
-          <td data-key="id_label">検査記録ID</td>
-          <td><input type="text" value="Auto Numbering" disabled /></td>
-        </tr>
-        <tr>
-          <td data-key="die_id_label">金型ID（die_id）</td>
-          <td><input type="text" id="die_id" value="" disabled /></td>
-        </tr> -->
-        <tr>
-          <td>
-            <span data-key="press_id_label">押出記録ID（press_id）</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <select id="press_id" onchange="validateForm()">
-              <option value="" data-key="press_select">
-                Select (last 7 days)
-              </option>
-            </select>
-          </td>
-        </tr>
-      </table>
-
-      <!-- 検査情報 -->
-      <div class="section-title" data-key="section_inspection">検査情報</div>
-      <table>
-        <tr>
-          <td>
-            <span data-key="inspection_date_label">検査日</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <input type="date" id="inspection_date" onchange="validateForm()" />
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <span data-key="inspected_by_label">検査担当者</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <select id="inspected_by" onchange="validateForm()">
-              <option value="" data-key="staff_select">Select</option>
-            </select>
-          </td>
-        </tr>
-
-        <!-- 検査結果（全体） -->
-        <tr>
-          <td>
-            <span data-key="result_label">検査結果（全体）</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <div class="radio-group">
-              <label
-                ><input
-                  type="radio"
-                  name="result"
-                  value="OK"
-                  onchange="validateForm()"
-                />
-                <span data-key="ok">OK</span></label
-              >
-              <label
-                ><input
-                  type="radio"
-                  name="result"
-                  value="NG"
-                  onchange="validateForm()"
-                />
-                <span data-key="ng">NG</span></label
-              >
-            </div>
-          </td>
-        </tr>
-
-        <!-- 寸法 -->
-        <tr>
-          <td>
-            <span data-key="dimension_label">寸法</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <div class="radio-group">
-              <label
-                ><input
-                  type="radio"
-                  name="dimension_result"
-                  value="OK"
-                  onchange="validateForm()"
-                />
-                <span data-key="ok">OK</span></label
-              >
-              <label
-                ><input
-                  type="radio"
-                  name="dimension_result"
-                  value="NG"
-                  onchange="validateForm()"
-                />
-                <span data-key="ng">NG</span></label
-              >
-            </div>
-          </td>
-        </tr>
-
-        <!-- 形状 -->
-        <tr>
-          <td>
-            <span data-key="shape_label">形状</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <div class="radio-group">
-              <label
-                ><input
-                  type="radio"
-                  name="shape_result"
-                  value="OK"
-                  onchange="validateForm()"
-                />
-                <span data-key="ok">OK</span></label
-              >
-              <label
-                ><input
-                  type="radio"
-                  name="shape_result"
-                  value="NG"
-                  onchange="validateForm()"
-                />
-                <span data-key="ng">NG</span></label
-              >
-            </div>
-          </td>
-        </tr>
-
-        <tr>
-          <td data-key="comment_label">検査コメント</td>
-          <td>
-            <textarea
-              id="inspection_comment"
-              placeholder="Enter inspection details (size, appearance, temperature...)"
-            ></textarea>
-          </td>
-        </tr>
-      </table>
-
-      <!-- 添付ファイル -->
-      <div class="section-title" data-key="section_file">添付ファイル</div>
-      <table>
-        <tr>
-          <td>
-            <span data-key="file_label">添付ファイル</span>
-            <span class="required">*</span>
-          </td>
-          <td>
-            <input
-              type="file"
-              id="file"
-              multiple
-              onchange="
-                previewFiles();
-                validateForm();
-              "
-            />
-            <div
-              id="preview_area"
-              style="
-                display: flex;
-                gap: 10px;
-                flex-wrap: wrap;
-                margin-top: 10px;
-              "
-            ></div>
-          </td>
-        </tr>
-      </table>
-
-      <!-- 必須注意文 -->
-      <p
-        id="required_note"
-        style="color: red; font-weight: bold; margin-top: 20px"
-        data-key="required_note"
-      >
-        * 印の項目は入力が必要です
-      </p>
-
-      <!-- 操作ボタン -->
-      <div class="buttons">
+      <!-- メニューへ戻る -->
+      <div style="text-align: right">
         <button
-          class="btn btn-save"
-          id="saveBtn"
-          onclick="saveData()"
-          disabled
-          data-key="btn_save"
+          class="btn back-btn"
+          onclick="location.href = 'die_progress_list.html'"
         >
-          保存
-        </button>
-        <button
-          class="btn btn-clear"
-          onclick="location.reload()"
-          data-key="btn_clear"
-        >
-          クリア
-        </button>
-        <button
-          class="btn btn-back"
-          onclick="history.back()"
-          data-key="btn_back"
-        >
-          一覧へ戻る
+          ← メニューへ戻る
         </button>
       </div>
-    </div>
 
-    <!-- モーダル -->
-    <div
-      id="imgModal"
-      style="
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      "
-    >
-      <div
-        style="
-          background: white;
-          padding: 20px;
-          border-radius: 6px;
-          max-width: 90%;
-          max-height: 90%;
-          text-align: center;
-        "
-      >
-        <img
-          id="modalImg"
-          src=""
-          style="max-width: 100%; max-height: 70vh; border-radius: 4px"
-        />
-        <br /><br />
-        <button
-          id="deleteBtn"
-          style="
-            background: #d9534f;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-            margin-right: 10px;
-          "
-        >
-          削除
-        </button>
+      <h1 data-key="title">📏 測定入力（Inspection）</h1>
 
-        <button
-          onclick="closeModal()"
-          style="
-            background: #2b6ca3;
-            color: white;
-            padding: 8px 20px;
-            border: none;
-            border-radius: 4px;
-          "
-        >
-          閉じる
-        </button>
+      <!-- 金型情報カード -->
+      <div class="die-card">
+        <div class="die-row">
+          <span class="die-label">金型番号：</span>
+          <span id="die_number_display" class="die-value"></span>
+        </div>
+
+        <div class="die-row">
+          <span class="die-label">押出日：</span>
+          <span id="press_date_display" class="die-value"></span>
+        </div>
+
+        <div class="die-row">
+          <span class="die-label">押出種類：</span>
+          <span id="pressing_type_display" class="die-value"></span>
+        </div>
+
+        <div class="die-row">
+          <span class="die-label">押し出し本数：</span>
+          <span id="billet_qty_display" class="die-value"></span>
+        </div>
+
+        <div class="die-row">
+          <span class="die-label">押出時間：</span>
+          <span id="press_hours_display" class="die-value"></span>
+        </div>
+
+        <input type="hidden" id="press_id" />
+        <input type="hidden" id="dies_id" />
+      </div>
+
+      <!-- 測定情報 -->
+      <div>
+        <div class="section-title" data-key="sec_inspection">■ 測定情報</div>
+
+        <label data-key="lbl_date">測定日</label>
+        <input type="date" id="inspection_date" />
+
+        <label data-key="lbl_staff">測定者</label>
+        <select id="inspection_staff_id"></select>
+
+        <label data-key="lbl_dim">寸法判定</label>
+        <select id="dimension_result">
+          <option value="OK">OK</option>
+          <option value="NG">NG</option>
+        </select>
+
+        <label data-key="lbl_shape">形状判定</label>
+        <select id="shape_result">
+          <option value="OK">OK</option>
+          <option value="NG">NG</option>
+        </select>
+
+        <label data-key="lbl_overall">総合判定</label>
+        <select id="overall_result">
+          <option value="OK">OK</option>
+          <option value="NG">NG</option>
+        </select>
+
+        <label data-key="lbl_memo">メモ</label>
+        <textarea id="memo" rows="4"></textarea>
+
+        <label data-key="lbl_files">添付ファイル（必須）</label>
+        <input type="file" id="inspection_files" multiple />
+
+        <!-- ★ ここに追加：サムネイル表示エリア -->
+        <div id="preview_area" class="preview-area"></div>
+      </div>
+
+      <button class="btn" id="saveBtn" data-key="btn_save">
+        保存して一覧へ戻る
+      </button>
+      <!-- ★ 画像モーダル -->
+      <div id="imgModal" class="img-modal">
+        <span id="modalClose" class="modal-close">&times;</span>
+        <img id="modalImg" class="modal-content" />
       </div>
     </div>
 
@@ -430,65 +297,35 @@
       /* 多言語辞書 */
       const dict = {
         ja: {
-          title: "🧾 Inspection（検査記録入力）",
-          section_basic: "基本情報",
-          id_label: "検査記録ID",
-          die_id_label: "金型ID（die_id）",
-          press_id_label: "押出記録ID（press_id）",
-          press_select: "選択してください（過去1週間）",
-
-          section_inspection: "検査情報",
-          inspection_date_label: "検査日",
-          inspected_by_label: "検査担当者",
-          staff_select: "選択してください",
-          result_label: "検査結果（全体）",
-          dimension_label: "寸法",
-          shape_label: "形状",
-          ok: "OK",
-          ng: "NG",
-          comment_label: "検査コメント",
-
-          section_file: "添付ファイル",
-          file_label: "添付ファイル",
-
-          required_note: "* 印の項目は入力が必要です",
-
-          btn_save: "保存",
-          btn_clear: "クリア",
-          btn_back: "一覧へ戻る",
+          title: "📏 測定入力（Inspection）",
+          sec_press: "■ 押出実績",
+          sec_inspection: "■ 測定情報",
+          lbl_press: "押出実績（t_press）",
+          lbl_date: "測定日",
+          lbl_staff: "測定者",
+          lbl_dim: "寸法判定",
+          lbl_shape: "形状判定",
+          lbl_overall: "総合判定",
+          lbl_memo: "メモ",
+          lbl_files: "添付ファイル（必須）",
+          btn_save: "保存して一覧へ戻る",
         },
-
         vi: {
-          title: "🧾 Kiểm tra (Nhập dữ liệu kiểm tra)",
-          section_basic: "Thông tin cơ bản",
-          id_label: "Mã kiểm tra",
-          die_id_label: "Mã khuôn (die_id)",
-          press_id_label: "Mã ép đùn (press_id)",
-          press_select: "Vui lòng chọn (trong 1 tuần qua)",
-
-          section_inspection: "Thông tin kiểm tra",
-          inspection_date_label: "Ngày kiểm tra",
-          inspected_by_label: "Người kiểm tra",
-          staff_select: "Vui lòng chọn",
-          result_label: "Kết quả kiểm tra (tổng thể)",
-          dimension_label: "Kích thước",
-          shape_label: "Hình dạng",
-          ok: "OK",
-          ng: "NG",
-          comment_label: "Ghi chú kiểm tra",
-
-          section_file: "Tệp đính kèm",
-          file_label: "Tệp đính kèm",
-
-          required_note: "Các mục có dấu * là bắt buộc",
-
-          btn_save: "Lưu",
-          btn_clear: "Xóa",
-          btn_back: "Quay lại danh sách",
+          title: "📏 Nhập dữ liệu đo",
+          sec_press: "■ Dữ liệu ép",
+          sec_inspection: "■ Thông tin đo",
+          lbl_press: "Dữ liệu ép (t_press)",
+          lbl_date: "Ngày đo",
+          lbl_staff: "Người đo",
+          lbl_dim: "Kết quả kích thước",
+          lbl_shape: "Kết quả hình dạng",
+          lbl_overall: "Kết quả tổng hợp",
+          lbl_memo: "Ghi chú",
+          lbl_files: "Tệp đính kèm (bắt buộc)",
+          btn_save: "Lưu và quay lại danh sách",
         },
       };
 
-      /* 言語切り替え */
       function setLang(lang) {
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
@@ -497,232 +334,194 @@
         localStorage.setItem("lang", lang);
       }
 
-      /* 初期処理 */
-      window.onload = () => {
+      // ★ ここが一番上に必要（最優先）
+      function getParam(name) {
+        return new URLSearchParams(window.location.search).get(name);
+      }
+
+      const pressId = getParam("press_id");
+
+      window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
-        loadInitialData();
+
+        loadStaffList(); // 測定者一覧
+
+        const pressId = getParam("press_id");
+        if (pressId) {
+          loadPressInfo(pressId); // ★ 分離した関数を呼ぶ
+        }
       };
 
-      /* 初期データ読み込み */
-      function loadInitialData() {
-        fetch("./php/die_inspection_php/load_inspection_data.php")
+      // 押出情報の読み出し
+      function loadPressInfo(pressId) {
+        fetch(`./php/die_progress_php/get_press_info.php?press_id=${pressId}`)
           .then((res) => res.json())
           .then((data) => {
-            const pressSelect = document.getElementById("press_id");
-            data.press_list.forEach((p) => {
-              const opt = document.createElement("option");
-              opt.value = p.id;
-              opt.textContent = `${p.id} / ${p.press_date_at} / ${p.die_number}`;
-              pressSelect.appendChild(opt);
-            });
+            document.getElementById("press_id").value = data.press_id;
+            document.getElementById("dies_id").value = data.dies_id;
 
-            const staffSelect = document.getElementById("inspected_by");
-            data.staff_list.forEach((s) => {
-              const opt = document.createElement("option");
-              opt.value = s.id;
-              opt.textContent = s.staff_name;
-              staffSelect.appendChild(opt);
-            });
+            document.getElementById("die_number_display").textContent =
+              data.die_number;
+            document.getElementById("press_date_display").textContent =
+              data.press_date;
+
+            document.getElementById("pressing_type_display").textContent =
+              data.pressing_type;
+            document.getElementById("billet_qty_display").textContent =
+              data.actual_billet_quantity;
+
+            const hours = calcPressHours(
+              data.press_start_at,
+              data.press_finish_at,
+            );
+            document.getElementById("press_hours_display").textContent =
+              hours + " 時間";
+          })
+          .catch((err) => {
+            console.error("押出情報の取得に失敗:", err);
           });
       }
 
-      /* サムネイル表示 */
-      let currentFile = null;
+      /* スタッフ一覧 */
+      function loadStaffList() {
+        fetch("./php/die_progress_php/get_staff_list.php")
+          .then((res) => res.json())
+          .then((staffList) => {
+            const sel = document.getElementById("inspection_staff_id");
+            sel.innerHTML = ""; // 初期化
 
-      function previewFile() {
-        const file = document.getElementById("file").files[0];
-        const preview = document.getElementById("preview_area");
-        preview.innerHTML = "";
-        currentFile = null;
+            staffList.forEach((s) => {
+              sel.innerHTML += `<option value="${s.id}">${s.staff_name}</option>`;
+            });
+          })
+          .catch((err) => {
+            console.error("スタッフ一覧の取得に失敗:", err);
+          });
+      }
 
-        if (!file) return;
-
-        if (!file.type.startsWith("image/")) {
-          const div = document.createElement("div");
-          div.textContent = file.name;
-          preview.appendChild(div);
+      /* 保存処理（ダミー） */
+      document.getElementById("saveBtn").onclick = function () {
+        const files = document.getElementById("inspection_files").files;
+        if (files.length === 0) {
+          alert("添付ファイルは必須です。");
           return;
         }
 
-        currentFile = file;
-        const reader = new FileReader();
-        reader.onload = function (event) {
-          const img = document.createElement("img");
-          img.src = event.target.result;
-          img.onclick = () => openModal(event.target.result);
-          preview.appendChild(img);
-        };
-        reader.readAsDataURL(file);
-      }
-
-      /* モーダル */
-      function openModal(src) {
-        document.getElementById("modalImg").src = src;
-        document.getElementById("imgModal").style.display = "flex";
-      }
-
-      function closeModal() {
-        document.getElementById("imgModal").style.display = "none";
-      }
-
-      document.getElementById("deleteBtn").onclick = function () {
-        document.getElementById("file").value = "";
-        document.getElementById("preview_area").innerHTML = "";
-        currentFile = null;
-        closeModal();
-        validateForm();
+        alert("保存しました。測定一覧へ戻ります。");
+        location.href = "die_inspection_list.html";
       };
+      // 押出時間計算
+      function calcPressHours(start, finish) {
+        console.log("raw:", start, finish);
 
-      /* 必須項目チェック */
-      function validateForm() {
-        const press_id = document.getElementById("press_id").value;
-        const inspection_date =
-          document.getElementById("inspection_date").value;
-        const inspected_by = document.getElementById("inspected_by").value;
-        const file = document.getElementById("file").files.length;
+        const [sh, sm, ss] = start.split(":").map(Number);
+        const [fh, fm, fs] = finish.split(":").map(Number);
+        // console.log("parsed:", sh, sm, ss, fh, fm, fs);
 
-        const result = document.querySelector("input[name='result']:checked");
-        const dimension = document.querySelector(
-          "input[name='dimension_result']:checked",
+        const startSec = sh * 3600 + sm * 60 + ss;
+        const finishSec = fh * 3600 + fm * 60 + fs;
+        // console.log("sec:", startSec, finishSec);
+
+        const diffSec = finishSec - startSec;
+        const hours = diffSec / 3600;
+        // console.log("hours(raw):", hours);
+
+        return hours.toFixed(2);
+      }
+      /* --------------------------------------------------
+        画像ファイル判定
+      -------------------------------------------------- */
+      function isImageFile(file) {
+        const name = file.name.toLowerCase();
+        return (
+          name.endsWith(".jpg") ||
+          name.endsWith(".jpeg") ||
+          name.endsWith(".png") ||
+          name.endsWith(".gif") ||
+          name.endsWith(".bmp") ||
+          name.endsWith(".webp") ||
+          name.endsWith(".heic")
         );
-        const shape = document.querySelector(
-          "input[name='shape_result']:checked",
-        );
-
-        const saveBtn = document.getElementById("saveBtn");
-
-        if (
-          press_id &&
-          inspection_date &&
-          inspected_by &&
-          file > 0 &&
-          result &&
-          dimension &&
-          shape
-        ) {
-          saveBtn.disabled = false;
-        } else {
-          saveBtn.disabled = true;
-        }
       }
 
-      /* 保存処理 */
-      /* 保存処理（複数ファイル対応） */
-      function saveData() {
-        const press_id = document.getElementById("press_id").value;
-        const inspection_date =
-          document.getElementById("inspection_date").value;
-        const inspected_by = document.getElementById("inspected_by").value;
-        const inspection_comment =
-          document.getElementById("inspection_comment").value;
-
-        const result = document.querySelector("input[name='result']:checked");
-        const dimension = document.querySelector(
-          "input[name='dimension_result']:checked",
-        );
-        const shape = document.querySelector(
-          "input[name='shape_result']:checked",
-        );
-
-        const files = document.getElementById("file").files;
-
-        const formData = new FormData();
-        formData.append("press_id", press_id);
-        formData.append("inspection_date", inspection_date);
-        formData.append("inspected_by", inspected_by);
-        formData.append("inspection_result", result.value);
-        formData.append("dimension_result", dimension.value);
-        formData.append("shape_result", shape.value);
-        formData.append("inspection_comment", inspection_comment);
-
-        // ★ 複数ファイルを送信
-        for (let i = 0; i < files.length; i++) {
-          formData.append("file[]", files[i]);
-        }
-
-        fetch("./php/die_inspection_php/save_inspection.php", {
-          method: "POST",
-          body: formData,
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.status === "success") {
-              alert("保存しました");
-              location.reload();
-            } else {
-              alert("エラー: " + data.message);
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            alert("通信エラーが発生しました");
-          });
-      }
-
-      // 複数プレビュー対応
-      function previewFiles() {
-        const files = document.getElementById("file").files;
+      /* --------------------------------------------------
+        サムネイル描画（削除ボタン付き）
+      -------------------------------------------------- */
+      function renderPreview(files) {
         const preview = document.getElementById("preview_area");
         preview.innerHTML = "";
 
-        Array.from(files).forEach((file, index) => {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const box = document.createElement("div");
-            box.style.position = "relative";
+        files.forEach((file, index) => {
+          const item = document.createElement("div");
+          item.classList.add("preview-item");
 
-            const img = document.createElement("img");
-            img.src = e.target.result;
-            img.style.width = "120px";
-            img.style.height = "120px";
-            img.style.objectFit = "cover";
-            img.style.border = "1px solid #ccc";
-            img.style.borderRadius = "6px";
-            img.style.cursor = "pointer";
+          // ★ 削除ボタン
+          const delBtn = document.createElement("div");
+          delBtn.classList.add("thumb-delete-btn");
+          delBtn.textContent = "×";
 
-            img.onclick = () => openPreviewModal(e.target.result);
+          delBtn.onclick = () => {
+            files.splice(index, 1);
 
-            // 削除ボタン
-            const del = document.createElement("button");
-            del.textContent = "×";
-            del.style.position = "absolute";
-            del.style.top = "0";
-            del.style.right = "0";
-            del.style.background = "red";
-            del.style.color = "white";
-            del.style.border = "none";
-            del.style.borderRadius = "50%";
-            del.style.cursor = "pointer";
+            // FileList を再構築
+            const dt = new DataTransfer();
+            files.forEach((f) => dt.items.add(f));
+            document.getElementById("inspection_files").files = dt.files;
 
-            del.onclick = () => removeFile(index);
-
-            box.appendChild(img);
-            box.appendChild(del);
-            preview.appendChild(box);
+            renderPreview(files);
           };
-          reader.readAsDataURL(file);
+
+          item.appendChild(delBtn);
+
+          // ★ 画像プレビュー
+          if (isImageFile(file)) {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+
+            // モーダル表示
+            img.onclick = () => openModal(img.src);
+
+            item.appendChild(img);
+          } else {
+            item.textContent = file.name;
+          }
+
+          preview.appendChild(item);
         });
       }
-      // 選択した画像を削除する
-      function removeFile(index) {
-        const input = document.getElementById("file");
-        const dt = new DataTransfer();
 
-        Array.from(input.files)
-          .filter((_, i) => i !== index)
-          .forEach((f) => dt.items.add(f));
+      /* --------------------------------------------------
+        ファイル選択時
+      -------------------------------------------------- */
+      document
+        .getElementById("inspection_files")
+        .addEventListener("change", function (e) {
+          const files = Array.from(e.target.files);
+          renderPreview(files);
+        });
 
-        input.files = dt.files;
+      /* --------------------------------------------------
+        モーダル表示
+      -------------------------------------------------- */
+      function openModal(src) {
+        const modal = document.getElementById("imgModal");
+        const modalImg = document.getElementById("modalImg");
 
-        previewFiles();
-        validateForm();
+        modalImg.src = src;
+        modal.style.display = "flex";
       }
-      // 既存モーダルを使用する
-      function openPreviewModal(src) {
-        document.getElementById("modalImg").src = src;
-        document.getElementById("imgModal").style.display = "flex";
-      }
+
+      document.getElementById("modalClose").onclick = function () {
+        document.getElementById("imgModal").style.display = "none";
+      };
+
+      // 背景クリックでも閉じる
+      document.getElementById("imgModal").onclick = function (e) {
+        if (e.target === this) {
+          this.style.display = "none";
+        }
+      };
     </script>
   </body>
 </html>

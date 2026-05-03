@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>金型進捗一覧（Progress List）</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #005fa3;
+      }
+
+      .btn-secondary {
+        background: #2b6ca3;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background: #e8f1ff;
+        font-weight: bold;
+      }
+
+      tr:hover {
+        background: #f0f8ff;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+      }
+      .ok {
+        background: #5cb85c;
+      }
+      .ng {
+        background: #d9534f;
+      }
+      .none {
+        background: #999;
+      }
+
+      /* ★ 押出種別の記号フォントを MS ゴシックに統一 */
+      .pressing-type {
+        font-family: "MS Gothic", "ＭＳ ゴシック", monospace;
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+      /* 型番表示部 */
+      .die-number {
+        font-family: "Roboto Mono", monospace;
+        text-align: left;
+        letter-spacing: 0.5px;
+      }
+      /* 型番検索用 */
+      .die-search {
+        width: 120px;
+        font-family: "Roboto Mono", monospace;
+        padding: 4px 6px;
+        margin-left: 6px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 多言語ボタン -->
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <!-- メニューへ戻る -->
+      <div style="text-align: right; margin-bottom: 10px">
+        <button
+          class="btn btn-secondary"
+          onclick="location.href = 'index.html'"
+        >
+          ← メニューへ戻る
+        </button>
+      </div>
+
+      <h1 data-key="title">📊 金型進捗一覧（Progress List）</h1>
+
+      <!-- 一覧テーブル -->
+      <table id="progressTable">
+        <thead>
+          <tr>
+            <th data-key="col_date">押出日</th>
+            <th>
+              金型番号
+              <input
+                type="text"
+                id="searchDie"
+                placeholder="検索…"
+                class="die-search"
+              />
+            </th>
+            <!-- <th data-key="col_die">金型番号</th> -->
+            <th data-key="col_type">押出種別</th>
+            <th data-key="col_ins">測定</th>
+            <th data-key="col_diag">診断</th>
+            <th data-key="col_app">承認</th>
+            <th data-key="col_needfix">修理要否</th>
+            <th data-key="col_fix">修理</th>
+            <th data-key="col_action">操作</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      /* 多言語辞書 */
+      const dict = {
+        ja: {
+          title: "📊 金型進捗一覧（Progress List）",
+          col_date: "押出日",
+          col_die: "金型番号",
+          col_type: "押出種別",
+          col_ins: "測定",
+          col_diag: "診断",
+          col_app: "承認",
+          col_needfix: "修理要否",
+          col_fix: "修理",
+          col_action: "操作",
+        },
+        vi: {
+          title: "📊 Danh sách tiến độ",
+          col_date: "Ngày ép",
+          col_die: "Mã khuôn",
+          col_type: "Loại ép",
+          col_ins: "Đo",
+          col_diag: "Chẩn đoán",
+          col_app: "Phê duyệt",
+          col_needfix: "Cần sửa",
+          col_fix: "Sửa chữa",
+          col_action: "Thao tác",
+        },
+      };
+      // 金型idの受け取り
+      function getParam(name) {
+        return new URLSearchParams(window.location.search).get(name);
+      }
+
+      const pressId = getParam("press_id");
+
+      if (pressId) {
+        fetch(`./php/die_inspection_php/get_press_info.php?press_id=${pressId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            document.getElementById("press_id").value = data.press_id;
+            document.getElementById("die_number").value = data.die_number;
+            document.getElementById("dies_id").value = data.dies_id;
+          });
+      }
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          el.textContent = dict[lang][key];
+        });
+        localStorage.setItem("lang", lang);
+      }
+
+      window.onload = function () {
+        const saved = localStorage.getItem("lang") || "ja";
+        setLang(saved);
+        loadProgressList();
+      };
+
+      /*  リストデータ読み込み */
+      function loadProgressList() {
+        fetch("./php/die_progress_php/get_progress_list.php")
+          .then((res) => res.json())
+          .then((data) => {
+            window._progressData = data; // ← 全データ保持
+            renderTable(data);
+          });
+      }
+
+      function renderTable(data) {
+        const tbody = document.querySelector("#progressTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+
+          const badge = (flag) =>
+            flag === 1
+              ? `<span class="badge ok">✔</span>`
+              : flag === 0
+                ? `<span class="badge ng">✖</span>`
+                : `<span class="badge none">—</span>`;
+
+          let actionBtn = "";
+          if (row.inspected == 0) {
+            actionBtn = `<button class="btn" onclick="goInspection(${row.press_id})">測定</button>`;
+          } else if (row.inspected == 1 && row.diagnosed == 0) {
+            actionBtn = `<button class="btn" onclick="goDiagnosis(${row.press_id})">診断</button>`;
+          } else if (row.need_fix == 1 && row.fixed == 0) {
+            actionBtn = `<button class="btn" onclick="goFix(${row.press_id})">修理</button>`;
+          } else {
+            actionBtn = `<button class="btn" onclick="goDetail(${row.press_id})">詳細</button>`;
+          }
+
+          tr.innerHTML = `
+            <td>${row.press_date}</td>
+            <td class="die-number">${row.die_number}</td>
+            <td class="pressing-type">${row.pressing_symbol}</td>
+            <td>${badge(row.inspected)}</td>
+            <td>${badge(row.diagnosed)}</td>
+            <td>${badge(row.approved)}</td>
+            <td>${badge(row.need_fix)}</td>
+            <td>${badge(row.fixed)}</td>
+            <td>${actionBtn}</td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      function goInspection(pressId) {
+        window.location.href = `die_inspection.html?press_id=${pressId}`;
+      }
+      function goDiagnosis(id) {
+        location.href = `die_diagnosis.html?press_id=${id}`;
+      }
+      function goFix(id) {
+        location.href = `die_fix_plan.html?press_id=${id}`;
+      }
+      function goDetail(id) {
+        alert("詳細画面はまだ未実装です");
+      }
+
+      // 型番検索
+      document
+        .getElementById("searchDie")
+        .addEventListener("input", function () {
+          const keyword = this.value.trim().toUpperCase();
+
+          // 全データは loadProgressList() で保持しておく
+          const filtered = window._progressData.filter((row) =>
+            row.die_number.toUpperCase().startsWith(keyword),
+          );
+
+          renderTable(filtered);
+        });
+      document
+        .getElementById("searchDie")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            const keyword = this.value.trim();
+
+            fetch(`./php/die_progress_php/get_progress_list.php?die=${keyword}`)
+              .then((res) => res.json())
+              .then((data) => {
+                window._progressData = data;
+                renderTable(data);
+              });
+          }
+        });
+    </script>
+  </body>
+</html>
