@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>Inspection List</title>
+    <title>測定一覧（Inspection List）</title>
 
     <style>
       body {
@@ -43,6 +43,23 @@
         padding-left: 10px;
       }
 
+      .btn {
+        padding: 8px 16px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #005fa3;
+      }
+
+      .btn-secondary {
+        background: #2b6ca3;
+      }
+
       table {
         width: 100%;
         border-collapse: collapse;
@@ -66,53 +83,68 @@
         cursor: pointer;
       }
 
-      .btn {
-        padding: 6px 12px;
-        background: #0078d4;
+      .badge {
+        padding: 4px 10px;
+        border-radius: 4px;
         color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
+        font-size: 12px;
+      }
+      .ok {
+        background: #5cb85c;
+      }
+      .ng {
+        background: #d9534f;
+      }
+
+      .clip {
+        font-size: 18px;
       }
     </style>
   </head>
 
   <body>
+    <!-- 多言語ボタン -->
     <div class="lang-buttons">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
     <div class="container">
-      <!-- ★ メニューへ戻るボタン -->
+      <!-- メニューへ戻る -->
       <div style="text-align: right; margin-bottom: 10px">
         <button
+          class="btn btn-secondary"
           onclick="location.href = 'index.html'"
-          style="
-            background: #2b6ca3;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-          "
         >
           ← メニューへ戻る
         </button>
       </div>
 
-      <h1 data-key="title">📋 Inspection List（検査一覧）</h1>
+      <h1 data-key="title">📋 測定一覧（Inspection List）</h1>
 
+      <!-- 新規測定 -->
+      <div style="text-align: right; margin-bottom: 15px">
+        <button
+          class="btn"
+          onclick="location.href = 'die_inspection.html'"
+          data-key="btn_new"
+        >
+          ＋ 新規測定を追加
+        </button>
+      </div>
+
+      <!-- 一覧テーブル -->
       <table id="inspectionTable">
         <thead>
           <tr>
-            <th data-key="col_date">Inspection Date</th>
-            <th data-key="col_die">Die Number</th>
-            <th data-key="col_result">Result</th>
-            <th data-key="col_dimension">Dimension</th>
-            <th data-key="col_shape">Shape</th>
-            <th data-key="col_staff">Staff</th>
-            <th data-key="col_action">Diagnosis</th>
+            <th data-key="col_date">測定日</th>
+            <th data-key="col_die">金型番号</th>
+            <th data-key="col_staff">測定者</th>
+            <th data-key="col_dim">寸法</th>
+            <th data-key="col_shape">形状</th>
+            <th data-key="col_overall">総合</th>
+            <th data-key="col_file">添付</th>
+            <th data-key="col_action">診断へ</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -123,23 +155,27 @@
       /* 多言語辞書 */
       const dict = {
         ja: {
-          title: "📋 Inspection List（検査一覧）",
-          col_date: "検査日",
+          title: "📋 測定一覧（Inspection List）",
+          btn_new: "＋ 新規測定を追加",
+          col_date: "測定日",
           col_die: "金型番号",
-          col_result: "検査結果",
-          col_dimension: "寸法",
+          col_staff: "測定者",
+          col_dim: "寸法",
           col_shape: "形状",
-          col_staff: "担当者",
+          col_overall: "総合",
+          col_file: "添付",
           col_action: "診断へ",
         },
         vi: {
-          title: "📋 Danh sách kiểm tra",
-          col_date: "Ngày kiểm tra",
+          title: "📋 Danh sách đo",
+          btn_new: "＋ Thêm dữ liệu đo",
+          col_date: "Ngày đo",
           col_die: "Mã khuôn",
-          col_result: "Kết quả",
-          col_dimension: "Kích thước",
+          col_staff: "Người đo",
+          col_dim: "Kích thước",
           col_shape: "Hình dạng",
-          col_staff: "Người kiểm tra",
+          col_overall: "Tổng hợp",
+          col_file: "Tệp",
           col_action: "Chẩn đoán",
         },
       };
@@ -158,44 +194,37 @@
         loadInspectionList();
       };
 
-      /* 一覧データ読み込み */
+      /* 一覧データ */
       function loadInspectionList() {
-        fetch("./php/die_inspection_php/load_inspection_list.php")
+        fetch("./php/die_inspection_php/get_inspection_list.php")
           .then((res) => res.json())
-          .then((data) => {
-            const tbody = document.querySelector("#inspectionTable tbody");
-            tbody.innerHTML = "";
-
-            data.forEach((row) => {
-              const tr = document.createElement("tr");
-
-              tr.innerHTML = `
-                  <td>${row.inspection_date}</td>
-                  <td>${row.die_number}</td>
-                  <td>${row.inspection_result}</td>
-                  <td>${row.dimension_result}</td>
-                  <td>${row.shape_result}</td>
-                  <td>${row.staff_name}</td>
-                  <td>
-                      ${
-                        row.diagnosis_count > 0
-                          ? "<span style='color: green; font-weight: bold;'>診断済み</span>"
-                          : '<button class="btn" onclick="goDiagnosis(' +
-                            row.id +
-                            '); event.stopPropagation();">診断</button>'
-                      }
-                  </td>
-              `;
-
-              tr.onclick = () => goDiagnosis(row.id);
-
-              tbody.appendChild(tr);
-            });
-          });
+          .then((data) => renderInspectionList(data));
       }
 
-      function goDiagnosis(inspection_id) {
-        window.location.href = `die_diagnosis.html?inspection_id=${inspection_id}`;
+      function renderInspectionList(data) {
+        const tbody = document.querySelector("#inspectionTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+      <td>${row.inspection_date}</td>
+      <td>${row.die_number}</td>
+      <td>${row.staff_name}</td>
+      <td><span class="badge ${row.dimension === "OK" ? "ok" : "ng"}">${row.dimension}</span></td>
+      <td><span class="badge ${row.shape === "OK" ? "ok" : "ng"}">${row.shape}</span></td>
+      <td><span class="badge ${row.overall === "OK" ? "ok" : "ng"}">${row.overall}</span></td>
+      <td>${row.has_file == 1 ? "📎" : "—"}</td>
+      <td><button class="btn" onclick="goDiagnosis(${row.id})">診断</button></td>
+    `;
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      function goDiagnosis(id) {
+        location.href = `die_diagnosis.html?inspection_id=${id}`;
       }
     </script>
   </body>
