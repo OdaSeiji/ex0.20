@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>修理計画（Fix Plan）</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      /* 多言語ボタン */
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* コンテナ */
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* タイトル */
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      /* ボタン */
+      .btn {
+        padding: 8px 16px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #005fa3;
+      }
+
+      .btn-secondary {
+        background: #2b6ca3;
+      }
+
+      /* カード */
+      .card {
+        padding: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+      }
+
+      .row {
+        margin-bottom: 10px;
+        display: flex;
+      }
+      .row label {
+        width: 150px;
+        font-weight: bold;
+      }
+
+      .file-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .file-item {
+        width: 120px;
+        text-align: center;
+      }
+      .thumb {
+        width: 120px;
+        height: 90px;
+        object-fit: cover;
+        border: 1px solid #ccc;
+      }
+
+      .button-area {
+        text-align: right;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 多言語ボタン -->
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <!-- 戻るボタン -->
+      <div style="text-align: right; margin-bottom: 10px">
+        <button class="btn btn-secondary" onclick="history.back()">
+          ← 戻る
+        </button>
+      </div>
+
+      <!-- タイトル -->
+      <h1>🛠 修理計画（Fix Plan）</h1>
+
+      <!-- ============================= -->
+      <!-- 診断情報（読み取り専用） -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 診断情報（読み取り専用）</h2>
+
+        <div class="row">
+          <label>診断日：</label><span id="diag_date"></span>
+        </div>
+        <div class="row">
+          <label>診断者：</label><span id="diag_staff"></span>
+        </div>
+        <div class="row">
+          <label>寸法判定：</label><span id="dim_judge"></span>
+        </div>
+        <div class="row">
+          <label>形状判定：</label><span id="shape_judge"></span>
+        </div>
+        <div class="row">
+          <label>総合判定：</label><span id="overall_judge"></span>
+        </div>
+        <div class="row">
+          <label>NG 対応：</label><span id="ng_action"></span>
+        </div>
+        <div class="row">
+          <label>条件変更：</label><span id="condition_change"></span>
+        </div>
+        <div class="row">
+          <label>修理要否：</label><span id="need_fix"></span>
+        </div>
+
+        <h3>■ 診断時の添付ファイル</h3>
+        <div id="diag_files" class="file-list"></div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- 修理計画（入力） -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 修理計画（入力）</h2>
+
+        <div class="row">
+          <label>修理予定日：</label>
+          <input type="date" id="plan_fix_date" required />
+        </div>
+
+        <div class="row">
+          <label>修理担当者：</label>
+          <select id="plan_fix_staff_id"></select>
+        </div>
+
+        <div class="row">
+          <label>修理予定内容：</label>
+          <textarea id="plan_fix_content" required></textarea>
+        </div>
+
+        <h3>■ 添付ファイル（任意）</h3>
+        <input type="file" id="plan_files" multiple />
+        <div id="plan_file_preview" class="file-list"></div>
+
+        <div class="button-area">
+          <button class="btn" id="submitBtn">申請する</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* 多言語（必要なら後で追加） */
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+      }
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const press_id = urlParams.get("press_id"); // ← 修正済み
+      let diagnosis_id = null;
+      let fix_id = null;
+
+      window.onload = function () {
+        loadDiagnosis();
+        loadStaffList();
+      };
+
+      /* ------------------------------
+         診断情報の読み込み
+      ------------------------------ */
+      function loadDiagnosis() {
+        fetch(
+          `./php/die_progress_php/get_diagnosis_data.php?press_id=${press_id}`,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const diag = data.diagnosis;
+            const diag_files = data.diagnosis_files;
+
+            diagnosis_id = diag ? diag.id : null;
+
+            document.getElementById("diag_date").textContent =
+              diag?.diagnosis_date || "";
+            document.getElementById("diag_staff").textContent =
+              diag?.staff_name || "";
+            document.getElementById("dim_judge").textContent =
+              diag?.dimension_judgement || "";
+            document.getElementById("shape_judge").textContent =
+              diag?.shape_judgement || "";
+            document.getElementById("overall_judge").textContent =
+              diag?.overall_judgement || "";
+            document.getElementById("ng_action").textContent =
+              diag?.ng_action || "";
+            document.getElementById("condition_change").textContent =
+              diag?.condition_change || "なし";
+            document.getElementById("need_fix").textContent =
+              diag?.ng_action == 2 || diag?.ng_action == 3 ? "必要" : "不要";
+
+            renderDiagFiles(diag_files);
+
+            // 診断IDが確定したら修理計画を読み込む
+            loadFixPlan();
+          });
+      }
+
+      /* ------------------------------
+         診断ファイル表示
+      ------------------------------ */
+      function renderDiagFiles(files) {
+        const area = document.getElementById("diag_files");
+        area.innerHTML = "";
+
+        if (!diagnosis_id) return;
+
+        files.forEach((f) => {
+          const div = document.createElement("div");
+          div.classList.add("file-item");
+
+          const base = `uploads/diagnosis/${diagnosis_id}/${f.file_path}`;
+
+          if (f.file_type.startsWith("image/")) {
+            div.innerHTML = `<img src="${base}" class="thumb">`;
+          } else {
+            div.innerHTML = `<a href="${base}" target="_blank">${f.file_path}</a>`;
+          }
+
+          area.appendChild(div);
+        });
+      }
+
+      /* ------------------------------
+         スタッフ一覧
+      ------------------------------ */
+      function loadStaffList() {
+        fetch("./php/die_progress_php/get_staff_list.php")
+          .then((res) => res.json())
+          .then((list) => {
+            const sel = document.getElementById("plan_fix_staff_id");
+            list.forEach((s) => {
+              const opt = document.createElement("option");
+              opt.value = s.id;
+              opt.textContent = s.staff_name;
+              sel.appendChild(opt);
+            });
+          });
+      }
+
+      /* ------------------------------
+         修理計画の読み込み
+      ------------------------------ */
+      function loadFixPlan() {
+        if (!diagnosis_id) return;
+
+        fetch(
+          `./php/die_progress_php/get_fix_plan.php?diagnosis_id=${diagnosis_id}`,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data) return;
+
+            fix_id = data.id;
+            document.getElementById("plan_fix_date").value =
+              data.plan_fix_date || "";
+            document.getElementById("plan_fix_staff_id").value =
+              data.plan_fix_staff_id || "";
+            document.getElementById("plan_fix_content").value =
+              data.plan_fix_content || "";
+
+            renderPlanFiles(data.files);
+          });
+      }
+
+      /* ------------------------------
+         修理計画ファイル表示
+      ------------------------------ */
+      function renderPlanFiles(files) {
+        const area = document.getElementById("plan_file_preview");
+        area.innerHTML = "";
+
+        files.forEach((f) => {
+          const div = document.createElement("div");
+          div.classList.add("file-item");
+
+          const base = `uploads/fix/${f.fix_id}/${f.file_path}`;
+
+          if (f.file_type.startsWith("image/")) {
+            div.innerHTML = `<img src="${base}" class="thumb">`;
+          } else {
+            div.innerHTML = `<a href="${base}" target="_blank">${f.file_path}</a>`;
+          }
+
+          area.appendChild(div);
+        });
+      }
+
+      /* ------------------------------
+         修理計画の申請（保存）
+      ------------------------------ */
+      document
+        .getElementById("submitBtn")
+        .addEventListener("click", function () {
+          const formData = new FormData();
+          formData.append("diagnosis_id", diagnosis_id);
+          formData.append(
+            "plan_fix_date",
+            document.getElementById("plan_fix_date").value,
+          );
+          formData.append(
+            "plan_fix_staff_id",
+            document.getElementById("plan_fix_staff_id").value,
+          );
+          formData.append(
+            "plan_fix_content",
+            document.getElementById("plan_fix_content").value,
+          );
+
+          if (fix_id) formData.append("fix_id", fix_id);
+
+          const files = document.getElementById("plan_files").files;
+          for (let i = 0; i < files.length; i++) {
+            formData.append("plan_files[]", files[i]);
+          }
+
+          fetch("./php/die_progress_php/save_fix_plan.php", {
+            method: "POST",
+            body: formData,
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              alert("修理計画を申請しました。");
+              location.reload();
+            });
+        });
+    </script>
+  </body>
+</html>

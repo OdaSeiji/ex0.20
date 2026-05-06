@@ -13,24 +13,29 @@ require_once "../db.php";
 $sql = "
 SELECT
     i.id,
+    i.press_id,
     i.inspection_date,
     d.die_number,
     s.staff_name,
     i.dimension_result AS dimension,
     i.shape_result AS shape,
-    i.inspection_result AS overall,
+    i.overall_result AS overall,
+    i.memo,
 
     -- 添付ファイルの有無
     CASE WHEN att.cnt > 0 THEN 1 ELSE 0 END AS has_file
 
 FROM t_die_inspection i
 
+-- 金型番号
 LEFT JOIN m_dies d
   ON i.die_id = d.id
 
+-- 測定者
 LEFT JOIN m_staff s
-  ON i.inspected_by = s.id
+  ON i.inspection_staff_id = s.id
 
+-- 添付ファイル数
 LEFT JOIN (
     SELECT inspection_id, COUNT(*) AS cnt
     FROM t_die_attachment

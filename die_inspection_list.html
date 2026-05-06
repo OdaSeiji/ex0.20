@@ -196,7 +196,7 @@
 
       /* 一覧データ */
       function loadInspectionList() {
-        fetch("./php/die_inspection_php/get_inspection_list.php")
+        fetch("./php/die_progress_php/get_inspection_list.php")
           .then((res) => res.json())
           .then((data) => renderInspectionList(data));
       }
