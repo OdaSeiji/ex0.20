@@ -3674,3 +3674,213 @@ MariaDB [extrusion]>
 ```
 
 実行成功。
+
+# 2026/05/03
+
+**テーブルに重大な問題 追加項目**
+
+t_die_inspectionのカラムに問題あり、
+
+```sql
+ALTER TABLE t_die_inspection
+  MODIFY inspection_staff INT(11) NOT NULL;
+ALTER TABLE t_die_inspection
+  CHANGE inspection_staff inspection_staff_id INT(11) NOT NULL;
+ALTER TABLE t_die_inspection
+  ADD CONSTRAINT fk_inspection_staff
+  FOREIGN KEY (inspection_staff_id)
+  REFERENCES m_staff(id);
+```
+
+もう一つ、重大な問題。`t_die_inspection`にpress_idが無いとデータが迷子になっちゃう。データが無いときに実行する。
+
+```sql
+ALTER TABLE t_die_inspection
+  ADD press_id INT(11) NOT NULL AFTER id;
+ALTER TABLE t_die_inspection
+  ADD CONSTRAINT fk_die_inspection_press
+  FOREIGN KEY (press_id)
+  REFERENCES t_press(id);
+```
+
+更にこっちも
+
+```sql
+ALTER TABLE t_die_attachment
+ADD COLUMN inspection_id INT(11) NULL AFTER id;
+```
+
+# 各画面を一旦整理
+
+**診断画面**
+
+```
+┌──────────────────────────────────────────────┐
+│  診断（Diagnosis）                           │
+├──────────────────────────────────────────────┤
+
+■ 測定情報（読み取り専用）
+  測定日：2026-05-03
+  測定者：山田
+  寸法結果：OK
+  形状結果：NG
+  総合結果：NG
+  メモ：…
+
+  ■ 測定時の添付ファイル（必須）
+    [サムネイル or アイコン＋リンク一覧]
+      - image1.jpg（サムネイル）
+      - measure.pdf（PDF アイコン＋リンク）
+      - measure.xlsx（Excel アイコン＋リンク）
+
+──────────────────────────────────────
+
+■ 押出指示条件（t_press_directive）
+  billet_size：180
+  billet_length：900
+  ram_speed：3.5
+  billet_temperature：480
+  billet_taper_heating：450
+  die_temperature：480
+  stretch_ratio：8%
+  discard_thickness：20mm
+
+■ 押出実績（t_press）
+  press_date_at：2026-04-30
+  billet_size：180
+  billet_length：900
+  no1_0200_ram_speed：3.2
+  actual_die_temperature：475
+  stretch_ratio：7.8%
+
+──────────────────────────────────────
+
+■ 診断情報（入力）
+  [診断日]        📅（デフォルト：今日）
+  [診断者]        （ログインユーザー自動入力）
+
+■ 判定
+  寸法判定：   (○) OK   ( ) NG
+  形状判定：   (○) OK   ( ) NG
+  総合判定：   (○) OK   ( ) NG
+
+■ NG 対応（必須）
+  (1) 様子を見る
+  (2) 修理
+  (3) 修理 + 条件変更
+  (4) 条件変更のみ
+
+■ 条件変更内容（ng_action が 3 or 4 の場合のみ表示）
+  [テキストエリア]
+
+■ 修理の要否（自動 or 手動）
+  [ ] 修理が必要
+  ※ ng_action が 2 or 3 の場合は自動チェック
+
+■ 承認ステータス
+  状態： (○) pending   ( ) approved   ( ) rejected
+  承認者： [テキスト]
+  承認日： [日付]
+  却下理由： [テキストエリア]
+
+■ メモ
+  [テキストエリア]
+
+■ 添付ファイル（任意）
+  [ファイル選択]（複数可）
+  ※ 画像 → サムネイル
+  ※ PDF / Excel / Word / ZIP → アイコン＋リンク
+
+──────────────────────────────────────
+  [保存]
+  [修理画面へ進む]（ng_action=2 or 3 の場合のみ有効）
+  [次回押出条件へ進む]（ng_action=3 or 4 の場合のみ有効）
+──────────────────────────────────────
+```
+
+**修理計画画面**
+
+```
+┌──────────────────────────────────────────────┐
+│  修理計画（Fix Plan）                        │
+├──────────────────────────────────────────────┤
+
+■ 診断情報（読み取り専用）
+  診断日：2026-05-03
+  診断者：山田
+  寸法判定：NG
+  形状判定：NG
+  総合判定：NG
+  NG 対応：修理（2）
+  条件変更：なし
+  修理要否：必要
+
+  ■ 診断時の添付ファイル
+    - diag1.jpg（サムネイル）
+    - diag_report.pdf（PDF アイコン＋リンク）
+
+──────────────────────────────────────
+
+■ 修理計画（入力）
+  [修理予定日]        📅（必須）
+  [修理担当者]        ▼（m_staff から選択）
+  [修理予定内容]      （テキストエリア、必須）
+
+■ 添付ファイル（任意）
+  [ファイル選択]（複数可）
+  ※ 画像 → サムネイル
+  ※ PDF / Excel / Word / ZIP → アイコン＋リンク
+
+──────────────────────────────────────
+  [保存]
+  [修理報告画面へ進む]（保存後に有効）
+──────────────────────────────────────
+```
+
+**修理報告画面**
+
+```
+┌──────────────────────────────────────────────┐
+│  修理報告（Fix Report）                      │
+├──────────────────────────────────────────────┤
+
+■ 修理計画（読み取り専用）
+  修理予定日：2026-05-10
+  修理担当者：山田
+  修理予定内容：
+    ・ベアリング交換
+    ・ランド部研磨
+
+  ■ 計画時の添付ファイル
+    - plan1.jpg（サムネイル）
+    - plan_doc.pdf（PDF アイコン＋リンク）
+
+──────────────────────────────────────
+
+■ 修理実行（入力）
+  [実修理日]        📅（必須）
+  [実修理担当者]    ▼（m_staff から選択、leave_at IS NULL）
+  [実修理内容]      （テキストエリア、必須）
+
+■ 修理結果（入力）
+  [修理結果]        （テキストエリア、必須）
+  ※ 例：良好、再修理が必要、注意点など
+
+■ 添付ファイル（必須推奨）
+  [ファイル選択]（複数可）
+  ※ 画像 → サムネイル
+  ※ PDF / Excel / Word / ZIP → アイコン＋リンク
+
+──────────────────────────────────────
+
+■ 実行後承認（承認②）
+  承認ステータス：
+      (○) pending   ( ) approved   ( ) rejected
+  承認者：        ▼（m_staff から選択）
+  承認日：        📅（approved の場合のみ）
+  却下理由：      （rejected の場合のみ表示）
+
+──────────────────────────────────────
+  [保存]
+──────────────────────────────────────
+```

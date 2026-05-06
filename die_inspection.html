@@ -191,6 +191,11 @@
         cursor: pointer;
         z-index: 10;
       }
+
+      .preview-item {
+        width: 100px;
+        text-align: center;
+      }
     </style>
   </head>
 
@@ -294,7 +299,161 @@
     </div>
 
     <script>
-      /* 多言語辞書 */
+      /* --------------------------------------------------
+        初期ログ（デバッグ用）
+      -------------------------------------------------- */
+      // console.log(
+      //   "inspection_files:",
+      //   document.getElementById("inspection_files"),
+      // );
+
+      /* --------------------------------------------------
+        添付ファイルの種類に応じたアイコン
+      -------------------------------------------------- */
+      function getFileIcon(fileName) {
+        const name = fileName.toLowerCase();
+
+        if (name.endsWith(".pdf")) return "📄";
+        if (name.endsWith(".xls") || name.endsWith(".xlsx")) return "📊";
+        if (name.endsWith(".doc") || name.endsWith(".docx")) return "📘";
+        if (name.endsWith(".zip") || name.endsWith(".rar")) return "🗂️";
+
+        return "📁"; // その他
+      }
+
+      /* --------------------------------------------------
+        画像ファイル判定
+      -------------------------------------------------- */
+      function isImageFile(file) {
+        const name = file.name.toLowerCase();
+        return (
+          name.endsWith(".jpg") ||
+          name.endsWith(".jpeg") ||
+          name.endsWith(".png") ||
+          name.endsWith(".gif") ||
+          name.endsWith(".bmp") ||
+          name.endsWith(".webp") ||
+          name.endsWith(".heic")
+        );
+      }
+
+      /* --------------------------------------------------
+        サムネイル描画（画像・非画像 / 削除ボタン付き）
+      -------------------------------------------------- */
+      function renderPreview(files) {
+        console.log("renderPreview:", files);
+
+        const preview = document.getElementById("preview_area");
+        preview.innerHTML = "";
+
+        files.forEach((file, index) => {
+          const item = document.createElement("div");
+          item.classList.add("preview-item");
+
+          /* --- 削除ボタン --- */
+          const delBtn = document.createElement("div");
+          delBtn.classList.add("thumb-delete-btn");
+          delBtn.textContent = "×";
+
+          delBtn.onclick = () => {
+            files.splice(index, 1);
+
+            // FileList を再構築
+            const dt = new DataTransfer();
+            files.forEach((f) => dt.items.add(f));
+            document.getElementById("inspection_files").files = dt.files;
+
+            renderPreview(files);
+          };
+
+          item.appendChild(delBtn);
+
+          /* --- 画像ファイル --- */
+          if (isImageFile(file)) {
+            const img = document.createElement("img");
+            img.src = URL.createObjectURL(file);
+
+            img.onclick = () => openModal(img.src);
+
+            item.appendChild(img);
+          } else {
+            /* --- 非画像ファイル --- */
+            console.log("非画像ファイル:", file.name);
+
+            const icon = document.createElement("div");
+            icon.style.fontSize = "40px";
+            icon.style.textAlign = "center";
+            icon.textContent = getFileIcon(file.name);
+
+            const label = document.createElement("div");
+            label.style.fontSize = "12px";
+            label.style.marginTop = "4px";
+            label.textContent = file.name;
+
+            item.appendChild(icon);
+            item.appendChild(label);
+
+            // クリックでダウンロード
+            item.onclick = () => {
+              const url = URL.createObjectURL(file);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = file.name;
+              a.click();
+            };
+          }
+
+          preview.appendChild(item);
+        });
+      }
+
+      /* --------------------------------------------------
+        ファイル選択時
+      -------------------------------------------------- */
+      document
+        .getElementById("inspection_files")
+        .addEventListener("change", function (e) {
+          const files = Array.from(e.target.files);
+
+          // ★ 5MB 制限
+          const MAX_SIZE = 5 * 1024 * 1024;
+
+          for (const file of files) {
+            if (file.size > MAX_SIZE) {
+              alert(`The file "${file.name}" exceeds the 5MB size limit.`);
+              e.target.value = ""; // 選択解除
+              return;
+            }
+          }
+
+          renderPreview(files);
+        });
+
+      /* --------------------------------------------------
+        モーダル表示
+      -------------------------------------------------- */
+      function openModal(src) {
+        const modal = document.getElementById("imgModal");
+        const modalImg = document.getElementById("modalImg");
+
+        modalImg.src = src;
+        modal.style.display = "flex";
+      }
+
+      document.getElementById("modalClose").onclick = function () {
+        document.getElementById("imgModal").style.display = "none";
+      };
+
+      // 背景クリックで閉じる
+      document.getElementById("imgModal").onclick = function (e) {
+        if (e.target === this) {
+          this.style.display = "none";
+        }
+      };
+
+      /* --------------------------------------------------
+        多言語辞書
+      -------------------------------------------------- */
       const dict = {
         ja: {
           title: "📏 測定入力（Inspection）",
@@ -326,6 +485,9 @@
         },
       };
 
+      /* --------------------------------------------------
+        言語切替
+      -------------------------------------------------- */
       function setLang(lang) {
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
@@ -334,26 +496,31 @@
         localStorage.setItem("lang", lang);
       }
 
-      // ★ ここが一番上に必要（最優先）
+      /* --------------------------------------------------
+        URL パラメータ取得
+      -------------------------------------------------- */
       function getParam(name) {
         return new URLSearchParams(window.location.search).get(name);
       }
 
-      const pressId = getParam("press_id");
-
+      /* --------------------------------------------------
+       初期ロード
+      -------------------------------------------------- */
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
 
-        loadStaffList(); // 測定者一覧
+        loadStaffList();
 
         const pressId = getParam("press_id");
         if (pressId) {
-          loadPressInfo(pressId); // ★ 分離した関数を呼ぶ
+          loadPressInfo(pressId);
         }
       };
 
-      // 押出情報の読み出し
+      /* --------------------------------------------------
+        押出情報の読み出し
+      -------------------------------------------------- */
       function loadPressInfo(pressId) {
         fetch(`./php/die_progress_php/get_press_info.php?press_id=${pressId}`)
           .then((res) => res.json())
@@ -378,150 +545,105 @@
             document.getElementById("press_hours_display").textContent =
               hours + " 時間";
           })
-          .catch((err) => {
-            console.error("押出情報の取得に失敗:", err);
-          });
+          .catch((err) => console.error("押出情報の取得に失敗:", err));
       }
 
-      /* スタッフ一覧 */
+      /* --------------------------------------------------
+        スタッフ一覧
+      -------------------------------------------------- */
       function loadStaffList() {
         fetch("./php/die_progress_php/get_staff_list.php")
           .then((res) => res.json())
           .then((staffList) => {
             const sel = document.getElementById("inspection_staff_id");
-            sel.innerHTML = ""; // 初期化
+            sel.innerHTML = "";
 
             staffList.forEach((s) => {
               sel.innerHTML += `<option value="${s.id}">${s.staff_name}</option>`;
             });
           })
-          .catch((err) => {
-            console.error("スタッフ一覧の取得に失敗:", err);
-          });
+          .catch((err) => console.error("スタッフ一覧の取得に失敗:", err));
       }
 
-      /* 保存処理（ダミー） */
+      /* --------------------------------------------------
+        保存処理
+      -------------------------------------------------- */
       document.getElementById("saveBtn").onclick = function () {
         const files = document.getElementById("inspection_files").files;
+
         if (files.length === 0) {
-          alert("添付ファイルは必須です。");
+          alert("Attachment is required.");
           return;
         }
 
-        alert("保存しました。測定一覧へ戻ります。");
-        location.href = "die_inspection_list.html";
-      };
-      // 押出時間計算
-      function calcPressHours(start, finish) {
-        console.log("raw:", start, finish);
+        // ★ FormData 作成
+        const fd = new FormData();
 
+        // --- 基本情報 ---
+        fd.append("press_id", document.getElementById("press_id").value);
+        fd.append("dies_id", document.getElementById("dies_id").value);
+        fd.append(
+          "inspection_date",
+          document.getElementById("inspection_date").value,
+        );
+        fd.append(
+          "inspection_staff_id",
+          document.getElementById("inspection_staff_id").value,
+        );
+        fd.append(
+          "dimension_result",
+          document.getElementById("dimension_result").value,
+        );
+        fd.append(
+          "shape_result",
+          document.getElementById("shape_result").value,
+        );
+        fd.append(
+          "overall_result",
+          document.getElementById("overall_result").value,
+        );
+        fd.append("memo", document.getElementById("memo").value);
+
+        // --- 添付ファイル（複数） ---
+        for (let i = 0; i < files.length; i++) {
+          fd.append("files[]", files[i]);
+        }
+
+        // ★ デバッグ表示
+        console.log("送信データ:", ...fd);
+
+        // ★ PHP に送信
+        fetch("./php/die_progress_php/save_inspection.php", {
+          method: "POST",
+          body: fd,
+        })
+          .then((res) => res.text())
+          .then((text) => {
+            console.log("サーバー応答:", text);
+
+            alert("Saved. Returning to the progress list.");
+            // デバッグ中は画面遷移しない
+            location.href = "die_progress_list.html";
+          })
+          .catch((err) => {
+            console.error("保存エラー:", err);
+            alert("Failed to save.");
+          });
+      };
+
+      /* --------------------------------------------------
+        押出時間計算
+      -------------------------------------------------- */
+      function calcPressHours(start, finish) {
         const [sh, sm, ss] = start.split(":").map(Number);
         const [fh, fm, fs] = finish.split(":").map(Number);
-        // console.log("parsed:", sh, sm, ss, fh, fm, fs);
 
         const startSec = sh * 3600 + sm * 60 + ss;
         const finishSec = fh * 3600 + fm * 60 + fs;
-        // console.log("sec:", startSec, finishSec);
 
         const diffSec = finishSec - startSec;
-        const hours = diffSec / 3600;
-        // console.log("hours(raw):", hours);
-
-        return hours.toFixed(2);
+        return (diffSec / 3600).toFixed(2);
       }
-      /* --------------------------------------------------
-        画像ファイル判定
-      -------------------------------------------------- */
-      function isImageFile(file) {
-        const name = file.name.toLowerCase();
-        return (
-          name.endsWith(".jpg") ||
-          name.endsWith(".jpeg") ||
-          name.endsWith(".png") ||
-          name.endsWith(".gif") ||
-          name.endsWith(".bmp") ||
-          name.endsWith(".webp") ||
-          name.endsWith(".heic")
-        );
-      }
-
-      /* --------------------------------------------------
-        サムネイル描画（削除ボタン付き）
-      -------------------------------------------------- */
-      function renderPreview(files) {
-        const preview = document.getElementById("preview_area");
-        preview.innerHTML = "";
-
-        files.forEach((file, index) => {
-          const item = document.createElement("div");
-          item.classList.add("preview-item");
-
-          // ★ 削除ボタン
-          const delBtn = document.createElement("div");
-          delBtn.classList.add("thumb-delete-btn");
-          delBtn.textContent = "×";
-
-          delBtn.onclick = () => {
-            files.splice(index, 1);
-
-            // FileList を再構築
-            const dt = new DataTransfer();
-            files.forEach((f) => dt.items.add(f));
-            document.getElementById("inspection_files").files = dt.files;
-
-            renderPreview(files);
-          };
-
-          item.appendChild(delBtn);
-
-          // ★ 画像プレビュー
-          if (isImageFile(file)) {
-            const img = document.createElement("img");
-            img.src = URL.createObjectURL(file);
-
-            // モーダル表示
-            img.onclick = () => openModal(img.src);
-
-            item.appendChild(img);
-          } else {
-            item.textContent = file.name;
-          }
-
-          preview.appendChild(item);
-        });
-      }
-
-      /* --------------------------------------------------
-        ファイル選択時
-      -------------------------------------------------- */
-      document
-        .getElementById("inspection_files")
-        .addEventListener("change", function (e) {
-          const files = Array.from(e.target.files);
-          renderPreview(files);
-        });
-
-      /* --------------------------------------------------
-        モーダル表示
-      -------------------------------------------------- */
-      function openModal(src) {
-        const modal = document.getElementById("imgModal");
-        const modalImg = document.getElementById("modalImg");
-
-        modalImg.src = src;
-        modal.style.display = "flex";
-      }
-
-      document.getElementById("modalClose").onclick = function () {
-        document.getElementById("imgModal").style.display = "none";
-      };
-
-      // 背景クリックでも閉じる
-      document.getElementById("imgModal").onclick = function (e) {
-        if (e.target === this) {
-          this.style.display = "none";
-        }
-      };
     </script>
   </body>
 </html>
