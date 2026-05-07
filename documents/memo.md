@@ -3884,3 +3884,12 @@ ADD COLUMN inspection_id INT(11) NULL AFTER id;
   [保存]
 ──────────────────────────────────────
 ```
+
+# 2026/05/07
+
+サーバーのテーブルの修正をして、Webプログラムを更新。
+
+<figure style="text-align:center;">
+  <img src="./img/20260507-01.png" width="300">
+  <figcaption>図1:現状使っている報告書</figcaption>
+</figure>
