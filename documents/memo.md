@@ -3893,3 +3893,18 @@ ADD COLUMN inspection_id INT(11) NULL AFTER id;
   <img src="./img/20260507-01.png" width="300">
   <figcaption>図1:現状使っている報告書</figcaption>
 </figure>
+
+# 2026/05/08
+
+- 修理要否の表示は必要ない・・・そのまま
+- 一番上のタイトルをスクロールしても固定する
+- 各工程をクリックして、内容を確認できるようにする
+- 承認を拒否した場合の流れ
+- 修理ページの作成
+- 押出種別でのフィルタリング
+- 押出指示書のPDFの読み出し
+
+<figure style="text-align:center;">
+  <img src="./img/20260508-01.png" width="500">
+  <!-- <figcaption>図1:現状使っている報告書</figcaption> -->
+</figure>
