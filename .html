@@ -109,32 +109,6 @@
       .btn-back:hover {
         background-color: #56729a;
       }
-
-      /* 押出指示書サムネイル */
-      .thumb {
-        margin-top: 5px;
-      }
-
-      .img-thumb {
-        width: 120px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-
-      .pdf-thumb {
-        width: 80px;
-        opacity: 0.85;
-      }
-
-      .no-file {
-        font-size: 14px;
-        color: #777;
-      }
-
-      .file-name {
-        font-size: 12px;
-        margin-top: 4px;
-      }
     </style>
   </head>
 
@@ -228,12 +202,6 @@
       </div>
       <div class="row">
         <label>discard_thickness：</label><span id="dir_discard"></span>
-      </div>
-
-      <!-- ★★★ ここに PDF / 画像サムネイルを表示 ★★★ -->
-      <div class="row" style="margin-top: 15px">
-        <label>指示書スキャン：</label>
-        <div id="directiveScanArea"></div>
       </div>
     </div>
 
@@ -543,8 +511,8 @@
       };
 
       /* ------------------------------
-   診断データ取得
------------------------------- */
+         診断データ取得
+      ------------------------------ */
       function loadDiagnosisData() {
         fetch(
           `./php/die_progress_php/get_diagnosis_data.php?press_id=${pressId}`,
@@ -552,70 +520,15 @@
           .then((res) => res.json())
           .then((data) => {
             console.log("Diagnosis Data:", data);
-            console.log(
-              "SCAN FILE:",
-              data.press.press_directive_scan_file_name,
-            );
-
             fillInspection(data.inspection, data.inspection_files);
             fillDirective(data.directive);
 
-            /* ★ 型番セット */
+            /* ★ ここで型番をセットするのが最適 */
             document.getElementById("dieNumber").textContent =
               data.press.die_number;
 
             fillPress(data.press);
             fillDiagnosis(data.diagnosis);
-
-            /* =====================================================
-              ★ 押出指示スキャンファイル（PDF/画像）サムネイル表示
-            ===================================================== */
-            const fileName = data.press.press_directive_scan_file_name;
-            const area = document.getElementById("directiveScanArea");
-
-            if (!area) {
-              console.warn("directiveScanArea が見つかりません");
-              return;
-            }
-
-            // ファイルが無い場合
-            if (!fileName) {
-              area.innerHTML = `<div class="no-file">No File</div>`;
-              return;
-            }
-
-            // 保存場所（固定）
-            const fileUrl = `../diereport/upload/01_press_directive/${fileName}`;
-            const ext = fileName.split(".").pop().toLowerCase();
-
-            let html = "";
-
-            if (ext === "pdf") {
-              // PDF → PDFアイコン
-              html = `
-          <div class="thumb">
-            <a href="${fileUrl}" target="_blank">
-              <img src="./img/pdf_icon.svg" class="pdf-thumb">
-            </a>
-            <div class="file-name">${fileName}</div>
-          </div>
-        `;
-            } else if (["jpg", "jpeg", "png"].includes(ext)) {
-              // 画像 → サムネイル
-              html = `
-          <div class="thumb">
-            <a href="${fileUrl}" target="_blank">
-              <img src="${fileUrl}" class="img-thumb">
-            </a>
-            <div class="file-name">${fileName}</div>
-          </div>
-        `;
-            } else {
-              // その他 → No File
-              html = `<div class="no-file">No File</div>`;
-            }
-
-            area.innerHTML = html;
           });
       }
 

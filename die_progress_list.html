@@ -121,6 +121,13 @@
         padding: 4px 6px;
         margin-left: 6px;
       }
+      /* ★ テーブルヘッダー固定 */
+      #progressTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: #e8f1ff; /* ← 既存のヘッダー色 */
+      }
     </style>
   </head>
 
@@ -159,7 +166,19 @@
               />
             </th>
             <!-- <th data-key="col_die">金型番号</th> -->
-            <th data-key="col_type">押出種別</th>
+            <th data-key="col_type">
+              押出種別
+              <select
+                id="filterPressingType"
+                class="die-search"
+                style="margin-left: 6px"
+              >
+                <option value="">すべて</option>
+                <option value="◎">◎</option>
+                <option value="〇">〇</option>
+                <option value="●">●</option>
+              </select>
+            </th>
             <th data-key="col_ins">測定</th>
             <th data-key="col_diag">診断</th>
             <th data-key="col_needfix">修理要否</th>
@@ -174,8 +193,8 @@
 
     <script>
       /* ============================================================
-         多言語辞書
-      ============================================================ */
+   多言語辞書
+============================================================ */
       const dict = {
         ja: {
           title: "📊 金型進捗一覧（Progress List）",
@@ -214,48 +233,61 @@
       };
 
       /* ============================================================
-         URLパラメータ取得
-      ============================================================ */
-      function getParam(name) {
-        return new URLSearchParams(window.location.search).get(name);
-      }
-
-      const pressId = getParam("press_id");
-
-      /* ============================================================
-         初期ロード：言語設定＋進捗リスト読み込み
-      ============================================================ */
+   初期ロード
+============================================================ */
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
         loadProgressList();
+
+        // ★ 押出種別フィルターのイベント登録
+        const typeFilter = document.getElementById("filterPressingType");
+        if (typeFilter) {
+          typeFilter.addEventListener("change", () => {
+            renderTable(applyFilters(window._progressData));
+          });
+        }
       };
 
       /* ============================================================
-         多言語切替
-      ============================================================ */
+   多言語切替（TH の select を壊さない安全版）
+============================================================ */
       function setLang(lang) {
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
-          el.textContent = dict[lang][key];
+          const newText = dict[lang][key];
+
+          if (el.tagName === "TH") {
+            // ★ 子要素（select 等）を保持しつつ、先頭テキストだけ置換
+            const children = Array.from(el.childNodes);
+
+            // 先頭のテキストノードを探す
+            const textNode = children.find(
+              (n) => n.nodeType === Node.TEXT_NODE,
+            );
+
+            if (textNode) {
+              textNode.textContent = newText + " ";
+            }
+          } else {
+            el.textContent = newText;
+          }
         });
 
         localStorage.setItem("lang", lang);
 
-        // ★ 言語切り替え時にテーブルを再描画する
         if (window._progressData) {
-          renderTable(window._progressData);
+          renderTable(applyFilters(window._progressData));
         }
       }
 
       /* ============================================================
-         進捗リスト読み込み（DB → JS）
-      ============================================================ */
+   進捗リスト読み込み
+============================================================ */
       function loadProgressList() {
         fetch("./php/die_progress_php/get_progress_list.php?ts=" + Date.now())
           .then((res) => res.json())
           .then((data) => {
-            // 数値に変換（null → null、0/1 → 数値）
             data.forEach((row) => {
               row.inspected =
                 row.inspected === null ? null : Number(row.inspected);
@@ -269,13 +301,28 @@
             });
 
             window._progressData = data;
-            renderTable(data);
+            renderTable(applyFilters(data));
           });
       }
 
       /* ============================================================
-         テーブル描画
-      ============================================================ */
+   押出種別フィルター（安全版）
+============================================================ */
+      function applyFilters(data) {
+        const select = document.getElementById("filterPressingType");
+        if (!select) return data;
+
+        const type = select.value;
+
+        return data.filter((row) => {
+          const matchType = type === "" || row.pressing_symbol === type;
+          return matchType;
+        });
+      }
+
+      /* ============================================================
+   テーブル描画
+============================================================ */
       function renderTable(data) {
         const tbody = document.querySelector("#progressTable tbody");
         tbody.innerHTML = "";
@@ -283,88 +330,69 @@
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
-          // ✔ / ✖ / — のバッジ表示
           const badge = (flag) =>
             flag === 1
-              ? `<span class="badge ok">✔</span>`
+              ? `<span class="badge ok">YES</span>`
               : flag === 0
-                ? `<span class="badge ng">✖</span>`
+                ? `<span class="badge ng">NO</span>`
                 : `<span class="badge none">—</span>`;
 
-          /* ------------------------------------------------------------
-            操作ボタンの判定ロジック（多言語対応版）
-            ① 測定前 → 測定へ
-            ② 測定済・診断前 → 診断へ
-            ③ 診断済・未承認 → 承認（PIN認証）
-            ④ 承認済・修理必要 → 修理へ
-            ⑤ それ以外 → 詳細
-          ------------------------------------------------------------ */
-          let actionBtn = "";
           const lang = localStorage.getItem("lang") || "ja";
+          let actionBtn = "";
 
           if (row.inspected === 0 || row.inspected === null) {
-            // ★ 測定前（0 または null）
             actionBtn = `<button class="btn" onclick="goInspection(${row.press_id})">${dict[lang].col_action_ins}</button>`;
           } else if (
             row.inspected === 1 &&
             (row.diagnosed === 0 || row.diagnosed === null)
           ) {
-            // ★ 測定済・診断前
             actionBtn = `<button class="btn" onclick="goDiagnosis(${row.press_id})">${dict[lang].col_action_diag}</button>`;
           } else if (row.diagnosed === 1 && row.approved !== 1) {
-            // ★ 診断済・未承認
             actionBtn = `<button class="btn btn-warning" onclick="approveDiagnosis(${row.press_id})">${dict[lang].col_action_app}</button>`;
           } else if (row.need_fix === 1 && row.fixed === 0) {
-            // ★ 修理必要・未修理
             actionBtn = `<button class="btn" onclick="goFix(${row.press_id})">${dict[lang].col_action_fix}</button>`;
           } else {
-            // ★ それ以外は詳細
             actionBtn = `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
           }
 
           tr.innerHTML = `
-            <td>${row.press_date}</td>
-            <td class="die-number">${row.die_number}</td>
-            <td class="pressing-type">${row.pressing_symbol}</td>
-            <td>${badge(row.inspected)}</td>
-            <td>${badge(row.diagnosed)}</td>
-            <td>${badge(row.need_fix)}</td>
-            <td>${badge(row.approved)}</td>
-            <td>${badge(row.fixed)}</td>
-            <td>${actionBtn}</td>
-          `;
+      <td>${row.press_date}</td>
+      <td class="die-number">${row.die_number}</td>
+      <td class="pressing-type">${row.pressing_symbol}</td>
+      <td>${badge(row.inspected)}</td>
+      <td>${badge(row.diagnosed)}</td>
+      <td>${badge(row.need_fix)}</td>
+      <td>${badge(row.approved)}</td>
+      <td>${badge(row.fixed)}</td>
+      <td>${actionBtn}</td>
+    `;
 
           tbody.appendChild(tr);
         });
       }
 
       /* ============================================================
-         各画面への遷移
-      ============================================================ */
+   画面遷移
+============================================================ */
       function goInspection(pressId) {
         location.href = `die_inspection.html?press_id=${pressId}`;
       }
-
       function goDiagnosis(pressId) {
         location.href = `die_diagnosis.html?press_id=${pressId}`;
       }
-
       function goFix(pressId) {
         location.href = `die_fix_plan.html?press_id=${pressId}`;
       }
-
       function goDetail(pressId) {
         alert("詳細画面はまだ未実装です");
       }
 
       /* ============================================================
-         ★ 承認ボタン（PIN認証 → 承認モードで診断画面へ）
-      ============================================================ */
+   承認（PIN）
+============================================================ */
       function approveDiagnosis(pressId) {
         const pin = prompt("承認PINコードを入力してください");
-
         if (pin === "1031") {
-          // 承認モードで診断画面へ遷移
           location.href = `die_diagnosis.html?press_id=${pressId}&mode=approval`;
         } else {
           alert("PINコードが違います");
@@ -372,8 +400,8 @@
       }
 
       /* ============================================================
-         型番検索
-      ============================================================ */
+   型番検索
+============================================================ */
       document
         .getElementById("searchDie")
         .addEventListener("input", function () {
@@ -381,21 +409,7 @@
           const filtered = window._progressData.filter((row) =>
             row.die_number.toUpperCase().startsWith(keyword),
           );
-          renderTable(filtered);
-        });
-
-      document
-        .getElementById("searchDie")
-        .addEventListener("keydown", function (e) {
-          if (e.key === "Enter") {
-            const keyword = this.value.trim();
-            fetch(`./php/die_progress_php/get_progress_list.php?die=${keyword}`)
-              .then((res) => res.json())
-              .then((data) => {
-                window._progressData = data;
-                renderTable(data);
-              });
-          }
+          renderTable(applyFilters(filtered));
         });
     </script>
   </body>
