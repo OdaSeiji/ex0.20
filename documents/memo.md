@@ -3908,3 +3908,17 @@ ADD COLUMN inspection_id INT(11) NULL AFTER id;
   <img src="./img/20260508-01.png" width="500">
   <!-- <figcaption>図1:現状使っている報告書</figcaption> -->
 </figure>
+
+## 実行段階
+
+押出指示書のPDFの表示だが、t_press.press_directive_scan_file_nameにあるので、値の取得は申されている。問題はディレクトリの位置。
+
+```terminal
+htdocs/
+ ├ ex0.20/
+ │   └ die_diagnosis.html   ← ここから表示したい
+ └ diereport/
+     └ upload/
+         └ 01_press_directive/
+             └ （スキャン画像ファイル）
+```

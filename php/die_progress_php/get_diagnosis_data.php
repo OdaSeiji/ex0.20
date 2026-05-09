@@ -200,5 +200,6 @@ echo json_encode([
     "fix_plan" => $fix_plan,
     "fix" => $fix,
     "fix_files" => $fix_files,
-    "fix_approval" => $fix_approval
+    "fix_approval" => $fix_approval,
+    "press_directive_scan_file_name" => $press["press_directive_scan_file_name"] // ← 追加
 ], JSON_UNESCAPED_UNICODE);
