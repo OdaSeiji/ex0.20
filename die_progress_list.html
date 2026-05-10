@@ -32,7 +32,7 @@
       }
 
       .container {
-        max-width: 1200px;
+        max-width: 1600px;
         margin: 0 auto;
         background: #fff;
         padding: 25px;
@@ -70,6 +70,18 @@
         margin-top: 15px;
       }
 
+      /* バッジ列の最小幅を確保 */
+      #progressTable td:nth-child(4),
+      #progressTable td:nth-child(5),
+      #progressTable td:nth-child(6),
+      #progressTable td:nth-child(7),
+      #progressTable td:nth-child(8),
+      #progressTable td:nth-child(9),
+      #progressTable td:nth-child(10),
+      #progressTable td:nth-child(11) {
+        min-width: 70px; /* ← ここを調整すればバッジが潰れない */
+      }
+
       th,
       td {
         padding: 10px;
@@ -85,21 +97,43 @@
       tr:hover {
         background: #f0f8ff;
       }
-
+      /* 進捗表示のバッジの設定 */
       .badge {
-        padding: 4px 10px;
-        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 48px; /* ★ 幅を広げる（未承認が入る） */
+        height: 32px; /* 高さしっかり */
+        padding: 0 10px;
+        border-radius: 8px; /* ピル型 */
+        font-size: 14px; /* ★ アイコン大きく */
+        font-weight: bold;
         color: white;
-        font-size: 12px;
+        box-sizing: border-box;
       }
-      .ok {
-        background: #5cb85c;
+
+      /* ☑（OK） */
+      .badge.ok {
+        background-color: #4caf50;
       }
-      .ng {
-        background: #d9534f;
+
+      /* ×（NG） */
+      .badge.ng {
+        background-color: #d9534f;
       }
-      .none {
-        background: #999;
+
+      /* —（none） */
+      .badge.none {
+        background-color: #9e9e9e;
+      }
+
+      /* 診断承認（3 色） */
+      .badge.reject {
+        background-color: #d9534f;
+      }
+
+      .badge.pending {
+        background-color: #f0ad4e;
       }
 
       /* ★ 押出種別の記号フォントを MS ゴシックに統一 */
@@ -156,6 +190,7 @@
         <thead>
           <tr>
             <th data-key="col_date">押出日</th>
+
             <th>
               金型番号
               <input
@@ -165,7 +200,7 @@
                 class="die-search"
               />
             </th>
-            <!-- <th data-key="col_die">金型番号</th> -->
+
             <th data-key="col_type">
               押出種別
               <select
@@ -179,11 +214,17 @@
                 <option value="●">●</option>
               </select>
             </th>
+
+            <!-- ★ ここから 8 ステップ -->
             <th data-key="col_ins">測定</th>
             <th data-key="col_diag">診断</th>
             <th data-key="col_needfix">修理要否</th>
-            <th data-key="col_app">承認</th>
-            <th data-key="col_fix">修理</th>
+            <th data-key="col_diag_app">診断承認</th>
+            <th data-key="col_fix_plan">修理計画</th>
+            <th data-key="col_fix_plan_app">修理計画承認</th>
+            <th data-key="col_fix_report">修理報告</th>
+            <th data-key="col_fix_report_app">修理報告承認</th>
+
             <th data-key="col_action">操作</th>
           </tr>
         </thead>
@@ -193,7 +234,7 @@
 
     <script>
       /* ============================================================
-   多言語辞書
+   多言語辞書（8ステップ対応）
 ============================================================ */
       const dict = {
         ja: {
@@ -201,33 +242,50 @@
           col_date: "押出日",
           col_die: "金型番号",
           col_type: "押出種別",
+
           col_ins: "測定",
           col_diag: "診断",
-          col_app: "承認",
           col_needfix: "修理要否",
-          col_fix: "修理",
+          col_diag_app: "診断承認",
+          col_fix_plan: "修理計画",
+          col_fix_plan_app: "修理計画承認",
+          col_fix_report: "修理報告",
+          col_fix_report_app: "修理報告承認",
+
           col_action: "操作",
           col_action_ins: "測定",
           col_action_diag: "診断",
-          col_action_app: "承認",
-          col_action_fix: "修理",
+          col_action_diag_app: "診断承認",
+          col_action_fix_plan: "修理計画",
+          col_action_fix_plan_app: "計画承認",
+          col_action_fix_report: "修理報告",
+          col_action_fix_report_app: "報告承認",
           col_action_detail: "詳細",
         },
+
         vi: {
           title: "📊 Danh sách tiến độ",
           col_date: "Ngày ép",
           col_die: "Mã khuôn",
           col_type: "Loại ép",
+
           col_ins: "Đo",
           col_diag: "Chẩn đoán",
-          col_app: "Phê duyệt",
           col_needfix: "Cần sửa",
-          col_fix: "Sửa chữa",
+          col_diag_app: "Duyệt chẩn đoán",
+          col_fix_plan: "Kế hoạch sửa",
+          col_fix_plan_app: "Duyệt kế hoạch",
+          col_fix_report: "Báo cáo sửa",
+          col_fix_report_app: "Duyệt báo cáo",
+
           col_action: "Thao tác",
           col_action_ins: "Đo",
           col_action_diag: "Chẩn đoán",
-          col_action_app: "Phê duyệt",
-          col_action_fix: "Sửa chữa",
+          col_action_diag_app: "Duyệt chẩn đoán",
+          col_action_fix_plan: "Kế hoạch sửa",
+          col_action_fix_plan_app: "Duyệt kế hoạch",
+          col_action_fix_report: "Báo cáo sửa",
+          col_action_fix_report_app: "Duyệt báo cáo",
           col_action_detail: "Chi tiết",
         },
       };
@@ -240,7 +298,6 @@
         setLang(saved);
         loadProgressList();
 
-        // ★ 押出種別フィルターのイベント登録
         const typeFilter = document.getElementById("filterPressingType");
         if (typeFilter) {
           typeFilter.addEventListener("change", () => {
@@ -258,17 +315,11 @@
           const newText = dict[lang][key];
 
           if (el.tagName === "TH") {
-            // ★ 子要素（select 等）を保持しつつ、先頭テキストだけ置換
             const children = Array.from(el.childNodes);
-
-            // 先頭のテキストノードを探す
             const textNode = children.find(
               (n) => n.nodeType === Node.TEXT_NODE,
             );
-
-            if (textNode) {
-              textNode.textContent = newText + " ";
-            }
+            if (textNode) textNode.textContent = newText + " ";
           } else {
             el.textContent = newText;
           }
@@ -293,11 +344,24 @@
                 row.inspected === null ? null : Number(row.inspected);
               row.diagnosed =
                 row.diagnosed === null ? null : Number(row.diagnosed);
-              row.approved =
-                row.approved === null ? null : Number(row.approved);
               row.need_fix =
                 row.need_fix === null ? null : Number(row.need_fix);
-              row.fixed = row.fixed === null ? null : Number(row.fixed);
+              row.approved =
+                row.approved === null ? null : Number(row.approved);
+
+              row.fix_plan =
+                row.fix_plan === null ? null : Number(row.fix_plan);
+              row.fix_plan_approval =
+                row.fix_plan_approval === null
+                  ? null
+                  : Number(row.fix_plan_approval);
+
+              row.fix_report =
+                row.fix_report === null ? null : Number(row.fix_report);
+              row.fix_report_approval =
+                row.fix_report_approval === null
+                  ? null
+                  : Number(row.fix_report_approval);
             });
 
             window._progressData = data;
@@ -306,7 +370,7 @@
       }
 
       /* ============================================================
-   押出種別フィルター（安全版）
+   押出種別フィルター
 ============================================================ */
       function applyFilters(data) {
         const select = document.getElementById("filterPressingType");
@@ -321,79 +385,167 @@
       }
 
       /* ============================================================
-   テーブル描画
-============================================================ */
+        テーブル描画（8ステップ対応）
+      ============================================================ */
       function renderTable(data) {
         const tbody = document.querySelector("#progressTable tbody");
         tbody.innerHTML = "";
 
+        /* ------------------------------
+          診断承認専用バッジ（3色）
+          1 = 承認, -1 = 却下, 0 = 未承認, null = —
+        ------------------------------ */
+        const approvalBadge = (flag) =>
+          flag === 1
+            ? `<span class="badge ok">承認</span>`
+            : flag === -1
+              ? `<span class="badge reject">却下</span>`
+              : flag === 0
+                ? `<span class="badge pending">未承認</span>`
+                : `<span class="badge none">—</span>`;
+
+        /* ------------------------------
+          その他ステップ用バッジ（☑ / × / —）
+          1 = ☑, 0 = ×, null = —
+        ------------------------------ */
+        const stepBadge = (flag) =>
+          flag === 1
+            ? `<span class="badge ok">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>`
+            : flag === 0
+              ? `<span class="badge ng">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <path d="M6 6L18 18M6 18L18 6" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                  </span>`
+              : `<span class="badge none">—</span>`;
+
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
-          const badge = (flag) =>
-            flag === 1
-              ? `<span class="badge ok">YES</span>`
-              : flag === 0
-                ? `<span class="badge ng">NO</span>`
-                : `<span class="badge none">—</span>`;
-
-          const lang = localStorage.getItem("lang") || "ja";
-          let actionBtn = "";
-
-          if (row.inspected === 0 || row.inspected === null) {
-            actionBtn = `<button class="btn" onclick="goInspection(${row.press_id})">${dict[lang].col_action_ins}</button>`;
-          } else if (
-            row.inspected === 1 &&
-            (row.diagnosed === 0 || row.diagnosed === null)
-          ) {
-            actionBtn = `<button class="btn" onclick="goDiagnosis(${row.press_id})">${dict[lang].col_action_diag}</button>`;
-          } else if (row.diagnosed === 1 && row.approved !== 1) {
-            actionBtn = `<button class="btn btn-warning" onclick="approveDiagnosis(${row.press_id})">${dict[lang].col_action_app}</button>`;
-          } else if (row.need_fix === 1 && row.fixed === 0) {
-            actionBtn = `<button class="btn" onclick="goFix(${row.press_id})">${dict[lang].col_action_fix}</button>`;
-          } else {
-            actionBtn = `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
-          }
-
           tr.innerHTML = `
-      <td>${row.press_date}</td>
-      <td class="die-number">${row.die_number}</td>
-      <td class="pressing-type">${row.pressing_symbol}</td>
-      <td>${badge(row.inspected)}</td>
-      <td>${badge(row.diagnosed)}</td>
-      <td>${badge(row.need_fix)}</td>
-      <td>${badge(row.approved)}</td>
-      <td>${badge(row.fixed)}</td>
-      <td>${actionBtn}</td>
-    `;
+            <td>${row.press_date}</td>
+            <td class="die-number">${row.die_number}</td>
+            <td class="pressing-type">${row.pressing_symbol}</td>
+
+            <!-- 測定・診断・修理要否 → ☑ / × / — -->
+            <td>${stepBadge(row.inspected)}</td>
+            <td>${stepBadge(row.diagnosed)}</td>
+            <td>${stepBadge(row.need_fix)}</td>
+
+            <!-- ★ 診断承認だけ 3 色バッジ -->
+            <td>${approvalBadge(row.approved)}</td>
+
+            <!-- 修理計画・承認・報告・承認 → ☑ / × / — -->
+            <td>${stepBadge(row.fix_plan)}</td>
+            <td>${stepBadge(row.fix_plan_approval)}</td>
+            <td>${stepBadge(row.fix_report)}</td>
+            <td>${stepBadge(row.fix_report_approval)}</td>
+
+            <td>${renderActionButton(row)}</td>
+          `;
 
           tbody.appendChild(tr);
         });
       }
 
       /* ============================================================
-   画面遷移
-============================================================ */
-      function goInspection(pressId) {
-        location.href = `die_inspection.html?press_id=${pressId}`;
+        操作ボタン（8ステップ対応）
+      ============================================================ */
+      function renderActionButton(row) {
+        const lang = localStorage.getItem("lang") || "ja";
+
+        // ① 測定前
+        if (!row.inspected) {
+          return `<button class="btn" onclick="goInspection(${row.press_id})">${dict[lang].col_action_ins}</button>`;
+        }
+
+        // ② 診断前
+        if (!row.diagnosed) {
+          return `<button class="btn" onclick="goDiagnosis(${row.press_id})">${dict[lang].col_action_diag}</button>`;
+        }
+
+        // ★★★ ③ 診断承認が「却下」された場合 → 再診断 ★★★
+        if (row.approved === -1) {
+          return `<button class="btn" onclick="goDiagnosis(${row.press_id})">再診断</button>`;
+        }
+
+        // ④ 診断済・未承認（approved = 0）→ 承認ボタン
+        if (row.approved === 0) {
+          return `<button class="btn btn-warning" onclick="approveDiagnosis(${row.press_id})">${dict[lang].col_action_diag_app}</button>`;
+        }
+
+        // ⑤ 修理計画
+        if (!row.fix_plan) {
+          return `<button class="btn" onclick="goFixPlan(${row.press_id})">${dict[lang].col_action_fix_plan}</button>`;
+        }
+
+        // ⑥ 修理計画承認
+        if (!row.fix_plan_approval) {
+          return `<button class="btn btn-warning" onclick="approveFixPlan(${row.press_id})">${dict[lang].col_action_fix_plan_app}</button>`;
+        }
+
+        // ⑦ 修理報告
+        if (!row.fix_report) {
+          return `<button class="btn" onclick="goFixReport(${row.press_id})">${dict[lang].col_action_fix_report}</button>`;
+        }
+
+        // ⑧ 修理報告承認
+        if (!row.fix_report_approval) {
+          return `<button class="btn btn-warning" onclick="approveFixReport(${row.press_id})">${dict[lang].col_action_fix_report_app}</button>`;
+        }
+
+        // ⑨ すべて完了 → 詳細
+        return `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
       }
-      function goDiagnosis(pressId) {
-        location.href = `die_diagnosis.html?press_id=${pressId}`;
+
+      /* ============================================================
+        画面遷移
+      ============================================================ */
+      function goInspection(id) {
+        location.href = `die_inspection.html?press_id=${id}`;
       }
-      function goFix(pressId) {
-        location.href = `die_fix_plan.html?press_id=${pressId}`;
+      function goDiagnosis(id) {
+        location.href = `die_diagnosis.html?press_id=${id}`;
       }
-      function goDetail(pressId) {
+      function goFixPlan(id) {
+        location.href = `die_fix_plan.html?press_id=${id}`;
+      }
+      function goFixReport(id) {
+        location.href = `die_fix_report.html?press_id=${id}`;
+      }
+      function goDetail(id) {
         alert("詳細画面はまだ未実装です");
       }
 
       /* ============================================================
    承認（PIN）
 ============================================================ */
-      function approveDiagnosis(pressId) {
-        const pin = prompt("承認PINコードを入力してください");
+      function approveDiagnosis(id) {
+        const pin = prompt("診断承認 PIN を入力してください");
         if (pin === "1031") {
-          location.href = `die_diagnosis.html?press_id=${pressId}&mode=approval`;
+          location.href = `die_diagnosis.html?press_id=${id}&mode=approval`;
+        } else {
+          alert("PINコードが違います");
+        }
+      }
+
+      function approveFixPlan(id) {
+        const pin = prompt("修理計画承認 PIN を入力してください");
+        if (pin === "1031") {
+          location.href = `die_fix_plan.html?press_id=${id}&mode=approval`;
+        } else {
+          alert("PINコードが違います");
+        }
+      }
+
+      function approveFixReport(id) {
+        const pin = prompt("修理報告承認 PIN を入力してください");
+        if (pin === "1031") {
+          location.href = `die_fix_report.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
         }

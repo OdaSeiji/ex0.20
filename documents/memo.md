@@ -3922,3 +3922,49 @@ htdocs/
          └ 01_press_directive/
              └ （スキャン画像ファイル）
 ```
+
+htdocs/
+├ ex0.20/
+│ ├ die_diagnosis.html ← ここから表示したい
+└ uploads/
+└ in{inspection_id}
+├ {file_name}
+└
+
+誠司さん、いいですね。
+では 「再診断ボタンを押したときの diagnosis.html の動作」 を、
+今のあなたのシステム構造に合わせて 正しく動くように改造していきます。
+
+まず結論から言うと：
+
+🎯 再診断ボタンを押したときの画面遷移は “問題ありません”
+あなたの renderActionButton の修正後：
+
+js
+return `<button class="btn" onclick="goDiagnosis(${row.press_id})">再診断</button>`;
+そして goDiagnosis() がこうなっているはずです：
+
+js
+function goDiagnosis(press_id) {
+location.href = `die_diagnosis.html?press_id=${press_id}`;
+}
+つまり：
+
+再診断ボタン → goDiagnosis()
+
+goDiagnosis() → die_diagnosis.html?press_id=◯◯
+
+diagnosis.html が press_id を受け取る
+
+この流れは 新規診断と全く同じなので、
+遷移としては 100% 正常です。
+
+🎉 問題は “diagnosis.html が既存診断を読み込んでいない” こと
+再診断のときに必要なのは：
+
+✔ diagnosis.html が
+✔ press_id を受け取り
+✔ その press_id の診断データを DB から読み込み
+✔ 画面にセットする
+この処理が まだ実装されていないため、
+再診断ボタンを押しても 新規診断画面のままになっています。

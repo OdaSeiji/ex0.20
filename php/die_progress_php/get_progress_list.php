@@ -14,7 +14,7 @@ if (!empty($_GET['die'])) {
 }
 
 /* -------------------------
-   メイン SQL（修正版）
+   メイン SQL（8ステップ対応版）
 -------------------------- */
 $sql = "
 SELECT
@@ -27,32 +27,77 @@ SELECT
     -- 押出種別（記号）
     pt.pressing_type AS pressing_symbol,
 
-    -- 測定済みか？（★ press_id で紐づけ）
-    CASE WHEN i.id IS NOT NULL THEN 1 ELSE NULL END AS inspected,
-
-    -- 診断済みか？
-    CASE WHEN d.id IS NOT NULL THEN 1 ELSE NULL END AS diagnosed,
-
-    -- 承認済みか？
+    /* ============================
+       ① 測定（t_die_inspection）
+    ============================ */
     CASE 
-        WHEN d.approval_status = 'approved' THEN 1
-        WHEN d.id IS NULL THEN NULL
-        ELSE 0
-    END AS approved,
+        WHEN i.id IS NOT NULL THEN 1
+        ELSE NULL
+    END AS inspected,
 
-    -- 修理要否（ng_action 2 or 3）
+    /* ============================
+       ② 診断（t_die_diagnosis）
+    ============================ */
+    CASE 
+        WHEN d.id IS NOT NULL THEN 1
+        ELSE NULL
+    END AS diagnosed,
+
+    /* ============================
+       ③ 修理要否（ng_action）
+       2,3 → 修理必要
+    ============================ */
     CASE 
         WHEN d.ng_action IN (2,3) THEN 1
         WHEN d.id IS NULL THEN NULL
         ELSE 0
     END AS need_fix,
 
-    -- 修理完了か？
-    CASE 
+    /* ============================
+       ④ 診断承認（approval_status）
+    ============================ */
+    CASE
+        WHEN d.approval_status = 'approved' THEN 1
+        WHEN d.approval_status = 'rejected' THEN -1
+        WHEN d.approval_status = 'pending' THEN 0
+        ELSE NULL
+    END AS approved,
+
+    /* ============================
+       ⑤ 修理計画（plan_fix_date）
+    ============================ */
+    CASE
+        WHEN f.plan_fix_date IS NOT NULL THEN 1
+        WHEN d.ng_action IN (2,3) THEN 0
+        ELSE NULL
+    END AS fix_plan,
+
+    /* ============================
+       ⑥ 修理計画承認（plan_approval_status）
+    ============================ */
+    CASE
+        WHEN f.plan_approval_status = 'approved' THEN 1
+        WHEN f.plan_approval_status = 'pending' THEN 0
+        ELSE NULL
+    END AS fix_plan_approval,
+
+    /* ============================
+       ⑦ 修理報告（actual_fix_date）
+    ============================ */
+    CASE
         WHEN f.actual_fix_date IS NOT NULL THEN 1
         WHEN d.ng_action IN (2,3) THEN 0
         ELSE NULL
-    END AS fixed
+    END AS fix_report,
+
+    /* ============================
+       ⑧ 修理報告承認（actual_approval_status）
+    ============================ */
+    CASE
+        WHEN f.actual_approval_status = 'approved' THEN 1
+        WHEN f.actual_approval_status = 'pending' THEN 0
+        ELSE NULL
+    END AS fix_report_approval
 
 FROM t_press p
 
@@ -64,7 +109,7 @@ LEFT JOIN m_dies md
 LEFT JOIN m_pressing_type pt
   ON p.pressing_type_id = pt.id
 
--- ★ 測定（press_id で紐づけ）
+-- 測定
 LEFT JOIN t_die_inspection i
   ON i.press_id = p.id
 
@@ -72,7 +117,7 @@ LEFT JOIN t_die_inspection i
 LEFT JOIN t_die_diagnosis d
   ON d.inspection_id = i.id
 
--- 修理
+-- 修理（計画・報告・承認すべて含む）
 LEFT JOIN t_die_fix f
   ON f.diagnosis_id = d.id
 

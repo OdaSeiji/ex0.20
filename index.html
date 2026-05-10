@@ -34,7 +34,6 @@
         font-weight: bold;
       }
 
-      /* ★ 段ごとに固定レイアウト */
       .menu-row {
         width: 90%;
         max-width: 900px;
@@ -43,19 +42,12 @@
         gap: 20px;
       }
 
-      /* 1段目：2列固定 */
       .row-2 {
         grid-template-columns: repeat(2, 1fr);
       }
 
-      /* 2段目：1列固定 */
       .row-1 {
         grid-template-columns: 1fr;
-      }
-
-      /* 3段目：3列固定 */
-      .row-3 {
-        grid-template-columns: repeat(3, 1fr);
       }
 
       .menu-card {
@@ -89,7 +81,6 @@
   </head>
 
   <body>
-    <!-- ★ 言語切替ボタン -->
     <div class="lang-switch">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
@@ -121,45 +112,15 @@
 
     <!-- ★ 2段目（1列） -->
     <div class="menu-row row-1">
-      <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
-        <div class="menu-title" data-key="issue_title">テーマ一覧</div>
-        <div class="menu-desc" data-key="issue_desc">
-          金型修正テーマの一覧ページ
-        </div>
-      </div>
-    </div>
-
-    <!-- ★ 3段目（3列） -->
-    <div class="menu-row row-3">
-      <div class="menu-card" onclick="location.href = 'die_inspection.html'">
-        <div class="menu-title" data-key="inspection_title">検査入力</div>
-        <div class="menu-desc" data-key="inspection_desc">
-          検査記録を入力するページ
-        </div>
-      </div>
-
-      <div
-        class="menu-card"
-        onclick="location.href = 'die_inspection_list.html'"
-      >
-        <div class="menu-title" data-key="inspection_list_title">
-          検査一覧、診断
-        </div>
-        <div class="menu-desc" data-key="inspection_list_desc">
-          検査記録および診断記録の一覧ページ
-        </div>
-      </div>
-
-      <div class="menu-card" onclick="location.href = 'diagnosis_list.html'">
-        <div class="menu-title" data-key="diagnosis_list_title">診断一覧</div>
-        <div class="menu-desc" data-key="diagnosis_list_desc">
-          診断記録の一覧ページ
+      <div class="menu-card" onclick="location.href = 'die_progress_list.html'">
+        <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
+        <div class="menu-desc" data-key="progress_desc">
+          測定 → 診断 → 承認 → 修理 の進捗管理
         </div>
       </div>
     </div>
 
     <script>
-      /* 翻訳辞書 */
       const dict = {
         ja: {
           title: "トップメニュー",
@@ -167,14 +128,8 @@
           billet_desc: "ビレット投入に関するページ",
           maintenance_title: "金型メンテナンス",
           maintenance_desc: "金型メンテナンスに関するページ",
-          issue_title: "テーマ一覧",
-          issue_desc: "金型修正テーマの一覧ページ",
-          inspection_title: "検査入力",
-          inspection_desc: "検査記録を入力するページ",
-          inspection_list_title: "検査一覧、診断",
-          inspection_list_desc: "検査記録および診断記録の一覧ページ",
-          diagnosis_list_title: "診断一覧",
-          diagnosis_list_desc: "診断記録の一覧ページ",
+          progress_title: "金型進捗一覧",
+          progress_desc: "測定 → 診断 → 承認 → 修理 の進捗管理",
         },
         vi: {
           title: "Menu Chính",
@@ -182,15 +137,9 @@
           billet_desc: "Trang liên quan đến việc nạp billet",
           maintenance_title: "Bảo trì khuôn",
           maintenance_desc: "Trang liên quan đến bảo trì khuôn",
-          issue_title: "Danh sách chủ đề",
-          issue_desc: "Trang danh sách các chủ đề sửa khuôn",
-          inspection_title: "Nhập kiểm tra",
-          inspection_desc: "Trang nhập dữ liệu kiểm tra",
-          inspection_list_title: "Danh sách kiểm tra & chẩn đoán",
-          inspection_list_desc:
-            "Trang danh sách các bản ghi kiểm tra và chẩn đoán",
-          diagnosis_list_title: "Danh sách chẩn đoán",
-          diagnosis_list_desc: "Trang danh sách các bản ghi chẩn đoán",
+          progress_title: "Danh sách tiến độ khuôn",
+          progress_desc:
+            "Quản lý tiến độ: đo → chẩn đoán → phê duyệt → sửa chữa",
         },
       };
 
