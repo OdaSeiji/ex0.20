@@ -58,8 +58,17 @@
         gap: 10px;
       }
       .btn {
+        font-size: 18pt;
         padding: 8px 16px;
         margin-right: 10px;
+
+        background-color: #6c8ebf;
+        color: white;
+        padding: 6px 14px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
       }
       textarea {
         width: 100%;
@@ -134,6 +143,10 @@
       .file-name {
         font-size: 12px;
         margin-top: 4px;
+      }
+
+      .file-name {
+        display: none;
       }
     </style>
   </head>
@@ -336,82 +349,87 @@
     </div>
 
     <!-- ============================= -->
-    <!-- ボタン -->
+    <!-- ⑤ 承認・却下（承認モードのみ表示） -->
     <!-- ============================= -->
-    <div>
+    <div class="card" id="approvalCard" style="display: none">
+      <h2>■ 承認 / 却下</h2>
+
+      <!-- 却下理由 -->
+      <div class="row">
+        <label>却下理由：</label>
+        <textarea
+          id="reject_reason"
+          rows="3"
+          placeholder="却下理由を入力してください"
+        ></textarea>
+      </div>
+
+      <!-- ボタン -->
+      <div class="row" style="margin-top: 10px">
+        <button class="btn" id="approveBtn2" onclick="approveDiagnosis()">
+          承認する
+        </button>
+
+        <button
+          class="btn btn-reject"
+          id="rejectBtn2"
+          onclick="rejectDiagnosis()"
+        >
+          却下する
+        </button>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- ボタン（修正版） -->
+    <!-- ============================= -->
+    <div id="buttonArea">
       <!-- 通常モード：診断内容の保存 -->
       <button class="btn" id="saveBtn" onclick="saveDiagnosis()">保存</button>
+    </div>
 
-      <!-- 承認モード：承認ボタン（最初は非表示） -->
-      <button
-        class="btn"
-        id="approveBtn"
-        style="display: none"
-        onclick="approveDiagnosis()"
-      >
-        承認する
-      </button>
-
-      <!-- 修理画面へ（診断結果がNGで修理必要な場合のみ表示） -->
-      <button class="btn" id="btn_fix" style="display: none" onclick="goFix()">
-        修理画面へ進む
-      </button>
-
-      <!-- 次回押出条件へ（診断結果が3 or 4 の場合のみ表示） -->
-      <button
-        class="btn"
-        id="btn_next"
-        style="display: none"
-        onclick="goNext()"
-      >
-        次回押出条件へ進む
-      </button>
-
-      <!-- ■■■■■■■■■■■■■■■■■■■■■ -->
-
-      <!-- ============================= -->
-      <!-- 画像モーダル -->
-      <!-- ============================= -->
-      <div
-        id="imgModal"
-        class="modal"
+    <!-- ============================= -->
+    <!-- 画像モーダル -->
+    <!-- ============================= -->
+    <div
+      id="imgModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <span
+        id="modalClose"
         style="
-          display: none;
-          position: fixed;
-          z-index: 9999;
-          left: 0;
-          top: 0;
-          width: 100%;
-          height: 100%;
-          background: rgba(0, 0, 0, 0.7);
-          justify-content: center;
-          align-items: center;
+          position: absolute;
+          top: 20px;
+          right: 30px;
+          font-size: 40px;
+          color: white;
+          cursor: pointer;
+          font-weight: bold;
         "
+        >&times;</span
       >
-        <span
-          id="modalClose"
-          style="
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 40px;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-          "
-          >&times;</span
-        >
 
-        <img
-          id="modalImg"
-          style="
-            max-width: 90%;
-            max-height: 90%;
-            border: 4px solid white;
-            border-radius: 8px;
-          "
-        />
-      </div>
+      <img
+        id="modalImg"
+        style="
+          max-width: 90%;
+          max-height: 90%;
+          border: 4px solid white;
+          border-radius: 8px;
+        "
+      />
     </div>
 
     <script>
@@ -536,15 +554,19 @@
         loadStaffList();
         loadDiagnosisData();
 
-        // ★ 承認モードなら入力欄をロックして承認ボタンを表示
         if (mode === "approval") {
+          // ★ 承認モード
           enableApprovalMode();
+        } else {
+          // ★ 通常モード：承認カードを非表示
+          const approvalCard = document.getElementById("approvalCard");
+          if (approvalCard) approvalCard.style.display = "none";
         }
       };
 
       /* ------------------------------
-   診断データ取得
------------------------------- */
+          診断データ取得（修正版）
+        ------------------------------ */
       function loadDiagnosisData() {
         fetch(
           `./php/die_progress_php/get_diagnosis_data.php?press_id=${pressId}`,
@@ -557,6 +579,7 @@
               data.press.press_directive_scan_file_name,
             );
 
+            /* 測定・指示・プレス情報 */
             fillInspection(data.inspection, data.inspection_files);
             fillDirective(data.directive);
 
@@ -565,7 +588,15 @@
               data.press.die_number;
 
             fillPress(data.press);
+
+            /* ★ 診断情報 */
             fillDiagnosis(data.diagnosis);
+
+            /* ★ diagnosis_id を保持（添付ファイルパス組み立てに必要） */
+            window._diagnosisId = data.diagnosis?.id || null;
+
+            /* ★ 診断添付ファイル表示 */
+            fillDiagnosisFiles(data.diagnosis_files);
 
             /* =====================================================
               ★ 押出指示スキャンファイル（PDF/画像）サムネイル表示
@@ -573,50 +604,87 @@
             const fileName = data.press.press_directive_scan_file_name;
             const area = document.getElementById("directiveScanArea");
 
-            if (!area) {
-              console.warn("directiveScanArea が見つかりません");
-              return;
+            if (area) {
+              if (!fileName) {
+                area.innerHTML = `<div class="no-file">No File</div>`;
+              } else {
+                const fileUrl = `../diereport/upload/01_press_directive/${fileName}`;
+                const ext = fileName.split(".").pop().toLowerCase();
+
+                let html = "";
+
+                if (ext === "pdf") {
+                  html = `
+                    <div class="thumb">
+                      <a href="${fileUrl}" target="_blank">
+                        <img src="./img/pdf_icon.svg" class="pdf-thumb">
+                      </a>
+                      <div class="file-name">${fileName}</div>
+                    </div>
+                  `;
+                } else if (["jpg", "jpeg", "png"].includes(ext)) {
+                  html = `
+                    <div class="thumb">
+                      <a href="${fileUrl}" target="_blank">
+                        <img src="${fileUrl}" class="img-thumb">
+                      </a>
+                      <div class="file-name">${fileName}</div>
+                    </div>
+                  `;
+                } else {
+                  html = `<div class="no-file">No File</div>`;
+                }
+
+                area.innerHTML = html;
+              }
             }
-
-            // ファイルが無い場合
-            if (!fileName) {
-              area.innerHTML = `<div class="no-file">No File</div>`;
-              return;
-            }
-
-            // 保存場所（固定）
-            const fileUrl = `../diereport/upload/01_press_directive/${fileName}`;
-            const ext = fileName.split(".").pop().toLowerCase();
-
-            let html = "";
-
-            if (ext === "pdf") {
-              // PDF → PDFアイコン
-              html = `
-          <div class="thumb">
-            <a href="${fileUrl}" target="_blank">
-              <img src="./img/pdf_icon.svg" class="pdf-thumb">
-            </a>
-            <div class="file-name">${fileName}</div>
-          </div>
-        `;
-            } else if (["jpg", "jpeg", "png"].includes(ext)) {
-              // 画像 → サムネイル
-              html = `
-          <div class="thumb">
-            <a href="${fileUrl}" target="_blank">
-              <img src="${fileUrl}" class="img-thumb">
-            </a>
-            <div class="file-name">${fileName}</div>
-          </div>
-        `;
-            } else {
-              // その他 → No File
-              html = `<div class="no-file">No File</div>`;
-            }
-
-            area.innerHTML = html;
           });
+      }
+
+      /* =====================================================
+   ★ 診断添付ファイル表示（外出し・再利用可能）
+===================================================== */
+      function fillDiagnosisFiles(files) {
+        const area = document.getElementById("diag_file_preview");
+        if (!area) return;
+
+        area.innerHTML = "";
+
+        if (!files || files.length === 0) {
+          area.innerHTML = `<div class="no-file">No File</div>`;
+          return;
+        }
+
+        const diagnosisId = window._diagnosisId;
+
+        files.forEach((f) => {
+          const fileUrl = `uploads/diagnosis/${diagnosisId}/${f.file_path}`;
+          const ext = f.file_type.toLowerCase();
+
+          let html = "";
+
+          if (ext.includes("pdf")) {
+            html = `
+        <div class="thumb">
+          <a href="${fileUrl}" target="_blank">
+            <img src="./img/pdf_icon.svg" class="pdf-thumb">
+          </a>
+          <div class="file-name">${f.file_path}</div>
+        </div>
+      `;
+          } else {
+            html = `
+        <div class="thumb">
+          <a href="${fileUrl}" target="_blank">
+            <img src="${fileUrl}" class="img-thumb">
+          </a>
+          <div class="file-name">${f.file_path}</div>
+        </div>
+      `;
+          }
+
+          area.insertAdjacentHTML("beforeend", html);
+        });
       }
 
       /* ------------------------------
@@ -704,47 +772,59 @@
       ------------------------------ */
       function fillDiagnosis(d) {
         if (!d) {
-          document.getElementById("diag_date").valueAsDate = new Date();
+          const el = document.getElementById("diag_date");
+          if (el) el.valueAsDate = new Date();
           return;
         }
 
-        document.getElementById("diag_date").value =
-          d.diagnosis_date?.substring(0, 10);
-        document.getElementById("diag_staff").value = d.diagnosis_staff || "";
+        const setValue = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.value = value || "";
+        };
 
-        document.querySelector(
-          `input[name="dim_judge"][value="${d.dimension_judgement}"]`,
-        ).checked = true;
-        document.querySelector(
-          `input[name="shape_judge"][value="${d.shape_judgement}"]`,
-        ).checked = true;
-        document.querySelector(
+        const setChecked = (selector) => {
+          const el = document.querySelector(selector);
+          if (el) el.checked = true;
+        };
+
+        // 日付・担当者
+        setValue("diag_date", d.diagnosis_date?.substring(0, 10));
+        setValue("diag_staff", d.diagnosis_staff);
+
+        // 寸法判定
+        setChecked(`input[name="dim_judge"][value="${d.dimension_judgement}"]`);
+
+        // 形状判定
+        setChecked(`input[name="shape_judge"][value="${d.shape_judgement}"]`);
+
+        // 総合判定
+        setChecked(
           `input[name="overall_judge"][value="${d.overall_judgement}"]`,
-        ).checked = true;
+        );
 
-        document.querySelector(
-          `input[name="ng_action"][value="${d.ng_action}"]`,
-        ).checked = true;
+        // NGアクション
+        setChecked(`input[name="ng_action"][value="${d.ng_action}"]`);
 
+        // 条件変更
         if (d.ng_action == 3 || d.ng_action == 4) {
-          document.getElementById("condition_change_block").style.display =
-            "block";
-          document.getElementById("condition_change").value =
-            d.condition_change || "";
+          const block = document.getElementById("condition_change_block");
+          if (block) block.style.display = "block";
+
+          setValue("condition_change", d.condition_change);
         }
 
-        // document.getElementById("repair_required").checked =
-        //   d.repair_required == 1;
-
-        document.querySelector(
+        // 診断承認ステータス
+        setChecked(
           `input[name="approval_status"][value="${d.approval_status}"]`,
-        ).checked = true;
+        );
 
-        document.getElementById("approver_id").value = d.approver_id || "";
-        document.getElementById("approval_date").value =
-          d.approval_date?.substring(0, 10) || "";
-        document.getElementById("reject_reason").value = d.reject_reason || "";
-        document.getElementById("diag_memo").value = d.memo || "";
+        // 承認情報
+        setValue("approver_id", d.approver_id);
+        setValue("approval_date", d.approval_date?.substring(0, 10));
+        setValue("reject_reason", d.reject_reason);
+
+        // メモ
+        setValue("diag_memo", d.memo);
       }
 
       /* ------------------------------
@@ -949,23 +1029,28 @@
           el.setAttribute("disabled", true);
         });
 
-        // ② 保存ボタンを非表示にする（存在する場合のみ）
+        // ② 保存ボタンを非表示
         const saveBtn = document.getElementById("saveBtn");
-        if (saveBtn) {
-          saveBtn.style.display = "none";
-        }
+        if (saveBtn) saveBtn.style.display = "none";
 
-        // ③ 承認ボタンを表示する
+        // ③ 診断情報カード内の承認ボタン（旧）を非表示（存在する場合）
         const approveBtn = document.getElementById("approveBtn");
-        if (approveBtn) {
-          approveBtn.style.display = "block";
-        }
+        if (approveBtn) approveBtn.style.display = "none";
 
-        // ④ タイトルなどに「承認モード」を表示したい場合（任意）
+        const rejectBtn = document.getElementById("rejectBtn");
+        if (rejectBtn) rejectBtn.style.display = "none";
+
+        // ④ ★ 承認・却下カードを表示（新しいカード）
+        const approvalCard = document.getElementById("approvalCard");
+        if (approvalCard) approvalCard.style.display = "block";
+
+        // ⑤ ★ 却下理由だけは入力可能にする
+        const rejectReason = document.getElementById("reject_reason");
+        if (rejectReason) rejectReason.removeAttribute("disabled");
+
+        // ⑥ タイトルに承認モード表示（任意）
         const title = document.getElementById("pageTitle");
-        if (title) {
-          title.textContent += "（承認モード）";
-        }
+        if (title) title.textContent += "（承認モード）";
       }
 
       /* ------------------------------
@@ -980,6 +1065,43 @@
         // ② 承認処理用 PHP へ遷移
         //    press_id を渡すだけでOK（承認モードなので PIN は不要）
         location.href = `./php/die_progress_php/approve_diagnosis.php?press_id=${pressId}`;
+      }
+      /* ------------------------------
+        却下ボタンの処理
+      ------------------------------ */
+
+      function rejectDiagnosis() {
+        if (!confirm("本当に却下しますか？\nこの操作は取り消せません。")) {
+          return;
+        }
+
+        const diagnosisId = window._diagnosisId;
+        const approverId = document.getElementById("approver_id").value;
+        const rejectReason = document.getElementById("reject_reason").value;
+
+        if (!rejectReason) {
+          alert("却下理由を入力してください。");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("diagnosis_id", diagnosisId);
+        formData.append("approver_id", approverId);
+        formData.append("reject_reason", rejectReason);
+
+        fetch("./php/die_progress_php/reject_diagnosis.php", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "success") {
+              alert("却下しました。");
+              location.href = "die_progress_list.html";
+            } else {
+              alert("却下処理に失敗しました。");
+            }
+          });
       }
 
       /* ------------------------------
