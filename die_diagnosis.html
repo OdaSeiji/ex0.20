@@ -554,6 +554,15 @@
         loadStaffList();
         loadDiagnosisData();
 
+        // ★ URL から press_id を取得（再診断時に必要）
+        const urlParams = new URLSearchParams(window.location.search);
+        const press_id = urlParams.get("press_id");
+
+        // ★ 再診断 or 編集時：既存診断データを読み込む
+        if (press_id) {
+          loadDiagnosis(press_id);
+        }
+
         if (mode === "approval") {
           // ★ 承認モード
           enableApprovalMode();

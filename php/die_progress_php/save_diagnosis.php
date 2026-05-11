@@ -56,7 +56,7 @@ $exist = $stmt->fetch(PDO::FETCH_ASSOC);
 // 4. INSERT or UPDATE
 // --------------------------------------------------
 if ($exist) {
-    // UPDATE
+    // UPDATE（★ 再診断 → 承認ステータスを未承認に戻す）
     $sql = "
         UPDATE t_die_diagnosis
         SET
@@ -67,7 +67,10 @@ if ($exist) {
             overall_judgement = ?,
             ng_action = ?,
             condition_change = ?,
-            memo = ?
+            memo = ?,
+            approval_status = 0,   -- ★ 再診断 → 未承認に戻す
+            approved_by = NULL,    -- ★ 承認者クリア
+            approved_at = NULL     -- ★ 承認日時クリア
         WHERE inspection_id = ?
     ";
     $stmt = $pdo->prepare($sql);
