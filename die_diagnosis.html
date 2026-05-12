@@ -552,22 +552,12 @@
         applyLanguage(lang);
 
         loadStaffList();
-        loadDiagnosisData();
+        loadDiagnosisData(); // ← ここで診断カードが描画される
 
-        // ★ URL から press_id を取得（再診断時に必要）
-        const urlParams = new URLSearchParams(window.location.search);
-        const press_id = urlParams.get("press_id");
-
-        // ★ 再診断 or 編集時：既存診断データを読み込む
-        if (press_id) {
-          loadDiagnosis(press_id);
-        }
-
+        // ★★★ 必ず最後に承認モードを適用する ★★★
         if (mode === "approval") {
-          // ★ 承認モード
           enableApprovalMode();
         } else {
-          // ★ 通常モード：承認カードを非表示
           const approvalCard = document.getElementById("approvalCard");
           if (approvalCard) approvalCard.style.display = "none";
         }
