@@ -353,7 +353,8 @@
     <!-- ============================= -->
     <div class="card" id="approvalCard" style="display: none">
       <h2>■ 承認 / 却下</h2>
-
+      <!-- 承認者（隠しフィールド） -->
+      <input type="hidden" id="approver_id" value="4" />
       <!-- 却下理由 -->
       <div class="row">
         <label>却下理由：</label>
@@ -1023,31 +1024,29 @@
          承認モード（mode=approval）処理
       ------------------------------ */
       function enableApprovalMode() {
-        // ① すべての入力欄を読み取り専用にする
         document.querySelectorAll("input, textarea, select").forEach((el) => {
           el.setAttribute("disabled", true);
         });
 
-        // ② 保存ボタンを非表示
         const saveBtn = document.getElementById("saveBtn");
         if (saveBtn) saveBtn.style.display = "none";
 
-        // ③ 診断情報カード内の承認ボタン（旧）を非表示（存在する場合）
         const approveBtn = document.getElementById("approveBtn");
         if (approveBtn) approveBtn.style.display = "none";
 
         const rejectBtn = document.getElementById("rejectBtn");
         if (rejectBtn) rejectBtn.style.display = "none";
 
-        // ④ ★ 承認・却下カードを表示（新しいカード）
         const approvalCard = document.getElementById("approvalCard");
         if (approvalCard) approvalCard.style.display = "block";
 
-        // ⑤ ★ 却下理由だけは入力可能にする
-        const rejectReason = document.getElementById("reject_reason");
-        if (rejectReason) rejectReason.removeAttribute("disabled");
+        // ★★★ DOM 反映後に却下理由を有効化する ★★★
+        setTimeout(() => {
+          const rejectReason = document.getElementById("reject_reason");
+          console.log("reject_reason after DOM update:", rejectReason);
+          if (rejectReason) rejectReason.removeAttribute("disabled");
+        }, 0);
 
-        // ⑥ タイトルに承認モード表示（任意）
         const title = document.getElementById("pageTitle");
         if (title) title.textContent += "（承認モード）";
       }
@@ -1070,24 +1069,44 @@
       ------------------------------ */
 
       function rejectDiagnosis() {
+        // デバッグログ
+        console.log(
+          "reject_reason at click:",
+          document.getElementById("reject_reason"),
+        );
+        console.log("diagnosisId:", window._diagnosisId);
+        console.log(
+          "approverId:",
+          document.getElementById("approver_id")?.value,
+        );
+        console.log(
+          "rejectReason:",
+          document.getElementById("reject_reason")?.value,
+        );
+
+        // 確認ダイアログ
         if (!confirm("本当に却下しますか？\nこの操作は取り消せません。")) {
           return;
         }
 
+        // 値の取得
         const diagnosisId = window._diagnosisId;
         const approverId = document.getElementById("approver_id").value;
         const rejectReason = document.getElementById("reject_reason").value;
 
+        // 却下理由のチェック
         if (!rejectReason) {
           alert("却下理由を入力してください。");
           return;
         }
 
+        // 送信データ作成
         const formData = new FormData();
         formData.append("diagnosis_id", diagnosisId);
         formData.append("approver_id", approverId);
         formData.append("reject_reason", rejectReason);
 
+        // PHP へ送信
         fetch("./php/die_progress_php/reject_diagnosis.php", {
           method: "POST",
           body: formData,
@@ -1102,7 +1121,6 @@
             }
           });
       }
-
       /* ------------------------------
         戻るボタンの処理
       ------------------------------ */
