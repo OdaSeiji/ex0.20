@@ -591,6 +591,7 @@
 
             /* ★ 診断情報 */
             fillDiagnosis(data.diagnosis);
+            // return;
 
             /* ★ diagnosis_id を保持（添付ファイルパス組み立てに必要） */
             window._diagnosisId = data.diagnosis?.id || null;
@@ -642,8 +643,8 @@
       }
 
       /* =====================================================
-   ★ 診断添付ファイル表示（外出し・再利用可能）
-===================================================== */
+        ★ 診断添付ファイル表示（外出し・再利用可能）
+      ===================================================== */
       function fillDiagnosisFiles(files) {
         const area = document.getElementById("diag_file_preview");
         if (!area) return;
@@ -819,7 +820,10 @@
         );
 
         // 承認情報
-        setValue("approver_id", d.approver_id);
+        // setValue("approver_id", d.approver_id);
+        if (d.approver_id) {
+          setValue("approver_id", d.approver_id);
+        }
         setValue("approval_date", d.approval_date?.substring(0, 10));
         setValue("reject_reason", d.reject_reason);
 
@@ -1024,29 +1028,30 @@
          承認モード（mode=approval）処理
       ------------------------------ */
       function enableApprovalMode() {
+        // ① すべての入力欄を読み取り専用にする（ただし除外あり）
         document.querySelectorAll("input, textarea, select").forEach((el) => {
-          el.setAttribute("disabled", true);
+          // ★ approver_id と reject_reason は disable しない
+          if (el.id !== "approver_id" && el.id !== "reject_reason") {
+            el.setAttribute("disabled", true);
+          }
         });
 
+        // ② 保存ボタンを非表示
         const saveBtn = document.getElementById("saveBtn");
         if (saveBtn) saveBtn.style.display = "none";
 
+        // ③ 診断情報カード内の承認・却下ボタン（旧）を非表示
         const approveBtn = document.getElementById("approveBtn");
         if (approveBtn) approveBtn.style.display = "none";
 
         const rejectBtn = document.getElementById("rejectBtn");
         if (rejectBtn) rejectBtn.style.display = "none";
 
+        // ④ 新しい承認・却下カードを表示
         const approvalCard = document.getElementById("approvalCard");
         if (approvalCard) approvalCard.style.display = "block";
 
-        // ★★★ DOM 反映後に却下理由を有効化する ★★★
-        setTimeout(() => {
-          const rejectReason = document.getElementById("reject_reason");
-          console.log("reject_reason after DOM update:", rejectReason);
-          if (rejectReason) rejectReason.removeAttribute("disabled");
-        }, 0);
-
+        // ⑤ タイトルに承認モード表示
         const title = document.getElementById("pageTitle");
         if (title) title.textContent += "（承認モード）";
       }
