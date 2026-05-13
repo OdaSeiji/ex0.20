@@ -1,7 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
-// require_once "../../config.php";  // ← パスは環境に合わせて調整してください
-require_once '../db.php';
+require_once '../db.php';   // ★ ここで $pdo が作られる
 
 try {
     // POST 受け取り
@@ -17,25 +16,23 @@ try {
         exit;
     }
 
-    // DB 接続
-    $pdo = new PDO($dsn, $db_user, $db_pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    // ★ db.php が $pdo を作っているので、ここでは何もしない
+    // $pdo はそのまま使える
 
-    // 却下処理（status = 2）
+    // 却下処理（approval_status = 'rejected'）
     $sql = "
         UPDATE t_die_diagnosis
         SET 
-            status = 2,
+            approval_status = 'rejected',
             reject_reason = :reject_reason,
             approver_id = :approver_id,
-            approved_at = NOW()
-        WHERE diagnosis_id = :diagnosis_id
+            approval_date = NOW()
+        WHERE id = :diagnosis_id
     ";
 
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(":reject_reason", $reject_reason, PDO::PARAM_STR);
-    $stmt->bindValue(":approver_id", $approver_id, PDO::PARAM_INT);
+    $stmt->bindValue(":approver_id", $approver_id, PDO::PARAM_STR); // VARCHAR(50)
     $stmt->bindValue(":diagnosis_id", $diagnosis_id, PDO::PARAM_INT);
     $stmt->execute();
 
