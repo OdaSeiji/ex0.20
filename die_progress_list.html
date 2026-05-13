@@ -277,6 +277,16 @@
         font-weight: bold;
         cursor: pointer;
       }
+      /* 測定と診断のバッジ上でポインタを変える。 */
+      .badge.ok,
+      .badge.ng {
+        cursor: pointer;
+      }
+
+      .badge.ok svg,
+      .badge.ng svg {
+        pointer-events: none;
+      }
     </style>
   </head>
 
