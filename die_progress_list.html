@@ -335,7 +335,7 @@
               >
                 <option value="">すべて</option>
                 <option value="◎">◎</option>
-                <option value="〇">〇</option>
+                <option value="〇" selected>〇</option>
                 <option value="●">●</option>
               </select>
             </th>
@@ -741,11 +741,13 @@
       }
 
       /* ============================================================
-   承認（PIN）
-============================================================ */
+        承認（PIN）
+      ============================================================ */
       function approveDiagnosis(id) {
         const pin = prompt("診断承認 PIN を入力してください");
-        if (pin === "1031") {
+
+        // ★ 1031 か 2054 のどちらかなら OK
+        if (pin === "1031" || pin === "2054") {
           location.href = `die_diagnosis.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
@@ -754,7 +756,8 @@
 
       function approveFixPlan(id) {
         const pin = prompt("修理計画承認 PIN を入力してください");
-        if (pin === "1031") {
+
+        if (pin === "1031" || pin === "2054") {
           location.href = `die_fix_plan.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
@@ -763,7 +766,8 @@
 
       function approveFixReport(id) {
         const pin = prompt("修理報告承認 PIN を入力してください");
-        if (pin === "1031") {
+
+        if (pin === "1031" || pin === "2054") {
           location.href = `die_fix_report.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");

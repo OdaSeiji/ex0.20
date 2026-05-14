@@ -102,6 +102,61 @@
         text-align: right;
         margin-top: 20px;
       }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      /* サムネイル */
+      .thumb {
+        width: 120px;
+        height: auto;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      /* モーダル背景 */
+      .img-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      /* モーダル画像 */
+      .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 6px;
+      }
+
+      /* 閉じるボタン */
+      .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+      }
     </style>
   </head>
 
@@ -122,6 +177,15 @@
 
       <!-- タイトル -->
       <h1>🛠 修理計画（Fix Plan）</h1>
+
+      <!-- 承認モード専用ボタン -->
+      <div
+        id="approvalButtons"
+        style="text-align: right; margin-bottom: 10px; display: none"
+      >
+        <button class="btn btn-success" id="approveBtn">承認</button>
+        <button class="btn btn-danger" id="rejectBtn">却下</button>
+      </div>
 
       <!-- ============================= -->
       <!-- 診断情報（読み取り専用） -->
@@ -188,17 +252,58 @@
         </div>
       </div>
     </div>
+    <!-- ============================= -->
+    <!-- 画像モーダル -->
+    <!-- ============================= -->
+    <div id="imgModal" class="img-modal" onclick="closeModal()">
+      <span class="close-btn">&times;</span>
+      <img id="modalImg" class="modal-content" />
+    </div>
+    <!-- ============================= -->
+    <!-- 却下モーダル -->
+    <!-- ============================= -->
+    <div id="rejectModal" class="img-modal" style="display: none">
+      <div
+        style="
+          background: white;
+          padding: 20px;
+          width: 300px;
+          margin: 100px auto;
+          border-radius: 8px;
+        "
+      >
+        <h3>却下理由</h3>
+        <textarea
+          id="reject_reason"
+          style="width: 100%; height: 80px"
+        ></textarea>
+        <div style="text-align: right; margin-top: 10px">
+          <button class="btn btn-secondary" onclick="closeRejectModal()">
+            キャンセル
+          </button>
+          <button class="btn btn-danger" onclick="submitReject()">
+            却下する
+          </button>
+        </div>
+      </div>
+    </div>
 
     <script>
-      /* 多言語（必要なら後で追加） */
+      /* ------------------------------
+     多言語（必要なら後で追加）
+  ------------------------------ */
       function setLang(lang) {
         localStorage.setItem("lang", lang);
       }
 
       const urlParams = new URLSearchParams(window.location.search);
-      const press_id = urlParams.get("press_id"); // ← 修正済み
+      const press_id = urlParams.get("press_id");
+      const mode = urlParams.get("mode"); // ★ 承認モード判定
       let diagnosis_id = null;
       let fix_id = null;
+
+      // 新規選択ファイル（修理計画）の一時保持用
+      let selectedPlanFiles = [];
 
       window.onload = function () {
         loadDiagnosis();
@@ -206,8 +311,16 @@
       };
 
       /* ------------------------------
-         診断情報の読み込み
-      ------------------------------ */
+     日付フォーマット（YYYY-MM-DD）
+  ------------------------------ */
+      function formatDateForInput(dt) {
+        if (!dt) return "";
+        return dt.split(" ")[0]; // "2026-05-14 00:00:00" → "2026-05-14"
+      }
+
+      /* ------------------------------
+     診断情報の読み込み
+  ------------------------------ */
       function loadDiagnosis() {
         fetch(
           `./php/die_progress_php/get_diagnosis_data.php?press_id=${press_id}`,
@@ -244,8 +357,8 @@
       }
 
       /* ------------------------------
-         診断ファイル表示
-      ------------------------------ */
+     診断ファイル表示
+  ------------------------------ */
       function renderDiagFiles(files) {
         const area = document.getElementById("diag_files");
         area.innerHTML = "";
@@ -259,7 +372,7 @@
           const base = `uploads/diagnosis/${diagnosis_id}/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
-            div.innerHTML = `<img src="${base}" class="thumb">`;
+            div.innerHTML = `<img src="${base}" class="thumb" onclick="openModal('${base}')">`;
           } else {
             div.innerHTML = `<a href="${base}" target="_blank">${f.file_path}</a>`;
           }
@@ -269,8 +382,8 @@
       }
 
       /* ------------------------------
-         スタッフ一覧
-      ------------------------------ */
+     スタッフ一覧
+  ------------------------------ */
       function loadStaffList() {
         fetch("./php/die_progress_php/get_staff_list.php")
           .then((res) => res.json())
@@ -286,8 +399,8 @@
       }
 
       /* ------------------------------
-         修理計画の読み込み
-      ------------------------------ */
+     修理計画の読み込み
+  ------------------------------ */
       function loadFixPlan() {
         if (!diagnosis_id) return;
 
@@ -299,20 +412,30 @@
             if (!data) return;
 
             fix_id = data.id;
-            document.getElementById("plan_fix_date").value =
-              data.plan_fix_date || "";
+
+            // ★ 修理予定日を date input 用に整形
+            document.getElementById("plan_fix_date").value = formatDateForInput(
+              data.plan_fix_date,
+            );
+
             document.getElementById("plan_fix_staff_id").value =
               data.plan_fix_staff_id || "";
+
             document.getElementById("plan_fix_content").value =
               data.plan_fix_content || "";
 
             renderPlanFiles(data.files);
+
+            // ★ 承認モードなら読み取り専用にする
+            if (mode === "approval") {
+              setApprovalMode();
+            }
           });
       }
 
       /* ------------------------------
-         修理計画ファイル表示
-      ------------------------------ */
+     修理計画ファイル表示（保存済み）
+  ------------------------------ */
       function renderPlanFiles(files) {
         const area = document.getElementById("plan_file_preview");
         area.innerHTML = "";
@@ -324,7 +447,7 @@
           const base = `uploads/fix/${f.fix_id}/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
-            div.innerHTML = `<img src="${base}" class="thumb">`;
+            div.innerHTML = `<img src="${base}" class="thumb" onclick="openModal('${base}')">`;
           } else {
             div.innerHTML = `<a href="${base}" target="_blank">${f.file_path}</a>`;
           }
@@ -334,8 +457,60 @@
       }
 
       /* ------------------------------
-         修理計画の申請（保存）
-      ------------------------------ */
+     修理計画ファイル（選択時プレビュー＋削除）
+  ------------------------------ */
+      document
+        .getElementById("plan_files")
+        .addEventListener("change", function () {
+          selectedPlanFiles = Array.from(this.files);
+          renderSelectedPlanFiles();
+        });
+
+      function renderSelectedPlanFiles() {
+        const area = document.getElementById("plan_file_preview");
+        area.innerHTML = "";
+
+        selectedPlanFiles.forEach((file, index) => {
+          const div = document.createElement("div");
+          div.classList.add("file-item");
+          div.style.position = "relative";
+
+          // 削除ボタン
+          const delBtn = document.createElement("div");
+          delBtn.textContent = "×";
+          delBtn.style.position = "absolute";
+          delBtn.style.top = "0px";
+          delBtn.style.right = "5px";
+          delBtn.style.color = "white";
+          delBtn.style.background = "rgba(0,0,0,0.6)";
+          delBtn.style.padding = "2px 6px";
+          delBtn.style.cursor = "pointer";
+          delBtn.style.borderRadius = "50%";
+          delBtn.style.fontWeight = "bold";
+          delBtn.onclick = () => {
+            selectedPlanFiles.splice(index, 1);
+            renderSelectedPlanFiles();
+          };
+
+          if (file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              div.innerHTML = `<img src="${e.target.result}" class="thumb" onclick="openModal('${e.target.result}')">`;
+              div.appendChild(delBtn);
+            };
+            reader.readAsDataURL(file);
+          } else {
+            div.innerHTML = `<span>${file.name}</span>`;
+            div.appendChild(delBtn);
+          }
+
+          area.appendChild(div);
+        });
+      }
+
+      /* ------------------------------
+     修理計画の申請（保存）
+  ------------------------------ */
       document
         .getElementById("submitBtn")
         .addEventListener("click", function () {
@@ -356,10 +531,10 @@
 
           if (fix_id) formData.append("fix_id", fix_id);
 
-          const files = document.getElementById("plan_files").files;
-          for (let i = 0; i < files.length; i++) {
-            formData.append("plan_files[]", files[i]);
-          }
+          // 削除後の選択ファイルだけ送信
+          selectedPlanFiles.forEach((file) => {
+            formData.append("plan_files[]", file);
+          });
 
           fetch("./php/die_progress_php/save_fix_plan.php", {
             method: "POST",
@@ -368,9 +543,98 @@
             .then((res) => res.json())
             .then((data) => {
               alert("修理計画を申請しました。");
-              location.reload();
+              location.href = "die_progress_list.html";
             });
         });
+
+      /* ------------------------------
+     承認モード設定
+  ------------------------------ */
+      function setApprovalMode() {
+        // タイトル変更
+        document.querySelector("h1").textContent = "🛠 修理計画（承認モード）";
+
+        // 入力不可にする
+        document.getElementById("plan_fix_date").disabled = true;
+        document.getElementById("plan_fix_staff_id").disabled = true;
+        document.getElementById("plan_fix_content").readOnly = true;
+
+        // ファイル選択を非表示
+        document.getElementById("plan_files").style.display = "none";
+
+        // 申請ボタンを非表示
+        document.getElementById("submitBtn").style.display = "none";
+
+        // ★ 承認ボタンを表示
+        document.getElementById("approvalButtons").style.display = "block";
+      }
+
+      /* ------------------------------
+     モーダル表示
+  ------------------------------ */
+      function openModal(src) {
+        document.getElementById("modalImg").src = src;
+        document.getElementById("imgModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("imgModal").style.display = "none";
+      }
+
+      /* ------------------------------
+        // 承認処理
+      ------------------------------ */
+      document
+        .getElementById("approveBtn")
+        .addEventListener("click", function () {
+          if (!fix_id) return alert("修理計画が読み込まれていません。");
+
+          fetch("./php/die_progress_php/approve_fix_plan.php", {
+            method: "POST",
+            body: new URLSearchParams({
+              fix_id: fix_id,
+              action: "approve",
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              alert("修理計画を承認しました。");
+              location.href = "die_progress_list.html";
+            });
+        });
+
+      /* ------------------------------
+        却下ボタンの動作
+      ------------------------------ */
+
+      document
+        .getElementById("rejectBtn")
+        .addEventListener("click", function () {
+          document.getElementById("rejectModal").style.display = "block";
+        });
+
+      function closeRejectModal() {
+        document.getElementById("rejectModal").style.display = "none";
+      }
+
+      function submitReject() {
+        const reason = document.getElementById("reject_reason").value.trim();
+        if (!reason) return alert("却下理由を入力してください。");
+
+        fetch("./php/die_progress_php/approve_fix_plan.php", {
+          method: "POST",
+          body: new URLSearchParams({
+            fix_id: fix_id,
+            action: "reject",
+            reason: reason,
+          }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            alert("修理計画を却下しました。");
+            location.href = "die_progress_list.html";
+          });
+      }
     </script>
   </body>
 </html>
