@@ -68,11 +68,12 @@ if ($exist) {
             ng_action = ?,
             condition_change = ?,
             memo = ?,
-            approval_status = 0,   -- ★ 再診断 → 未承認に戻す
-            approved_by = NULL,    -- ★ 承認者クリア
-            approved_at = NULL     -- ★ 承認日時クリア
+            approval_status = 'pending',   -- ★ 未承認に戻す
+            approver_id = NULL,            -- ★ 承認者クリア
+            approval_date = NULL           -- ★ 承認日時クリア
         WHERE inspection_id = ?
     ";
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $diagnosis_date,

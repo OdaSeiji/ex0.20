@@ -60,21 +60,7 @@ $stmt->execute([$diagnosis_id]);
 /* ----------------------------------------
    5. 遷移先を決定
 ---------------------------------------- */
-if ($ng_action == 1) {
-    // (1) 様子を見る → 修理へ
-    $redirect = "../../die_fix_plan.html?press_id=" . $press_id;
-
-} elseif ($ng_action == 2) {
-    // (2) 修理 → 次回押出条件へ
-    $redirect = "../../die_next_condition.html?press_id=" . $press_id;
-
-} else {
-    // (3) 修理 + 条件変更
-    // (4) 条件変更のみ
-    // → 進捗一覧へ戻る
-    $redirect = "../../die_progress_list.html";
-}
-
+$redirect = "../../die_progress_list.html";
     
     /* ----------------------------------------
    6. リダイレクト
