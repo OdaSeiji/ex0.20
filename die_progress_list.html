@@ -340,15 +340,13 @@
               </select>
             </th>
 
-            <!-- ★ ここから 8 ステップ -->
+            <!-- ★ ここから 6 ステップ -->
             <th data-key="col_ins">測定</th>
             <th data-key="col_diag">診断</th>
             <th data-key="col_needfix">修理要否</th>
             <th data-key="col_diag_app">診断承認</th>
             <th data-key="col_fix_plan">修理計画</th>
-            <th data-key="col_fix_plan_app">修理計画承認</th>
             <th data-key="col_fix_report">修理報告</th>
-            <th data-key="col_fix_report_app">修理報告承認</th>
 
             <th data-key="col_action">操作</th>
           </tr>
@@ -357,73 +355,151 @@
       </table>
     </div>
 
-    <!-- ▼▼▼ プレビューモーダル（ここを追加） ▼▼▼ -->
+    <!-- ▼▼▼ プレビューモーダル ▼▼▼ -->
     <div id="previewModal" class="modal">
       <div class="modal-content preview-wide">
         <span class="close" id="previewClose">&times;</span>
+
+        <!-- タイトル -->
         <h2 id="previewTitle"></h2>
 
         <div class="preview-grid">
           <!-- 左カラム：基本情報 -->
           <div class="preview-card">
-            <h3>基本情報</h3>
-            <p><strong>日付:</strong> <span id="pv_date"></span></p>
-            <p><strong>担当者:</strong> <span id="pv_staff"></span></p>
-            <p><strong>金型番号:</strong> <span id="pv_die"></span></p>
-            <p><strong>プレス番号:</strong> <span id="pv_press"></span></p>
+            <h3 data-key="preview_basic_info">基本情報</h3>
+
+            <p>
+              <strong data-key="label_date">日付</strong>：<span
+                id="pv_date"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_staff">担当者</strong>：<span
+                id="pv_staff"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_die">金型番号</strong>：<span
+                id="pv_die"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_press">プレス番号</strong>：<span
+                id="pv_press"
+              ></span>
+            </p>
           </div>
 
           <!-- 右カラム：判定情報 -->
           <div class="preview-card">
-            <h3>判定</h3>
-            <p><strong>寸法判定:</strong> <span id="pv_dim"></span></p>
-            <p><strong>形状判定:</strong> <span id="pv_shape"></span></p>
-            <p><strong>総合判定:</strong> <span id="pv_overall"></span></p>
-            <p><strong>NGアクション:</strong> <span id="pv_ng"></span></p>
-            <p><strong>条件変更:</strong> <span id="pv_condition"></span></p>
+            <h3 data-key="preview_judgement">判定</h3>
+
+            <p>
+              <strong data-key="label_dim">寸法判定</strong>：<span
+                id="pv_dim"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_shape">形状判定</strong>：<span
+                id="pv_shape"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_overall">総合判定</strong>：<span
+                id="pv_overall"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_ng">NGアクション</strong>：<span
+                id="pv_ng"
+              ></span>
+            </p>
+            <p>
+              <strong data-key="label_condition">条件変更</strong>：<span
+                id="pv_condition"
+              ></span>
+            </p>
+
+            <!-- ★ 追加：診断メモ -->
+            <p>
+              <strong data-key="label_memo">メモ</strong>：<span
+                id="pv_memo"
+              ></span>
+            </p>
           </div>
         </div>
 
-        <!-- 診断専用：承認情報 -->
+        <!-- ★ 診断専用：承認情報 -->
         <div
-          class="preview-card"
           id="previewApprovalBlock"
+          class="preview-card"
           style="display: none"
         >
-          <h3>承認情報</h3>
-
+          <h3 data-key="preview_approval">承認情報</h3>
           <p>
-            <strong>承認ステータス:</strong>
-            <span id="pv_approval">-</span>
-          </p>
-
-          <p>
-            <strong>承認者:</strong>
-            <span id="pv_approver">-</span>
-          </p>
-
-          <p>
-            <strong>承認日:</strong>
-            <span id="pv_approval_date">-</span>
-          </p>
-
-          <p>
-            <strong>却下理由:</strong>
-            <span id="pv_reject_reason">-</span>
+            <strong data-key="label_approval">承認状態</strong>：<span
+              id="pv_approval"
+            ></span>
           </p>
         </div>
 
         <!-- 添付ファイル -->
-        <h3>添付ファイル</h3>
+        <h3 data-key="preview_files">添付ファイル</h3>
         <div class="preview-files" id="pv_files"></div>
       </div>
     </div>
     <!-- ▲▲▲ プレビューモーダルここまで ▲▲▲ -->
 
+    <!-- ▼▼▼ 画像拡大モーダル ▼▼▼ -->
+    <div
+      id="imgModal"
+      class="modal"
+      style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <!-- ★ 閉じるボタン -->
+      <span
+        id="imgModalClose"
+        style="
+          position: absolute;
+          top: 20px;
+          right: 30px;
+          font-size: 40px;
+          color: white;
+          cursor: pointer;
+          font-weight: bold;
+          z-index: 10000;
+        "
+        >&times;</span
+      >
+
+      <!-- 拡大画像 -->
+      <img
+        id="modalImg"
+        style="
+          max-width: 90%;
+          max-height: 90%;
+          border: 4px solid white;
+          border-radius: 8px;
+        "
+      />
+    </div>
+    <!-- ▲▲▲ 画像拡大モーダルここまで ▲▲▲ -->
+
     <script>
       /* ============================================================
-   多言語辞書（8ステップ対応）
-============================================================ */
+        多言語辞書（8ステップ対応）
+      ============================================================ */
       const dict = {
         ja: {
           title: "📊 金型進捗一覧（Progress List）",
@@ -449,6 +525,19 @@
           col_action_fix_report: "修理報告",
           col_action_fix_report_app: "報告承認",
           col_action_detail: "詳細",
+
+          // ▼▼▼ ここからプレビュー画面用 ▼▼▼
+          preview_title: "測定プレビュー",
+          label_date: "日付",
+          label_staff: "担当者",
+          label_die: "金型番号",
+          label_press: "プレス機",
+          label_dim: "寸法判定",
+          label_shape: "形状判定",
+          label_overall: "総合判定",
+          label_ng: "NGアクション",
+          label_condition: "条件変更",
+          label_memo: "メモ",
         },
 
         vi: {
@@ -475,6 +564,19 @@
           col_action_fix_report: "Báo cáo sửa",
           col_action_fix_report_app: "Duyệt báo cáo",
           col_action_detail: "Chi tiết",
+
+          // ▼▼▼ ここからプレビュー画面用 ▼▼▼
+          preview_title: "Xem trước đo kiểm",
+          label_date: "Ngày",
+          label_staff: "Người đo",
+          label_die: "Số khuôn",
+          label_press: "Máy ép",
+          label_dim: "Đánh giá kích thước",
+          label_shape: "Đánh giá hình dạng",
+          label_overall: "Đánh giá tổng thể",
+          label_ng: "Hành động NG",
+          label_condition: "Thay đổi điều kiện",
+          label_memo: "Ghi chú",
         },
       };
 
@@ -580,9 +682,9 @@
         tbody.innerHTML = "";
 
         /* ------------------------------
-          診断承認専用バッジ（3色）
-          1 = 承認, -1 = 却下, 0 = 未承認, null = —
-        ------------------------------ */
+    診断承認専用バッジ（3色）
+    1 = 承認, -1 = 却下, 0 = 未承認, null = —
+  ------------------------------ */
         const approvalBadge = (flag) =>
           flag === 1
             ? `<span class="badge ok">承認</span>`
@@ -593,51 +695,51 @@
                 : `<span class="badge none">—</span>`;
 
         /* ------------------------------
-          その他ステップ用バッジ（☑ / × / —）
-          1 = ☑, 0 = ×, null = —
-        ------------------------------ */
+    その他ステップ用バッジ（☑ / × / —）
+    1 = ☑, 0 = ×, null = —
+  ------------------------------ */
         const stepBadge = (flag) =>
           flag === 1
             ? `<span class="badge ok">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-         </span>`
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>`
             : flag === 0
               ? `<span class="badge ng">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M6 6L18 18M6 18L18 6" stroke="white" stroke-width="3" stroke-linecap="round"/>
-              </svg>
-           </span>`
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M6 6L18 18M6 18L18 6" stroke="white" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </span>`
               : `<span class="badge none">—</span>`;
 
         /* ------------------------------
-          ★ 測定バッジ（クリックでプレビュー）
-        ------------------------------ */
+    ★ 測定バッジ（クリックでプレビュー）
+  ------------------------------ */
         const inspectionBadge = (flag, pressId) =>
           flag === 1
             ? `<span class="badge ok" onclick="previewInspection(${pressId})">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-         </span>`
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>`
             : stepBadge(flag);
 
         /* ------------------------------
-          ★ 診断バッジ（クリックでプレビュー）
-        ------------------------------ */
+    ★ 診断バッジ（クリックでプレビュー）
+  ------------------------------ */
         const diagnosisBadge = (flag, pressId) =>
           flag === 1
             ? `<span class="badge ok" onclick="previewDiagnosis(${pressId})">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-         </span>`
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>`
             : stepBadge(flag);
 
         /* ------------------------------
-          行生成
-        ------------------------------ */
+    行生成
+  ------------------------------ */
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
@@ -658,21 +760,21 @@
       <!-- 診断承認（3色） -->
       <td>${approvalBadge(row.approved)}</td>
 
-      <!-- 修理計画・承認・報告・承認 -->
+      <!-- 修理計画 -->
       <td>${stepBadge(row.fix_plan)}</td>
-      <td>${stepBadge(row.fix_plan_approval)}</td>
-      <td>${stepBadge(row.fix_report)}</td>
-      <td>${stepBadge(row.fix_report_approval)}</td>
 
+      <!-- 修理報告 -->
+      <td>${stepBadge(row.fix_report)}</td>
+
+      <!-- 操作 -->
       <td>${renderActionButton(row)}</td>
     `;
 
           tbody.appendChild(tr);
         });
       }
-
       /* ============================================================
-        操作ボタン（8ステップ対応）
+        操作ボタン（承認なしの新6ステップ対応）
       ============================================================ */
       function renderActionButton(row) {
         const lang = localStorage.getItem("lang") || "ja";
@@ -687,37 +789,29 @@
           return `<button class="btn" onclick="goDiagnosis(${row.press_id})">${dict[lang].col_action_diag}</button>`;
         }
 
-        // ★★★ ③ 診断承認が「却下」された場合 → 再診断 ★★★
+        // ★ ③ 診断承認が「却下」された場合 → 再診断
         if (row.approved === -1) {
           return `<button class="btn" onclick="goDiagnosis(${row.press_id})">再診断</button>`;
         }
 
         // ④ 診断済・未承認（approved = 0）→ 承認ボタン
+        // ※ 診断承認は残す運用なのでこのまま
         if (row.approved === 0) {
           return `<button class="btn btn-warning" onclick="approveDiagnosis(${row.press_id})">${dict[lang].col_action_diag_app}</button>`;
         }
 
-        // ⑤ 修理計画
+        // ⑤ 修理計画（未作成）
         if (!row.fix_plan) {
           return `<button class="btn" onclick="goFixPlan(${row.press_id})">${dict[lang].col_action_fix_plan}</button>`;
         }
 
-        // ⑥ 修理計画承認
-        if (!row.fix_plan_approval) {
-          return `<button class="btn btn-warning" onclick="approveFixPlan(${row.press_id})">${dict[lang].col_action_fix_plan_app}</button>`;
-        }
-
-        // ⑦ 修理報告
+        // ★★★ ⑥ 修理計画承認は廃止 → すぐ修理実施報告へ ★★★
+        // 修理報告がまだなら「修理実施報告」へ
         if (!row.fix_report) {
-          return `<button class="btn" onclick="goFixReport(${row.press_id})">${dict[lang].col_action_fix_report}</button>`;
+          return `<button class="btn" onclick="goFixReport(${row.press_id})">修理実施報告</button>`;
         }
 
-        // ⑧ 修理報告承認
-        if (!row.fix_report_approval) {
-          return `<button class="btn btn-warning" onclick="approveFixReport(${row.press_id})">${dict[lang].col_action_fix_report_app}</button>`;
-        }
-
-        // ⑨ すべて完了 → 詳細
+        // ⑦ 修理報告済 → 詳細
         return `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
       }
 
@@ -791,41 +885,52 @@
         モーダル 共通と、inspection
       ============================================================ */
       function openInspectionPreview(data) {
-        document.getElementById("previewTitle").textContent = "測定プレビュー";
+        // ▼ タイトル（多言語対応）
+        document.getElementById("previewTitle").textContent =
+          t("preview_title");
 
+        // ▼ 基本情報
         document.getElementById("pv_date").textContent =
-          data.inspection.inspection_date;
+          data.inspection.inspection_date || "-";
 
         // ★ staff → staff_name に修正
         document.getElementById("pv_staff").textContent =
-          data.inspection.staff_name;
+          data.inspection.inspection_staff || "-";
 
-        document.getElementById("pv_die").textContent = data.press.die_number;
-        document.getElementById("pv_press").textContent = data.press.press_no;
+        document.getElementById("pv_die").textContent =
+          data.press?.die_number || data.inspection.die_number || "-";
 
-        // ★ judgement → result に修正
+        document.getElementById("pv_press").textContent =
+          data.press?.press_no || data.inspection.press_machine_no || "-";
+
+        // ▼ 判定（judgement → result）
         document.getElementById("pv_dim").textContent =
-          data.inspection.dimension_result;
+          data.inspection.dimension_result || "-";
 
         document.getElementById("pv_shape").textContent =
-          data.inspection.shape_result;
+          data.inspection.shape_result || "-";
 
         document.getElementById("pv_overall").textContent =
-          data.inspection.overall_result;
+          data.inspection.overall_result || "-";
 
+        // ▼ 測定には NGアクションは無い
         document.getElementById("pv_ng").textContent = "-";
+
+        // ▼ 条件変更（inspection に存在しないので "-"）
         document.getElementById("pv_condition").textContent =
           data.inspection.condition_change || "-";
 
+        // ▼ 承認情報は測定には無いので非表示
         document.getElementById("previewApprovalBlock").style.display = "none";
 
-        // ★ id は data.inspection.id で正しい
+        // ▼ 添付ファイル（inspection_id が正しい）
         renderPreviewFiles(
           data.inspection_files,
-          data.inspection.inspection_id, // ← これが正しい
+          data.inspection.inspection_id,
           "inspection",
         );
 
+        // ▼ モーダル表示
         openModal();
       }
 
@@ -841,17 +946,21 @@
         const container = document.getElementById("pv_files");
         container.innerHTML = "";
 
-        // ★ inspection / diagnosis でフォルダを切り替える
+        // inspection / diagnosis でフォルダ切替
         const folder = type === "diagnosis" ? "diagnosis" : "inspection";
 
         files.forEach((f) => {
           const fileUrl = `./uploads/${folder}/${id}/${f.file_path}`;
 
+          // ★ 画像ファイル → モーダルで拡大表示
           if (f.file_type.startsWith("image/")) {
             const img = document.createElement("img");
             img.src = fileUrl;
-            img.onclick = () => window.open(fileUrl, "_blank");
+            img.className = "thumb";
+            img.onclick = () => showImageModal(fileUrl);
             container.appendChild(img);
+
+            // ★ PDF → 新しいタブで開く（従来通り）
           } else if (f.file_type === "application/pdf") {
             const pdf = document.createElement("div");
             pdf.className = "pdf-thumb";
@@ -861,6 +970,10 @@
           }
         });
       }
+
+      /* ============================================================
+        Inspection Preview
+      ============================================================ */
 
       function previewInspection(pressId) {
         fetch(
@@ -883,7 +996,7 @@
               data.inspection.inspection_date || "-";
 
             document.getElementById("pv_staff").textContent =
-              data.inspection.staff_name || "-";
+              data.inspection.inspection_staff || "-";
 
             document.getElementById("pv_die").textContent =
               data.inspection.die_number || data.press?.die_number || "-";
@@ -923,62 +1036,8 @@
           });
       }
 
-      function previewDiagnosis(pressId) {
-        console.log("previewDiagnosis called", pressId); // ★追加
-        fetch(
-          `./php/die_progress_php/get_diagnosis_data.php?press_id=${pressId}`,
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            document.getElementById("previewTitle").textContent =
-              "診断プレビュー";
-
-            document.getElementById("pv_date").textContent =
-              data.diagnosis.diagnosis_date;
-            document.getElementById("pv_staff").textContent =
-              data.diagnosis.diagnosis_staff;
-            document.getElementById("pv_die").textContent =
-              data.press.die_number;
-            document.getElementById("pv_press").textContent =
-              data.press.press_no;
-
-            document.getElementById("pv_dim").textContent =
-              data.diagnosis.dimension_judgement;
-            document.getElementById("pv_shape").textContent =
-              data.diagnosis.shape_judgement;
-            document.getElementById("pv_overall").textContent =
-              data.diagnosis.overall_judgement;
-
-            document.getElementById("pv_ng").textContent =
-              data.diagnosis.ng_action;
-            document.getElementById("pv_condition").textContent =
-              data.diagnosis.condition_change || "-";
-
-            // 承認情報
-            document.getElementById("previewApprovalBlock").style.display =
-              "block";
-            document.getElementById("pv_approval_status").textContent =
-              data.diagnosis.approval_status;
-            document.getElementById("pv_approver").textContent =
-              data.diagnosis.approver_id || "-";
-            document.getElementById("pv_approval_date").textContent =
-              data.diagnosis.approval_date || "-";
-            document.getElementById("pv_reject_reason").textContent =
-              data.diagnosis.reject_reason || "-";
-
-            renderPreviewFiles(
-              data.diagnosis_files,
-              data.diagnosis.id,
-              "diagnosis",
-            );
-
-            openModal();
-          });
-      }
-
-      // -----------------------------------------------------
       /* ============================================================
-        モーダル diagnosis preview
+        Inspection Diagnosis
       ============================================================ */
 
       function previewDiagnosis(pressId) {
@@ -994,6 +1053,7 @@
               return;
             }
 
+            // ▼ タイトル（固定日本語）
             document.getElementById("previewTitle").textContent =
               "診断プレビュー";
 
@@ -1002,13 +1062,13 @@
               data.diagnosis.diagnosis_date || "-";
 
             document.getElementById("pv_staff").textContent =
-              data.diagnosis.diagnosed_by || "-";
+              data.diagnosis.diagnosis_staff_name || "-";
 
             document.getElementById("pv_die").textContent =
-              data.press.die_number || "-";
+              data.press?.die_number || "-";
 
             document.getElementById("pv_press").textContent =
-              data.press.press_machine_no || "-";
+              data.press?.press_machine_no || "-";
 
             // ▼ 判定
             document.getElementById("pv_dim").textContent =
@@ -1028,10 +1088,14 @@
             document.getElementById("pv_condition").textContent =
               data.diagnosis.condition_change || "-";
 
+            document.getElementById("pv_memo").textContent =
+              data.diagnosis.memo || "-";
+
             // ▼ 承認情報（診断だけ表示）
             document.getElementById("previewApprovalBlock").style.display =
               "block";
 
+            // ▼ 承認ステータス
             let approvalText = "未承認";
             if (data.diagnosis.approved == 1) approvalText = "承認";
             if (data.diagnosis.approved == -1) approvalText = "却下";
@@ -1047,6 +1111,26 @@
 
             openModal();
           });
+      }
+
+      // 画像モーダルを閉じる
+      document.getElementById("imgModalClose").onclick = function () {
+        document.getElementById("imgModal").style.display = "none";
+      };
+
+      // 背景クリックでも閉じる
+      document.getElementById("imgModal").onclick = function (e) {
+        if (e.target.id === "imgModal") {
+          document.getElementById("imgModal").style.display = "none";
+        }
+      };
+
+      function showImageModal(path) {
+        const modal = document.getElementById("imgModal");
+        const img = document.getElementById("modalImg");
+
+        img.src = path;
+        modal.style.display = "flex";
       }
     </script>
   </body>

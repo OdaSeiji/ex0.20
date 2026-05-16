@@ -78,10 +78,13 @@ if ($inspection_id) {
 $diagnosis = null;
 if ($inspection_id) {
     $sql = "
-    SELECT *
-    FROM t_die_diagnosis
-    WHERE inspection_id = ?
-    ORDER BY id DESC
+    SELECT 
+        d.*,
+        s.staff_name AS diagnosis_staff_name
+    FROM t_die_diagnosis d
+    LEFT JOIN m_staff s ON d.diagnosis_staff = s.id
+    WHERE d.inspection_id = ?
+    ORDER BY d.id DESC
     LIMIT 1
     ";
     $stmt = $pdo->prepare($sql);

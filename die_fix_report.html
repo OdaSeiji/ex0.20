@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>修理実施報告（Fix Report）</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      /* 多言語ボタン */
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      /* コンテナ */
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      /* タイトル */
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      /* ボタン */
+      .btn {
+        padding: 8px 16px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .btn:hover {
+        background: #005fa3;
+      }
+
+      .btn-secondary {
+        background: #2b6ca3;
+      }
+
+      /* カード */
+      .card {
+        padding: 16px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+      }
+
+      .row {
+        margin-bottom: 10px;
+        display: flex;
+      }
+      .row label {
+        width: 150px;
+        font-weight: bold;
+      }
+
+      .file-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .file-item {
+        width: 120px;
+        text-align: center;
+      }
+      .thumb {
+        width: 120px;
+        height: auto;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      .button-area {
+        text-align: right;
+        margin-top: 20px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      /* モーダル背景 */
+      .img-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      /* モーダル画像 */
+      .modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 80%;
+        border-radius: 6px;
+      }
+
+      /* 閉じるボタン */
+      .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 35px;
+        color: #fff;
+        font-size: 40px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- 多言語ボタン -->
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+      <!-- 戻るボタン -->
+      <div style="text-align: right; margin-bottom: 10px">
+        <button class="btn btn-secondary" onclick="history.back()">
+          ← 戻る
+        </button>
+      </div>
+
+      <!-- タイトル -->
+      <h1>🛠 修理実施報告（Fix Report）</h1>
+
+      <!-- ============================= -->
+      <!-- 修理計画（読み取り専用） -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 修理計画（読み取り専用）</h2>
+
+        <div class="row">
+          <label>修理予定日：</label><span id="plan_fix_date"></span>
+        </div>
+        <div class="row">
+          <label>修理担当者：</label><span id="plan_fix_staff"></span>
+        </div>
+        <div class="row">
+          <label>修理予定内容：</label>
+          <span id="plan_fix_content" style="white-space: pre-wrap"></span>
+        </div>
+
+        <h3>■ 計画時の添付ファイル</h3>
+        <div id="plan_files" class="file-list"></div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- 修理実施（入力） -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 修理実施（入力）</h2>
+
+        <div class="row">
+          <label>実修理日：</label>
+          <input type="date" id="actual_fix_date" required />
+        </div>
+
+        <div class="row">
+          <label>実修理担当者：</label>
+          <select id="actual_fix_staff_id"></select>
+        </div>
+
+        <div class="row">
+          <label>実修理内容：</label>
+          <textarea id="actual_fix_content" required></textarea>
+        </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- 修理結果 -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 修理結果（入力）</h2>
+
+        <div class="row">
+          <label>修理結果：</label>
+          <textarea id="fix_result" required></textarea>
+        </div>
+      </div>
+
+      <!-- ============================= -->
+      <!-- 添付ファイル -->
+      <!-- ============================= -->
+      <div class="card">
+        <h2>■ 添付ファイル（任意）</h2>
+
+        <input type="file" id="files" multiple />
+        <div id="preview_files" class="file-list"></div>
+
+        <div class="button-area">
+          <button class="btn" onclick="saveFixReport()">保存する</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================= -->
+    <!-- 画像モーダル -->
+    <!-- ============================= -->
+    <div id="imgModal" class="img-modal" onclick="closeModal()">
+      <span class="close-btn">&times;</span>
+      <img id="modalImg" class="modal-content" />
+    </div>
+
+    <script>
+      /* ============================================================
+     初期ロード（順番が重要）
+  ============================================================ */
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadStaff(); // ★ スタッフ一覧を先に読み込む
+        await loadFixPlan(); // ★ その後に修理計画を読み込む
+        setToday();
+      });
+
+      function setToday() {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("actual_fix_date").value = today;
+      }
+
+      /* ============================================================
+     スタッフ一覧
+  ============================================================ */
+      async function loadStaff() {
+        const res = await fetch("./php/die_progress_php/get_staff_list.php");
+        const staff = await res.json();
+
+        const sel = document.getElementById("actual_fix_staff_id");
+        staff.forEach((s) => {
+          const opt = document.createElement("option");
+          opt.value = s.id;
+          opt.textContent = s.staff_name; // ★ 正しいキー名
+          sel.appendChild(opt);
+        });
+
+        return true; // ★ 読み込み完了を知らせる
+      }
+
+      /* ============================================================
+     修理計画の読み込み
+  ============================================================ */
+      async function loadFixPlan() {
+        const press_id = new URLSearchParams(location.search).get("press_id");
+        const res = await fetch(
+          `./php/die_progress_php/get_fix_plan.php?press_id=${press_id}`,
+        );
+        const data = await res.json();
+
+        document.getElementById("plan_fix_date").textContent =
+          data.plan_fix_date?.split(" ")[0] || "-";
+
+        document.getElementById("plan_fix_staff").textContent =
+          data.plan_fix_staff_name || "-";
+
+        document.getElementById("plan_fix_content").textContent =
+          data.plan_fix_content || "-";
+
+        // ★ 修理計画の担当者をデフォルトに設定（スタッフ一覧読み込み後なので確実に反映される）
+        document.getElementById("actual_fix_staff_id").value =
+          data.plan_fix_staff_id;
+
+        // ★ 修理計画の添付ファイル表示
+        renderPlanFiles(data.files, data.fix_id);
+      }
+
+      /* ============================================================
+     計画ファイル表示
+  ============================================================ */
+      function renderPlanFiles(files, fix_id) {
+        const container = document.getElementById("plan_files");
+        container.innerHTML = "";
+
+        files.forEach((f) => {
+          const url = `./uploads/fix/${fix_id}/${f.file_path}`;
+
+          if (f.file_type.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "thumb";
+            img.onclick = () => showImageModal(url);
+            container.appendChild(img);
+          } else {
+            const pdf = document.createElement("div");
+            pdf.className = "file-item";
+            pdf.textContent = "PDF";
+            pdf.onclick = () => window.open(url, "_blank");
+            container.appendChild(pdf);
+          }
+        });
+      }
+
+      /* ============================================================
+     モーダル
+  ============================================================ */
+      function showImageModal(path) {
+        document.getElementById("modalImg").src = path;
+        document.getElementById("imgModal").style.display = "block";
+      }
+      function closeModal() {
+        document.getElementById("imgModal").style.display = "none";
+      }
+
+      /* ============================================================
+     保存処理
+  ============================================================ */
+      async function saveFixReport() {
+        const press_id = new URLSearchParams(location.search).get("press_id");
+        const form = new FormData();
+
+        form.append("press_id", press_id);
+        form.append("actual_fix_date", actual_fix_date.value);
+        form.append("actual_fix_staff_id", actual_fix_staff_id.value);
+        form.append("actual_fix_content", actual_fix_content.value);
+        form.append("fix_result", fix_result.value);
+
+        const files = document.getElementById("files").files;
+        for (let f of files) form.append("files[]", f);
+
+        const res = await fetch("./php/die_progress_php/save_fix_report.php", {
+          method: "POST",
+          body: form,
+        });
+
+        const result = await res.text();
+        alert(result);
+        location.href = "die_progress_list.html";
+      }
+    </script>
+  </body>
+</html>
