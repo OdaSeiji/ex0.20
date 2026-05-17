@@ -34,11 +34,10 @@ $inspection_id = $inspection["id"];
    2. inspection_id → diagnosis（最新1件）
 -------------------------------------------------- */
 $sql = "
-    SELECT d.*, s.staff_name AS diagnosis_staff_name
-    FROM t_die_diagnosis d
-    LEFT JOIN m_staff s ON d.diagnosis_staff = s.id
-    WHERE d.inspection_id = ?
-    ORDER BY d.id DESC
+    SELECT *
+    FROM t_die_diagnosis
+    WHERE inspection_id = ?
+    ORDER BY id DESC
     LIMIT 1
 ";
 $stmt = $pdo->prepare($sql);
@@ -53,12 +52,12 @@ if (!$diagnosis) {
 $diagnosis_id = $diagnosis["id"];
 
 /* --------------------------------------------------
-   3. diagnosis_id → 修理計画（t_die_fix）
+   3. diagnosis_id → 修理（t_die_fix）
 -------------------------------------------------- */
 $sql = "
-    SELECT f.*, s.staff_name AS plan_fix_staff_name
+    SELECT f.*, s.staff_name AS actual_fix_staff_name
     FROM t_die_fix f
-    LEFT JOIN m_staff s ON f.plan_fix_staff_id = s.id
+    LEFT JOIN m_staff s ON f.actual_fix_staff_id = s.id
     WHERE f.diagnosis_id = ?
 ";
 $stmt = $pdo->prepare($sql);
@@ -66,7 +65,7 @@ $stmt->execute([$diagnosis_id]);
 $fix = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$fix) {
-    echo json_encode(["error" => "fix plan not found"]);
+    echo json_encode(["error" => "fix report not found"]);
     exit;
 }
 
@@ -100,7 +99,6 @@ foreach ($files_raw as $f) {
    5. JSON で返す
 -------------------------------------------------- */
 $fix["files"] = $files;
-$fix["inspection_id"] = $inspection_id;
 $fix["fix_id"] = $fix_id;
 
 echo json_encode($fix);
