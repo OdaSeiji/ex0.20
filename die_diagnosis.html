@@ -656,11 +656,11 @@
           return;
         }
 
-        const diagnosisId = window._diagnosisId;
-
         files.forEach((f) => {
-          const fileUrl = `uploads/diagnosis/${diagnosisId}/${f.file_path}`;
           const ext = f.file_type.toLowerCase();
+
+          // ★ file_path は "diagnosis/13/xxx.jpg" なので、そのまま使う
+          const fileUrl = `../ex0.20/uploads/${f.file_path}`;
 
           let html = "";
 
@@ -687,7 +687,6 @@
           area.insertAdjacentHTML("beforeend", html);
         });
       }
-
       /* ------------------------------
         測定情報
       ------------------------------ */
@@ -707,22 +706,23 @@
 
         files.forEach((f) => {
           const ext = f.file_path.split(".").pop().toLowerCase();
+
+          // ★ file_path が inspection/14/xxx.jpg の場合、そのまま使う
+          const fileUrl = `../ex0.20/uploads/${f.file_path}`;
+
           let html = "";
 
-          // 画像ファイル → モーダル表示
           if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
             html = `
         <img 
-          src="./uploads/inspection/${ins.id}/${f.file_path}" 
+          src="${fileUrl}" 
           class="thumb"
-          onclick="openModal('./uploads/inspection/${ins.id}/${f.file_path}')"
+          onclick="openModal('${fileUrl}')"
         >
       `;
-          }
-          // その他ファイル → 通常リンク
-          else {
+          } else {
             html = `
-        <a href="./uploads/inspection/${ins.id}/${f.file_path}" target="_blank">
+        <a href="${fileUrl}" target="_blank">
           📄 ${f.file_path}
         </a>
       `;

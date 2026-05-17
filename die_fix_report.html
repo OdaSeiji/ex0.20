@@ -315,8 +315,14 @@
         const container = document.getElementById("plan_files");
         container.innerHTML = "";
 
+        // ★ files が undefined/null/空配列なら何も表示しない
+        if (!files || !Array.isArray(files) || files.length === 0) {
+          return;
+        }
+
         files.forEach((f) => {
-          const url = `./uploads/fix/${fix_id}/${f.file_path}`;
+          // ★ file_path は "fix/14/xxx.jpg" なので、そのまま使う
+          const url = `../ex0.20/uploads/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
             const img = document.createElement("img");
