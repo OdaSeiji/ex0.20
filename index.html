@@ -234,6 +234,19 @@
       </div>
     </div>
 
+    <!-- ★★★ 追加：対策必要金型一覧 ★★★ -->
+    <div class="section-title" data-key="section_progress">📊 金型進捗管理</div>
+    <div class="menu-row">
+      <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
+        <img class="menu-icon" src="./img/warning.svg" alt="" />
+        <div class="menu-title" data-key="issue_title">対策必要金型一覧</div>
+        <div class="menu-desc" data-key="issue_desc">
+          NG診断が承認された金型の一覧
+        </div>
+      </div>
+    </div>
+    <!-- ★★★ ここまで追加 ★★★ -->
+
     <!-- 📊 測定ダッシュボード -->
     <div class="dashboard-section">
       <div class="dashboard-title" data-key="dashboard_title">
@@ -248,7 +261,7 @@
     <script>
       /* -------------------------
        多言語辞書
-    ------------------------- */
+      ------------------------- */
       const dict = {
         ja: {
           title: "トップメニュー",
@@ -264,13 +277,17 @@
           progress_title: "金型進捗一覧",
           progress_desc: "測定 → 診断 → 承認 → 修理 の進捗管理",
 
+          /* ★ 追加：対策必要金型一覧 */
+          issue_title: "対策必要金型一覧",
+          issue_desc: "NG診断が承認された金型の一覧",
+
           th_die: "金型",
           th_status: "測定",
           th_time: "時刻",
           count_label: "押出〇",
           pending: "✖ 未",
 
-          count_unit: "件", // 日本語
+          count_unit: "件",
         },
 
         vi: {
@@ -288,13 +305,17 @@
           progress_desc:
             "Quản lý tiến độ: đo → chẩn đoán → phê duyệt → sửa chữa",
 
+          /* ★ 追加：対策必要金型一覧 */
+          issue_title: "Danh sách khuôn cần xử lý",
+          issue_desc: "Danh sách khuôn có chẩn đoán NG đã được phê duyệt",
+
           th_die: "Khuôn",
           th_status: "Kết quả",
           th_time: "Giờ",
           count_label: "Ép khuôn OK",
           pending: "✖ Chưa đo",
 
-          count_unit: "件", // 越南語
+          count_unit: "件",
         },
       };
 

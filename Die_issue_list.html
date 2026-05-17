@@ -97,6 +97,25 @@
         border-radius: 5px;
         cursor: pointer;
       }
+
+      /* ★ issue_detail 編集用 */
+      .detail-cell {
+        min-width: 200px;
+      }
+      .detail-edit {
+        width: 95%;
+        height: 60px;
+        font-size: 14px;
+      }
+      .save-btn {
+        margin-top: 5px;
+        padding: 4px 10px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
     </style>
   </head>
 
@@ -130,10 +149,14 @@
         <thead>
           <tr>
             <th data-key="col_die">Die Number</th>
-            <th data-key="col_type">Issue Type</th>
+            <th data-key="col_type">Issue 種類</th>
             <th data-key="col_priority">Priority</th>
-            <th data-key="col_latest">Latest Diagnosis</th>
-            <th data-key="col_status">Status</th>
+            <th data-key="col_latest">最新診断日</th>
+            <th data-key="col_status">完了状態</th>
+
+            <!-- ★ 追加：詳細 -->
+            <th>詳細</th>
+
             <th data-key="col_action">Action</th>
           </tr>
         </thead>
@@ -180,7 +203,7 @@
 
       /* 一覧データ読み込み */
       function loadIssueList() {
-        fetch("./php/die_inspection_php/get_issue_list.php")
+        fetch("./php/die_progress_php/get_die_issue_list.php")
           .then((res) => res.json())
           .then((data) => {
             const tbody = document.querySelector("#issueTable tbody");
@@ -189,7 +212,6 @@
             data.forEach((row) => {
               const tr = document.createElement("tr");
 
-              // Priority バッジ
               let priorityClass =
                 row.priority == 1
                   ? "high"
@@ -197,20 +219,23 @@
                     ? "medium"
                     : "low";
 
-              // 完了状態
               let compClass =
-                row.completion_status === "completed"
-                  ? "complete"
-                  : "incomplete";
-              let compLabel =
-                row.completion_status === "completed" ? "完了" : "未完了";
+                row.completion_status === "完了" ? "complete" : "incomplete";
 
               tr.innerHTML = `
                 <td>${row.die_number}</td>
                 <td>${row.issue_title}</td>
                 <td><span class="badge ${priorityClass}">${row.priority_label}</span></td>
                 <td>${row.latest_diagnosis_date ?? "—"}</td>
-                <td><span class="badge ${compClass}">${compLabel}</span></td>
+                <td><span class="badge ${compClass}">${row.completion_status}</span></td>
+
+                <!-- ★ issue_detail 表示＋編集 -->
+                <td class="detail-cell" data-id="${row.id}">
+                  <div class="detail-view">${row.issue_detail ?? ""}</div>
+                  <textarea class="detail-edit" style="display:none;">${row.issue_detail ?? ""}</textarea>
+                  <button class="save-btn" style="display:none;">保存</button>
+                </td>
+
                 <td><button class="btn">詳細</button></td>
               `;
 
@@ -218,6 +243,55 @@
             });
           });
       }
+
+      /* ★ クリックで編集モードへ */
+      document.addEventListener("click", function (e) {
+        const cell = e.target.closest(".detail-cell");
+        if (!cell) return;
+
+        const view = cell.querySelector(".detail-view");
+        const edit = cell.querySelector(".detail-edit");
+        const save = cell.querySelector(".save-btn");
+
+        view.style.display = "none";
+        edit.style.display = "block";
+        save.style.display = "inline-block";
+      });
+
+      /* ★ 保存処理 */
+      document.addEventListener("click", async function (e) {
+        if (!e.target.classList.contains("save-btn")) return;
+
+        const cell = e.target.closest(".detail-cell");
+        const id = cell.dataset.id;
+        const edit = cell.querySelector(".detail-edit");
+        const view = cell.querySelector(".detail-view");
+
+        const newDetail = edit.value;
+
+        const form = new FormData();
+        form.append("id", id);
+        form.append("issue_detail", newDetail);
+
+        const res = await fetch(
+          "./php/die_progress_php/update_issue_detail.php",
+          {
+            method: "POST",
+            body: form,
+          },
+        );
+
+        const result = await res.json();
+
+        if (result.status === "success") {
+          view.textContent = newDetail;
+          view.style.display = "block";
+          edit.style.display = "none";
+          e.target.style.display = "none";
+        } else {
+          alert("保存に失敗しました");
+        }
+      });
     </script>
   </body>
 </html>
