@@ -442,6 +442,10 @@
             ></span>
           </p>
         </div>
+        <!-- 金型修理結果 -->
+        <p id="pv_result_row" style="display: none">
+          <strong>結果</strong>：<span id="pv_result"></span>
+        </p>
 
         <!-- 添付ファイル -->
         <h3 data-key="preview_files">添付ファイル</h3>
@@ -675,7 +679,7 @@
       }
 
       /* ============================================================
-        テーブル描画（8ステップ対応）
+        テーブル描画（6ステップ対応）
       ============================================================ */
       function renderTable(data) {
         const tbody = document.querySelector("#progressTable tbody");
@@ -726,53 +730,78 @@
             : stepBadge(flag);
 
         /* ------------------------------
-    ★ 診断バッジ（クリックでプレビュー）
-  ------------------------------ */
+          ★ 診断バッジ（クリックでプレビュー）
+        ------------------------------ */
         const diagnosisBadge = (flag, pressId) =>
           flag === 1
             ? `<span class="badge ok" onclick="previewDiagnosis(${pressId})">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </span>`
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>`
             : stepBadge(flag);
 
         /* ------------------------------
-    行生成
-  ------------------------------ */
+          ★ 修理計画バッジ（クリックでプレビュー）
+        ------------------------------ */
+        const fixPlanBadge = (flag, pressId) =>
+          flag === 1
+            ? `<span class="badge ok" onclick="previewFixPlan(${pressId})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>`
+            : stepBadge(flag);
+
+        /* ------------------------------
+          ★ 修理報告バッジ（クリックでプレビュー）
+        ------------------------------ */
+        const fixReportBadge = (flag, pressId) =>
+          flag === 1
+            ? `<span class="badge ok" onclick="previewFixReport(${pressId})">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17L4 12" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>`
+            : stepBadge(flag);
+
+        /* ------------------------------
+          行生成
+        ------------------------------ */
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
           tr.innerHTML = `
-      <td>${row.press_date}</td>
-      <td class="die-number">${row.die_number}</td>
-      <td class="pressing-type">${row.pressing_symbol}</td>
+            <td>${row.press_date}</td>
+            <td class="die-number">${row.die_number}</td>
+            <td class="pressing-type">${row.pressing_symbol}</td>
 
-      <!-- ★ 測定（プレビュー対応） -->
-      <td>${inspectionBadge(row.inspected, row.press_id)}</td>
+            <!-- ★ 測定（プレビュー対応） -->
+            <td>${inspectionBadge(row.inspected, row.press_id)}</td>
 
-      <!-- ★ 診断（プレビュー対応） -->
-      <td>${diagnosisBadge(row.diagnosed, row.press_id)}</td>
+            <!-- ★ 診断（プレビュー対応） -->
+            <td>${diagnosisBadge(row.diagnosed, row.press_id)}</td>
 
-      <!-- 修理要否 -->
-      <td>${stepBadge(row.need_fix)}</td>
+            <!-- 修理要否 -->
+            <td>${stepBadge(row.need_fix)}</td>
 
-      <!-- 診断承認（3色） -->
-      <td>${approvalBadge(row.approved)}</td>
+            <!-- 診断承認（3色） -->
+            <td>${approvalBadge(row.approved)}</td>
 
-      <!-- 修理計画 -->
-      <td>${stepBadge(row.fix_plan)}</td>
+            <!-- 修理計画（プレビュー対応） -->
+            <td>${fixPlanBadge(row.fix_plan, row.press_id)}</td>
+            
+            <!-- 修理報告（プレビュー対応） -->
+            <td>${fixReportBadge(row.fix_report, row.press_id)}</td>
 
-      <!-- 修理報告 -->
-      <td>${stepBadge(row.fix_report)}</td>
-
-      <!-- 操作 -->
-      <td>${renderActionButton(row)}</td>
-    `;
+            <!-- 操作 -->
+            <td>${renderActionButton(row)}</td>
+          `;
 
           tbody.appendChild(tr);
         });
       }
+
       /* ============================================================
         操作ボタン（承認なしの新6ステップ対応）
       ============================================================ */
@@ -924,11 +953,7 @@
         document.getElementById("previewApprovalBlock").style.display = "none";
 
         // ▼ 添付ファイル（inspection_id が正しい）
-        renderPreviewFiles(
-          data.inspection_files,
-          data.inspection.inspection_id,
-          "inspection",
-        );
+        renderPreviewFiles(data.files);
 
         // ▼ モーダル表示
         openModal();
@@ -942,17 +967,14 @@
         document.getElementById("previewModal").style.display = "none";
       };
 
-      function renderPreviewFiles(files, id, type = "inspection") {
+      function renderPreviewFiles(files) {
         const container = document.getElementById("pv_files");
         container.innerHTML = "";
 
-        // inspection / diagnosis でフォルダ切替
-        const folder = type === "diagnosis" ? "diagnosis" : "inspection";
-
         files.forEach((f) => {
-          const fileUrl = `./uploads/${folder}/${id}/${f.file_path}`;
+          const fileUrl = `./uploads/${f.file_path}`;
 
-          // ★ 画像ファイル → モーダルで拡大表示
+          // 画像ファイル
           if (f.file_type.startsWith("image/")) {
             const img = document.createElement("img");
             img.src = fileUrl;
@@ -960,7 +982,7 @@
             img.onclick = () => showImageModal(fileUrl);
             container.appendChild(img);
 
-            // ★ PDF → 新しいタブで開く（従来通り）
+            // PDF
           } else if (f.file_type === "application/pdf") {
             const pdf = document.createElement("div");
             pdf.className = "pdf-thumb";
@@ -1025,11 +1047,7 @@
               "none";
 
             // ▼ 添付ファイル（★ここが重要）
-            renderPreviewFiles(
-              data.inspection_files,
-              data.inspection.inspection_id, // ← inspection_id ではなく id
-              "inspection",
-            );
+            renderPreviewFiles(data.inspection_files);
 
             // ▼ モーダル表示
             openModal();
@@ -1037,7 +1055,7 @@
       }
 
       /* ============================================================
-        Inspection Diagnosis
+        Diagnosis Preview
       ============================================================ */
 
       function previewDiagnosis(pressId) {
@@ -1103,17 +1121,126 @@
             document.getElementById("pv_approval").textContent = approvalText;
 
             // ▼ 添付ファイル
-            renderPreviewFiles(
-              data.diagnosis_files,
-              data.diagnosis.id,
-              "diagnosis",
-            );
+            renderPreviewFiles(data.inspection_files);
 
             openModal();
           });
       }
 
-      // 画像モーダルを閉じる
+      /* ============================================================
+        Fix Plan preview
+      ============================================================ */
+      async function previewFixPlan(press_id) {
+        // 1. データ取得
+        const res = await fetch(
+          `./php/die_progress_php/get_fix_plan.php?press_id=${press_id}`,
+        );
+        const data = await res.json();
+
+        // 2. タイトル
+        document.getElementById("previewTitle").textContent = "修理計画";
+
+        // 3. 基本情報
+        document.getElementById("pv_date").textContent =
+          data.plan_fix_date?.split(" ")[0] || "-";
+
+        document.getElementById("pv_staff").textContent =
+          data.plan_fix_staff_name || "-";
+
+        // 金型番号・プレス番号は診断と同じデータ構造を使う
+        document.getElementById("pv_die").textContent = data.die_number || "-";
+        document.getElementById("pv_press").textContent = data.press_no || "-";
+
+        // 4. 内容（修理計画の本文）
+        document.getElementById("pv_dim").parentElement.style.display = "none";
+        document.getElementById("pv_shape").parentElement.style.display =
+          "none";
+        document.getElementById("pv_overall").parentElement.style.display =
+          "none";
+        document.getElementById("pv_ng").parentElement.style.display = "none";
+        document.getElementById("pv_condition").parentElement.style.display =
+          "none";
+        document.getElementById("pv_memo").parentElement.style.display = "none";
+
+        // ★ 修理計画の内容を pv_memo に表示するのが自然
+        document.getElementById("pv_memo").parentElement.style.display =
+          "block";
+        document.getElementById("pv_memo").textContent =
+          data.plan_fix_content || "-";
+
+        // 5. 承認情報は修理計画では不要
+        document.getElementById("previewApprovalBlock").style.display = "none";
+
+        // 6. 添付ファイル
+        renderPreviewFiles(data.files);
+
+        // 7. モーダル表示
+        document.getElementById("previewModal").style.display = "block";
+      }
+
+      /* ============================================================
+        Fix Report preview
+      ============================================================ */
+      async function previewFixReport(press_id) {
+        // 1. データ取得
+        const res = await fetch(
+          `./php/die_progress_php/get_fix_report.php?press_id=${press_id}`,
+        );
+        const data = await res.json();
+
+        // 2. タイトル
+        document.getElementById("previewTitle").textContent = "修理実施報告";
+
+        // 3. 基本情報
+        document.getElementById("pv_date").textContent =
+          data.actual_fix_date?.split(" ")[0] || "-";
+
+        document.getElementById("pv_staff").textContent =
+          data.actual_fix_staff_name || "-";
+
+        // 金型番号・プレス番号（診断と同じ構造）
+        document.getElementById("pv_die").textContent = data.die_number || "-";
+        document.getElementById("pv_press").textContent = data.press_no || "-";
+
+        // 4. 修理内容（本文）
+        document.getElementById("pv_memo").parentElement.style.display =
+          "block";
+        document.getElementById("pv_memo").textContent =
+          data.actual_fix_content || "-";
+
+        // 5. 修理結果（Fix Report 専用）
+        // HTML に <p id="pv_result_row"> を追加している前提
+        document.getElementById("pv_result_row").style.display = "block";
+        document.getElementById("pv_result").textContent =
+          data.fix_result || "-";
+
+        // 6. 修理報告では判定系をすべて非表示
+        document.getElementById("pv_dim").parentElement.style.display = "none";
+        document.getElementById("pv_shape").parentElement.style.display =
+          "none";
+        document.getElementById("pv_overall").parentElement.style.display =
+          "none";
+        document.getElementById("pv_ng").parentElement.style.display = "none";
+        document.getElementById("pv_condition").parentElement.style.display =
+          "none";
+
+        // 7. 診断メモは修理報告では使わないので非表示
+        // （ただし pv_memo は修理内容として使う）
+        // → ここは上で pv_memo を表示しているので OK
+
+        // 8. 承認情報は修理報告には存在しない
+        document.getElementById("previewApprovalBlock").style.display = "none";
+
+        // 9. 添付ファイル
+        renderPreviewFiles(data.files);
+
+        // 10. モーダル表示
+        document.getElementById("previewModal").style.display = "block";
+      }
+
+      /* ============================================================
+        画像モーダルを閉じる
+      ============================================================ */
       document.getElementById("imgModalClose").onclick = function () {
         document.getElementById("imgModal").style.display = "none";
       };

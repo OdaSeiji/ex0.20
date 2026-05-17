@@ -69,7 +69,17 @@ if ($inspection_id) {
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$inspection_id]);
-    $inspection_files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $inspection_files_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // ★ 共通化：フォルダ込みパスに変換
+    foreach ($inspection_files_raw as $f) {
+        $inspection_files[] = [
+            "id"        => $f["id"],
+            "file_path" => "inspection/{$inspection_id}/" . $f["file_path"],
+            "file_type" => $f["file_type"],
+            "created_at" => $f["created_at"]
+        ];
+    }
 }
 
 // --------------------------------------------------
@@ -111,31 +121,24 @@ if ($diagnosis_id) {
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$diagnosis_id]);
-    $diagnosis_files = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $diagnosis_files_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // ★ 共通化：フォルダ込みパスに変換
+    foreach ($diagnosis_files_raw as $f) {
+        $diagnosis_files[] = [
+            "id"        => $f["id"],
+            "file_path" => "diagnosis/{$diagnosis_id}/" . $f["file_path"],
+            "file_type" => $f["file_type"],
+            "created_at" => $f["created_at"]
+        ];
+    }
 }
 
 // --------------------------------------------------
-// 7. 修理計画（t_die_fix_plan）
+// 7. 修理計画（未使用のため null 固定）
 // --------------------------------------------------
-// $fix_plan = null;
-// if ($diagnosis_id) {
-//     $sql = "
-//     SELECT *
-//     FROM t_die_fix_plan
-//     WHERE diagnosis_id = ?
-//     ORDER BY id DESC
-//     LIMIT 1
-//     ";
-//     $stmt = $pdo->prepare($sql);
-//     $stmt->execute([$diagnosis_id]);
-//     $fix_plan = $stmt->fetch(PDO::FETCH_ASSOC);
-// }
-
-// $fix_plan_id = $fix_plan ? $fix_plan["id"] : null;
-// ★ 修理計画は未使用のため常に null とする
 $fix_plan = null;
 $fix_plan_id = null;
-
 
 // --------------------------------------------------
 // 8. 修理実行（t_die_fix）
@@ -199,10 +202,10 @@ echo json_encode([
     "inspection" => $inspection,
     "inspection_files" => $inspection_files,
     "diagnosis" => $diagnosis,
-    "diagnosis_files" => $diagnosis_files,   // ← 追加
+    "diagnosis_files" => $diagnosis_files,
     "fix_plan" => $fix_plan,
     "fix" => $fix,
     "fix_files" => $fix_files,
     "fix_approval" => $fix_approval,
-    "press_directive_scan_file_name" => $press["press_directive_scan_file_name"] // ← 追加
+    "press_directive_scan_file_name" => $press["press_directive_scan_file_name"]
 ], JSON_UNESCAPED_UNICODE);

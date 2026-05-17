@@ -54,7 +54,17 @@ WHERE inspection_id = :inspection_id
 $stmt2 = $pdo->prepare($sql2);
 $stmt2->bindValue(":inspection_id", $inspection["inspection_id"], PDO::PARAM_INT);
 $stmt2->execute();
-$files = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+$files_raw = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+/* ★ 共通化：フォルダ込みの file_path に変換 */
+$files = [];
+foreach ($files_raw as $f) {
+    $files[] = [
+        "id"        => $f["id"],
+        "file_path" => "inspection/" . $inspection["inspection_id"] . "/" . $f["file_path"],
+        "file_type" => $f["file_type"]
+    ];
+}
 
 /* 返却 */
 echo json_encode([

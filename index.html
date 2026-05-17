@@ -6,7 +6,7 @@
 
     <style>
       body {
-        background-color: #e8f0f8;
+        background: linear-gradient(135deg, #eef3f8, #ffffff);
         font-family: sans-serif;
         margin: 0;
         padding: 0;
@@ -34,35 +34,49 @@
         font-weight: bold;
       }
 
+      /* セクションタイトル */
+      .section-title {
+        width: 90%;
+        max-width: 900px;
+        margin: 30px auto 10px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #2b6ca3;
+        border-left: 6px solid #2b6ca3;
+        padding-left: 10px;
+      }
+
+      /* カードグリッド */
       .menu-row {
         width: 90%;
         max-width: 900px;
-        margin: 20px auto;
+        margin: 10px auto 30px;
         display: grid;
         gap: 20px;
-      }
-
-      .row-2 {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .row-1 {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       }
 
       .menu-card {
         background: #ffffff;
         border: 1px solid #c5d1dd;
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 20px;
         text-align: center;
         cursor: pointer;
         transition: 0.2s;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
       }
 
       .menu-card:hover {
         background-color: #f2f7fc;
         transform: translateY(-3px);
+      }
+
+      .menu-icon {
+        width: 40px;
+        height: 40px;
+        margin-bottom: 10px;
+        opacity: 0.85;
       }
 
       .menu-title {
@@ -77,30 +91,128 @@
         color: #555;
         line-height: 1.4;
       }
+
+      /* ダッシュボード全体 */
+      .dashboard-section {
+        width: 90%;
+        max-width: 1100px;
+        margin: 20px auto 40px;
+      }
+
+      .dashboard-title {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2b6ca3;
+        margin-bottom: 10px;
+      }
+
+      /* 日別カードを横に並べるコンテナ */
+      .dashboard-days {
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+      }
+
+      /* 日別カード */
+      .day-card {
+        min-width: 220px;
+        background: #ffffff;
+        border: 1px solid #c5d1dd;
+        border-radius: 10px;
+        padding: 10px 12px 12px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        flex-shrink: 0;
+      }
+
+      /* カードヘッダ（日付＋押出件数） */
+      .day-card-header {
+        font-size: 0.95rem;
+        font-weight: bold;
+        color: #2b6ca3;
+        margin-bottom: 6px;
+      }
+
+      /* テーブル風レイアウト */
+      .day-card-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      .day-card-table th,
+      .day-card-table td {
+        padding: 2px 0;
+        text-align: left;
+      }
+
+      .day-card-table th {
+        font-weight: bold;
+        color: #555;
+        border-bottom: 1px solid #e0e6ee;
+        font-size: 0.8rem;
+      }
+
+      /* ステータスの色分け */
+      .status-ok {
+        color: #1b9e3f; /* 緑 */
+        font-weight: bold;
+      }
+
+      .status-ng {
+        color: #d93025; /* 赤 */
+        font-weight: bold;
+      }
+
+      .status-pending {
+        color: #777; /* グレー */
+        font-weight: bold;
+      }
+
+      .time-text {
+        color: #555;
+        font-size: 0.8rem;
+      }
+
+      .die-number {
+        font-family: "Roboto Mono", monospace;
+        font-size: 0.9rem;
+        letter-spacing: 0.3px;
+      }
     </style>
   </head>
 
   <body>
+    <!-- 🌐 多言語切替 -->
     <div class="lang-switch">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
-    <h1 id="title">Top Menu</h1>
+    <h1 id="title">トップメニュー</h1>
 
-    <!-- ★ 1段目（2列） -->
-    <div class="menu-row row-2">
+    <!-- 🏭 押出工程 -->
+    <div class="section-title" data-key="section_press">🏭 押出工程</div>
+    <div class="menu-row">
       <div
         class="menu-card"
         onclick="location.href = 'PressBilletCharge-SelectMachine.html'"
       >
+        <img class="menu-icon" src="./img/factory.svg" alt="" />
         <div class="menu-title" data-key="billet_title">ビレット投入</div>
         <div class="menu-desc" data-key="billet_desc">
           ビレット投入に関するページ
         </div>
       </div>
+    </div>
 
+    <!-- 🧰 金型メンテナンス -->
+    <div class="section-title" data-key="section_maintenance">
+      🧰 金型メンテナンス
+    </div>
+    <div class="menu-row">
       <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
+        <img class="menu-icon" src="./img/wrench.svg" alt="" />
         <div class="menu-title" data-key="maintenance_title">
           金型メンテナンス
         </div>
@@ -110,9 +222,11 @@
       </div>
     </div>
 
-    <!-- ★ 2段目（1列） -->
-    <div class="menu-row row-1">
+    <!-- 📊 金型進捗管理 -->
+    <div class="section-title" data-key="section_progress">📊 金型進捗管理</div>
+    <div class="menu-row">
       <div class="menu-card" onclick="location.href = 'die_progress_list.html'">
+        <img class="menu-icon" src="./img/chart.svg" alt="" />
         <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
         <div class="menu-desc" data-key="progress_desc">
           測定 → 診断 → 承認 → 修理 の進捗管理
@@ -120,19 +234,52 @@
       </div>
     </div>
 
+    <!-- 📊 測定ダッシュボード -->
+    <div class="dashboard-section">
+      <div class="dashboard-title" data-key="dashboard_title">
+        📊 測定ダッシュボード（押出〇）
+      </div>
+      <div class="dashboard-days"></div>
+    </div>
+
+    <!-- ============================
+       ▼ JavaScript（最適化済み）
+       ============================ -->
     <script>
+      /* -------------------------
+       多言語辞書
+    ------------------------- */
       const dict = {
         ja: {
           title: "トップメニュー",
+          section_press: "🏭 押出工程",
+          section_maintenance: "🧰 金型メンテナンス",
+          section_progress: "📊 金型進捗管理",
+          dashboard_title: "📊 測定ダッシュボード（押出〇）",
+
           billet_title: "ビレット投入",
           billet_desc: "ビレット投入に関するページ",
           maintenance_title: "金型メンテナンス",
           maintenance_desc: "金型メンテナンスに関するページ",
           progress_title: "金型進捗一覧",
           progress_desc: "測定 → 診断 → 承認 → 修理 の進捗管理",
+
+          th_die: "金型",
+          th_status: "測定",
+          th_time: "時刻",
+          count_label: "押出〇",
+          pending: "✖ 未",
+
+          count_unit: "件", // 日本語
         },
+
         vi: {
           title: "Menu Chính",
+          section_press: "🏭 Quy trình ép đùn",
+          section_maintenance: "🧰 Bảo trì khuôn",
+          section_progress: "📊 Tiến độ khuôn",
+          dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
+
           billet_title: "Nạp Billet",
           billet_desc: "Trang liên quan đến việc nạp billet",
           maintenance_title: "Bảo trì khuôn",
@@ -140,22 +287,114 @@
           progress_title: "Danh sách tiến độ khuôn",
           progress_desc:
             "Quản lý tiến độ: đo → chẩn đoán → phê duyệt → sửa chữa",
+
+          th_die: "Khuôn",
+          th_status: "Kết quả",
+          th_time: "Giờ",
+          count_label: "Ép khuôn OK",
+          pending: "✖ Chưa đo",
+
+          count_unit: "件", // 越南語
         },
       };
 
       function setLang(lang) {
         document.getElementById("title").textContent = dict[lang].title;
+
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
           el.textContent = dict[lang][key];
         });
+
         localStorage.setItem("lang", lang);
+
+        // ★ 言語切り替え時にダッシュボードを再描画
+        if (window.dashboardData) {
+          renderDashboard(window.dashboardData);
+        }
       }
 
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
+
+        // ★ 言語切り替え時にダッシュボードを再描画
+        if (window.dashboardData) {
+          renderDashboard(window.dashboardData);
+        }
       };
+
+      /* -------------------------
+       ダッシュボード
+    ------------------------- */
+
+      function renderStatus(status, lang) {
+        if (status === "ok") return `<span class="status-ok">✔ OK</span>`;
+        if (status === "ng") return `<span class="status-ng">✔ NG</span>`;
+        return `<span class="status-pending">${dict[lang].pending}</span>`;
+      }
+
+      function renderDashboard(data) {
+        const container = document.querySelector(".dashboard-days");
+        container.innerHTML = "";
+
+        const lang = localStorage.getItem("lang") || "ja";
+
+        // ▼ 日付キーを新しい順に並べる
+        const dates = Object.keys(data).sort(
+          (a, b) => new Date(b) - new Date(a),
+        );
+
+        dates.forEach((date) => {
+          const list = data[date];
+          const label = date.slice(5).replace("-", "/");
+          const count = list.length;
+
+          let html = `
+      <div class="day-card">
+        <div class="day-card-header">
+          📅 ${label}（${dict[lang].count_label}：${count}件）
+        </div>
+
+        <table class="day-card-table">
+          <thead>
+            <tr>
+              <th>${dict[lang].th_die}</th>
+              <th>${dict[lang].th_status}</th>
+              <th>${dict[lang].th_time}</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+          list.forEach((item) => {
+            html += `
+        <tr>
+          <td class="die-number">${item.die}</td>
+          <td>${renderStatus(item.status, lang)}</td>
+          <td><span class="time-text">${item.time}</span></td>
+        </tr>
+      `;
+          });
+
+          html += `
+          </tbody>
+        </table>
+      </div>
+    `;
+
+          container.insertAdjacentHTML("beforeend", html);
+        });
+      }
+
+      window.addEventListener("load", () => {
+        fetch("php/die_progress_php/get_dashboard_measurement.php")
+          .then((res) => res.json())
+          .then((data) => {
+            window.dashboardData = data; // ★ これが重要
+            renderDashboard(data);
+          });
+      });
     </script>
   </body>
 </html>
