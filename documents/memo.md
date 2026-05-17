@@ -4082,3 +4082,17 @@ htdocs/
  │    │
  │    └
 ```
+
+# t_handover
+
+このファイルを生かし始める。日付が0000-00-00になっているデータを、`null`にセットする。
+
+```sql
+UPDATE t_die_handover
+SET
+    press_condition_document_completion_at = NULLIF(press_condition_document_completion_at, '0000-00-00'),
+    qa_dimension_inspection_completed_at = NULLIF(qa_dimension_inspection_completed_at, '0000-00-00'),
+    dimension_inspection_sample_sent_at = NULLIF(dimension_inspection_sample_sent_at, '0000-00-00'),
+    capitalization_date = NULLIF(capitalization_date, '0000-00-00'),
+    arrived_at = NULLIF(arrived_at, '0000-00-00');
+```
