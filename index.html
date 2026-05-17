@@ -180,6 +180,26 @@
         letter-spacing: 0.3px;
       }
     </style>
+    <style>
+      .accordion {
+        margin-bottom: 10px;
+        background: #f0f0f0;
+        padding: 10px;
+        cursor: pointer;
+        border-radius: 6px;
+        font-weight: bold;
+      }
+
+      .accordion.open {
+        background: #e0eaff;
+      }
+
+      .accordion-content {
+        display: none;
+        margin-left: 10px;
+        margin-bottom: 20px;
+      }
+    </style>
   </head>
 
   <body>
@@ -192,59 +212,77 @@
     <h1 id="title">トップメニュー</h1>
 
     <!-- 🏭 押出工程 -->
-    <div class="section-title" data-key="section_press">🏭 押出工程</div>
-    <div class="menu-row">
-      <div
-        class="menu-card"
-        onclick="location.href = 'PressBilletCharge-SelectMachine.html'"
-      >
-        <img class="menu-icon" src="./img/factory.svg" alt="" />
-        <div class="menu-title" data-key="billet_title">ビレット投入</div>
-        <div class="menu-desc" data-key="billet_desc">
-          ビレット投入に関するページ
+    <div class="accordion" onclick="toggleAccordion(this)">🏭 押出工程</div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div
+          class="menu-card"
+          onclick="location.href = 'PressBilletCharge-SelectMachine.html'"
+        >
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="billet_title">ビレット投入</div>
+          <div class="menu-desc" data-key="billet_desc">
+            ビレット投入に関するページ
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 🧰 金型メンテナンス -->
-    <div class="section-title" data-key="section_maintenance">
+    <div class="accordion" onclick="toggleAccordion(this)">
       🧰 金型メンテナンス
     </div>
-    <div class="menu-row">
-      <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
-        <img class="menu-icon" src="./img/wrench.svg" alt="" />
-        <div class="menu-title" data-key="maintenance_title">
-          金型メンテナンス
-        </div>
-        <div class="menu-desc" data-key="maintenance_desc">
-          金型メンテナンスに関するページ
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
+          <img class="menu-icon" src="./img/wrench.svg" alt="" />
+          <div class="menu-title" data-key="maintenance_title">
+            金型メンテナンス
+          </div>
+          <div class="menu-desc" data-key="maintenance_desc">
+            金型メンテナンスに関するページ
+          </div>
         </div>
       </div>
     </div>
 
     <!-- 📊 金型進捗管理 -->
-    <div class="section-title" data-key="section_progress">📊 金型進捗管理</div>
-    <div class="menu-row">
-      <div class="menu-card" onclick="location.href = 'die_progress_list.html'">
-        <img class="menu-icon" src="./img/chart.svg" alt="" />
-        <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
-        <div class="menu-desc" data-key="progress_desc">
-          測定 → 診断 → 承認 → 修理 の進捗管理
+    <div class="accordion" onclick="toggleAccordion(this)">📊 金型進捗管理</div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div
+          class="menu-card"
+          onclick="location.href = 'die_progress_list.html'"
+        >
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
+          <div class="menu-desc" data-key="progress_desc">
+            測定 → 診断 → 承認 → 修理 の進捗管理
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
+          <img class="menu-icon" src="./img/warning.svg" alt="" />
+          <div class="menu-title" data-key="issue_title">対策必要金型一覧</div>
+          <div class="menu-desc" data-key="issue_desc">
+            NG診断が承認された金型の一覧
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'handover_list.html'">
+          <img class="menu-icon" src="./img/handover.svg" alt="" />
+          <div class="menu-title" data-key="handover_title">金型引継ぎ一覧</div>
+          <div class="menu-desc" data-key="handover_desc">
+            書類・検査・到着・資産化の進捗管理
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ★★★ 追加：対策必要金型一覧 ★★★ -->
-    <div class="section-title" data-key="section_progress">📊 金型進捗管理</div>
-    <div class="menu-row">
-      <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
-        <img class="menu-icon" src="./img/warning.svg" alt="" />
-        <div class="menu-title" data-key="issue_title">対策必要金型一覧</div>
-        <div class="menu-desc" data-key="issue_desc">
-          NG診断が承認された金型の一覧
-        </div>
-      </div>
-    </div>
     <!-- ★★★ ここまで追加 ★★★ -->
 
     <!-- 📊 測定ダッシュボード -->
@@ -280,6 +318,8 @@
           /* ★ 追加：対策必要金型一覧 */
           issue_title: "対策必要金型一覧",
           issue_desc: "NG診断が承認された金型の一覧",
+          handover_title: "金型引継ぎ一覧",
+          handover_desc: "書類・検査・到着・資産化の進捗管理",
 
           th_die: "金型",
           th_status: "測定",
@@ -308,6 +348,9 @@
           /* ★ 追加：対策必要金型一覧 */
           issue_title: "Danh sách khuôn cần xử lý",
           issue_desc: "Danh sách khuôn có chẩn đoán NG đã được phê duyệt",
+          handover_title: "Danh sách bàn giao khuôn",
+          handover_desc:
+            "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
 
           th_die: "Khuôn",
           th_status: "Kết quả",
@@ -416,6 +459,14 @@
             renderDashboard(data);
           });
       });
+
+      //　アコーディオン
+      function toggleAccordion(el) {
+        el.classList.toggle("open");
+        const content = el.nextElementSibling;
+        content.style.display =
+          content.style.display === "block" ? "none" : "block";
+      }
     </script>
   </body>
 </html>

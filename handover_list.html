@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>金型引継ぎ一覧</title>
+
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      .filter-toggle {
+        background: #0078d4;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+
+      .filter-box {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 15px;
+        display: none;
+      }
+
+      .filter-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 10px;
+      }
+
+      .filter-row label {
+        width: 120px;
+        font-weight: bold;
+      }
+
+      .filter-row input,
+      .filter-row select {
+        padding: 6px 10px;
+        width: 200px;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      th,
+      td {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+      }
+
+      th {
+        background: #e8f1ff;
+        cursor: pointer;
+        position: relative;
+      }
+
+      th .sort-icon {
+        margin-left: 5px;
+        font-size: 12px;
+        opacity: 0.6;
+      }
+
+      tr:hover {
+        background: #f0f8ff;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>金型引継ぎ一覧</h1>
+
+    <!-- ▼ フィルター開閉ボタン -->
+    <button class="filter-toggle" onclick="toggleFilter()">
+      フィルターを開く ▼
+    </button>
+
+    <!-- ▼ フィルターボックス -->
+    <div class="filter-box" id="filterBox">
+      <div class="filter-row">
+        <label>金型番号</label>
+        <select id="filterDie">
+          <option value="">すべて</option>
+        </select>
+      </div>
+
+      <div class="filter-row">
+        <label>期間対象</label>
+        <select id="filterDateColumn">
+          <option value="arrived_at">到着日</option>
+          <option value="capitalization_date">資産化日</option>
+          <option value="press_condition_document_completion_at">
+            押出条件書 完了日
+          </option>
+          <option value="qa_dimension_inspection_completed_at">
+            寸法検査 完了日
+          </option>
+          <option value="dimension_inspection_sample_sent_at">
+            サンプル送付日
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-row">
+        <label>期間（開始）</label>
+        <input type="date" id="filterStart" />
+      </div>
+
+      <div class="filter-row">
+        <label>期間（終了）</label>
+        <input type="date" id="filterEnd" />
+      </div>
+
+      <button class="btn" onclick="applyFilter()">検索</button>
+    </div>
+
+    <!-- ▼ 一覧テーブル -->
+    <table id="handoverTable">
+      <thead>
+        <tr>
+          <th data-col="die_number">型番 <span class="sort-icon"></span></th>
+          <th data-col="pn">品番 <span class="sort-icon"></span></th>
+          <th data-col="press_condition_document_completion_at">
+            押出条件書 <span class="sort-icon"></span>
+          </th>
+          <th data-col="qa_dimension_inspection_completed_at">
+            寸法検査 <span class="sort-icon"></span>
+          </th>
+          <th data-col="qa_dimension_inspection_document_number">
+            検査書番号 <span class="sort-icon"></span>
+          </th>
+          <th data-col="dimension_inspection_sample_sent_at">
+            サンプル送付 <span class="sort-icon"></span>
+          </th>
+          <th data-col="arrived_at">到着日 <span class="sort-icon"></span></th>
+          <th data-col="capitalization_date">
+            資産化日 <span class="sort-icon"></span>
+          </th>
+          <th>メモ</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <script>
+      let sortCol = "";
+      let sortDir = "asc";
+
+      function toggleFilter() {
+        const box = document.getElementById("filterBox");
+        box.style.display = box.style.display === "none" ? "block" : "none";
+      }
+
+      async function loadDieList() {
+        const res = await fetch("./php/handover/get_die_handover_list.php");
+        const list = await res.json();
+
+        const sel = document.getElementById("filterDie");
+        list.forEach((d) => {
+          const opt = document.createElement("option");
+          opt.value = d.id;
+          opt.textContent = d.die_number;
+          sel.appendChild(opt);
+        });
+      }
+
+      async function loadTable() {
+        const params = new URLSearchParams();
+
+        params.append("die_id", document.getElementById("filterDie").value);
+        params.append("start", document.getElementById("filterStart").value);
+        params.append("end", document.getElementById("filterEnd").value);
+        params.append(
+          "date_col",
+          document.getElementById("filterDateColumn").value,
+        );
+
+        const res = await fetch(
+          "./php/handover/get_die_handover_list.php?" + params.toString(),
+        );
+        let data = await res.json();
+
+        if (sortCol) {
+          data.sort((a, b) => {
+            let v1 = a[sortCol] || "";
+            let v2 = b[sortCol] || "";
+
+            if (sortDir === "asc") return v1 > v2 ? 1 : -1;
+            else return v1 < v2 ? 1 : -1;
+          });
+        }
+
+        const tbody = document.querySelector("#handoverTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+          <td>${row.die_number}</td>
+          <td>${row.pn ?? ""}</td>
+          <td>${row.press_condition_document_completion_at ?? ""}</td>
+          <td>${row.qa_dimension_inspection_completed_at ?? ""}</td>
+          <td>${row.qa_dimension_inspection_document_number ?? ""}</td>
+          <td>${row.dimension_inspection_sample_sent_at ?? ""}</td>
+          <td>${row.arrived_at ?? ""}</td>
+          <td>${row.capitalization_date ?? ""}</td>
+          <td>${row.memo ?? ""}</td>
+        `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      function applyFilter() {
+        loadTable();
+      }
+
+      document.querySelectorAll("th[data-col]").forEach((th) => {
+        th.addEventListener("click", () => {
+          const col = th.dataset.col;
+
+          if (sortCol === col) {
+            sortDir = sortDir === "asc" ? "desc" : "asc";
+          } else {
+            sortCol = col;
+            sortDir = "asc";
+          }
+
+          document
+            .querySelectorAll(".sort-icon")
+            .forEach((i) => (i.textContent = ""));
+          th.querySelector(".sort-icon").textContent =
+            sortDir === "asc" ? "▲" : "▼";
+
+          loadTable();
+        });
+      });
+
+      window.onload = () => {
+        loadDieList();
+        loadTable();
+      };
+    </script>
+  </body>
+</html>
