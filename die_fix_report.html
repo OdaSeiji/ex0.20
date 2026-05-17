@@ -88,9 +88,11 @@
         gap: 10px;
       }
       .file-item {
-        width: 120px;
-        text-align: center;
+        position: relative !important; /* ★ 上書きされないように */
+        display: inline-block;
+        margin: 5px;
       }
+
       .thumb {
         width: 120px;
         height: auto;
@@ -148,6 +150,24 @@
         font-size: 40px;
         font-weight: bold;
         cursor: pointer;
+      }
+
+      .delete-btn {
+        position: absolute;
+        top: 2px; /* ★ 画像の内側に収める */
+        right: 2px; /* ★ 右上にぴったり */
+        background: #ff4444;
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 20px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 0 3px rgba(0, 0, 0, 0.4);
+        z-index: 10; /* ★ 念のため前面に */
       }
     </style>
   </head>
@@ -375,6 +395,60 @@
         const result = await res.text();
         alert(result);
         location.href = "die_progress_list.html";
+      }
+
+      /* ============================================================
+        読み込んだファイルのプレビュー表示
+      ============================================================ */
+      document.getElementById("files").addEventListener("change", function (e) {
+        const files = Array.from(e.target.files);
+        const preview = document.getElementById("preview_files");
+        preview.innerHTML = "";
+
+        window._selectedFiles = files;
+
+        files.forEach((file, index) => {
+          const ext = file.name.split(".").pop().toLowerCase();
+          const div = document.createElement("div");
+          div.classList.add("file-item");
+
+          const del = document.createElement("div");
+          del.classList.add("delete-btn");
+          del.textContent = "×";
+          del.onclick = () => removePreviewFile(index);
+          div.appendChild(del);
+
+          if (["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) {
+            const img = document.createElement("img");
+            img.className = "thumb";
+
+            // ★ blob URL を作成
+            const blobUrl = URL.createObjectURL(file);
+            img.src = blobUrl;
+
+            // ★ モーダルにも同じ URL を渡す（revoke しない）
+            img.onclick = () => showImageModal(blobUrl);
+
+            div.appendChild(img);
+          } else {
+            div.appendChild(document.createTextNode(file.name));
+          }
+
+          preview.appendChild(div);
+        });
+      });
+
+      // ★ プレビュー削除処理
+      function removePreviewFile(index) {
+        window._selectedFiles.splice(index, 1);
+
+        // input[type=file] の中身を作り直す
+        const dt = new DataTransfer();
+        window._selectedFiles.forEach((f) => dt.items.add(f));
+        document.getElementById("files").files = dt.files;
+
+        // プレビューを再描画
+        document.getElementById("files").dispatchEvent(new Event("change"));
       }
     </script>
   </body>
