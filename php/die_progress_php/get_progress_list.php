@@ -44,7 +44,7 @@ SELECT
     END AS diagnosed,
 
     /* ============================
-       ③ 修理要否（ng_action）
+       ③ 修理要否（need_fix）
        2,3 → 修理必要
     ============================ */
     CASE 
@@ -52,6 +52,9 @@ SELECT
         WHEN d.id IS NULL THEN NULL
         ELSE 0
     END AS need_fix,
+
+    /* ★ ng_action の生値を返す（追加） */
+    d.ng_action,
 
     /* ============================
        ④ 診断承認（approval_status）

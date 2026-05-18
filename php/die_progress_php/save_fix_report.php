@@ -13,7 +13,6 @@ $press_id = $_POST["press_id"] ?? null;
 $actual_fix_date = $_POST["actual_fix_date"] ?? null;
 $actual_fix_staff_id = $_POST["actual_fix_staff_id"] ?? null;
 $actual_fix_content = $_POST["actual_fix_content"] ?? null;
-$fix_result = $_POST["fix_result"] ?? null;
 
 if (!$press_id) {
     echo "press_id がありません";
@@ -48,14 +47,14 @@ $diagnosis_id = $row["diagnosis_id"];
 
 /* --------------------------------------------------
    t_die_fix を UPDATE（実施報告）
+   ※ fix_result を削除
 -------------------------------------------------- */
 $sql = "
     UPDATE t_die_fix
     SET 
         actual_fix_date = ?,
         actual_fix_staff_id = ?,
-        actual_fix_content = ?,
-        fix_result = ?
+        actual_fix_content = ?
     WHERE id = ?
 ";
 $stmt = $pdo->prepare($sql);
@@ -63,7 +62,6 @@ $stmt->execute([
     $actual_fix_date,
     $actual_fix_staff_id,
     $actual_fix_content,
-    $fix_result,
     $fix_id
 ]);
 

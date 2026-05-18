@@ -179,8 +179,6 @@
         font-size: 0.9rem;
         letter-spacing: 0.3px;
       }
-    </style>
-    <style>
       .accordion {
         margin-bottom: 10px;
         background: #f0f0f0;
@@ -293,6 +291,17 @@
       <div class="dashboard-days"></div>
     </div>
 
+    <!-- 📋 最新測定一覧（上位10件） -->
+    <!-- 🆕 最新の測定（直近10件） -->
+    <div class="dashboard-section">
+      <div class="dashboard-title" data-key="latest_inspections">
+        🆕 最新の測定（直近10件）なんでこれ読まれないの？
+      </div>
+
+      <!-- 既存と同じ横スクロールカード -->
+      <div class="dashboard-days" id="latestInspectionCards"></div>
+    </div>
+
     <!-- ============================
        ▼ JavaScript（最適化済み）
        ============================ -->
@@ -328,6 +337,8 @@
           pending: "✖ 未",
 
           count_unit: "件",
+
+          latest_inspections: "🆕 最新の測定（直近10件）",
         },
 
         vi: {
@@ -359,6 +370,8 @@
           pending: "✖ Chưa đo",
 
           count_unit: "件",
+
+          latest_inspections: "🆕 Danh sách đo mới nhất (10 mục gần đây)",
         },
       };
 
@@ -467,6 +480,48 @@
         content.style.display =
           content.style.display === "block" ? "none" : "block";
       }
+
+      // 上位10件の最新測定を取得してカード表示
+      async function loadLatestInspections() {
+        const res = await fetch(
+          "./php/die_progress_php/get_latest_inspection.php",
+        );
+        const data = await res.json();
+
+        const container = document.getElementById("latestInspectionCards");
+        container.innerHTML = "";
+
+        data.forEach((row) => {
+          const card = document.createElement("div");
+          card.className = "day-card";
+
+          card.innerHTML = `
+      <div class="day-card-header">
+        ${row.created_at?.split(" ")[0] || "-"}
+      </div>
+
+      <table class="day-card-table">
+        <tr>
+          <th data-key="label_die">金型</th>
+          <td>${row.die_number || "-"}</td>
+        </tr>
+        <tr>
+          <th data-key="label_staff">担当</th>
+          <td>${row.staff_name || "-"}</td>
+        </tr>
+        <tr>
+          <th data-key="label_overall">総合</th>
+          <td>${row.overall_result || "-"}</td>
+        </tr>
+      </table>
+    `;
+
+          container.appendChild(card);
+        });
+      }
+
+      // ページ読み込み時に実行
+      loadLatestInspections();
     </script>
   </body>
 </html>

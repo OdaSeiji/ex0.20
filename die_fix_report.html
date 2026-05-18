@@ -182,96 +182,144 @@
     <div class="container">
       <!-- 戻るボタン -->
       <div style="text-align: right; margin-bottom: 10px">
-        <button class="btn btn-secondary" onclick="history.back()">
+        <button
+          class="btn btn-secondary"
+          onclick="history.back()"
+          data-key="back_btn"
+        >
           ← 戻る
         </button>
       </div>
 
       <!-- タイトル -->
-      <h1>🛠 修理実施報告（Fix Report）</h1>
+      <h1 data-key="title">🛠 修理実施報告（Fix Report）</h1>
 
-      <!-- ============================= -->
-      <!-- 修理計画（読み取り専用） -->
-      <!-- ============================= -->
+      <!-- 修理計画 -->
       <div class="card">
-        <h2>■ 修理計画（読み取り専用）</h2>
+        <h2 data-key="plan_title">■ 修理計画（読み取り専用）</h2>
 
         <div class="row">
-          <label>修理予定日：</label><span id="plan_fix_date"></span>
+          <label data-key="plan_date">修理予定日：</label>
+          <span id="plan_fix_date"></span>
         </div>
+
         <div class="row">
-          <label>修理担当者：</label><span id="plan_fix_staff"></span>
+          <label data-key="plan_staff">修理担当者：</label>
+          <span id="plan_fix_staff"></span>
         </div>
+
         <div class="row">
-          <label>修理予定内容：</label>
+          <label data-key="plan_content">修理予定内容：</label>
           <span id="plan_fix_content" style="white-space: pre-wrap"></span>
         </div>
 
-        <h3>■ 計画時の添付ファイル</h3>
+        <h3 data-key="plan_files">■ 計画時の添付ファイル</h3>
         <div id="plan_files" class="file-list"></div>
       </div>
 
-      <!-- ============================= -->
-      <!-- 修理実施（入力） -->
-      <!-- ============================= -->
+      <!-- 修理実施 -->
       <div class="card">
-        <h2>■ 修理実施（入力）</h2>
+        <h2 data-key="actual_title">■ 修理実施（入力）</h2>
 
         <div class="row">
-          <label>実修理日：</label>
+          <label data-key="actual_date">実修理日：</label>
           <input type="date" id="actual_fix_date" required />
         </div>
 
         <div class="row">
-          <label>実修理担当者：</label>
+          <label data-key="actual_staff">実修理担当者：</label>
           <select id="actual_fix_staff_id"></select>
         </div>
 
         <div class="row">
-          <label>実修理内容：</label>
+          <label data-key="actual_content">実修理内容：</label>
           <textarea id="actual_fix_content" required></textarea>
         </div>
       </div>
 
-      <!-- ============================= -->
-      <!-- 修理結果 -->
-      <!-- ============================= -->
-      <div class="card">
-        <h2>■ 修理結果（入力）</h2>
-
-        <div class="row">
-          <label>修理結果：</label>
-          <textarea id="fix_result" required></textarea>
-        </div>
-      </div>
-
-      <!-- ============================= -->
       <!-- 添付ファイル -->
-      <!-- ============================= -->
       <div class="card">
-        <h2>■ 添付ファイル（任意）</h2>
+        <h2>
+          <span data-key="files_title">■ 添付ファイル</span>
+          <span
+            style="color: red; font-size: 14px; margin-left: 6px"
+            data-key="required_mark"
+            >※必須</span
+          >
+        </h2>
 
         <input type="file" id="files" multiple />
         <div id="preview_files" class="file-list"></div>
 
         <div class="button-area">
-          <button class="btn" onclick="saveFixReport()">保存する</button>
+          <button class="btn" onclick="saveFixReport()" data-key="save_btn">
+            保存する
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- ============================= -->
     <!-- 画像モーダル -->
-    <!-- ============================= -->
     <div id="imgModal" class="img-modal" onclick="closeModal()">
       <span class="close-btn">&times;</span>
       <img id="modalImg" class="modal-content" />
     </div>
 
     <script>
+      const dict = {
+        ja: {
+          back_btn: "← 戻る",
+          title: "🛠 修理実施報告（Fix Report）",
+
+          plan_title: "■ 修理計画（読み取り専用）",
+          plan_date: "修理予定日：",
+          plan_staff: "修理担当者：",
+          plan_content: "修理予定内容：",
+          plan_files: "■ 計画時の添付ファイル",
+
+          actual_title: "■ 修理実施（入力）",
+          actual_date: "実修理日：",
+          actual_staff: "実修理担当者：",
+          actual_content: "実修理内容：",
+
+          files_title: "■ 添付ファイル",
+          required_mark: "※必須",
+          save_btn: "保存する",
+        },
+
+        vi: {
+          back_btn: "← Quay lại",
+          title: "🛠 Báo cáo Thực hiện Sửa chữa (Fix Report)",
+
+          plan_title: "■ Kế hoạch sửa chữa (Chỉ xem)",
+          plan_date: "Ngày dự kiến sửa chữa:",
+          plan_staff: "Người phụ trách:",
+          plan_content: "Nội dung dự kiến:",
+          plan_files: "■ Tệp đính kèm của kế hoạch",
+
+          actual_title: "■ Thực hiện sửa chữa (Nhập liệu)",
+          actual_date: "Ngày sửa thực tế:",
+          actual_staff: "Người sửa thực tế:",
+          actual_content: "Nội dung sửa thực tế:",
+
+          files_title: "■ Tệp đính kèm",
+          required_mark: "※Bắt buộc",
+          save_btn: "Lưu",
+        },
+      };
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          if (dict[lang][key]) {
+            el.textContent = dict[lang][key];
+          }
+        });
+      }
+
       /* ============================================================
-     初期ロード（順番が重要）
-  ============================================================ */
+        初期ロード（順番が重要）
+      ============================================================ */
       document.addEventListener("DOMContentLoaded", async () => {
         await loadStaff(); // ★ スタッフ一覧を先に読み込む
         await loadFixPlan(); // ★ その後に修理計画を読み込む
@@ -284,8 +332,8 @@
       }
 
       /* ============================================================
-     スタッフ一覧
-  ============================================================ */
+        スタッフ一覧
+      ============================================================ */
       async function loadStaff() {
         const res = await fetch("./php/die_progress_php/get_staff_list.php");
         const staff = await res.json();
@@ -361,8 +409,8 @@
       }
 
       /* ============================================================
-     モーダル
-  ============================================================ */
+        モーダル
+      ============================================================ */
       function showImageModal(path) {
         document.getElementById("modalImg").src = path;
         document.getElementById("imgModal").style.display = "block";
@@ -372,19 +420,24 @@
       }
 
       /* ============================================================
-     保存処理
-  ============================================================ */
+          保存処理
+        ============================================================ */
       async function saveFixReport() {
         const press_id = new URLSearchParams(location.search).get("press_id");
         const form = new FormData();
+
+        // ▼ 添付ファイル必須チェック
+        const files = document.getElementById("files").files;
+        if (!files || files.length === 0) {
+          alert("添付ファイルを1つ以上選択してください。");
+          return;
+        }
 
         form.append("press_id", press_id);
         form.append("actual_fix_date", actual_fix_date.value);
         form.append("actual_fix_staff_id", actual_fix_staff_id.value);
         form.append("actual_fix_content", actual_fix_content.value);
-        form.append("fix_result", fix_result.value);
 
-        const files = document.getElementById("files").files;
         for (let f of files) form.append("files[]", f);
 
         const res = await fetch("./php/die_progress_php/save_fix_report.php", {
