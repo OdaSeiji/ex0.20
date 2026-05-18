@@ -1049,6 +1049,10 @@
             // ▼ 添付ファイル（★ここが重要）
             renderPreviewFiles(data.inspection_files);
 
+            // memoの表示
+            document.getElementById("pv_memo").textContent =
+              data.inspection.memo || "-";
+
             // ▼ モーダル表示
             openModal();
           });

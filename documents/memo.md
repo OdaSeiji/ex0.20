@@ -4096,3 +4096,61 @@ SET
     capitalization_date = NULLIF(capitalization_date, '0000-00-00'),
     arrived_at = NULLIF(arrived_at, '0000-00-00');
 ```
+
+上の表の一覧表示に、`Inv No`を付けた方がいい。
+
+# 2026/05/18
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-01.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+ここの表示に、NGアクション、と条件変更と表示されているが、実際にはこれは入力されていないため、必要ない。必要なのは、「NG対応」の項目。
+<figure style="text-align:center;">
+  <img src="./img/20260518-02.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+以下画面、測定のプレビューだけど、診断のプレビューが入った？
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-03.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+```
+全ページ：「担当者」のベトナム語言葉: 「Người phụ trách」
+```
+
+以下の赤枠必要なし
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-04.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>。
+
+全ての項目を入力完了したら、全行程のまとめの情報表示が欲しい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-05.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+ソート機能が欲しい。次に診断しないといけない金型を探すため。
+<figure style="text-align:center;">
+  <img src="./img/20260518-06.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+以下の内容を一覧表に時にそのまま表示すればいい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-07.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+タイトル行の固定。特に型番が見えなくなるのが嫌なのかも。
+<figure style="text-align:center;">
+  <img src="./img/20260518-10.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+修理報告時に、窒化するか否か判断する。それを表示する。
