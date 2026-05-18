@@ -4162,3 +4162,10 @@ SET
   <img src="./img/20260518-12.png" width="300">
   <!-- <figcaption>ベトナム語でない</figcaption> -->
 </figure>
+
+こっちは、ボタンが横に長いという話。修理実施報告：BC SỬA CHỮA。修正計画: KH SỬA CHỮA。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-13.png" width="100">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
