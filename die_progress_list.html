@@ -150,7 +150,7 @@
       }
       /* 型番検索用 */
       .die-search {
-        width: 120px;
+        width: 80px;
         font-family: "Roboto Mono", monospace;
         padding: 4px 6px;
         margin-left: 6px;
@@ -356,6 +356,7 @@
     </div>
 
     <!-- ▼▼▼ プレビューモーダル ▼▼▼ -->
+    <!-- ▼▼▼ プレビューモーダル ▼▼▼ -->
     <div id="previewModal" class="modal">
       <div class="modal-content preview-wide">
         <span class="close" id="previewClose">&times;</span>
@@ -368,25 +369,24 @@
           <div class="preview-card">
             <h3 data-key="preview_basic_info">基本情報</h3>
 
-            <p>
-              <strong data-key="label_date">日付</strong>：<span
-                id="pv_date"
-              ></span>
+            <p id="pv_date_row">
+              <strong data-key="label_date">日付</strong>：
+              <span id="pv_date"></span>
             </p>
-            <p>
-              <strong data-key="label_staff">担当者</strong>：<span
-                id="pv_staff"
-              ></span>
+
+            <p id="pv_staff_row">
+              <strong data-key="label_staff">担当者</strong>：
+              <span id="pv_staff"></span>
             </p>
-            <p>
-              <strong data-key="label_die">金型番号</strong>：<span
-                id="pv_die"
-              ></span>
+
+            <p id="pv_die_row">
+              <strong data-key="label_die">金型番号</strong>：
+              <span id="pv_die"></span>
             </p>
-            <p>
-              <strong data-key="label_press">プレス番号</strong>：<span
-                id="pv_press"
-              ></span>
+
+            <p id="pv_press_row">
+              <strong data-key="label_press">プレス番号</strong>：
+              <span id="pv_press"></span>
             </p>
           </div>
 
@@ -394,42 +394,40 @@
           <div class="preview-card">
             <h3 data-key="preview_judgement">判定</h3>
 
-            <p>
-              <strong data-key="label_dim">寸法判定</strong>：<span
-                id="pv_dim"
-              ></span>
-            </p>
-            <p>
-              <strong data-key="label_shape">形状判定</strong>：<span
-                id="pv_shape"
-              ></span>
-            </p>
-            <p>
-              <strong data-key="label_overall">総合判定</strong>：<span
-                id="pv_overall"
-              ></span>
-            </p>
-            <p>
-              <strong data-key="label_ng">NGアクション</strong>：<span
-                id="pv_ng"
-              ></span>
-            </p>
-            <p>
-              <strong data-key="label_condition">条件変更</strong>：<span
-                id="pv_condition"
-              ></span>
+            <p id="pv_dim_row">
+              <strong data-key="label_dim">寸法判定</strong>：
+              <span id="pv_dim"></span>
             </p>
 
-            <!-- ★ 追加：診断メモ -->
-            <p>
-              <strong data-key="label_memo">メモ</strong>：<span
-                id="pv_memo"
-              ></span>
+            <p id="pv_shape_row">
+              <strong data-key="label_shape">形状判定</strong>：
+              <span id="pv_shape"></span>
+            </p>
+
+            <p id="pv_overall_row">
+              <strong data-key="label_overall">総合判定</strong>：
+              <span id="pv_overall"></span>
+            </p>
+
+            <!-- 対策（診断・修理で使用） -->
+            <p id="pv_action_row">
+              <strong data-key="label_action">対策</strong>：
+              <span id="pv_action"></span>
+            </p>
+
+            <p id="pv_condition_row">
+              <strong data-key="label_condition">条件変更</strong>：
+              <span id="pv_condition"></span>
+            </p>
+
+            <p id="pv_memo_row">
+              <strong data-key="label_memo">メモ</strong>：
+              <span id="pv_memo"></span>
             </p>
           </div>
         </div>
 
-        <!-- ★ 診断専用：承認情報 -->
+        <!-- 診断専用：承認情報 -->
         <div
           id="previewApprovalBlock"
           class="preview-card"
@@ -437,14 +435,15 @@
         >
           <h3 data-key="preview_approval">承認情報</h3>
           <p>
-            <strong data-key="label_approval">承認状態</strong>：<span
-              id="pv_approval"
-            ></span>
+            <strong data-key="label_approval">承認状態</strong>：
+            <span id="pv_approval"></span>
           </p>
         </div>
-        <!-- 金型修理結果 -->
+
+        <!-- 修理結果（修理報告専用） -->
         <p id="pv_result_row" style="display: none">
-          <strong>結果</strong>：<span id="pv_result"></span>
+          <strong>結果</strong>：
+          <span id="pv_result"></span>
         </p>
 
         <!-- 添付ファイル -->
@@ -452,6 +451,8 @@
         <div class="preview-files" id="pv_files"></div>
       </div>
     </div>
+    <!-- ▲▲▲ プレビューモーダルここまで ▲▲▲ -->
+
     <!-- ▲▲▲ プレビューモーダルここまで ▲▲▲ -->
 
     <!-- ▼▼▼ 画像拡大モーダル ▼▼▼ -->
@@ -501,6 +502,8 @@
     <!-- ▲▲▲ 画像拡大モーダルここまで ▲▲▲ -->
 
     <script>
+      let currentLang = localStorage.getItem("lang") || "ja";
+
       /* ============================================================
         多言語辞書（8ステップ対応）
       ============================================================ */
@@ -539,9 +542,10 @@
           label_dim: "寸法判定",
           label_shape: "形状判定",
           label_overall: "総合判定",
-          label_ng: "NGアクション",
+          label_ng: "対策内容",
           label_condition: "条件変更",
           label_memo: "メモ",
+          label_action: "対策内容",
         },
 
         vi: {
@@ -578,15 +582,27 @@
           label_dim: "Đánh giá kích thước",
           label_shape: "Đánh giá hình dạng",
           label_overall: "Đánh giá tổng thể",
-          label_ng: "Hành động NG",
+          label_ng: "Biện pháp",
           label_condition: "Thay đổi điều kiện",
           label_memo: "Ghi chú",
+          label_action: "Biện pháp",
         },
       };
 
       /* ============================================================
-      初期ロード
-    ============================================================ */
+          t_die_diagnosis.ng_action の数値 → 日本語表示マッピング
+           0 = 様子を見る, 1 = 修理, 2 = 修理＋条件変更, 3 = 条件変更
+        ============================================================ */
+      const actionMap = {
+        1: { ja: "様子を見る", vi: "Theo dõi" },
+        2: { ja: "修理", vi: "Sửa chữa" },
+        3: { ja: "修理＋条件変更", vi: "Sửa chữa + thay đổi điều kiện" },
+        4: { ja: "条件変更", vi: "Thay đổi điều kiện" },
+      };
+
+      /* ============================================================
+          初期ロード
+        ============================================================ */
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
@@ -604,6 +620,9 @@
         多言語切替（TH の select を壊さない安全版）
       ============================================================ */
       function setLang(lang) {
+        // ★ 現在の言語を更新（これが重要）
+        currentLang = lang;
+
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
           const newText = dict[lang][key];
@@ -686,9 +705,9 @@
         tbody.innerHTML = "";
 
         /* ------------------------------
-    診断承認専用バッジ（3色）
-    1 = 承認, -1 = 却下, 0 = 未承認, null = —
-  ------------------------------ */
+          診断承認専用バッジ（3色）
+          1 = 承認, -1 = 却下, 0 = 未承認, null = —
+        ------------------------------ */
         const approvalBadge = (flag) =>
           flag === 1
             ? `<span class="badge ok">承認</span>`
@@ -699,9 +718,9 @@
                 : `<span class="badge none">—</span>`;
 
         /* ------------------------------
-    その他ステップ用バッジ（☑ / × / —）
-    1 = ☑, 0 = ×, null = —
-  ------------------------------ */
+          その他ステップ用バッジ（☑ / × / —）
+          1 = ☑, 0 = ×, null = —
+        ------------------------------ */
         const stepBadge = (flag) =>
           flag === 1
             ? `<span class="badge ok">
@@ -782,8 +801,8 @@
             <!-- ★ 診断（プレビュー対応） -->
             <td>${diagnosisBadge(row.diagnosed, row.press_id)}</td>
 
-            <!-- 修理要否 -->
-            <td>${stepBadge(row.need_fix)}</td>
+            <!-- 修理要否（文章表示） -->
+            <td>${actionMap[row.ng_action]?.[currentLang] ?? "—"}</td>
 
             <!-- 診断承認（3色） -->
             <td>${approvalBadge(row.approved)}</td>
@@ -942,8 +961,8 @@
         document.getElementById("pv_overall").textContent =
           data.inspection.overall_result || "-";
 
-        // ▼ 測定には NGアクションは無い
-        document.getElementById("pv_ng").textContent = "-";
+        // // ▼ 測定には NGアクションは無い
+        // document.getElementById("pv_ng").textContent = "-";
 
         // ▼ 条件変更（inspection に存在しないので "-"）
         document.getElementById("pv_condition").textContent =
@@ -997,140 +1016,126 @@
         Inspection Preview
       ============================================================ */
 
-      function previewInspection(pressId) {
-        fetch(
+      async function previewInspection(pressId) {
+        resetPreviewFields();
+
+        const res = await fetch(
           `./php/die_progress_php/get_inspection_data.php?press_id=${pressId}`,
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("previewInspection data:", data);
+        );
+        const data = await res.json();
 
-            if (!data.inspection) {
-              alert("測定データがありません。");
-              return;
-            }
+        if (!data.inspection) {
+          alert("測定データがありません。");
+          return;
+        }
 
-            document.getElementById("previewTitle").textContent =
-              "測定プレビュー";
+        document.getElementById("previewTitle").textContent = "測定プレビュー";
 
-            // ▼ 基本情報
-            document.getElementById("pv_date").textContent =
-              data.inspection.inspection_date || "-";
+        document.getElementById("pv_date").textContent =
+          data.inspection.inspection_date || "-";
+        document.getElementById("pv_staff").textContent =
+          data.inspection.inspection_staff || "-";
+        document.getElementById("pv_die").textContent =
+          data.inspection.die_number || data.press?.die_number || "-";
+        document.getElementById("pv_press").textContent =
+          data.inspection.press_machine_no ||
+          data.press?.press_machine_no ||
+          "-";
 
-            document.getElementById("pv_staff").textContent =
-              data.inspection.inspection_staff || "-";
+        document.getElementById("pv_dim").textContent =
+          data.inspection.dimension_result || "-";
+        document.getElementById("pv_shape").textContent =
+          data.inspection.shape_result || "-";
+        document.getElementById("pv_overall").textContent =
+          data.inspection.overall_result || "-";
 
-            document.getElementById("pv_die").textContent =
-              data.inspection.die_number || data.press?.die_number || "-";
+        // 測定には対策・条件変更なし
+        document.getElementById("pv_action_row").style.display = "none";
+        document.getElementById("pv_condition").parentElement.style.display =
+          "none";
 
-            document.getElementById("pv_press").textContent =
-              data.inspection.press_machine_no ||
-              data.press?.press_machine_no ||
-              "-";
+        document.getElementById("pv_memo").textContent =
+          data.inspection.memo || "-";
 
-            // ▼ 判定
-            document.getElementById("pv_dim").textContent =
-              data.inspection.dimension_result || "-";
+        renderPreviewFiles(data.inspection_files);
 
-            document.getElementById("pv_shape").textContent =
-              data.inspection.shape_result || "-";
-
-            document.getElementById("pv_overall").textContent =
-              data.inspection.overall_result || "-";
-
-            // ▼ 測定には NGアクション・条件変更は無い
-            document.getElementById("pv_ng").textContent = "-";
-            document.getElementById("pv_condition").textContent = "-";
-
-            // ▼ 承認情報は測定には無いので非表示
-            document.getElementById("previewApprovalBlock").style.display =
-              "none";
-
-            // ▼ 添付ファイル（★ここが重要）
-            renderPreviewFiles(data.inspection_files);
-
-            // memoの表示
-            document.getElementById("pv_memo").textContent =
-              data.inspection.memo || "-";
-
-            // ▼ モーダル表示
-            openModal();
-          });
+        openModal();
       }
 
       /* ============================================================
         Diagnosis Preview
       ============================================================ */
 
-      function previewDiagnosis(pressId) {
-        fetch(
+      async function previewDiagnosis(pressId) {
+        // 1. すべての項目を初期状態に戻す
+        resetPreviewFields();
+
+        // 2. データ取得
+        const res = await fetch(
           `./php/die_progress_php/get_diagnosis_data.php?press_id=${pressId}`,
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("previewDiagnosis data:", data);
+        );
+        const data = await res.json();
 
-            if (!data.diagnosis) {
-              alert("診断データがありません。");
-              return;
-            }
+        console.log("previewDiagnosis data:", data);
 
-            // ▼ タイトル（固定日本語）
-            document.getElementById("previewTitle").textContent =
-              "診断プレビュー";
+        if (!data.diagnosis) {
+          alert("診断データがありません。");
+          return;
+        }
 
-            // ▼ 基本情報
-            document.getElementById("pv_date").textContent =
-              data.diagnosis.diagnosis_date || "-";
+        // 3. タイトル
+        document.getElementById("previewTitle").textContent = "診断プレビュー";
 
-            document.getElementById("pv_staff").textContent =
-              data.diagnosis.diagnosis_staff_name || "-";
+        // 4. 基本情報
+        document.getElementById("pv_date").textContent =
+          data.diagnosis.diagnosis_date || "-";
 
-            document.getElementById("pv_die").textContent =
-              data.press?.die_number || "-";
+        document.getElementById("pv_staff").textContent =
+          data.diagnosis.diagnosis_staff_name || "-";
 
-            document.getElementById("pv_press").textContent =
-              data.press?.press_machine_no || "-";
+        document.getElementById("pv_die").textContent =
+          data.press?.die_number || "-";
 
-            // ▼ 判定
-            document.getElementById("pv_dim").textContent =
-              data.diagnosis.dimension_judgement || "-";
+        document.getElementById("pv_press").textContent =
+          data.press?.press_machine_no || "-";
 
-            document.getElementById("pv_shape").textContent =
-              data.diagnosis.shape_judgement || "-";
+        // 5. 判定
+        document.getElementById("pv_dim").textContent =
+          data.diagnosis.dimension_judgement || "-";
 
-            document.getElementById("pv_overall").textContent =
-              data.diagnosis.overall_judgement || "-";
+        document.getElementById("pv_shape").textContent =
+          data.diagnosis.shape_judgement || "-";
 
-            // ▼ NG 内容
-            document.getElementById("pv_ng").textContent =
-              data.diagnosis.need_fix == 1 ? "要修理" : "—";
+        document.getElementById("pv_overall").textContent =
+          data.diagnosis.overall_judgement || "-";
 
-            // ▼ 条件変更
-            document.getElementById("pv_condition").textContent =
-              data.diagnosis.condition_change || "-";
+        // 6. 対策（ng_action）
+        document.getElementById("pv_action").textContent =
+          actionMap[data.diagnosis.ng_action]?.[currentLang] ?? "—";
 
-            document.getElementById("pv_memo").textContent =
-              data.diagnosis.memo || "-";
+        // 7. 条件変更
+        document.getElementById("pv_condition").textContent =
+          data.diagnosis.condition_change || "-";
 
-            // ▼ 承認情報（診断だけ表示）
-            document.getElementById("previewApprovalBlock").style.display =
-              "block";
+        // 8. メモ
+        document.getElementById("pv_memo").textContent =
+          data.diagnosis.memo || "-";
 
-            // ▼ 承認ステータス
-            let approvalText = "未承認";
-            if (data.diagnosis.approved == 1) approvalText = "承認";
-            if (data.diagnosis.approved == -1) approvalText = "却下";
+        // 9. 承認情報（診断のみ表示）
+        document.getElementById("previewApprovalBlock").style.display = "block";
 
-            document.getElementById("pv_approval").textContent = approvalText;
+        let approvalText = "未承認";
+        if (data.diagnosis.approved == 1) approvalText = "承認";
+        if (data.diagnosis.approved == -1) approvalText = "却下";
 
-            // ▼ 添付ファイル
-            renderPreviewFiles(data.inspection_files);
+        document.getElementById("pv_approval").textContent = approvalText;
 
-            openModal();
-          });
+        // 10. 添付ファイル（診断ファイル）
+        renderPreviewFiles(data.diagnosis_files);
+
+        // 11. モーダル表示
+        openModal();
       }
-
       /* ============================================================
         Fix Plan preview
       ============================================================ */
@@ -1161,7 +1166,7 @@
           "none";
         document.getElementById("pv_overall").parentElement.style.display =
           "none";
-        document.getElementById("pv_ng").parentElement.style.display = "none";
+        // document.getElementById("pv_ng").parentElement.style.display = "none";
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
         document.getElementById("pv_memo").parentElement.style.display = "none";
@@ -1171,6 +1176,9 @@
           "block";
         document.getElementById("pv_memo").textContent =
           data.plan_fix_content || "-";
+        // 診断に対する対策
+        document.getElementById("pv_action").textContent =
+          actionMap[data.ng_action]?.[currentLang] ?? "—";
 
         // 5. 承認情報は修理計画では不要
         document.getElementById("previewApprovalBlock").style.display = "none";
@@ -1224,7 +1232,7 @@
           "none";
         document.getElementById("pv_overall").parentElement.style.display =
           "none";
-        document.getElementById("pv_ng").parentElement.style.display = "none";
+        // document.getElementById("pv_ng").parentElement.style.display = "none";
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
 
@@ -1241,7 +1249,28 @@
         // 10. モーダル表示
         document.getElementById("previewModal").style.display = "block";
       }
+      /* ============================================================
+        全ての項目を表示に戻す（次のプレビューで必要）
+      ============================================================ */
+      function resetPreviewFields() {
+        // すべての項目を表示に戻す
+        document.getElementById("pv_dim").parentElement.style.display = "block";
+        document.getElementById("pv_shape").parentElement.style.display =
+          "block";
+        document.getElementById("pv_overall").parentElement.style.display =
+          "block";
+        document.getElementById("pv_condition").parentElement.style.display =
+          "block";
+        document.getElementById("pv_memo").parentElement.style.display =
+          "block";
+        document.getElementById("pv_action_row").style.display = "block";
 
+        // 承認情報もデフォルト非表示に戻す
+        document.getElementById("previewApprovalBlock").style.display = "none";
+
+        // 結果欄もデフォルト非表示
+        document.getElementById("pv_result_row").style.display = "none";
+      }
       /* ============================================================
         画像モーダルを閉じる
       ============================================================ */

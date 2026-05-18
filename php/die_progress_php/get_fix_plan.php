@@ -56,9 +56,13 @@ $diagnosis_id = $diagnosis["id"];
    3. diagnosis_id → 修理計画（t_die_fix）
 -------------------------------------------------- */
 $sql = "
-    SELECT f.*, s.staff_name AS plan_fix_staff_name
+    SELECT 
+        f.*,
+        s.staff_name AS plan_fix_staff_name,
+        d.ng_action   -- ★ 追加
     FROM t_die_fix f
     LEFT JOIN m_staff s ON f.plan_fix_staff_id = s.id
+    LEFT JOIN t_die_diagnosis d ON f.diagnosis_id = d.id   -- ★ 追加
     WHERE f.diagnosis_id = ?
 ";
 $stmt = $pdo->prepare($sql);
