@@ -4154,3 +4154,11 @@ SET
 </figure>
 
 修理報告時に、窒化するか否か判断する。それを表示する。
+診断承認後、画面遷移がおかしい。
+
+金型の修理が必要ない場合、修理計画、修理報告の表示を変更する。また、この一覧表の表示数が不足する。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-12.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
