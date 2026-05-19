@@ -43,12 +43,22 @@ if (!$diagnosis) {
     exit;
 }
 
-$diagnosis_id      = $diagnosis["id"];
-$overall_judgement = $diagnosis["overall_judgement"];
-$die_issue_id      = $diagnosis["die_issue_id"];
+$diagnosis_id = $diagnosis["id"];
+$need_fix     = $diagnosis["need_fix"];        // ★ need_fix を取得
+$die_issue_id = $diagnosis["die_issue_id"];
 
 /* ----------------------------------------
-   4. 承認処理
+   4. die_lifecycle_status_id を取得
+---------------------------------------- */
+$sql = "SELECT die_lifecycle_status_id FROM m_dies WHERE id = ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$die_id]);
+$die_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$die_lifecycle_status_id = $die_info["die_lifecycle_status_id"];
+
+/* ----------------------------------------
+   5. 承認処理
 ---------------------------------------- */
 $sql = "
     UPDATE t_die_diagnosis
@@ -62,13 +72,33 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$diagnosis_id]);
 
 /* ----------------------------------------
-   5. NG の場合 → Issue 自動登録
----------------------------------------- */
-if ($overall_judgement === "NG" && empty($die_issue_id)) {
+   6. Issue 自動登録の条件判定（新仕様）
+   ----------------------------------------
+   ▼ t_die_issue に追加する条件（誠司さん仕様）
 
-    /* ----------------------------------------
-       5-1. 同じ die_id の open Issue があるか確認
-    ---------------------------------------- */
+   ① need_fix = 1（修理が必要）なら登録する
+
+   ② need_fix = 0（修理不要）でも、
+      die_lifecycle_status_id ≠ 7（移管済み以外）なら登録する
+
+   ③ need_fix = 0 かつ die_lifecycle_status_id = 7（移管済み）の場合のみ、
+      t_die_issue に登録せず運用を続ける
+
+   ※ まとめ：
+      「修理が必要でない範囲である金型で、移管済みであれば登録しない。
+        そうでないなら t_die_issue で管理を行う」
+---------------------------------------- */
+
+$should_create_issue =
+    ($need_fix == 1) ||
+    ($need_fix == 0 && $die_lifecycle_status_id != 7);
+
+/* ----------------------------------------
+   7. Issue 自動登録
+---------------------------------------- */
+if ($should_create_issue && empty($die_issue_id)) {
+
+    /* 7-1. 同じ die_id の open Issue があるか確認 */
     $sql = "SELECT id FROM t_die_issue 
             WHERE die_id = ? AND status = 'open' 
             LIMIT 1";
@@ -77,23 +107,20 @@ if ($overall_judgement === "NG" && empty($die_issue_id)) {
     $existing_issue = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($existing_issue) {
-        // 既に open Issue がある → 新規作成しない
-        // diagnosis に既存 issue_id を紐づける
+        // 既存 issue を紐づける
         $sql = "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$existing_issue["id"], $diagnosis_id]);
-    } else {
 
-        /* ----------------------------------------
-           5-2. Issue 新規作成
-        ---------------------------------------- */
+    } else {
+        /* 7-2. 新規 Issue 作成 */
         $sql = "INSERT INTO t_die_issue 
                 (die_id, issue_title, issue_detail, priority, status)
                 VALUES (?, ?, ?, 3, 'open')";
         $stmt = $pdo->prepare($sql);
 
-        $title  = "診断NG（診断ID: {$diagnosis_id}）";
-        $detail = "診断でNG判定が出たため自動登録";
+        $title  = "診断結果による自動登録（診断ID: {$diagnosis_id}）";
+        $detail = "診断結果に基づき自動登録されました";
 
         $stmt->execute([$die_id, $title, $detail]);
 
@@ -107,7 +134,7 @@ if ($overall_judgement === "NG" && empty($die_issue_id)) {
 }
 
 /* ----------------------------------------
-   6. 完了レスポンス
+   8. 完了レスポンス
 ---------------------------------------- */
 echo json_encode([
     "status" => "success",
