@@ -3991,27 +3991,6 @@ diagnosis.html が press_id を受け取る
 
 1031と2054のどちらでも入れるようにする。
 
-# Web改良点
-
-| No  | 内容                                                  | ステータス | 備考                             |
-| --- | ----------------------------------------------------- | ---------- | -------------------------------- |
-| 1   | 修理要否の表示は必要ない                              | 不要       |                                  |
-| 2   | 一番上のタイトルをスクロールしても固定する            | 完了       |                                  |
-| 3   | 各工程をクリックして、内容を確認できるようにする      | 完了       | 5/17 測定・診断部完了            |
-| 4   | 承認を拒否した場合の流れ                              | 完了       | 5/14完了（再申請可否は未確認）   |
-| 5   | 修理ページの作成                                      | 完了       | 5/15完了　承認　修理計画は未確認 |
-| 6   | 押出種別でのフィルタリング                            | 完了       |                                  |
-| 7   | 押出指示書のPDFの読み出し                             | 完了       |                                  |
-| 8   | 項目：寸法、成形、傷                                  | 不要       |                                  |
-| 9   | 承認者の追加                                          | 完了       | 5/15完了                         |
-| 10  | プレビューに閉じるボタンが無い / デフォルト表示の調整 | 完了       | 5/15完了                         |
-| 11  | 測定のみの進捗確認ページ                              | 完了       | top page下に表示                 |
-| 12  | 診断のみのページ                                      | 未着手     |                                  |
-| 13  | 承認メンバーにTienさん追加                            | 完了       | 5/15完了                         |
-| 14  | 修理の承認と修理後の承認は必要ない                    | 完了       |                                  |
-| 15  | 修理計画画面のベトナム語が無い                        | 完了       |                                  |
-| 16  | プレビュー画面にベトナム語が無い                      | 完了       | 5/16完了                         |
-
 <figure style="text-align:center;">
   <img src="./img/20260515-01.png" width="500">
   <figcaption>ベトナム語でない</figcaption>
@@ -4175,3 +4154,234 @@ SET
   <img src="./img/20260518-13.png" width="100">
   <!-- <figcaption>ベトナム語でない</figcaption> -->
 </figure>
+
+# Web改良点
+
+| No  | 内容                                                  | ステータス | 備考                             |
+| --- | ----------------------------------------------------- | ---------- | -------------------------------- |
+| 1   | 修理要否の表示は必要ない                              | 不要       |                                  |
+| 2   | 一番上のタイトルをスクロールしても固定する            | 完了       |                                  |
+| 3   | 各工程をクリックして、内容を確認できるようにする      | 完了       | 5/17 測定・診断部完了            |
+| 4   | 承認を拒否した場合の流れ                              | 完了       | 5/14完了（再申請可否は未確認）   |
+| 5   | 修理ページの作成                                      | 完了       | 5/15完了　承認　修理計画は未確認 |
+| 6   | 押出種別でのフィルタリング                            | 完了       |                                  |
+| 7   | 押出指示書のPDFの読み出し                             | 完了       |                                  |
+| 8   | 項目：寸法、成形、傷                                  | 不要       |                                  |
+| 9   | 承認者の追加                                          | 完了       | 5/15完了                         |
+| 10  | プレビューに閉じるボタンが無い / デフォルト表示の調整 | 完了       | 5/15完了                         |
+| 11  | 測定のみの進捗確認ページ                              | 完了       | top page下に表示                 |
+| 12  | 診断のみのページ                                      | 未着手     |                                  |
+| 13  | 承認メンバーにTienさん追加                            | 完了       | 5/15完了                         |
+| 14  | 修理の承認と修理後の承認は必要ない                    | 完了       |                                  |
+| 15  | 修理計画画面のベトナム語が無い                        | 完了       |                                  |
+| 16  | プレビュー画面にベトナム語が無い                      | 完了       | 5/16完了                         |
+
+### Web改善項目
+
+#### 不具合1
+
+##### 不具合内容
+
+診断Preview画面の下部に不要なものが有る。
+
+#####　対策内容
+preview（検査、診断、修理計画、修理報告）の内容に不具合が有ったため、修正。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-01.png" width="300">
+  <figcaption>修正前</figcaption>
+</figure>
+
+<figure style="text-align:center;">
+  <img src="./img/20260519-01.png" width="300">
+  <figcaption>修正後</figcaption>
+</figure>
+
+#### 不具合2
+
+##### 不具合内容
+
+測定preview画面に、診断の情報が出る。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-03.png" width="300">
+  <figcaption>修正前</figcaption>
+</figure>
+
+##### 対策内容
+
+上記修正時に、対策。
+
+<figure style="text-align:center;">
+  <img src="./img/20260519-02.png" width="300">
+  <figcaption>修正後</figcaption>
+</figure>
+
+#### 不具合3
+
+##### 不具合内容
+
+全ページ：「担当者」のベトナム語言葉: 「Người phụ trách」
+
+##### 対策内容
+
+これは、die_progress_list.html以外にはない。本当にこれで良いのか？
+
+#### 不具合4
+
+##### 不具合内容
+
+下記赤枠修正の表示の必要なし。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-04.png" width="300">
+  <figcaption>修正前</figcaption>
+</figure>。
+
+<figure style="text-align:center;">
+  <img src="./img/20260519-03.png" width="300">
+  <figcaption>修正後</figcaption>
+</figure>。
+
+#### 不具合5
+
+##### 不具合内容
+
+die_progress_list.htmlの一覧表示の「修理要否」の表示が分かりにくい。
+
+##### 対策内容
+
+診断の結果をそのまま載せる。
+
+<figure style="text-align:center;">
+  <img src="./img/20260519-04.png" width="300">
+  <figcaption>修正後</figcaption>
+</figure>
+
+#### 未完了項目
+
+- 全ての項目を入力完了したら、全行程のまとめの情報表示が欲しい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-05.png" width="200">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+- ソート機能が欲しい。次に診断しないといけない金型を探すため。
+<figure style="text-align:center;">
+  <img src="./img/20260518-06.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+- タイトル行の固定。特に型番が見えなくなるのが嫌なのかも。
+<figure style="text-align:center;">
+  <img src="./img/20260518-10.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+- 修理報告時に、窒化するか否か判断する。それを表示する。診断承認後、画面遷移がおかしい。
+
+- 金型の修理が必要ない場合、修理計画、修理報告の表示を変更する。また、この一覧表の表示数が不足する。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-12.png" width="300">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+- こっちは、ボタンが横に長い。修理実施報告：BC SỬA CHỮA。修正計画: KH SỬA CHỮA。`die_progress_list.html`の横方向をもう少し効率的に詰める必要がある。
+
+<figure style="text-align:center;">
+  <img src="./img/20260518-13.png" width="100">
+  <!-- <figcaption>ベトナム語でない</figcaption> -->
+</figure>
+
+- 修理しないで条件だけ変更した金型は、今のところ`t_die_issue`テーブルに登録されない。未移管金型はちゃんと登録するべきか。。。
+
+#### 改良点
+
+<figure style="text-align:center;">
+  <img src="./img/20260519-05.png" width="300">
+  <figcaption>測定進捗追加</figcaption>
+</figure>
+
+#### 追加改善点
+
+- 修正が必要ない金型は、修正計画無で完了。
+- 移管していない金型の試押は、`t_die_issue`で管理する
+- 評価完了は、縦型のリストで表現する
+
+## 金型のステータス管理
+
+テーブルの準備
+
+🟦 condition系
+
+```
+m_die_conditions（定義）
+↓
+t_die_condition_history（履歴）
+↓
+m_dies（現在）
+```
+
+🟨 status系
+
+```
+m_die_lifecycle_status（定義）
+↓
+t_die_status_history（履歴）
+↓
+m_dies（現在）
+```
+
+```sql
+CREATE TABLE m_die_conditions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+) COMMENT = 'Master table for managing die lifecycle conditions (e.g., new, inspection, exported, arrived, setup, repair).';
+```
+
+```sql
+CREATE TABLE m_die_lifecycle_status (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50) NOT NULL
+) COMMENT = 'Master table that defines the lifecycle management status of extrusion dies (e.g., pending, transferred, disposed).';
+```
+
+```sql
+ALTER TABLE m_dies
+ADD COLUMN die_condition_id INT AFTER die_number,
+ADD COLUMN die_lifecycle_status_id INT AFTER die_condition_id;
+
+ALTER TABLE m_dies
+ADD CONSTRAINT fk_m_dies_condition
+FOREIGN KEY (die_condition_id)
+REFERENCES m_die_conditions(id),
+ADD CONSTRAINT fk_m_dies_lifecycle_status
+FOREIGN KEY (die_lifecycle_status_id)
+REFERENCES m_die_lifecycle_status(id);
+```
+
+```sql
+CREATE TABLE t_die_condition_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  die_id INT,
+  condition_id INT,
+  changed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  staff_id INT,
+  memo TEXT
+) COMMENT = 'Transaction table for recording the history of die condition changes. Stores when and by whom the condition was updated, along with optional notes.';
+```
+
+```sql
+CREATE TABLE t_die_lifecycle_history (
+  id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Primary key',
+  die_id INT COMMENT 'Reference to m_dies.id',
+  status_id INT COMMENT 'Reference to m_die_lifecycle_status.id',
+  changed_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Timestamp of the status change',
+  staff_id INT COMMENT 'Reference to m_staff.id (who made the change)',
+  memo TEXT COMMENT 'Optional remarks or notes about the change'
+) COMMENT = 'History table that tracks lifecycle status changes of extrusion dies over time. Used for monitoring management state transitions and audit purposes.';
+```
+
+めんどくさいのが、金型のステータス管理だけでなく、新規登録も行わなければならない点。
