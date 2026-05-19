@@ -287,6 +287,13 @@
       .badge.ng svg {
         pointer-events: none;
       }
+
+      .btn-disabled {
+        background: #ccc;
+        color: #666;
+        cursor: not-allowed;
+        border: 1px solid #aaa;
+      }
     </style>
   </head>
 
@@ -532,6 +539,7 @@
           col_action_fix_report: "修理報告",
           col_action_fix_report_app: "報告承認",
           col_action_detail: "詳細",
+          col_action_done: "完了",
 
           // ▼▼▼ ここからプレビュー画面用 ▼▼▼
           preview_title: "測定プレビュー",
@@ -572,6 +580,7 @@
           col_action_fix_report: "Báo cáo sửa",
           col_action_fix_report_app: "Duyệt báo cáo",
           col_action_detail: "Chi tiết",
+          col_action_done: "Hoàn tất",
 
           // ▼▼▼ ここからプレビュー画面用 ▼▼▼
           preview_title: "Xem trước đo kiểm",
@@ -826,6 +835,9 @@
       ============================================================ */
       function renderActionButton(row) {
         const lang = localStorage.getItem("lang") || "ja";
+        const ng = Number(row.ng_action);
+
+        console.log("row:", row);
 
         // ① 測定前
         if (!row.inspected) {
@@ -848,6 +860,12 @@
           return `<button class="btn btn-warning" onclick="approveDiagnosis(${row.press_id})">${dict[lang].col_action_diag_app}</button>`;
         }
 
+        // ★★★ ここを追加：修理不要（1 or 4）かつ承認済み → グレーアウト ★★★
+
+        if ((ng === 1 || ng === 4) && row.approved == 1) {
+          return `<button class="btn btn-disabled" disabled>${dict[lang].col_action_done}</button>`;
+        }
+
         // ⑤ 修理計画（未作成）
         if (!row.fix_plan) {
           return `<button class="btn" onclick="goFixPlan(${row.press_id})">${dict[lang].col_action_fix_plan}</button>`;
@@ -859,8 +877,9 @@
           return `<button class="btn" onclick="goFixReport(${row.press_id})">修理実施報告</button>`;
         }
 
-        // ⑦ 修理報告済 → 詳細
-        return `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
+        // ⑦ 修理報告済 → 詳細　一次的に詳細ではなく、完了としている。
+        // return `<button class="btn" onclick="goDetail(${row.press_id})">${dict[lang].col_action_detail}</button>`;
+        return `<button class="btn btn-disabled" disabled>${dict[lang].col_action_done}</button>`;
       }
 
       /* ============================================================

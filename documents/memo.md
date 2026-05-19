@@ -4385,3 +4385,60 @@ CREATE TABLE t_die_lifecycle_history (
 ```
 
 めんどくさいのが、金型のステータス管理だけでなく、新規登録も行わなければならない点。
+
+```sql
+INSERT INTO m_die_lifecycle_status (name) VALUES
+('Planning'),
+('Quoted'),
+('Ordered'),
+('Inspected'),
+('Exported'),
+('Arrived'),
+('Transferred'),
+('Disposed');
+```
+
+値を追加する。
+
+## t_die_issueへの登録について
+
+`approve_diagnosis.php`で行っている。
+
+### ①
+
+🎯 今回の仕様（再確認）
+あなたが定義した条件①はこうです：
+
+修理が必要でない金型（need_fix = 0）であっても、
+その金型が「移管済み（die_lifecycle_status_id = 7）」でなければ、
+t_die_issue に登録して管理を続ける。
+
+つまり：
+
+✔ need_fix = 1 → issue 登録
+✔ need_fix = 0 かつ die_lifecycle_status_id ≠ 7 → issue 登録
+✔ need_fix = 0 かつ die_lifecycle_status_id = 7 → issue 登録しない
+🔧 必要な追加処理
+m_dies から die_lifecycle_status_id を取得する
+
+need_fix と die_lifecycle_status_id を使って条件①を判定する
+
+overall_judgement = NG の判定を廃止し、need_fix ベースに変更する
+
+### ② 診断が承認されていること
+
+コード
+approved = 1
+承認されていない（0）
+または却下（-1）
+の場合は t_die_issue に保存しません。
+
+### ③ まだ t_die_issue に同じ press_id の issue が存在しないこと
+
+同じ press_id に対して 二重登録を防ぐためです。
+
+通常は approve_diagnosis.php 内で：
+
+コード
+SELECT COUNT(\*) FROM t_die_issue WHERE press_id = :press_id
+でチェックしています。
