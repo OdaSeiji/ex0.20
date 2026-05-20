@@ -294,6 +294,20 @@
         cursor: not-allowed;
         border: 1px solid #aaa;
       }
+      .btn-edit {
+        background-color: #ff9800;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .btn-edit:hover {
+        background-color: #e68900;
+      }
     </style>
   </head>
 
@@ -362,7 +376,6 @@
       </table>
     </div>
 
-    <!-- ▼▼▼ プレビューモーダル ▼▼▼ -->
     <!-- ▼▼▼ プレビューモーダル ▼▼▼ -->
     <div id="previewModal" class="modal">
       <div class="modal-content preview-wide">
@@ -456,9 +469,19 @@
         <!-- 添付ファイル -->
         <h3 data-key="preview_files">添付ファイル</h3>
         <div class="preview-files" id="pv_files"></div>
+
+        <!-- ★ 修正ボタン（測定・診断どちらでも使える） -->
+        <div id="previewEditArea" style="text-align: right; margin-top: 20px">
+          <button
+            class="btn-edit"
+            data-key="btn_edit"
+            onclick="editPreviewData()"
+          >
+            ✏️ 修正する
+          </button>
+        </div>
       </div>
     </div>
-    <!-- ▲▲▲ プレビューモーダルここまで ▲▲▲ -->
 
     <!-- ▲▲▲ プレビューモーダルここまで ▲▲▲ -->
 
@@ -511,6 +534,16 @@
     <script>
       let currentLang = localStorage.getItem("lang") || "ja";
 
+      // ========================================
+      // URL パラメータ
+      // ----------------------------------------
+      // mode     : 画面モード（new / edit / approval）
+      // press_id : 対象データの識別子
+      // ========================================
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get("mode");
+      const pressId = urlParams.get("press_id");
+
       /* ============================================================
         多言語辞書（8ステップ対応）
       ============================================================ */
@@ -554,6 +587,9 @@
           label_condition: "条件変更",
           label_memo: "メモ",
           label_action: "対策内容",
+
+          // ▼▼▼ 編集ボタン ▼▼▼
+          btn_edit: "✏️ 修正する",
         },
 
         vi: {
@@ -595,6 +631,9 @@
           label_condition: "Thay đổi điều kiện",
           label_memo: "Ghi chú",
           label_action: "Biện pháp",
+
+          // ▼▼▼ 編集ボタン ▼▼▼
+          btn_edit: "✏️ Chỉnh sửa",
         },
       };
 
@@ -837,7 +876,7 @@
         const lang = localStorage.getItem("lang") || "ja";
         const ng = Number(row.ng_action);
 
-        console.log("row:", row);
+        // console.log("row:", row);
 
         // ① 測定前
         if (!row.inspected) {
@@ -1005,28 +1044,68 @@
         document.getElementById("previewModal").style.display = "none";
       };
 
+      // ------------------------------------------------------------
+      // プレビュー用の添付ファイル一覧を描画する関数
+      // ------------------------------------------------------------
+      // ・files[] は DB から取得した file_path / file_type を含む配列
+      // ・画像 / PDF / その他ファイルを種類別に表示する
+      // ・テスト環境などでファイルが存在しない場合（404）でも
+      //   JS が停止しないように安全処理を実装
+      // ・画像が 404 の場合は no_image.png に一度だけ差し替える
+      //   （無限ループ防止のため、onerror は1回のみ実行）
+      // ------------------------------------------------------------
       function renderPreviewFiles(files) {
         const container = document.getElementById("pv_files");
         container.innerHTML = "";
 
+        if (!files || files.length === 0) {
+          container.textContent = "添付ファイルなし";
+          return;
+        }
+
         files.forEach((f) => {
-          const fileUrl = `./uploads/${f.file_path}`;
+          try {
+            const safePath = encodeURIComponent(f.file_path).replace(
+              /%2F/g,
+              "/",
+            );
+            const fileUrl = `./uploads/${safePath}`;
 
-          // 画像ファイル
-          if (f.file_type.startsWith("image/")) {
-            const img = document.createElement("img");
-            img.src = fileUrl;
-            img.className = "thumb";
-            img.onclick = () => showImageModal(fileUrl);
-            container.appendChild(img);
+            // 画像ファイル
+            if (f.file_type && f.file_type.startsWith("image/")) {
+              const img = document.createElement("img");
+              img.src = fileUrl;
+              img.className = "thumb";
 
-            // PDF
-          } else if (f.file_type === "application/pdf") {
-            const pdf = document.createElement("div");
-            pdf.className = "pdf-thumb";
-            pdf.textContent = "PDF";
-            pdf.onclick = () => window.open(fileUrl, "_blank");
-            container.appendChild(pdf);
+              // ★ 無限ループ防止（404 → no_image.png → 404 → … を防ぐ）
+              img.onerror = () => {
+                if (!img.dataset.errorHandled) {
+                  img.dataset.errorHandled = "1";
+                  img.src = "./img/no_image.png";
+                }
+              };
+
+              img.onclick = () => showImageModal(fileUrl);
+              container.appendChild(img);
+
+              // PDF
+            } else if (f.file_type === "application/pdf") {
+              const pdf = document.createElement("div");
+              pdf.className = "pdf-thumb";
+              pdf.textContent = "PDF";
+              pdf.onclick = () => window.open(fileUrl, "_blank");
+              container.appendChild(pdf);
+
+              // その他ファイル
+            } else {
+              const other = document.createElement("div");
+              other.className = "file-thumb";
+              other.textContent = f.file_path || "ファイル";
+              other.onclick = () => window.open(fileUrl, "_blank");
+              container.appendChild(other);
+            }
+          } catch (e) {
+            console.error("renderPreviewFiles error:", e);
           }
         });
       }
@@ -1036,6 +1115,10 @@
       ============================================================ */
 
       async function previewInspection(pressId) {
+        // ★ 編集モード遷移用に保持
+        currentPressId = pressId;
+        currentPreviewType = "inspection";
+
         resetPreviewFields();
 
         const res = await fetch(
@@ -1088,6 +1171,10 @@
       async function previewDiagnosis(pressId) {
         // 1. すべての項目を初期状態に戻す
         resetPreviewFields();
+
+        // ★ 編集モード遷移用に保持
+        currentPressId = pressId;
+        currentPreviewType = "diagnosis";
 
         // 2. データ取得
         const res = await fetch(
@@ -1155,6 +1242,7 @@
         // 11. モーダル表示
         openModal();
       }
+
       /* ============================================================
         Fix Plan preview
       ============================================================ */
@@ -1310,6 +1398,25 @@
 
         img.src = path;
         modal.style.display = "flex";
+      }
+
+      /* ============================================================
+        プレビューから編集画面へ（測定・診断・修理計画・修理報告共通）
+         - 編集可能なデータがある場合はプレビューに「修正する」ボタンを表示
+         - クリックすると該当の編集画面へ遷移
+      ============================================================ */
+      function editPreviewData() {
+        if (!currentPressId) {
+          alert("press_id が取得できません。");
+          return;
+        }
+        if (currentPreviewType === "inspection") {
+          window.location.href = `die_inspection.html?press_id=${currentPressId}&mode=edit`;
+        } else if (currentPreviewType === "diagnosis") {
+          window.location.href = `die_diagnosis.html?press_id=${currentPressId}&mode=edit`;
+        } else {
+          alert("編集できるデータではありません。");
+        }
       }
     </script>
   </body>
