@@ -374,7 +374,7 @@
       <textarea id="diag_memo"></textarea>
 
       <h3 data-key="sec_diag_files">■ 添付ファイル（任意）</h3>
-      <input type="file" id="diag_files" multiple />
+      <input type="file" id="diag_files" name="diag_files[]" multiple />
 
       <!-- ▼ サムネイル表示エリア -->
       <div id="diag_file_preview" class="file-list"></div>
@@ -565,17 +565,18 @@
       };
 
       /* ------------------------------
-         URL パラメータ取得
+        URL パラメータ取得
       ------------------------------ */
       function getParam(name) {
         return new URLSearchParams(window.location.search).get(name);
       }
 
+      // ★ pressId と mode はここで1回だけ宣言
       const pressId = getParam("press_id");
-      document.getElementById("press_id").value = pressId;
+      const mode = getParam("mode");
 
-      // ★ 承認モード判定（ここに追加）
-      const mode = getParam("mode"); // "approval" のとき承認モード
+      // hidden にセット（必要なら）
+      document.getElementById("press_id").value = pressId;
 
       /* ------------------------------
         初期ロード
@@ -588,39 +589,27 @@
         // ▼ スタッフ一覧
         loadStaffList();
 
-        // ▼ URL パラメータ取得（画面モードと press_id）
-        const urlParams = new URLSearchParams(window.location.search);
-
-        // mode = 画面モード
-        //   null        : 新規入力
-        //   "edit"      : プレビューからの修正モード
-        //   "approval"  : 承認モード（入力不可）
-        const mode = urlParams.get("mode");
-
-        // press_id = 対象となる診断データのキー
-        const pressId = urlParams.get("press_id");
-
         // ▼ 押出情報カードは常に表示
         if (pressId) {
           loadPressInfo(pressId);
         }
 
-        // ▼ 編集モード（プレビュー → 修正する）
+        // ▼ 編集モード
         if (mode === "edit") {
-          loadDiagnosisData(pressId); // 既存データを読み込む
-          enableInputs(); // 入力欄を編集可能にする
-          return; // ★ 承認モード処理を避ける
+          loadDiagnosisData(pressId);
+          enableInputs();
+          return;
         }
 
         // ▼ 承認モード
         if (mode === "approval") {
-          loadDiagnosisData(pressId); // 既存データを読み込む
-          enableApprovalMode(); // 入力不可＋承認UI表示
+          loadDiagnosisData(pressId);
+          enableApprovalMode();
           return;
         }
 
-        // ▼ 新規モード（mode=null）
-        // → 何もしない（空欄のまま入力）
+        // ▼ 新規モード
+        // 何もしない
       };
 
       /* ------------------------------
@@ -649,14 +638,20 @@
             fillPress(data.press);
 
             /* ★ 診断情報 */
-            fillDiagnosis(data.diagnosis);
-            // return;
+            if (data.diagnosis) {
+              fillDiagnosis(data.diagnosis);
+              window._diagnosisId = data.diagnosis.id;
 
-            /* ★ diagnosis_id を保持（添付ファイルパス組み立てに必要） */
-            window._diagnosisId = data.diagnosis?.id || null;
+              console.log("Diagnosis Files:", data.diagnosis_files); // ← 追加
 
-            /* ★ 診断添付ファイル表示 */
-            fillDiagnosisFiles(data.diagnosis_files);
+              renderDiagnosisPreviewFiles(data.diagnosis_files);
+            } else {
+              window._diagnosisId = null;
+
+              console.log("Diagnosis Files:", data.diagnosis_files); // ← 追加
+
+              renderDiagnosisPreviewFiles([]);
+            }
 
             /* =====================================================
               ★ 押出指示スキャンファイル（PDF/画像）サムネイル表示
@@ -701,51 +696,123 @@
           });
       }
 
-      /* =====================================================
-        ★ 診断添付ファイル表示（外出し・再利用可能）
-      ===================================================== */
-      function fillDiagnosisFiles(files) {
-        const area = document.getElementById("diag_file_preview");
-        if (!area) return;
+      /* ------------------------------
+        押出情報カードのロード
+      ------------------------------ */
+      function loadPressInfo(pressId) {
+        fetch(`./php/die_progress_php/get_press_info.php?press_id=${pressId}`)
+          .then((res) => res.json())
+          .then((data) => {
+            if (!data || !data.press) return;
 
-        area.innerHTML = "";
+            const p = data.press;
+
+            // 型番
+            const dieNumber = document.getElementById("dieNumber");
+            if (dieNumber) dieNumber.textContent = p.die_number || "";
+
+            // 押出日
+            const pressDate = document.getElementById("pressDate");
+            if (pressDate) pressDate.textContent = p.press_date || "";
+
+            // ビレット
+            const billet = document.getElementById("billet");
+            if (billet) billet.textContent = p.billet || "";
+
+            // ロット
+            const lotNo = document.getElementById("lotNo");
+            if (lotNo) lotNo.textContent = p.lot_no || "";
+
+            // その他必要な項目があればここに追加
+          })
+          .catch((err) => {
+            console.error("loadPressInfo error:", err);
+          });
+      }
+
+      /* =====================================================
+        ★ 新: 診断添付ファイル表示（外出し・再利用可能）
+      ===================================================== */
+      function renderDiagnosisPreviewFiles(files) {
+        const container = document.getElementById("diag_file_preview");
+        container.innerHTML = "";
 
         if (!files || files.length === 0) {
-          area.innerHTML = `<div class="no-file">No File</div>`;
+          container.innerHTML = `<div class="no-file">No File</div>`;
           return;
         }
 
         files.forEach((f) => {
-          const ext = f.file_type.toLowerCase();
+          const fileUrl = "./uploads/" + f.file_path; // get_diagnosis_data.php の返却仕様に合わせる
+          const ext = f.file_path.split(".").pop().toLowerCase();
 
-          // ★ file_path は "diagnosis/13/xxx.jpg" なので、そのまま使う
-          const fileUrl = `../ex0.20/uploads/${f.file_path}`;
+          // PDF の場合
+          if (ext === "pdf") {
+            const pdfDiv = document.createElement("div");
+            pdfDiv.className = "thumb";
 
-          let html = "";
-
-          if (ext.includes("pdf")) {
-            html = `
-        <div class="thumb">
-          <a href="${fileUrl}" target="_blank">
-            <img src="./img/pdf_icon.svg" class="pdf-thumb">
-          </a>
-          <div class="file-name">${f.file_path}</div>
-        </div>
+            pdfDiv.innerHTML = `
+        <img src="./img/pdf_icon.svg" class="pdf-thumb" onclick="openModal('${fileUrl}')">
+        <div class="file-name">${f.file_path}</div>
       `;
-          } else {
-            html = `
-        <div class="thumb">
-          <a href="${fileUrl}" target="_blank">
-            <img src="${fileUrl}" class="img-thumb">
-          </a>
-          <div class="file-name">${f.file_path}</div>
-        </div>
-      `;
+
+            container.appendChild(pdfDiv);
+            return;
           }
 
-          area.insertAdjacentHTML("beforeend", html);
+          // 画像の場合
+          const img = document.createElement("img");
+          img.src = fileUrl;
+          img.className = "thumb";
+          img.onclick = () => openModal(fileUrl);
+
+          container.appendChild(img);
         });
       }
+
+      /* =====================================================
+        ★ 診断添付ファイル表示（外出し・再利用可能）
+      ===================================================== */
+      // function renderDiagnosisPreviewFiles(files) {
+      //   const container = document.getElementById("diag_file_preview");
+      //   container.innerHTML = "";
+
+      //   if (!files || files.length === 0) {
+      //     container.innerHTML = "<div class='no-file'>No File</div>";
+      //     return;
+      //   }
+
+      //   files.forEach((f) => {
+      //     const div = document.createElement("div");
+      //     div.className = "preview-item";
+
+      //     // 削除ボタン（編集時も表示）
+      //     const del = document.createElement("div");
+      //     del.className = "thumb-delete-btn";
+      //     del.textContent = "×";
+      //     del.onclick = () => div.remove();
+
+      //     // 画像 or PDF
+      //     const ext = f.file_type.toLowerCase();
+      //     const fileUrl = `./uploads/${f.file_path}`;
+
+      //     let img = document.createElement("img");
+
+      //     if (ext.includes("pdf")) {
+      //       img.src = "./img/pdf_icon.svg";
+      //       img.className = "pdf-thumb";
+      //       img.onclick = () => window.open(fileUrl, "_blank");
+      //     } else {
+      //       img.src = fileUrl;
+      //       img.className = "preview-img";
+      //       img.onclick = () => openModal(fileUrl);
+      //     }
+
+      //     div.appendChild(del);
+      //     div.appendChild(img);
+      //     container.appendChild(div);
+      //   });
+      // }
       /* ------------------------------
         測定情報
       ------------------------------ */
@@ -831,6 +898,7 @@
         診断情報（既存データ）
       ------------------------------ */
       function fillDiagnosis(d) {
+        // ★ 診断データが無い場合（新規診断）
         if (!d) {
           const el = document.getElementById("diag_date");
           if (el) el.valueAsDate = new Date();
@@ -849,7 +917,7 @@
 
         // 日付・担当者
         setValue("diag_date", d.diagnosis_date?.substring(0, 10));
-        setValue("diag_staff", d.diagnosis_staff);
+        setValue("diag_staff", d.diagnosis_staff); // ★ 名前でOK
 
         // 寸法判定
         setChecked(`input[name="dim_judge"][value="${d.dimension_judgement}"]`);
@@ -873,13 +941,12 @@
           setValue("condition_change", d.condition_change);
         }
 
-        // 診断承認ステータス
+        // 承認ステータス
         setChecked(
           `input[name="approval_status"][value="${d.approval_status}"]`,
         );
 
         // 承認情報
-        // setValue("approver_id", d.approver_id);
         if (d.approver_id) {
           setValue("approver_id", d.approver_id);
         }
@@ -928,12 +995,6 @@
             ? document.getElementById("condition_change").value
             : "";
 
-        // // 修理要否
-        // const repair_required = document.getElementById("repair_required")
-        //   .checked
-        //   ? 1
-        //   : 0;
-
         // POST データ作成
         const formData = new FormData();
         formData.append("press_id", press_id);
@@ -950,13 +1011,12 @@
         formData.append("overall_judgement", overall_judge);
         formData.append("ng_action", ng_action);
         formData.append("condition_change", condition_change);
-        // formData.append("repair_required", repair_required);
         formData.append("memo", document.getElementById("diag_memo").value);
 
         // 添付ファイル（任意）
         const files = document.getElementById("diag_files").files;
         for (let i = 0; i < files.length; i++) {
-          formData.append("diag_files[]", files[i]); // ← 修正ポイント
+          formData.append("diag_files[]", files[i]); // ← ★ 修正ポイント
         }
 
         // 保存実行
@@ -970,7 +1030,7 @@
 
             if (result.status === "ok") {
               alert("診断を保存しました");
-              location.href = "die_progress_list.html"; // ← ここだけでOK
+              location.href = "die_progress_list.html";
             } else {
               alert("保存に失敗しました: " + result.message);
             }

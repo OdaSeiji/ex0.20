@@ -71,7 +71,6 @@ if ($inspection_id) {
     $stmt->execute([$inspection_id]);
     $inspection_files_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // ★ 共通化：フォルダ込みパスに変換
     foreach ($inspection_files_raw as $f) {
         $inspection_files[] = [
             "id"        => $f["id"],
@@ -110,20 +109,19 @@ $diagnosis_id = $diagnosis ? $diagnosis["id"] : null;
 $diagnosis_files = [];
 if ($diagnosis_id) {
     $sql = "
-    SELECT 
-        id,
-        file_path,
-        file_type,
-        created_at
-    FROM t_die_attachment
-    WHERE diagnosis_id = ?
-    ORDER BY id ASC
+        SELECT 
+            id,
+            file_path,
+            file_type,
+            created_at
+        FROM t_die_attachment
+        WHERE diagnosis_id = ?
+        ORDER BY id ASC
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$diagnosis_id]);
     $diagnosis_files_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // ★ 共通化：フォルダ込みパスに変換
     foreach ($diagnosis_files_raw as $f) {
         $diagnosis_files[] = [
             "id"        => $f["id"],
@@ -134,8 +132,9 @@ if ($diagnosis_id) {
     }
 }
 
+
 // --------------------------------------------------
-// 7. 修理計画（未使用のため null 固定）
+// 7. 修理計画（未使用のため null）
 // --------------------------------------------------
 $fix_plan = null;
 $fix_plan_id = null;

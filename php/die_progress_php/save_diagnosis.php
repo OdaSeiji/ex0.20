@@ -127,24 +127,36 @@ if ($exist) {
 }
 
 // --------------------------------------------------
-// 5. 添付ファイル保存（diag_files[]）
+// 5. 添付ファイル保存（UPDATE 時は古いファイル削除）
 // --------------------------------------------------
-if (!empty($_FILES["diag_files"]["name"][0])) {
+$dir = "../../uploads/diagnosis/" . $diagnosis_id;
 
-    $dir = "../../uploads/diagnosis/" . $diagnosis_id;
+if (!file_exists($dir)) {
+    mkdir($dir, 0777, true);
+}
 
-    if (!file_exists($dir)) {
-        mkdir($dir, 0777, true);
+// ★ 新しいファイルがあるか？
+$hasNewFiles = !empty($_FILES["diag_files"]["name"][0]);
+
+if ($mode === "update" && $hasNewFiles) {
+
+    // ★ 新しいファイルがあるときだけ古いファイルを削除する
+    foreach (glob($dir . "/*") as $old) {
+        unlink($old);
     }
 
+    $pdo->prepare("DELETE FROM t_die_attachment WHERE diagnosis_id = ?")
+        ->execute([$diagnosis_id]);
+}
+
+// ★ 新しいファイルがあるときだけ保存
+if ($hasNewFiles) {
     foreach ($_FILES["diag_files"]["tmp_name"] as $i => $tmp) {
         $name = $_FILES["diag_files"]["name"][$i];
         $path = "$dir/$name";
 
-        // ファイル保存
         move_uploaded_file($tmp, $path);
 
-        // DB 登録（t_die_attachment に diagnosis_id で紐づける）
         $sql = "INSERT INTO t_die_attachment 
                 (diagnosis_id, file_path, file_type, created_at)
                 VALUES (?, ?, ?, NOW())";
@@ -156,6 +168,7 @@ if (!empty($_FILES["diag_files"]["name"][0])) {
         ]);
     }
 }
+
 
 // --------------------------------------------------
 // 6. 完了レスポンス
