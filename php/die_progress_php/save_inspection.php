@@ -1,15 +1,11 @@
 <?php
-// --------------------------------------------------
-// DB 接続
-// --------------------------------------------------
 require_once "../db.php";
-
 header("Content-Type: application/json; charset=utf-8");
 
 // --------------------------------------------------
 // 1. POST データ取得
 // --------------------------------------------------
-$press_id   = $_POST["press_id"];              // ★ 必須
+$press_id   = $_POST["press_id"];              // ★ 主キー扱い
 $die_id     = $_POST["dies_id"];
 $date       = $_POST["inspection_date"];
 $staff_id   = $_POST["inspection_staff_id"];
@@ -19,30 +15,69 @@ $overall    = $_POST["overall_result"];
 $memo       = $_POST["memo"];
 
 // --------------------------------------------------
-// 2. INSERT（t_die_inspection）
+// 2. press_id のレコードが存在するか確認
 // --------------------------------------------------
-$sql = "INSERT INTO t_die_inspection 
+$sql = "SELECT id FROM t_die_inspection WHERE press_id = ?";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$press_id]);
+$existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+// --------------------------------------------------
+// 3. INSERT or UPDATE
+// --------------------------------------------------
+if ($existing) {
+    // ★ UPDATE
+    $inspection_id = $existing["id"];
+
+    $sql = "
+        UPDATE t_die_inspection
+        SET
+            inspection_date = ?,
+            inspection_staff_id = ?,
+            dimension_result = ?,
+            shape_result = ?,
+            overall_result = ?,
+            memo = ?
+        WHERE press_id = ?
+    ";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $date,
+        $staff_id,
+        $dim,
+        $shape,
+        $overall,
+        $memo,
+        $press_id
+    ]);
+
+} else {
+    // ★ INSERT
+    $sql = "
+        INSERT INTO t_die_inspection
         (press_id, die_id, inspection_date, inspection_staff_id,
          dimension_result, shape_result, overall_result, memo, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+    ";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute([
-    $press_id,
-    $die_id,
-    $date,
-    $staff_id,
-    $dim,
-    $shape,
-    $overall,
-    $memo
-]);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        $press_id,
+        $die_id,
+        $date,
+        $staff_id,
+        $dim,
+        $shape,
+        $overall,
+        $memo
+    ]);
 
-// 新しい inspection_id を取得
-$inspection_id = $pdo->lastInsertId();
+    $inspection_id = $pdo->lastInsertId();
+}
 
 // --------------------------------------------------
-// 3. 添付ファイル保存（uploads/inspection/{inspection_id}/）
+// 4. 添付ファイル保存（UPDATE の場合は古いファイル削除）
 // --------------------------------------------------
 $upload_dir = "../../uploads/inspection/" . $inspection_id . "/";
 
@@ -52,6 +87,20 @@ if (!file_exists($upload_dir)) {
 
 $files_saved = [];
 
+// ★ UPDATE の場合は古いファイル削除
+if ($existing) {
+    // 物理ファイル削除
+    $old_files = glob($upload_dir . "*");
+    foreach ($old_files as $f) {
+        unlink($f);
+    }
+
+    // DB の添付ファイル削除
+    $pdo->prepare("DELETE FROM t_die_attachment WHERE inspection_id = ?")
+        ->execute([$inspection_id]);
+}
+
+// ★ 新しいファイル保存
 if (!empty($_FILES["files"]["name"][0])) {
 
     for ($i = 0; $i < count($_FILES["files"]["name"]); $i++) {
@@ -60,21 +109,20 @@ if (!empty($_FILES["files"]["name"][0])) {
         $name = basename($_FILES["files"]["name"][$i]);
         $type = $_FILES["files"]["type"][$i];
 
-        // 保存先パス
         $save_path = $upload_dir . $name;
 
-        // ファイル移動
         if (move_uploaded_file($tmp, $save_path)) {
 
-            // DB 登録（t_die_attachment）
-            $sql = "INSERT INTO t_die_attachment
-                    (inspection_id, file_path, file_type, created_at)
-                    VALUES (?, ?, ?, NOW())";
+            $sql = "
+                INSERT INTO t_die_attachment
+                (inspection_id, file_path, file_type, created_at)
+                VALUES (?, ?, ?, NOW())
+            ";
 
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 $inspection_id,
-                $name,          // file_path はファイル名のみ
+                $name,
                 $type
             ]);
 
@@ -84,7 +132,7 @@ if (!empty($_FILES["files"]["name"][0])) {
 }
 
 // --------------------------------------------------
-// 4. レスポンス
+// 5. レスポンス
 // --------------------------------------------------
 echo json_encode([
     "status" => "ok",

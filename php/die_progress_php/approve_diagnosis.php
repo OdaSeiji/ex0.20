@@ -139,7 +139,7 @@ if ($should_create_issue && empty($die_issue_id)) {
 echo json_encode([
     "status" => "success",
     "message" => "承認処理が完了しました",
-    "redirect" => "../../die_progress_list.html"
+    "redirect" => "/ex0.20/die_progress_list.html"
 ]);
 exit;
 

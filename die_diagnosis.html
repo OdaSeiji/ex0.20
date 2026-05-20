@@ -581,19 +581,46 @@
         初期ロード
       ------------------------------ */
       window.onload = function () {
+        // ▼ 言語設定
         const lang = localStorage.getItem("lang") || "ja";
         applyLanguage(lang);
 
+        // ▼ スタッフ一覧
         loadStaffList();
-        loadDiagnosisData(); // ← ここで診断カードが描画される
 
-        // ★★★ 必ず最後に承認モードを適用する ★★★
-        if (mode === "approval") {
-          enableApprovalMode();
-        } else {
-          const approvalCard = document.getElementById("approvalCard");
-          if (approvalCard) approvalCard.style.display = "none";
+        // ▼ URL パラメータ取得（画面モードと press_id）
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // mode = 画面モード
+        //   null        : 新規入力
+        //   "edit"      : プレビューからの修正モード
+        //   "approval"  : 承認モード（入力不可）
+        const mode = urlParams.get("mode");
+
+        // press_id = 対象となる診断データのキー
+        const pressId = urlParams.get("press_id");
+
+        // ▼ 押出情報カードは常に表示
+        if (pressId) {
+          loadPressInfo(pressId);
         }
+
+        // ▼ 編集モード（プレビュー → 修正する）
+        if (mode === "edit") {
+          loadDiagnosisData(pressId); // 既存データを読み込む
+          enableInputs(); // 入力欄を編集可能にする
+          return; // ★ 承認モード処理を避ける
+        }
+
+        // ▼ 承認モード
+        if (mode === "approval") {
+          loadDiagnosisData(pressId); // 既存データを読み込む
+          enableApprovalMode(); // 入力不可＋承認UI表示
+          return;
+        }
+
+        // ▼ 新規モード（mode=null）
+        // → 何もしない（空欄のまま入力）
       };
 
       /* ------------------------------
@@ -1173,10 +1200,30 @@
             }
           });
       }
+
+      /* ------------------------------
+        編集モード（mode=edit）で入力欄を有効化
+      ------------------------------ */
+      function enableInputs() {
+        // 入力欄をすべて編集可能にする
+        document.querySelectorAll("input, textarea, select").forEach((el) => {
+          el.disabled = false;
+        });
+
+        // 保存ボタンを表示
+        const saveBtn = document.getElementById("saveBtn");
+        if (saveBtn) saveBtn.style.display = "inline-block";
+
+        // 承認カードは編集モードでは不要
+        const approvalCard = document.getElementById("approvalCard");
+        if (approvalCard) approvalCard.style.display = "none";
+      }
+
       /* ------------------------------
         戻るボタンの処理
       ------------------------------ */
       function goBackToList() {
+        location.href = "ex0.20/die_progress_list.html";
         location.href = "die_progress_list.html";
       }
     </script>
