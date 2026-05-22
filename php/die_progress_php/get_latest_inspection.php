@@ -8,8 +8,9 @@ require_once "../db.php";
 */
 
 $sql = "
-    SELECT 
+    SELECT
         i.id,
+        i.press_id,
         i.created_at,
         i.overall_result,
         d.die_number,

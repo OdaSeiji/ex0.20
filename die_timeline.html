@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>金型タイムライン</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px 25px 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .top-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .back-btn {
+        background: #2b6ca3;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      h1 {
+        font-size: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+
+      .die-number-mono { font-family: "Roboto Mono", monospace; }
+
+      /* ── Legend ── */
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 18px;
+        font-size: 12px;
+      }
+      .leg-badge {
+        padding: 3px 10px;
+        border-radius: 5px;
+        color: #fff;
+        font-weight: bold;
+        font-size: 11px;
+      }
+
+      /* ── Timeline outer ── */
+      .tl-outer {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fafafa;
+      }
+
+      /* tl-inner width set by JS */
+      .tl-inner { position: relative; }
+
+      /* Axis bar */
+      .tl-axis {
+        position: relative;
+        height: 36px;
+        border-bottom: 2px solid #888;
+        background: #f0f2f5;
+      }
+      .tl-month-label {
+        position: absolute;
+        bottom: 6px;
+        font-size: 11px;
+        font-weight: bold;
+        color: #444;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        user-select: none;
+      }
+
+      /* Zone (event area) */
+      .tl-zone {
+        position: relative;
+        overflow: visible; /* allow tick marks to protrude into axis */
+      }
+
+      /* Month grid lines */
+      .tl-grid {
+        position: absolute;
+        top: 0;
+        width: 1px;
+        background: #e4e4e4;
+        pointer-events: none;
+      }
+
+      /* Connector SVG */
+      .tl-svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* Tick marks at actual event dates (protrude up into axis) */
+      .tl-tick {
+        position: absolute;
+        width: 2px;
+        height: 10px;
+        background: #888;
+        top: -6px;
+        transform: translateX(-50%);
+        z-index: 2;
+      }
+
+      /* Badge stacks */
+      .badge-stack {
+        position: absolute;
+        top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        transform: translateX(-50%);
+        z-index: 10;
+      }
+
+      .badge-card {
+        border-radius: 6px;
+        padding: 4px 10px;
+        text-align: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
+        white-space: nowrap;
+        min-width: 88px;
+        cursor: default;
+      }
+      .badge-type {
+        display: block;
+        font-size: 11px;
+        font-weight: bold;
+        color: #fff;
+        line-height: 1.3;
+      }
+      .badge-date {
+        display: block;
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.88);
+        line-height: 1.3;
+        font-family: "Roboto Mono", monospace;
+      }
+
+      /* Event type colors */
+      .bc-press        { background: #1565C0; }
+      .bc-insp-ok      { background: #2E7D32; }
+      .bc-insp-ng      { background: #C62828; }
+      .bc-diagnosis    { background: #E65100; }
+      .bc-approval     { background: #6A1B9A; }
+      .bc-fix-plan     { background: #4E342E; }
+      .bc-fix-report   { background: #00695C; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="top-bar">
+        <button class="back-btn" onclick="history.back()">← 戻る</button>
+        <h1>
+          金型タイムライン：
+          <span class="die-number-mono" id="dieNumberDisplay">─</span>
+        </h1>
+      </div>
+
+      <div class="legend">
+        <span class="leg-badge bc-press">押出</span>
+        <span class="leg-badge bc-insp-ok">測定 OK</span>
+        <span class="leg-badge bc-insp-ng">測定 NG</span>
+        <span class="leg-badge bc-diagnosis">診断</span>
+        <span class="leg-badge bc-approval">診断承認</span>
+        <span class="leg-badge bc-fix-plan">修理計画</span>
+        <span class="leg-badge bc-fix-report">修理実績</span>
+      </div>
+
+      <div class="tl-outer">
+        <div class="tl-inner" id="tlInner">
+          <div class="tl-axis" id="tlAxis"></div>
+          <div class="tl-zone" id="tlZone">
+            <svg class="tl-svg" id="tlSvg"></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ── URL params ── */
+      const params     = new URLSearchParams(location.search);
+      const die_id     = params.get("die_id");
+      const die_number = params.get("die_number") || "─";
+      document.getElementById("dieNumberDisplay").textContent = die_number;
+
+      /* ── Scale: 1200px = 90 days (3 months) ── */
+      const PX_PER_DAY       = 1200 / 90;   // ≈ 13.33
+      const PAD_DAYS         = 8;
+      const MIN_WIDTH        = 1200;
+      const BADGE_W          = 92;           // badge width (cluster threshold)
+      const BADGE_H          = 40;           // badge height (px)
+      const BADGE_GAP        = 4;
+      const ZONE_TOP_PAD     = 12;           // space above first badge
+
+      let tlMaxMs, tlMinMs;
+
+      function toMs(str)  { return str ? new Date(str).getTime() : null; }
+
+      /* newer date → smaller x (left), older date → larger x (right) */
+      function dateToX(ms) {
+        return (tlMaxMs - ms) / 86400000 * PX_PER_DAY + PAD_DAYS * PX_PER_DAY;
+      }
+
+      function fmtDate(str) {
+        if (!str) return "";
+        const d  = new Date(str);
+        const yy = String(d.getFullYear()).slice(2);
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yy}-${mm}-${dd}`;
+      }
+
+      function datePropFor(type) {
+        return {
+          press:      "press_date",
+          inspection: "inspection_date",
+          diagnosis:  "diagnosis_date",
+          approval:   "diagnosis_approval_date",
+          fix_plan:   "plan_fix_date",
+          fix_report: "actual_fix_date",
+        }[type];
+      }
+
+      /* ── Main render ── */
+      function render(data) {
+        /* 1. Flatten all events */
+        const events = [];
+        data.forEach((row) => {
+          const add = (type, cssClass, label, dateStr) => {
+            const ms = toMs(dateStr);
+            if (!ms) return;
+            events.push({ ms, type, cssClass, label, dateStr, row });
+          };
+          add("press",      "bc-press",     "押出",     row.press_date);
+          add("inspection",
+              row.overall_result === "OK" ? "bc-insp-ok" : "bc-insp-ng",
+              `測定 ${row.overall_result ?? ""}`,    row.inspection_date);
+          add("diagnosis",  "bc-diagnosis", "診断",     row.diagnosis_date);
+          add("approval",   "bc-approval",  "診断承認", row.diagnosis_approval_date);
+          add("fix_plan",   "bc-fix-plan",  "修理計画", row.plan_fix_date);
+          add("fix_report", "bc-fix-report","修理実績", row.actual_fix_date);
+        });
+
+        if (events.length === 0) {
+          document.getElementById("tlZone").innerHTML =
+            "<p style='padding:20px;color:#888'>データがありません</p>";
+          return;
+        }
+
+        /* 2. Date bounds → pixel width */
+        const allMs  = events.map((e) => e.ms);
+        tlMaxMs = Math.max(...allMs);
+        tlMinMs = Math.min(...allMs);
+        const totalDays = (tlMaxMs - tlMinMs) / 86400000 + PAD_DAYS * 2;
+        const contentW  = Math.max(MIN_WIDTH, Math.ceil(totalDays * PX_PER_DAY));
+
+        /* 3. Compute x for every event */
+        events.forEach((ev) => { ev.x = dateToX(ev.ms); });
+
+        /* 4. Size DOM elements */
+        const inner = document.getElementById("tlInner");
+        const axis  = document.getElementById("tlAxis");
+        const zone  = document.getElementById("tlZone");
+        const svg   = document.getElementById("tlSvg");
+        inner.style.width = axis.style.width = contentW + "px";
+        svg.setAttribute("width", contentW);
+
+        /* 5. Month labels + grid lines */
+        const cur = new Date(tlMinMs);
+        cur.setDate(1); cur.setHours(0, 0, 0, 0);
+        while (cur.getTime() <= tlMaxMs + PAD_DAYS * 86400000) {
+          const x = dateToX(cur.getTime());
+
+          const lbl = document.createElement("div");
+          lbl.className  = "tl-month-label";
+          lbl.style.left = x + "px";
+          lbl.textContent =
+            `${cur.getFullYear()}-${String(cur.getMonth() + 1).padStart(2, "0")}`;
+          axis.appendChild(lbl);
+
+          const gl = document.createElement("div");
+          gl.className  = "tl-grid";
+          gl.style.left = x + "px";
+          zone.appendChild(gl);          // height updated after zone height known
+
+          cur.setMonth(cur.getMonth() + 1);
+        }
+
+        /* 6. Cycle connector lines (one polyline per press row) */
+        data.forEach((row) => {
+          const pts = [
+            row.press_date, row.inspection_date, row.diagnosis_date,
+            row.diagnosis_approval_date, row.plan_fix_date, row.actual_fix_date,
+          ]
+            .map(toMs)
+            .filter(Boolean)
+            .map((ms) => Math.round(dateToX(ms)));
+
+          if (pts.length < 2) return;
+
+          const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+          poly.setAttribute("points",         pts.map((x) => `${x},2`).join(" "));
+          poly.setAttribute("fill",           "none");
+          poly.setAttribute("stroke",         "#bbb");
+          poly.setAttribute("stroke-width",   "2");
+          poly.setAttribute("stroke-dasharray","6 4");
+          svg.appendChild(poly);
+        });
+
+        /* 7. Cluster overlapping events
+              Sort by x ascending (left=newer first).
+              Events within BADGE_W px of the cluster start → same stack. */
+        events.sort((a, b) => a.x - b.x);
+
+        const groups = [];
+        events.forEach((ev) => {
+          const last = groups[groups.length - 1];
+          if (last && ev.x - last.startX < BADGE_W) {
+            last.events.push(ev);
+          } else {
+            groups.push({ startX: ev.x, events: [ev] });
+          }
+        });
+
+        /* 8. Within each group: newer (larger ms) → top of stack */
+        groups.forEach((g) => {
+          g.events.sort((a, b) => b.ms - a.ms);
+          /* x of stack = average of member x positions */
+          g.x = Math.round(
+            g.events.reduce((s, e) => s + e.x, 0) / g.events.length,
+          );
+        });
+
+        /* 9. Zone height = tallest stack */
+        const maxDepth = Math.max(...groups.map((g) => g.events.length));
+        const zoneH    = ZONE_TOP_PAD + maxDepth * (BADGE_H + BADGE_GAP) + 20;
+        zone.style.height = zoneH + "px";
+        svg.setAttribute("height", zoneH);
+        zone.querySelectorAll(".tl-grid").forEach(
+          (el) => (el.style.height = zoneH + "px"),
+        );
+
+        /* 10. Tick marks at actual event x positions */
+        events.forEach((ev) => {
+          const tick       = document.createElement("div");
+          tick.className   = "tl-tick";
+          tick.style.left  = Math.round(ev.x) + "px";
+          zone.appendChild(tick);
+        });
+
+        /* 11. Badge stacks */
+        groups.forEach((g) => {
+          const stack      = document.createElement("div");
+          stack.className  = "badge-stack";
+          stack.style.left = g.x + "px";
+
+          g.events.forEach((ev) => {
+            const card      = document.createElement("div");
+            card.className  = `badge-card ${ev.cssClass}`;
+            card.innerHTML  =
+              `<span class="badge-type">${ev.label}</span>` +
+              `<span class="badge-date">${fmtDate(ev.dateStr)}</span>`;
+            stack.appendChild(card);
+          });
+
+          zone.appendChild(stack);
+        });
+      }
+
+      /* ── Fetch ── */
+      fetch(`./php/die_progress_php/get_die_timeline.php?die_id=${die_id}`)
+        .then((r) => r.json())
+        .then((data) => render(data))
+        .catch(() => {
+          document.getElementById("tlZone").textContent =
+            "データの取得に失敗しました";
+        });
+    </script>
+  </body>
+</html>

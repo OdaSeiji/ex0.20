@@ -1,16 +1,19 @@
 <?php
 require_once "./../db.php";
 
-$id = $_POST["id"] ?? null;
-$detail = $_POST["issue_detail"] ?? null;
+$id    = $_POST["id"]    ?? null;
+$field = $_POST["field"] ?? "issue_detail";
+$value = $_POST["value"] ?? null;
 
-if (!$id) {
-    echo json_encode(["status" => "error", "message" => "ID がありません"]);
+$allowed = ["issue_detail", "issue_title_jp", "issue_title_vn"];
+
+if (!$id || !in_array($field, $allowed)) {
+    echo json_encode(["status" => "error", "message" => "invalid input"]);
     exit;
 }
 
-$sql = "UPDATE t_die_issue SET issue_detail = ? WHERE id = ?";
+$sql = "UPDATE t_die_issue SET {$field} = ? WHERE id = ?";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$detail, $id]);
+$stmt->execute([$value, $id]);
 
 echo json_encode(["status" => "success"]);
