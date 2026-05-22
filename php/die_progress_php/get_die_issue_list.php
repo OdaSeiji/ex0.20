@@ -12,7 +12,9 @@ $sql = "
         i.die_id,
         d.die_number,
         i.issue_title,
-        i.issue_detail,     -- ★ 追加
+        i.issue_title_jp,
+        i.issue_title_vn,
+        i.issue_detail,
         i.priority,
         CASE 
             WHEN i.status = 'open' THEN '未完了'
@@ -20,12 +22,12 @@ $sql = "
         END AS completion_status,
         i.created_at,
         (
-            SELECT diagnosis_date 
-            FROM t_die_diagnosis 
-            WHERE die_issue_id = i.id 
-            ORDER BY id DESC 
+            SELECT p.press_date_at
+            FROM t_press p
+            WHERE p.dies_id = i.die_id
+            ORDER BY p.press_date_at DESC
             LIMIT 1
-        ) AS latest_diagnosis_date,
+        ) AS latest_press_date,
         CASE 
             WHEN i.priority = 1 THEN '高'
             WHEN i.priority = 2 THEN '中'

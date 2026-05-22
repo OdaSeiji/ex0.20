@@ -123,6 +123,13 @@
         padding: 10px 12px 12px;
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         flex-shrink: 0;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+
+      .day-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 14px rgba(0, 120, 212, 0.18);
+        border-color: #0078d4;
       }
 
       /* カードヘッダ（日付＋押出件数） */
@@ -494,6 +501,11 @@
         data.forEach((row) => {
           const card = document.createElement("div");
           card.className = "day-card";
+          card.style.cursor = "pointer";
+          card.title = "クリックして測定詳細を開く";
+          card.onclick = () => {
+            location.href = `die_inspection.html?press_id=${row.press_id}&mode=edit`;
+          };
 
           card.innerHTML = `
       <div class="day-card-header">
