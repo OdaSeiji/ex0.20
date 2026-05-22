@@ -317,13 +317,19 @@
         });
       }
 
+      const mode = new URLSearchParams(location.search).get("mode");
+
       /* ============================================================
         初期ロード（順番が重要）
       ============================================================ */
       document.addEventListener("DOMContentLoaded", async () => {
         await loadStaff(); // ★ スタッフ一覧を先に読み込む
         await loadFixPlan(); // ★ その後に修理計画を読み込む
-        setToday();
+        if (mode === "edit") {
+          await loadFixReportData(); // ★ 編集モード：既存報告データをフォームに展開
+        } else {
+          setToday();
+        }
       });
 
       function setToday() {
@@ -347,6 +353,45 @@
         });
 
         return true; // ★ 読み込み完了を知らせる
+      }
+
+      /* ============================================================
+        既存の修理実施報告を読み込んでフォームに展開（編集モード用）
+      ============================================================ */
+      async function loadFixReportData() {
+        const press_id = new URLSearchParams(location.search).get("press_id");
+        const res = await fetch(`./php/die_progress_php/get_fix_report.php?press_id=${press_id}`);
+        const data = await res.json();
+
+        if (data.error) return;
+
+        document.getElementById("actual_fix_date").value = data.actual_fix_date?.split(" ")[0] || "";
+        document.getElementById("actual_fix_staff_id").value = data.actual_fix_staff_id || "";
+        document.getElementById("actual_fix_content").value = data.actual_fix_content || "";
+
+        renderExistingReportFiles(data.files || []);
+      }
+
+      function renderExistingReportFiles(files) {
+        const container = document.getElementById("preview_files");
+        container.innerHTML = "";
+
+        files.forEach((f) => {
+          const url = `../ex0.20/uploads/${f.file_path}`;
+          if (f.file_type.startsWith("image/")) {
+            const img = document.createElement("img");
+            img.src = url;
+            img.className = "thumb";
+            img.onclick = () => showImageModal(url);
+            container.appendChild(img);
+          } else {
+            const div = document.createElement("div");
+            div.className = "file-item";
+            div.textContent = "PDF";
+            div.onclick = () => window.open(url, "_blank");
+            container.appendChild(div);
+          }
+        });
       }
 
       /* ============================================================
@@ -426,9 +471,9 @@
         const press_id = new URLSearchParams(location.search).get("press_id");
         const form = new FormData();
 
-        // ▼ 添付ファイル必須チェック
+        // ▼ 添付ファイル必須チェック（新規登録のみ）
         const files = document.getElementById("files").files;
-        if (!files || files.length === 0) {
+        if (mode !== "edit" && (!files || files.length === 0)) {
           alert("添付ファイルを1つ以上選択してください。");
           return;
         }

@@ -308,6 +308,35 @@
       .btn-edit:hover {
         background-color: #e68900;
       }
+
+      /* ステップフィルターボタン */
+      .step-filter {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      .step-filter button {
+        padding: 6px 14px;
+        border: 2px solid #0078d4;
+        background: #fff;
+        color: #0078d4;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: bold;
+        transition: background 0.15s, color 0.15s;
+      }
+
+      .step-filter button:hover {
+        background: #e0f0ff;
+      }
+
+      .step-filter button.active {
+        background: #0078d4;
+        color: #fff;
+      }
     </style>
   </head>
 
@@ -330,6 +359,16 @@
       </div>
 
       <h1 data-key="title">📊 金型進捗一覧（Progress List）</h1>
+
+      <!-- ステップフィルター -->
+      <div class="step-filter" id="stepFilterArea">
+        <button class="active" onclick="setStepFilter('all', this)" data-key="filter_all">すべて</button>
+        <button onclick="setStepFilter('need_inspection', this)" data-key="filter_inspection">測定待ち</button>
+        <button onclick="setStepFilter('need_diagnosis', this)" data-key="filter_diagnosis">診断待ち</button>
+        <button onclick="setStepFilter('need_approval', this)" data-key="filter_approval">診断承認待ち</button>
+        <button onclick="setStepFilter('need_fix_plan', this)" data-key="filter_fix_plan">修理計画待ち</button>
+        <button onclick="setStepFilter('need_fix_report', this)" data-key="filter_fix_report">修理報告待ち</button>
+      </div>
 
       <!-- 一覧テーブル -->
       <table id="progressTable">
@@ -590,6 +629,14 @@
 
           // ▼▼▼ 編集ボタン ▼▼▼
           btn_edit: "✏️ 修正する",
+
+          // ▼▼▼ ステップフィルター ▼▼▼
+          filter_all: "すべて",
+          filter_inspection: "測定待ち",
+          filter_diagnosis: "診断待ち",
+          filter_approval: "診断承認待ち",
+          filter_fix_plan: "修理計画待ち",
+          filter_fix_report: "修理報告待ち",
         },
 
         vi: {
@@ -634,6 +681,14 @@
 
           // ▼▼▼ 編集ボタン ▼▼▼
           btn_edit: "✏️ Chỉnh sửa",
+
+          // ▼▼▼ ステップフィルター ▼▼▼
+          filter_all: "Tất cả",
+          filter_inspection: "Chờ đo",
+          filter_diagnosis: "Chờ chẩn đoán",
+          filter_approval: "Chờ duyệt chẩn đoán",
+          filter_fix_plan: "Chờ kế hoạch sửa",
+          filter_fix_report: "Chờ báo cáo sửa",
         },
       };
 
@@ -731,17 +786,46 @@
       }
 
       /* ============================================================
-   押出種別フィルター
+        ステップフィルター
+      ============================================================ */
+      let currentStepFilter = "all";
+
+      function setStepFilter(step, btn) {
+        currentStepFilter = step;
+        document.querySelectorAll(".step-filter button").forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderTable(applyFilters(window._progressData));
+      }
+
+      /* ============================================================
+   押出種別フィルター＋ステップフィルター
 ============================================================ */
       function applyFilters(data) {
         const select = document.getElementById("filterPressingType");
-        if (!select) return data;
-
-        const type = select.value;
+        const type = select ? select.value : "";
 
         return data.filter((row) => {
-          const matchType = type === "" || row.pressing_symbol === type;
-          return matchType;
+          const ng = Number(row.ng_action);
+          const needsRepair = ng === 2 || ng === 3;
+
+          // 押出種別フィルター
+          if (type !== "" && row.pressing_symbol !== type) return false;
+
+          // ステップフィルター
+          switch (currentStepFilter) {
+            case "need_inspection":
+              return !row.inspected;
+            case "need_diagnosis":
+              return row.inspected && !row.diagnosed;
+            case "need_approval":
+              return row.diagnosed && row.approved === 0;
+            case "need_fix_plan":
+              return row.approved === 1 && !row.fix_plan && needsRepair;
+            case "need_fix_report":
+              return row.fix_plan && !row.fix_report && needsRepair;
+            default:
+              return true;
+          }
         });
       }
 
@@ -1247,6 +1331,10 @@
         Fix Plan preview
       ============================================================ */
       async function previewFixPlan(press_id) {
+        resetPreviewFields();
+        currentPressId = press_id;
+        currentPreviewType = "fix_plan";
+
         // 1. データ取得
         const res = await fetch(
           `./php/die_progress_php/get_fix_plan.php?press_id=${press_id}`,
@@ -1301,6 +1389,10 @@
         Fix Report preview
       ============================================================ */
       async function previewFixReport(press_id) {
+        resetPreviewFields();
+        currentPressId = press_id;
+        currentPreviewType = "fix_report";
+
         // 1. データ取得
         const res = await fetch(
           `./php/die_progress_php/get_fix_report.php?press_id=${press_id}`,
@@ -1414,6 +1506,10 @@
           window.location.href = `die_inspection.html?press_id=${currentPressId}&mode=edit`;
         } else if (currentPreviewType === "diagnosis") {
           window.location.href = `die_diagnosis.html?press_id=${currentPressId}&mode=edit`;
+        } else if (currentPreviewType === "fix_plan") {
+          window.location.href = `die_fix_plan.html?press_id=${currentPressId}&mode=edit`;
+        } else if (currentPreviewType === "fix_report") {
+          window.location.href = `die_fix_report.html?press_id=${currentPressId}&mode=edit`;
         } else {
           alert("編集できるデータではありません。");
         }
