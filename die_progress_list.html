@@ -615,7 +615,7 @@
 
           // ▼▼▼ ここからプレビュー画面用 ▼▼▼
           preview_title: "測定プレビュー",
-          label_date: "日付",
+          label_date: "押出日",
           label_staff: "担当者",
           label_die: "金型番号",
           label_press: "プレス機",
@@ -667,7 +667,7 @@
 
           // ▼▼▼ ここからプレビュー画面用 ▼▼▼
           preview_title: "Xem trước đo kiểm",
-          label_date: "Ngày",
+          label_date: "Ngày ép",
           label_staff: "Người phụ trách",
           label_die: "Số khuôn",
           label_press: "Máy ép",
@@ -1081,7 +1081,7 @@
 
         // ▼ 基本情報
         document.getElementById("pv_date").textContent =
-          data.inspection.inspection_date || "-";
+          formatDate(data.inspection.inspection_date);
 
         // ★ staff → staff_name に修正
         document.getElementById("pv_staff").textContent =
@@ -1118,6 +1118,24 @@
 
         // ▼ モーダル表示
         openModal();
+      }
+
+      /* ============================================================
+        日付フォーマット
+          ja: yy-mm-dd（例: 26-05-22）
+          vi: dd-mm-yy（例: 22-05-26）
+      ============================================================ */
+      function formatDate(dateStr) {
+        if (!dateStr) return "-";
+        const base = dateStr.split(" ")[0]; // 時刻部分を除去
+        const parts = base.split("-");
+        if (parts.length !== 3) return dateStr;
+        const yy = parts[0].slice(2);
+        const mm = parts[1];
+        const dd = parts[2];
+        return currentLang === "vi"
+          ? `${dd}-${mm}-${yy}`
+          : `${yy}-${mm}-${dd}`;
       }
 
       function openModal() {
@@ -1218,7 +1236,7 @@
         document.getElementById("previewTitle").textContent = "測定プレビュー";
 
         document.getElementById("pv_date").textContent =
-          data.inspection.inspection_date || "-";
+          formatDate(data.inspection.inspection_date);
         document.getElementById("pv_staff").textContent =
           data.inspection.inspection_staff || "-";
         document.getElementById("pv_die").textContent =
@@ -1278,7 +1296,7 @@
 
         // 4. 基本情報
         document.getElementById("pv_date").textContent =
-          data.diagnosis.diagnosis_date || "-";
+          formatDate(data.diagnosis.diagnosis_date);
 
         document.getElementById("pv_staff").textContent =
           data.diagnosis.diagnosis_staff_name || "-";
@@ -1346,7 +1364,7 @@
 
         // 3. 基本情報
         document.getElementById("pv_date").textContent =
-          data.plan_fix_date?.split(" ")[0] || "-";
+          formatDate(data.plan_fix_date);
 
         document.getElementById("pv_staff").textContent =
           data.plan_fix_staff_name || "-";
@@ -1404,7 +1422,7 @@
 
         // 3. 基本情報
         document.getElementById("pv_date").textContent =
-          data.actual_fix_date?.split(" ")[0] || "-";
+          formatDate(data.actual_fix_date);
 
         document.getElementById("pv_staff").textContent =
           data.actual_fix_staff_name || "-";
