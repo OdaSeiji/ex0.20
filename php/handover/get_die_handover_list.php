@@ -44,7 +44,8 @@ $sql = "
         h.id,
         h.die_id,
         d.die_number,
-        h.pn,
+        h.pn as original_pn,
+        p.production_number as database_pn,
         h.press_condition_document_completion_at,
         h.qa_dimension_inspection_completed_at,
         h.qa_dimension_inspection_document_number,
@@ -54,6 +55,7 @@ $sql = "
         h.memo
     FROM t_die_handover h
     JOIN m_dies d ON h.die_id = d.id
+    JOIN m_production_numbers p ON d.production_number_id = p.id
     $whereSql
     ORDER BY h.id DESC
 ";

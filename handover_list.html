@@ -2,7 +2,11 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>金型引継ぎ一覧</title>
+    <title>金型移管書類一覧</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
       body {
@@ -12,209 +16,415 @@
         padding: 20px;
       }
 
+      .lang-buttons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 100;
+      }
+      .lang-buttons button {
+        padding: 6px 12px;
+        margin-left: 5px;
+        border: 1px solid #0078d4;
+        background: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
       h1 {
         font-size: 24px;
-        margin-bottom: 20px;
+        margin-bottom: 12px;
         border-left: 6px solid #0078d4;
         padding-left: 10px;
       }
 
-      .filter-toggle {
-        background: #0078d4;
-        color: white;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin-bottom: 10px;
-      }
-
-      .filter-box {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 15px;
-        display: none;
-      }
-
-      .filter-row {
+      /* ツールバー */
+      .toolbar {
         display: flex;
-        gap: 15px;
-        margin-bottom: 10px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
       }
 
-      .filter-row label {
-        width: 120px;
-        font-weight: bold;
-      }
-
-      .filter-row input,
-      .filter-row select {
-        padding: 6px 10px;
-        width: 200px;
+      .toolbar .checked-count {
+        font-size: 13px;
+        color: #555;
       }
 
       .btn {
-        padding: 8px 16px;
-        background: #0078d4;
-        color: white;
+        padding: 7px 16px;
         border: none;
         border-radius: 5px;
         cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .btn-edit {
+        background: #ff9800;
+        color: white;
+      }
+      .btn-edit:hover { background: #e68900; }
+      .btn-edit:disabled {
+        background: #ccc;
+        color: #888;
+        cursor: not-allowed;
+      }
+
+      .btn-save {
+        background: #4caf50;
+        color: white;
+      }
+      .btn-save:hover { background: #388e3c; }
+
+      .btn-cancel {
+        background: #9e9e9e;
+        color: white;
+      }
+      .btn-cancel:hover { background: #757575; }
+
+      /* テーブル */
+      .table-wrap {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
       }
 
-      th,
-      td {
-        padding: 10px;
+      th, td {
+        padding: 8px 10px;
         border-bottom: 1px solid #ddd;
         text-align: center;
+      }
+
+      td {
+        font-family: "Roboto Mono", monospace;
+      }
+
+      td.td-memo {
+        font-family: "Segoe UI", sans-serif;
+        text-align: left;
       }
 
       th {
         background: #e8f1ff;
         cursor: pointer;
-        position: relative;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      th.no-sort {
+        cursor: default;
       }
 
       th .sort-icon {
-        margin-left: 5px;
-        font-size: 12px;
+        margin-left: 4px;
+        font-size: 11px;
         opacity: 0.6;
       }
 
-      tr:hover {
+      tr:hover { background: #f0f8ff; }
+
+      /* チェック済み行のハイライト */
+      tr.checked-row { background: #fff8e1; }
+      tr.checked-row:hover { background: #fff3cd; }
+
+      /* 編集モードの input */
+      td input[type="date"],
+      td input[type="text"],
+      td textarea {
+        font-family: "Roboto Mono", monospace;
+        font-size: 13px;
+        padding: 3px 6px;
+        border: 1px solid #90c0f0;
+        border-radius: 4px;
+        width: 100%;
+        box-sizing: border-box;
         background: #f0f8ff;
+      }
+
+      td textarea {
+        font-family: "Segoe UI", sans-serif;
+        resize: vertical;
+        min-height: 36px;
+      }
+
+      .die-number {
+        font-family: "Roboto Mono", monospace;
+        text-align: left;
+        letter-spacing: 0.5px;
+      }
+
+      .die-search {
+        width: 80px;
+        font-family: "Roboto Mono", monospace;
+        padding: 2px 6px;
+        margin-left: 6px;
+        border: 1px solid #aac4e8;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+
+      /* チェックボックス列 */
+      th.col-check, td.col-check {
+        width: 36px;
+        min-width: 36px;
+        cursor: default;
       }
     </style>
   </head>
 
   <body>
-    <h1>金型引継ぎ一覧</h1>
-
-    <!-- ▼ フィルター開閉ボタン -->
-    <button class="filter-toggle" onclick="toggleFilter()">
-      フィルターを開く ▼
-    </button>
-
-    <!-- ▼ フィルターボックス -->
-    <div class="filter-box" id="filterBox">
-      <div class="filter-row">
-        <label>金型番号</label>
-        <select id="filterDie">
-          <option value="">すべて</option>
-        </select>
-      </div>
-
-      <div class="filter-row">
-        <label>期間対象</label>
-        <select id="filterDateColumn">
-          <option value="arrived_at">到着日</option>
-          <option value="capitalization_date">資産化日</option>
-          <option value="press_condition_document_completion_at">
-            押出条件書 完了日
-          </option>
-          <option value="qa_dimension_inspection_completed_at">
-            寸法検査 完了日
-          </option>
-          <option value="dimension_inspection_sample_sent_at">
-            サンプル送付日
-          </option>
-        </select>
-      </div>
-
-      <div class="filter-row">
-        <label>期間（開始）</label>
-        <input type="date" id="filterStart" />
-      </div>
-
-      <div class="filter-row">
-        <label>期間（終了）</label>
-        <input type="date" id="filterEnd" />
-      </div>
-
-      <button class="btn" onclick="applyFilter()">検索</button>
+    <!-- 多言語ボタン -->
+    <div class="lang-buttons">
+      <button onclick="setLang('ja')">日本語</button>
+      <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
-    <!-- ▼ 一覧テーブル -->
-    <table id="handoverTable">
-      <thead>
-        <tr>
-          <th data-col="die_number">型番 <span class="sort-icon"></span></th>
-          <th data-col="pn">品番 <span class="sort-icon"></span></th>
-          <th data-col="press_condition_document_completion_at">
-            押出条件書 <span class="sort-icon"></span>
-          </th>
-          <th data-col="qa_dimension_inspection_completed_at">
-            寸法検査 <span class="sort-icon"></span>
-          </th>
-          <th data-col="qa_dimension_inspection_document_number">
-            検査書番号 <span class="sort-icon"></span>
-          </th>
-          <th data-col="dimension_inspection_sample_sent_at">
-            サンプル送付 <span class="sort-icon"></span>
-          </th>
-          <th data-col="arrived_at">到着日 <span class="sort-icon"></span></th>
-          <th data-col="capitalization_date">
-            資産化日 <span class="sort-icon"></span>
-          </th>
-          <th>メモ</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <h1 data-key="title">金型移管書類一覧</h1>
+
+    <!-- ツールバー -->
+    <div class="toolbar">
+      <button class="btn btn-edit" id="editBtn" onclick="enterEditMode()" disabled
+        data-key="btn_edit">✏️ チェックのみ編集</button>
+      <button class="btn btn-save" id="saveBtn" onclick="saveAll()"
+        style="display:none" data-key="btn_save">💾 一括保存</button>
+      <button class="btn btn-cancel" id="cancelBtn" onclick="cancelEditMode()"
+        style="display:none" data-key="btn_cancel">✕ キャンセル</button>
+      <span class="checked-count" id="checkedCount"></span>
+    </div>
+
+    <!-- 一覧テーブル -->
+    <div class="table-wrap">
+      <table id="handoverTable">
+        <thead>
+          <tr>
+            <th class="col-check no-sort">
+              <input type="checkbox" id="checkAll" onclick="toggleCheckAll(this)" />
+            </th>
+            <th data-col="die_number" data-key="col_die">型番
+              <input type="text" id="searchDie" placeholder="検索…" class="die-search" />
+              <span class="sort-icon"></span>
+            </th>
+            <th data-col="original_pn" data-key="col_pn">品番 <span class="sort-icon"></span></th>
+            <th data-col="press_condition_document_completion_at" data-key="col_press_cond">
+              押出条件書 <span class="sort-icon"></span>
+            </th>
+            <th data-col="qa_dimension_inspection_completed_at" data-key="col_dim_insp">
+              寸法検査 <span class="sort-icon"></span>
+            </th>
+            <th data-col="qa_dimension_inspection_document_number" data-key="col_insp_doc">
+              検査書番号 <span class="sort-icon"></span>
+            </th>
+            <th data-col="dimension_inspection_sample_sent_at" data-key="col_sample">
+              サンプル送付 <span class="sort-icon"></span>
+            </th>
+            <th data-col="arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
+            <th data-col="capitalization_date" data-key="col_capital">
+              資産化日 <span class="sort-icon"></span>
+            </th>
+            <th class="no-sort" data-key="col_memo">メモ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
 
     <script>
-      let sortCol = "";
-      let sortDir = "asc";
+      /* ============================================================
+        多言語
+      ============================================================ */
+      const dict = {
+        ja: {
+          title:         "金型移管書類一覧",
+          col_die:       "型番",
+          col_pn:        "品番",
+          col_press_cond:"押出条件書",
+          col_dim_insp:  "寸法検査",
+          col_insp_doc:  "検査書番号",
+          col_sample:    "サンプル送付",
+          col_arrived:   "到着日",
+          col_capital:   "資産化日",
+          col_memo:      "メモ",
+          btn_edit:      "✏️ チェックのみ編集",
+          btn_save:      "💾 一括保存",
+          btn_cancel:    "✕ キャンセル",
+          checked_count: (n) => `${n}件選択中`,
+        },
+        vi: {
+          title:         "Danh sách tài liệu chuyển giao khuôn",
+          col_die:       "Số khuôn",
+          col_pn:        "Số sản phẩm",
+          col_press_cond:"Tài liệu điều kiện ép",
+          col_dim_insp:  "Kiểm tra kích thước",
+          col_insp_doc:  "Số phiếu kiểm tra",
+          col_sample:    "Gửi mẫu",
+          col_arrived:   "Ngày đến",
+          col_capital:   "Ngày vốn hóa",
+          col_memo:      "Ghi chú",
+          btn_edit:      "✏️ Chỉnh sửa mục đã chọn",
+          btn_save:      "💾 Lưu tất cả",
+          btn_cancel:    "✕ Hủy",
+          checked_count: (n) => `Đã chọn ${n} mục`,
+        },
+      };
 
-      function toggleFilter() {
-        const box = document.getElementById("filterBox");
-        box.style.display = box.style.display === "none" ? "block" : "none";
+      let currentLang = localStorage.getItem("lang") || "ja";
+
+      function setLang(lang) {
+        currentLang = lang;
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          const val = dict[lang][key];
+          if (!val || typeof val === "function") return;
+          if (el.tagName === "TH") {
+            const textNode = Array.from(el.childNodes).find(
+              (n) => n.nodeType === Node.TEXT_NODE,
+            );
+            if (textNode) textNode.textContent = val + " ";
+          } else {
+            el.textContent = val;
+          }
+        });
+        localStorage.setItem("lang", lang);
+        if (window._tableData) renderTable(window._tableData);
+        updateCheckedCount();
       }
 
-      async function loadDieList() {
-        const res = await fetch("./php/handover/get_die_handover_list.php");
-        const list = await res.json();
+      /* ============================================================
+        日付フォーマット
+          ja: yy-mm-dd  /  vi: dd-mm-yy
+      ============================================================ */
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        const base = String(dateStr).split(" ")[0];
+        const parts = base.split("-");
+        if (parts.length !== 3) return dateStr;
+        const yy = parts[0].slice(2);
+        const mm = parts[1];
+        const dd = parts[2];
+        return currentLang === "vi" ? `${dd}-${mm}-${yy}` : `${yy}-${mm}-${dd}`;
+      }
 
-        const sel = document.getElementById("filterDie");
-        list.forEach((d) => {
-          const opt = document.createElement("option");
-          opt.value = d.id;
-          opt.textContent = d.die_number;
-          sel.appendChild(opt);
+      /* ============================================================
+        チェック状態管理
+      ============================================================ */
+      const checkedIds = new Set();
+      let isEditMode = false;
+
+      function toggleCheck(id, checked) {
+        id = Number(id);
+        if (checked) checkedIds.add(id);
+        else checkedIds.delete(id);
+        updateCheckedCount();
+        // 該当行のハイライト更新
+        const tr = document.querySelector(`tr[data-id="${id}"]`);
+        if (tr) tr.classList.toggle("checked-row", checked);
+      }
+
+      function toggleCheckAll(cbAll) {
+        const visibleRows = document.querySelectorAll("#handoverTable tbody tr[data-id]");
+        visibleRows.forEach((tr) => {
+          const id = Number(tr.dataset.id);
+          const cb = tr.querySelector("input[type=checkbox]");
+          if (cb) cb.checked = cbAll.checked;
+          toggleCheck(id, cbAll.checked);
         });
       }
 
+      function updateCheckedCount() {
+        const n = checkedIds.size;
+        document.getElementById("checkedCount").textContent =
+          n > 0 ? dict[currentLang].checked_count(n) : "";
+        document.getElementById("editBtn").disabled = n === 0;
+      }
+
+      /* ============================================================
+        編集モード
+      ============================================================ */
+      function enterEditMode() {
+        if (checkedIds.size === 0) return;
+        isEditMode = true;
+        document.getElementById("editBtn").style.display = "none";
+        document.getElementById("saveBtn").style.display = "";
+        document.getElementById("cancelBtn").style.display = "";
+        document.getElementById("searchDie").disabled = true;
+        // チェック済みのみ表示・編集モードで再描画
+        const checked = (window._tableData || []).filter((r) => checkedIds.has(Number(r.id)));
+        renderTable(checked);
+      }
+
+      function cancelEditMode() {
+        isEditMode = false;
+        document.getElementById("editBtn").style.display = "";
+        document.getElementById("saveBtn").style.display = "none";
+        document.getElementById("cancelBtn").style.display = "none";
+        document.getElementById("searchDie").disabled = false;
+        renderTable(window._tableData || []);
+      }
+
+      /* ============================================================
+        一括保存
+      ============================================================ */
+      async function saveAll() {
+        const rows = [];
+        document.querySelectorAll("#handoverTable tbody tr[data-id]").forEach((tr) => {
+          rows.push({
+            id: Number(tr.dataset.id),
+            press_condition_document_completion_at: tr.querySelector('[name="press_cond"]').value || null,
+            qa_dimension_inspection_completed_at:   tr.querySelector('[name="dim_insp"]').value || null,
+            qa_dimension_inspection_document_number:tr.querySelector('[name="insp_doc"]').value || null,
+            dimension_inspection_sample_sent_at:    tr.querySelector('[name="sample"]').value || null,
+            arrived_at:         tr.querySelector('[name="arrived"]').value || null,
+            capitalization_date:tr.querySelector('[name="capital"]').value || null,
+            memo:               tr.querySelector('[name="memo"]').value || null,
+          });
+        });
+
+        const res = await fetch("./php/handover/update_die_handover.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(rows),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          alert(`${result.updated}件 保存しました。`);
+          checkedIds.clear();
+          cancelEditMode();
+          await loadTable();
+        } else {
+          alert("保存に失敗しました。");
+        }
+      }
+
+      /* ============================================================
+        データ読み込み
+      ============================================================ */
       async function loadTable() {
-        const params = new URLSearchParams();
+        const res = await fetch("./php/handover/get_die_handover_list.php");
+        window._tableData = await res.json();
+        renderTable(window._tableData);
+        updateCheckedCount();
+      }
 
-        params.append("die_id", document.getElementById("filterDie").value);
-        params.append("start", document.getElementById("filterStart").value);
-        params.append("end", document.getElementById("filterEnd").value);
-        params.append(
-          "date_col",
-          document.getElementById("filterDateColumn").value,
-        );
+      /* ============================================================
+        テーブル描画
+      ============================================================ */
+      let sortCol = "";
+      let sortDir = "asc";
 
-        const res = await fetch(
-          "./php/handover/get_die_handover_list.php?" + params.toString(),
-        );
-        let data = await res.json();
-
+      function renderTable(data) {
+        const sorted = [...data];
         if (sortCol) {
-          data.sort((a, b) => {
-            let v1 = a[sortCol] || "";
-            let v2 = b[sortCol] || "";
-
+          sorted.sort((a, b) => {
+            const v1 = a[sortCol] || "";
+            const v2 = b[sortCol] || "";
             if (sortDir === "asc") return v1 > v2 ? 1 : -1;
             else return v1 < v2 ? 1 : -1;
           });
@@ -223,50 +433,87 @@
         const tbody = document.querySelector("#handoverTable tbody");
         tbody.innerHTML = "";
 
-        data.forEach((row) => {
+        sorted.forEach((row) => {
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-          <td>${row.die_number}</td>
-          <td>${row.pn ?? ""}</td>
-          <td>${row.press_condition_document_completion_at ?? ""}</td>
-          <td>${row.qa_dimension_inspection_completed_at ?? ""}</td>
-          <td>${row.qa_dimension_inspection_document_number ?? ""}</td>
-          <td>${row.dimension_inspection_sample_sent_at ?? ""}</td>
-          <td>${row.arrived_at ?? ""}</td>
-          <td>${row.capitalization_date ?? ""}</td>
-          <td>${row.memo ?? ""}</td>
-        `;
+          tr.dataset.id = row.id;
+          const isChecked = checkedIds.has(Number(row.id));
+          if (isChecked) tr.classList.add("checked-row");
+
+          if (isEditMode) {
+            // 編集モード：inputで表示
+            const rawDate = (val) => val ? String(val).split(" ")[0] : "";
+            tr.innerHTML = `
+              <td class="col-check">
+                <input type="checkbox" checked disabled />
+              </td>
+              <td class="die-number">${row.die_number ?? ""}</td>
+              <td class="die-number">${row.original_pn ?? ""}</td>
+              <td><input type="date" name="press_cond" value="${rawDate(row.press_condition_document_completion_at)}" /></td>
+              <td><input type="date" name="dim_insp"   value="${rawDate(row.qa_dimension_inspection_completed_at)}" /></td>
+              <td><input type="text" name="insp_doc"   value="${row.qa_dimension_inspection_document_number ?? ""}" /></td>
+              <td><input type="date" name="sample"     value="${rawDate(row.dimension_inspection_sample_sent_at)}" /></td>
+              <td><input type="date" name="arrived"    value="${rawDate(row.arrived_at)}" /></td>
+              <td><input type="date" name="capital"    value="${rawDate(row.capitalization_date)}" /></td>
+              <td class="td-memo"><textarea name="memo">${row.memo ?? ""}</textarea></td>
+            `;
+          } else {
+            // 通常モード：テキスト表示
+            tr.innerHTML = `
+              <td class="col-check">
+                <input type="checkbox" ${isChecked ? "checked" : ""}
+                  onchange="toggleCheck(${row.id}, this.checked)" />
+              </td>
+              <td class="die-number">${row.die_number ?? ""}</td>
+              <td class="die-number">${row.original_pn ?? ""}</td>
+              <td>${formatDate(row.press_condition_document_completion_at)}</td>
+              <td>${formatDate(row.qa_dimension_inspection_completed_at)}</td>
+              <td>${row.qa_dimension_inspection_document_number ?? ""}</td>
+              <td>${formatDate(row.dimension_inspection_sample_sent_at)}</td>
+              <td>${formatDate(row.arrived_at)}</td>
+              <td>${formatDate(row.capitalization_date)}</td>
+              <td class="td-memo">${row.memo ?? ""}</td>
+            `;
+          }
+
           tbody.appendChild(tr);
         });
       }
 
-      function applyFilter() {
-        loadTable();
-      }
-
+      /* ============================================================
+        ソート
+      ============================================================ */
       document.querySelectorAll("th[data-col]").forEach((th) => {
         th.addEventListener("click", () => {
+          if (isEditMode) return;
           const col = th.dataset.col;
-
           if (sortCol === col) {
             sortDir = sortDir === "asc" ? "desc" : "asc";
           } else {
             sortCol = col;
             sortDir = "asc";
           }
-
-          document
-            .querySelectorAll(".sort-icon")
-            .forEach((i) => (i.textContent = ""));
-          th.querySelector(".sort-icon").textContent =
-            sortDir === "asc" ? "▲" : "▼";
-
-          loadTable();
+          document.querySelectorAll(".sort-icon").forEach((i) => (i.textContent = ""));
+          th.querySelector(".sort-icon").textContent = sortDir === "asc" ? "▲" : "▼";
+          if (window._tableData) renderTable(window._tableData);
         });
       });
 
+      /* ============================================================
+        型番検索
+      ============================================================ */
+      document.getElementById("searchDie").addEventListener("input", function () {
+        const keyword = this.value.trim().toUpperCase();
+        const filtered = (window._tableData || []).filter((row) =>
+          (row.die_number ?? "").toUpperCase().startsWith(keyword),
+        );
+        renderTable(filtered);
+      });
+
+      /* ============================================================
+        初期ロード
+      ============================================================ */
       window.onload = () => {
-        loadDieList();
+        setLang(currentLang);
         loadTable();
       };
     </script>
