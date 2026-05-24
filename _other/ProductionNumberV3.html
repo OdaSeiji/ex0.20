@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Production Number Page</title>
+    <link rel="stylesheet" href="./css/main.css" />
+    <link rel="stylesheet" href="./css/ProductionNumberV3.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <header>
+      <div>
+        <img id="language__mark" src="./img/En.png" alt="Lang" />
+      </div>
+      <div><div class="title__letters" id="mode_display"></div></div>
+      <div>
+        <div>ProductionNumberV3</div>
+      </div>
+      <div>
+        <div>
+          <div id="summary__table_record">123 items</div>
+        </div>
+      </div>
+      <div>
+        <img id="window_close__mark" src="./img/close.png" alt="close button" />
+      </div>
+    </header>
+
+    <div class="main__wrapper">
+      <div class="top__wrapper">
+        <div class="input__wrapper">
+          <div class="title__wrapper">
+            <div class="title__letters">Production Number</div>
+          </div>
+          <input
+            id="production_number"
+            class="save-data need-clear input-required"
+            type="text"
+          />
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper">
+            <div class="title__letters">Drawn Depertment</div>
+          </div>
+          <select
+            id="drawn_department"
+            class="save-data need-clear input-required"
+          >
+            <option value="0">no</option>
+            <option value="1">Dev. 1</option>
+            <option value="2">Dev. 2</option>
+            <option value="3">Dev. 3</option>
+            <option value="4">Dev. 4</option>
+            <option value="5">Dev. 5</option>
+            <option value="6">Dev. 6</option>
+            <option value="7">Dev. 7</option>
+            <option value="8">Dev. 8</option>
+            <option value="9">Dev. 9</option>
+            <option value="11">Dev. 11</option>
+          </select>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Material</div>
+          <select
+            id="billet_material_id"
+            class="save-data need-clear input-required"
+          >
+            <option value="0">no</option>
+            <option value="1">A6061</option>
+            <option value="2">A6063</option>
+            <option value="3">A6N01A</option>
+            <option value="4">A6N01</option>
+          </select>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Aging</div>
+          <select
+            id="aging_type_id"
+            class="save-data need-clear input-required"
+          >
+            <option value="0">no</option>
+            <option value="1">O</option>
+            <option value="2">T5</option>
+            <option value="3">T6</option>
+          </select>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Production Length</div>
+          <div class="input-sub__wrapper">
+            <input
+              type="text"
+              id="production_length"
+              class="save-data need-clear input-required"
+            />
+            <div class="unit__wrapper">
+              <div>m</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Circumscribed Circle</div>
+          <div class="input-sub__wrapper">
+            <input
+              type="text"
+              id="circumscribed_circle"
+              class="save-data need-clear"
+            />
+            <div class="unit__wrapper">
+              <div>mm</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Specific Weight</div>
+          <div class="input-sub__wrapper">
+            <input
+              type="text"
+              id="specific_weight"
+              class="save-data need-clear input-required"
+            />
+            <div class="unit__wrapper">
+              <div>kg/m</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Cross Section Area</div>
+          <div class="input-sub__wrapper">
+            <input
+              type="text"
+              id="cross_section_area"
+              class="save-data need-clear input-required"
+            />
+            <div class="unit__wrapper">
+              <div>mm2</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Packing Qty</div>
+          <div class="input-sub__wrapper">
+            <input
+              type="text"
+              id="packing_quantity"
+              class="save-data need-clear input-required"
+            />
+            <div class="unit__wrapper">
+              <div>pic</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Packing Spec</div>
+          <div class="packing_spec__wrapper">
+            <input
+              type="text"
+              id="packing_row"
+              class="save-data need-clear input-required"
+            />
+            <div>
+              <div>X</div>
+            </div>
+            <input
+              type="text"
+              id="packing_column"
+              class="save-data need-clear input-required"
+            />
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Hardness</div>
+          <div class="input-sub__wrapper">
+            <input type="text" id="hardness" class="save-data need-clear" />
+            <div class="unit__wrapper">
+              <div>HRF</div>
+            </div>
+          </div>
+        </div>
+        <div class="input__wrapper">
+          <div class="title__wrapper title__letters">Hardness note</div>
+          <div class="input-sub__wrapper">
+            <input type="text" id="hardness_note" class="save-data need-clear" />
+            <div class="unit__wrapper">
+              <div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="category__wrapper">
+          <table class="category__table" id="category1__table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th colspan="2">
+                  <div class="title__letters">Category 1</div>
+                </th>
+              </tr>
+              <tr>
+                <th>id</th>
+                <th>note</th>
+                <th>qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="category__wrapper">
+          <table class="category__table" id="category2__table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th colspan="2">
+                  <div class="title__letters">Category 2</div>
+                </th>
+              </tr>
+              <tr>
+                <th>id</th>
+                <th>note</th>
+                <th>qty</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="button__wrapper">
+        <button id="save__button" disabled>
+          <div class="title__letters">Save</div>
+        </button>
+        <button id="update__button" disabled>
+          <div class="title__letters">Update</div>
+        </button>
+        <button id="clipboard__button">
+          <div class="title__letters">from Clipboard</div>
+        </button>
+        <button id="edit_category__button">
+          <div class="title__letters">Edit Category</div>
+        </button>
+        <button id="copyToClipboard__button">
+          <!-- <div class="title__letters"> -->
+          <div></div>
+          <div class="title__letters">Clipboard</div>
+          <div>
+            <img id="clipboard__mark" src="./img/bx-clipboard.png" alt="clip" />
+          </div>
+          <!-- </div> -->
+        </button>
+        <!-- <button id="test__button">Test</button> -->
+      </div>
+      <div class="table__wrapper">
+        <table class="summary__table" id="summary__table">
+          <thead>
+            <tr>
+              <th>id</th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>cate 1</div>
+                  <div class="sort_img">
+                    <img id="table_arrow__img" src="./img/arrow_down.png" />
+                  </div>
+                </div>
+              </th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>cate 2</div>
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>PN</div>
+                  <input id="production_number_sort" class="" type="text" />
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <th>Dpt</th>
+              <th>Mtrl</th>
+              <th>Agi</th>
+              <th>Area</th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>Wght</div>
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <th>W_Len</th>
+              <th>Pack</th>
+              <th>col</th>
+              <th>row</th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>Hardness</div>
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>Note</div>
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <th class="sort">
+                <div class="sort">
+                  <div></div>
+                  <div>crt</div>
+                  <div class="sort_img"></div>
+                </div>
+              </th>
+              <!-- <th>BiletBandl</th> -->
+            </tr>
+          </thead>
+          <tbody id="summary__table_body">
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <dialog id="delete__dialog">
+      <div>
+        <div id="dialog_title__wrapper">
+          <div>Delete? Tẩy xóa?</div>
+        </div>
+        <button id="dialog-cancel__button">
+          Cancel <br />
+          Hủy bỏ
+        </button>
+        <div id="dialog_input__wapper">
+          <div id="dialog_input__title">Emploee No</div>
+          <input id="emploee_number" type="text" />
+        </div>
+        <button id="dialog-delete__button" disabled>Del</button>
+      </div>
+    </dialog>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./scr/ProdcutionNumberV3.js"></script>
+  </body>
+</html>

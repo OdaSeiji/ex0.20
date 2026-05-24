@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>品番管理</title>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1300px; margin: 0 auto; }
+
+      /* ── ヘッダー ── */
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+      .new-btn {
+        background: #2e7d32; color: #fff;
+        padding: 8px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
+      }
+
+      /* ── フォームカード ── */
+      .form-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 22px 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        display: none;
+      }
+      .form-card.open { display: block; }
+
+      .form-title {
+        font-size: 15px; font-weight: bold; color: #1565c0;
+        margin-bottom: 18px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+      }
+      .form-title.edit { color: #e65100; }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px 20px;
+        margin-bottom: 20px;
+      }
+      .form-group { display: flex; flex-direction: column; gap: 4px; }
+      .form-group.span2 { grid-column: span 2; }
+
+      label.f-label { font-size: 12px; font-weight: bold; color: #555; }
+
+      input[type="text"],
+      select.f-select {
+        padding: 7px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+
+      /* ── カテゴリ選択 ── */
+      .cat-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .cat-card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; max-height: 220px; display: flex; flex-direction: column; }
+      .cat-title { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0; }
+      .cat-scroll { overflow-y: auto; flex: 1; }
+      .cat-table { width: 100%; border-collapse: collapse; }
+      .cat-table td { padding: 7px 12px; font-size: 13px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
+      .cat-table tr:hover td { background: #f7f9ff; }
+      .cat-table tr.selected td { background: #e8f1ff; font-weight: bold; color: #1565c0; }
+      .cat-hint { font-size: 11px; color: #c62828; padding: 4px 12px; display: none; flex-shrink: 0; }
+      .cat-hint.show { display: block; }
+
+      /* ── フォームボタン ── */
+      .form-actions {
+        display: flex; justify-content: flex-end; gap: 10px;
+        padding-top: 16px; border-top: 1px solid #eee;
+      }
+      .btn-cancel { padding: 8px 18px; background: #9e9e9e; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+      .btn-save   { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-delete { padding: 8px 18px; background: #c62828; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-right: auto; }
+
+      /* ── 一覧カード ── */
+      .list-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      .list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+      .list-header h2 { font-size: 15px; color: #333; }
+      .count-label { font-size: 12px; color: #888; }
+      .search-input {
+        padding: 6px 12px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; width: 220px; margin-left: auto;
+      }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 9px 12px; border-bottom: 1px solid #eee; text-align: left; }
+      th {
+        background: #e8f1ff; font-weight: bold; color: #333;
+        white-space: nowrap; user-select: none;
+      }
+      th.sortable { cursor: pointer; }
+      th.sortable:hover { background: #d0e4ff; }
+      .sort-icon { font-size: 10px; margin-left: 3px; color: #999; }
+      tr:hover { background: #f7f9ff; }
+
+      .edit-btn {
+        padding: 4px 12px; background: #1565c0; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+      }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- ヘッダー -->
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1 data-key="title">品番管理</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+        <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
+      </div>
+
+      <!-- フォームカード -->
+      <div class="form-card" id="formCard">
+        <div class="form-title" id="formTitle">✚ 新規登録</div>
+        <input type="hidden" id="fId" />
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_pn">品番 *</label>
+            <input type="text" id="fPn" placeholder="例: ABC-001" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_dept">図面部門</label>
+            <select class="f-select" id="fDept">
+              <option value="0">—</option>
+              <option value="1">Dev. 1</option>
+              <option value="2">Dev. 2</option>
+              <option value="3">Dev. 3</option>
+              <option value="4">Dev. 4</option>
+              <option value="5">Dev. 5</option>
+              <option value="6">Dev. 6</option>
+              <option value="7">Dev. 7</option>
+              <option value="8">Dev. 8</option>
+              <option value="9">Dev. 9</option>
+              <option value="11">Dev. 11</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_material">材質</label>
+            <select class="f-select" id="fMaterial">
+              <option value="0">—</option>
+              <option value="1">A6061</option>
+              <option value="2">A6063</option>
+              <option value="3">A6N01A</option>
+              <option value="4">A6N01</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_aging">時効処理</label>
+            <select class="f-select" id="fAging">
+              <option value="0">—</option>
+              <option value="1">O</option>
+              <option value="2">T5</option>
+              <option value="3">T6</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_length">製品長 (m)</label>
+            <input type="text" id="fLength" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_circle">外接円 (mm)</label>
+            <input type="text" id="fCircle" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_weight">比重 (kg/m)</label>
+            <input type="text" id="fWeight" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_area">断面積 (mm²)</label>
+            <input type="text" id="fArea" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_pack_qty">梱包数 (個)</label>
+            <input type="text" id="fPackQty" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_pack_row">梱包 行</label>
+            <input type="text" id="fPackRow" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_pack_col">梱包 列</label>
+            <input type="text" id="fPackCol" />
+          </div>
+          <div class="form-group">
+            <label class="f-label" data-key="lbl_hardness">硬さ (HRF)</label>
+            <input type="text" id="fHardness" />
+          </div>
+          <div class="form-group span2">
+            <label class="f-label" data-key="lbl_hardness_note">硬さ備考</label>
+            <input type="text" id="fHardnessNote" />
+          </div>
+        </div>
+
+        <!-- カテゴリ選択 -->
+        <div class="cat-wrap">
+          <div class="cat-card">
+            <div class="cat-title" data-key="lbl_cat1">カテゴリ1 *</div>
+            <div class="cat-scroll">
+              <table class="cat-table"><tbody id="cat1Tbody"></tbody></table>
+            </div>
+            <div class="cat-hint" id="cat1Hint" data-key="hint_cat">選択してください</div>
+          </div>
+          <div class="cat-card">
+            <div class="cat-title" data-key="lbl_cat2">カテゴリ2 *</div>
+            <div class="cat-scroll">
+              <table class="cat-table"><tbody id="cat2Tbody"></tbody></table>
+            </div>
+            <div class="cat-hint" id="cat2Hint" data-key="hint_cat">選択してください</div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteRecord()" data-key="btn_delete">削除</button>
+          <button class="btn-cancel" onclick="closeForm()" data-key="btn_cancel">キャンセル</button>
+          <button class="btn-save"   id="saveBtn"   onclick="saveForm()"   data-key="btn_save">登録する</button>
+        </div>
+      </div>
+
+      <!-- 一覧 -->
+      <div class="list-card">
+        <div class="list-header">
+          <h2 data-key="list_title">品番一覧</h2>
+          <span class="count-label" id="countLabel"></span>
+          <input type="text" class="search-input" id="searchInput"
+            placeholder="品番で絞り込み..." oninput="filterTable(this.value)" />
+        </div>
+        <table id="mainTable">
+          <thead>
+            <tr>
+              <th class="sortable" onclick="sortBy('id')">No<span class="sort-icon" data-sortkey="id">↕</span></th>
+              <th class="sortable" onclick="sortBy('cat1')" data-key="col_cat1">カテゴリ1<span class="sort-icon" data-sortkey="cat1">↕</span></th>
+              <th class="sortable" onclick="sortBy('cat2')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="cat2">↕</span></th>
+              <th class="sortable" onclick="sortBy('production_number')" data-key="col_pn">品番<span class="sort-icon" data-sortkey="production_number">↕</span></th>
+              <th data-key="col_material">材質</th>
+              <th data-key="col_aging">時効</th>
+              <th data-key="col_area">断面積 (mm²)</th>
+              <th data-key="col_weight">比重 (kg/m)</th>
+              <th data-key="col_length">製品長 (m)</th>
+              <th data-key="col_action">操作</th>
+            </tr>
+          </thead>
+          <tbody id="mainTbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          title: "品番管理",
+          btn_new: "＋ 新規登録",
+          btn_save: "登録する",
+          btn_update: "更新する",
+          btn_cancel: "キャンセル",
+          btn_delete: "削除",
+          list_title: "品番一覧",
+          lbl_pn: "品番 *",
+          lbl_dept: "図面部門",
+          lbl_material: "材質",
+          lbl_aging: "時効処理",
+          lbl_length: "製品長 (m)",
+          lbl_circle: "外接円 (mm)",
+          lbl_weight: "比重 (kg/m)",
+          lbl_area: "断面積 (mm²)",
+          lbl_pack_qty: "梱包数 (個)",
+          lbl_pack_row: "梱包 行",
+          lbl_pack_col: "梱包 列",
+          lbl_hardness: "硬さ (HRF)",
+          lbl_hardness_note: "硬さ備考",
+          lbl_cat1: "カテゴリ1 *",
+          lbl_cat2: "カテゴリ2 *",
+          hint_cat: "選択してください",
+          col_cat1: "カテゴリ1",
+          col_cat2: "カテゴリ2",
+          col_pn: "品番",
+          col_material: "材質",
+          col_aging: "時効",
+          col_area: "断面積 (mm²)",
+          col_weight: "比重 (kg/m)",
+          col_length: "製品長 (m)",
+          col_action: "操作",
+        },
+        vi: {
+          title: "Quản lý mã sản phẩm",
+          btn_new: "＋ Thêm mới",
+          btn_save: "Lưu",
+          btn_update: "Cập nhật",
+          btn_cancel: "Hủy",
+          btn_delete: "Xóa",
+          list_title: "Danh sách mã sản phẩm",
+          lbl_pn: "Mã SP *",
+          lbl_dept: "Bộ phận thiết kế",
+          lbl_material: "Vật liệu",
+          lbl_aging: "Xử lý lão hóa",
+          lbl_length: "Chiều dài SP (m)",
+          lbl_circle: "Đường tròn ngoại tiếp (mm)",
+          lbl_weight: "Trọng lượng riêng (kg/m)",
+          lbl_area: "Diện tích tiết diện (mm²)",
+          lbl_pack_qty: "Số lượng đóng gói (cái)",
+          lbl_pack_row: "Hàng đóng gói",
+          lbl_pack_col: "Cột đóng gói",
+          lbl_hardness: "Độ cứng (HRF)",
+          lbl_hardness_note: "Ghi chú độ cứng",
+          lbl_cat1: "Danh mục 1 *",
+          lbl_cat2: "Danh mục 2 *",
+          hint_cat: "Vui lòng chọn",
+          col_cat1: "Danh mục 1",
+          col_cat2: "Danh mục 2",
+          col_pn: "Mã SP",
+          col_material: "Vật liệu",
+          col_aging: "Lão hóa",
+          col_area: "Tiết diện (mm²)",
+          col_weight: "TL riêng (kg/m)",
+          col_length: "Dài (m)",
+          col_action: "Thao tác",
+        },
+      };
+
+      function setLang(lang) {
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        localStorage.setItem("lang", lang);
+      }
+
+      /* ── Toast ── */
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2200);
+      }
+
+      /* ── マスタ定数 ── */
+      const MATERIAL = { "1":"A6061", "2":"A6063", "3":"A6N01A", "4":"A6N01" };
+      const AGING    = { "1":"O", "2":"T5", "3":"T6" };
+
+      /* ── POST helper ── */
+      async function postForm(url, params) {
+        const res = await fetch(url, {
+          method:  "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body:    new URLSearchParams(params).toString(),
+        });
+        return res.json();
+      }
+
+      /* ── 状態 ── */
+      let allData       = [];
+      let sortKey       = "";
+      let sortAsc       = true;
+      let editingId     = null;
+      let selectedCat1Id = null;
+      let selectedCat2Id = null;
+
+      /* ════════════════════════════
+         一覧
+      ════════════════════════════ */
+      async function loadList() {
+        allData = await postForm("./php/ProductionNumber/SelSummaryV3.php", { dummy: "dummy" });
+        renderTable(allData);
+      }
+
+      function renderTable(data) {
+        document.getElementById("countLabel").textContent = `${data.length} 件`;
+        const tbody = document.getElementById("mainTbody");
+        tbody.innerHTML = "";
+
+        if (!data.length) {
+          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          return;
+        }
+
+        data.forEach((row) => {
+          /* カテゴリ名：PHPが返すキー名に合わせて複数候補を試みる */
+          const cat1 = row.category1_name ?? row.category1 ?? row.cate1 ?? "—";
+          const cat2 = row.category2_name ?? row.category2 ?? row.cate2 ?? "—";
+          const mat  = row.material_name  ?? MATERIAL[String(row.billet_material_id)] ?? "—";
+          const agi  = row.aging_name     ?? AGING[String(row.aging_type_id)]         ?? "—";
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.id}</td>
+            <td>${cat1}</td>
+            <td>${cat2}</td>
+            <td><strong>${row.production_number ?? ""}</strong></td>
+            <td>${mat}</td>
+            <td>${agi}</td>
+            <td>${row.cross_section_area ?? "—"}</td>
+            <td>${row.specific_weight    ?? "—"}</td>
+            <td>${row.production_length  ?? "—"}</td>
+            <td><button class="edit-btn" onclick="openEditForm(${row.id})">✏ 編集</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* 絞り込み */
+      function filterTable(q) {
+        q = q.toUpperCase();
+        renderTable(allData.filter((r) =>
+          String(r.production_number ?? "").toUpperCase().includes(q)
+        ));
+      }
+
+      /* ソート */
+      function sortBy(key) {
+        if (sortKey === key) sortAsc = !sortAsc;
+        else { sortKey = key; sortAsc = true; }
+
+        document.querySelectorAll(".sort-icon").forEach((el) => el.textContent = "↕");
+        const icon = document.querySelector(`.sort-icon[data-sortkey="${key}"]`);
+        if (icon) icon.textContent = sortAsc ? "↑" : "↓";
+
+        const sorted = [...allData].sort((a, b) => {
+          let va = a[key] ?? "", vb = b[key] ?? "";
+          const n = Number(va) - Number(vb);
+          const result = (!isNaN(va) && !isNaN(vb) && va !== "")
+            ? n
+            : String(va).localeCompare(String(vb), "ja");
+          return sortAsc ? result : -result;
+        });
+        renderTable(sorted);
+      }
+
+      /* ════════════════════════════
+         カテゴリ
+      ════════════════════════════ */
+      async function loadCat1() {
+        const data = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
+        const tbody = document.getElementById("cat1Tbody");
+        tbody.innerHTML = "";
+        data.forEach((row) => {
+          const vals = Object.values(row);
+          const id   = vals[0];
+          const name = vals[1] ?? "";
+          const tr   = document.createElement("tr");
+          tr.dataset.id  = id;
+          tr.innerHTML   = `<td>${id}</td><td>${name}</td>`;
+          tr.onclick     = () => onCat1Click(id, tr);
+          tbody.appendChild(tr);
+        });
+      }
+
+      async function onCat1Click(id, tr) {
+        document.querySelectorAll("#cat1Tbody tr.selected").forEach((r) => r.classList.remove("selected"));
+        tr.classList.add("selected");
+        selectedCat1Id = id;
+        document.getElementById("cat1Hint").classList.remove("show");
+
+        const data = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: id });
+        const tbody = document.getElementById("cat2Tbody");
+        tbody.innerHTML = "";
+        selectedCat2Id = null;
+        data.forEach((row) => {
+          const vals = Object.values(row);
+          const cid  = vals[0];
+          const name = vals[1] ?? "";
+          const tr2  = document.createElement("tr");
+          tr2.dataset.id = cid;
+          tr2.innerHTML  = `<td>${cid}</td><td>${name}</td>`;
+          tr2.onclick    = () => onCat2Click(cid, tr2);
+          tbody.appendChild(tr2);
+        });
+      }
+
+      function onCat2Click(id, tr) {
+        document.querySelectorAll("#cat2Tbody tr.selected").forEach((r) => r.classList.remove("selected"));
+        tr.classList.add("selected");
+        selectedCat2Id = id;
+        document.getElementById("cat2Hint").classList.remove("show");
+      }
+
+      /* ════════════════════════════
+         フォーム
+      ════════════════════════════ */
+      function openNewForm() {
+        resetForm();
+        editingId = null;
+        const lang = localStorage.getItem("lang") || "ja";
+        document.getElementById("formTitle").textContent = "✚ " + (lang === "vi" ? "Thêm mới" : "新規登録");
+        document.getElementById("formTitle").className   = "form-title";
+        document.getElementById("deleteBtn").style.display = "none";
+        document.getElementById("saveBtn").textContent   = dict[lang].btn_save;
+        document.getElementById("formCard").classList.add("open");
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+      }
+
+      async function openEditForm(id) {
+        resetForm();
+        editingId = id;
+
+        const data = await postForm("./php/ProductionNumber/SelSelSummaryV3.php", { targetId: id });
+        if (!data.length) return;
+        const r    = data[0];
+        const lang = localStorage.getItem("lang") || "ja";
+
+        document.getElementById("formTitle").textContent = `✏ ${lang === "vi" ? "Đang chỉnh sửa" : "編集中"}：${r.production_number}`;
+        document.getElementById("formTitle").className   = "form-title edit";
+        document.getElementById("deleteBtn").style.display = "";
+        document.getElementById("saveBtn").textContent   = dict[lang].btn_update;
+        document.getElementById("fId").value             = id;
+
+        document.getElementById("fPn").value           = r.production_number    ?? "";
+        document.getElementById("fDept").value         = r.drawn_department     ?? "0";
+        document.getElementById("fMaterial").value     = r.billet_material_id   ?? "0";
+        document.getElementById("fAging").value        = r.aging_type_id        ?? "0";
+        document.getElementById("fLength").value       = r.production_length    ?? "";
+        document.getElementById("fCircle").value       = r.circumscribed_circle ?? "";
+        document.getElementById("fWeight").value       = r.specific_weight      ?? "";
+        document.getElementById("fArea").value         = r.cross_section_area   ?? "";
+        document.getElementById("fPackQty").value      = r.packing_quantity     ?? "";
+        document.getElementById("fPackRow").value      = r.packing_row          ?? "";
+        document.getElementById("fPackCol").value      = r.packing_column       ?? "";
+        document.getElementById("fHardness").value     = r.hardness             ?? "";
+        document.getElementById("fHardnessNote").value = r.hardness_note        ?? "";
+
+        /* カテゴリ選択を復元 */
+        await restoreCategories(id, r.production_category2_id ?? null);
+
+        document.getElementById("formCard").classList.add("open");
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+      }
+
+      async function restoreCategories(targetId, cat2Id) {
+        const d1 = await postForm("./php/ProductionNumber/SelCate2_1.php", { targetId });
+        if (!d1.length) return;
+
+        const cat1Id = d1[0].category1_id;
+        const cat1Rows = document.querySelectorAll("#cat1Tbody tr");
+        let cat1Tr = null;
+        cat1Rows.forEach((tr) => { if (String(tr.dataset.id) === String(cat1Id)) cat1Tr = tr; });
+        if (cat1Tr) await onCat1Click(cat1Id, cat1Tr);
+
+        if (cat2Id) {
+          const cat2Rows = document.querySelectorAll("#cat2Tbody tr");
+          cat2Rows.forEach((tr) => {
+            if (String(tr.dataset.id) === String(cat2Id)) onCat2Click(cat2Id, tr);
+          });
+        }
+      }
+
+      function closeForm() {
+        document.getElementById("formCard").classList.remove("open");
+        resetForm();
+      }
+
+      function resetForm() {
+        ["fId","fPn","fLength","fCircle","fWeight","fArea",
+         "fPackQty","fPackRow","fPackCol","fHardness","fHardnessNote"]
+          .forEach((id) => { document.getElementById(id).value = ""; });
+        document.getElementById("fDept").value     = "0";
+        document.getElementById("fMaterial").value = "0";
+        document.getElementById("fAging").value    = "0";
+
+        document.querySelectorAll("#cat1Tbody tr.selected, #cat2Tbody tr.selected")
+          .forEach((tr) => tr.classList.remove("selected"));
+        document.getElementById("cat2Tbody").innerHTML = "";
+        document.getElementById("cat1Hint").classList.remove("show");
+        document.getElementById("cat2Hint").classList.remove("show");
+        selectedCat1Id = null;
+        selectedCat2Id = null;
+      }
+
+      /* ════════════════════════════
+         保存 / 削除
+      ════════════════════════════ */
+      async function saveForm() {
+        const pn = document.getElementById("fPn").value.trim().toUpperCase();
+        if (!pn) { showToast("品番を入力してください", false); return; }
+
+        if (!selectedCat2Id) {
+          document.getElementById("cat1Hint").classList.toggle("show", !selectedCat1Id);
+          document.getElementById("cat2Hint").classList.add("show");
+          showToast("カテゴリを選択してください", false);
+          return;
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+        const params = {
+          production_number:       pn,
+          drawn_department:        document.getElementById("fDept").value,
+          billet_material_id:      document.getElementById("fMaterial").value,
+          aging_type_id:           document.getElementById("fAging").value,
+          production_length:       document.getElementById("fLength").value,
+          circumscribed_circle:    document.getElementById("fCircle").value,
+          specific_weight:         document.getElementById("fWeight").value,
+          cross_section_area:      document.getElementById("fArea").value,
+          packing_quantity:        document.getElementById("fPackQty").value,
+          packing_row:             document.getElementById("fPackRow").value,
+          packing_column:          document.getElementById("fPackCol").value,
+          hardness:                document.getElementById("fHardness").value,
+          hardness_note:           document.getElementById("fHardnessNote").value,
+          production_category2_id: selectedCat2Id,
+          targetId:                editingId ?? "",
+          updated_at:              today,
+        };
+
+        const url = editingId
+          ? "./php/ProductionNumber/UpdateSummaryV3.php"
+          : "./php/ProductionNumber/InsInputData3.php";
+
+        await postForm(url, params);
+        showToast(editingId ? "更新しました" : "登録しました");
+        closeForm();
+        loadList();
+      }
+
+      async function deleteRecord() {
+        if (!editingId) return;
+        if (!confirm("この品番を削除しますか？")) return;
+
+        await postForm("./php/ProductionNumber/DelSummary.php", { targetId: editingId });
+        showToast("削除しました");
+        closeForm();
+        loadList();
+      }
+
+      /* ── 初期化 ── */
+      window.onload = function () {
+        const lang = localStorage.getItem("lang") || "ja";
+        setLang(lang);
+        loadCat1();
+        loadList();
+      };
+    </script>
+  </body>
+</html>

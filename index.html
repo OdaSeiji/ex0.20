@@ -217,7 +217,7 @@
     <h1 id="title">トップメニュー</h1>
 
     <!-- 🏭 押出工程 -->
-    <div class="accordion" onclick="toggleAccordion(this)">🏭 押出工程</div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_press">🏭 押出工程</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div
@@ -234,9 +234,7 @@
     </div>
 
     <!-- 🧰 金型メンテナンス -->
-    <div class="accordion" onclick="toggleAccordion(this)">
-      🧰 金型メンテナンス
-    </div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_maintenance">🧰 金型メンテナンス</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
@@ -252,7 +250,7 @@
     </div>
 
     <!-- 📊 金型進捗管理 -->
-    <div class="accordion" onclick="toggleAccordion(this)">📊 金型進捗管理</div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_progress">📊 金型進捗管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div
@@ -298,7 +296,39 @@
       </div>
     </div>
 
-    <!-- ★★★ ここまで追加 ★★★ -->
+    <!-- ⚙️ 各種情報 -->
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_settings">⚙️ 各種設定</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'staff_settings.html'">
+          <img class="menu-icon" src="./img/wrench.svg" alt="" />
+          <div class="menu-title" data-key="staff_title">スタッフ設定</div>
+          <div class="menu-desc" data-key="staff_desc">
+            スタッフのロール・パスワードの管理
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_import.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="import_title">金型インポート</div>
+          <div class="menu-desc" data-key="import_desc">
+            CSVから金型を一括登録
+          </div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'production_number.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="pn_title">品番管理</div>
+          <div class="menu-desc" data-key="pn_desc">
+            品番の登録・編集・カテゴリ設定
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- 📊 測定ダッシュボード -->
     <div class="dashboard-section">
@@ -332,6 +362,7 @@
           section_press: "🏭 押出工程",
           section_maintenance: "🧰 金型メンテナンス",
           section_progress: "📊 金型進捗管理",
+          section_settings: "⚙️ 各種設定",
           dashboard_title: "📊 測定ダッシュボード（押出〇）",
 
           billet_title: "ビレット投入",
@@ -348,6 +379,12 @@
           handover_desc: "書類・検査・到着・資産化の進捗管理",
           watch_title: "重点管理金型リスト",
           watch_desc: "押出前を含む、重点管理が必要な金型の登録・管理",
+          staff_title: "スタッフ設定",
+          staff_desc: "スタッフのロール・パスワードの管理",
+          import_title: "金型インポート",
+          import_desc: "CSVから金型を一括登録",
+          pn_title: "品番管理",
+          pn_desc: "品番の登録・編集・カテゴリ設定",
 
           th_die: "金型",
           th_status: "測定",
@@ -365,6 +402,7 @@
           section_press: "🏭 Quy trình ép đùn",
           section_maintenance: "🧰 Bảo trì khuôn",
           section_progress: "📊 Tiến độ khuôn",
+          section_settings: "⚙️ Cài đặt chung",
           dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
 
           billet_title: "Nạp Billet",
@@ -383,6 +421,12 @@
             "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
           watch_desc: "Đăng ký và quản lý khuôn cần theo dõi, kể cả trước khi ép",
+          staff_title: "Cài đặt nhân viên",
+          staff_desc: "Quản lý vai trò và mật khẩu của nhân viên",
+          import_title: "Nhập khuôn",
+          import_desc: "Nhập hàng loạt khuôn từ file CSV",
+          pn_title: "Quản lý mã SP",
+          pn_desc: "Đăng ký, chỉnh sửa mã sản phẩm và danh mục",
 
           th_die: "Khuôn",
           th_status: "Kết quả",
