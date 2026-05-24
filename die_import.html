@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>金型 CSVインポート</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1100px; margin: 0 auto; }
+
+      /* ── ヘッダー ── */
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+
+      /* ── アップロードカード ── */
+      .upload-card {
+        background: #fff; border-radius: 10px;
+        padding: 22px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 14px; font-weight: bold; color: #1565c0;
+        margin-bottom: 14px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+      }
+      .upload-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .upload-row input[type="file"] {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; flex: 1; min-width: 200px;
+      }
+      .btn-upload {
+        background: #1565c0; color: #fff;
+        padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;
+        font-weight: bold; white-space: nowrap;
+      }
+      .csv-hint { font-size: 12px; color: #888; margin-top: 8px; }
+      .upload-result {
+        margin-top: 12px; padding: 10px 14px; border-radius: 6px;
+        font-size: 13px; display: none;
+      }
+      .upload-result.ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+      .upload-result.err { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+      /* ── 一覧カード ── */
+      .list-card {
+        background: #fff; border-radius: 10px;
+        padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .list-header {
+        display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+      }
+      .list-header h2 { font-size: 15px; color: #333; }
+      .list-header select {
+        padding: 5px 10px; border: 1px solid #ccc;
+        border-radius: 5px; font-size: 13px; margin-left: auto;
+      }
+      .count-label { font-size: 12px; color: #888; }
+
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 9px 12px; border-bottom: 1px solid #eee; font-size: 13px; text-align: left; }
+      th { background: #e8f1ff; font-weight: bold; color: #333; white-space: nowrap; }
+      tr.editing { background: #fff8e1 !important; }
+      tr:hover:not(.editing) { background: #f7f9ff; }
+
+      .mono { font-family: "Roboto Mono", monospace; }
+
+      /* バッジ */
+      .badge {
+        display: inline-block; padding: 3px 10px; border-radius: 4px;
+        font-size: 11px; font-weight: bold; color: #fff; white-space: nowrap;
+      }
+      .s-pending     { background: #1565c0; }
+      .s-transferred { background: #9e9e9e; }
+      .s-error       { background: #c62828; cursor: help; }
+
+      .pn-matched   { color: #2e7d32; font-weight: bold; }
+      .pn-raw       { color: #e65100; }
+      .pn-empty     { color: #aaa; }
+
+      .edit-btn {
+        padding: 4px 12px; background: #1565c0; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+      }
+      .edit-btn:disabled { background: #ccc; cursor: default; }
+
+      /* チェックボックス列 */
+      td input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+      td input[type="checkbox"]:disabled { cursor: default; }
+
+      /* ── 編集パネル ── */
+      .edit-panel {
+        background: #fffde7; border: 2px solid #f9a825;
+        border-radius: 10px; padding: 20px 24px;
+        margin-bottom: 20px; display: none;
+      }
+      .edit-panel.open { display: block; }
+      .edit-panel-title {
+        font-size: 14px; font-weight: bold; color: #e65100;
+        margin-bottom: 14px;
+        font-family: "Roboto Mono", monospace;
+      }
+      .edit-grid {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 12px 24px;
+      }
+      .edit-group { display: flex; flex-direction: column; gap: 4px; }
+      label.edit-label { font-size: 12px; font-weight: bold; color: #555; }
+      select.edit-select {
+        padding: 7px 10px; border: 1px solid #ccc;
+        border-radius: 5px; font-size: 13px;
+      }
+      .edit-actions {
+        display: flex; justify-content: flex-end; gap: 10px;
+        margin-top: 16px; padding-top: 14px; border-top: 1px solid #f0e0a0;
+      }
+      .btn-cancel-edit {
+        padding: 8px 18px; background: #9e9e9e; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer;
+      }
+      .btn-save-edit {
+        padding: 8px 22px; background: #e65100; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer; font-weight: bold;
+      }
+
+      /* ── 転送エリア ── */
+      .transfer-bar {
+        background: #fff; border-radius: 10px;
+        padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 16px;
+      }
+      .selected-count { font-size: 14px; color: #555; }
+      .btn-transfer {
+        background: #2e7d32; color: #fff;
+        padding: 10px 24px; border: none; border-radius: 5px;
+        cursor: pointer; font-weight: bold; font-size: 14px;
+        margin-left: auto;
+      }
+      .btn-transfer:disabled { background: #ccc; cursor: default; }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- ヘッダー -->
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1>金型 CSVインポート</h1>
+      </div>
+
+      <!-- ① CSVアップロード -->
+      <div class="upload-card">
+        <div class="card-title">① CSVアップロード</div>
+        <div class="upload-row">
+          <input type="file" id="csvFile" accept=".csv" />
+          <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
+        </div>
+        <p class="csv-hint">列順: A列 = budget_id　B列 = die_number　C列 = 品番（1行目はヘッダーとしてスキップ）</p>
+        <div class="upload-result" id="uploadResult"></div>
+      </div>
+
+      <!-- ② 一覧 -->
+      <div class="list-card">
+        <div class="list-header">
+          <h2>② インポート一覧</h2>
+          <span class="count-label" id="countLabel"></span>
+          <select id="flagSelect" onchange="loadList(this.value)">
+            <option value="pending">未転送のみ</option>
+            <option value="transferred">転送済のみ</option>
+            <option value="all">すべて</option>
+          </select>
+        </div>
+
+        <table id="importTable">
+          <thead>
+            <tr>
+              <th style="width:36px;"><input type="checkbox" id="checkAll" onchange="toggleAll(this.checked)" /></th>
+              <th>budget_id</th>
+              <th>die_number</th>
+              <th>品番</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- 編集パネル -->
+      <div class="edit-panel" id="editPanel">
+        <div class="edit-panel-title" id="editPanelTitle">編集中：</div>
+        <input type="hidden" id="editId" />
+        <div class="edit-grid">
+          <div class="edit-group">
+            <label class="edit-label">品番 *</label>
+            <select class="edit-select" id="ePn">
+              <option value="">-- 選択してください --</option>
+            </select>
+          </div>
+          <div class="edit-group">
+            <label class="edit-label">径 (mm)</label>
+            <select class="edit-select" id="eDiam" onchange="filterBolster()">
+              <option value="">-- 選択してください --</option>
+            </select>
+          </div>
+          <div class="edit-group">
+            <label class="edit-label">ビレットサイズ (インチ)</label>
+            <select class="edit-select" id="eBillet">
+              <option value="">-- 選択してください --</option>
+            </select>
+          </div>
+          <div class="edit-group">
+            <label class="edit-label">ボルスター</label>
+            <select class="edit-select" id="eBolster">
+              <option value="">-- 選択してください --</option>
+            </select>
+          </div>
+        </div>
+        <div class="edit-actions">
+          <button class="btn-cancel-edit" onclick="closeEdit()">キャンセル</button>
+          <button class="btn-save-edit" onclick="saveEdit()">保存</button>
+        </div>
+      </div>
+
+      <!-- ③ 転送 -->
+      <div class="transfer-bar">
+        <span class="selected-count" id="selectedCount">0 件選択中</span>
+        <button class="btn-transfer" id="transferBtn" onclick="transferSelected()" disabled>
+          選択した行を m_dies へ転送
+        </button>
+      </div>
+
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── マスタデータ ── */
+      let masters = { production_numbers: [], diameters: [], billet_sizes: [], bolsters: [] };
+
+      async function loadMasters() {
+        const res  = await fetch("./php/die_import/get_masters.php");
+        masters    = await res.json();
+
+        const ePn = document.getElementById("ePn");
+        masters.production_numbers.forEach((r) => {
+          ePn.insertAdjacentHTML("beforeend", `<option value="${r.id}">${r.production_number}</option>`);
+        });
+
+        const eDiam = document.getElementById("eDiam");
+        masters.diameters.forEach((r) => {
+          eDiam.insertAdjacentHTML("beforeend", `<option value="${r.id}">${r.die_diamater} mm</option>`);
+        });
+
+        const eBillet = document.getElementById("eBillet");
+        masters.billet_sizes.forEach((r) => {
+          eBillet.insertAdjacentHTML("beforeend", `<option value="${r.id}">${r.billet_size} インチ</option>`);
+        });
+
+        /* ボルスターは径選択後に動的フィルタ */
+        filterBolster();
+      }
+
+      /* 径が変わったらボルスター選択肢を絞り込む */
+      function filterBolster() {
+        const diamId  = document.getElementById("eDiam").value;
+        const current = document.getElementById("eBolster").value;
+        const sel     = document.getElementById("eBolster");
+        sel.innerHTML = '<option value="">-- 選択してください --</option>';
+
+        const list = diamId
+          ? masters.bolsters.filter((b) => String(b.diamater_id) === String(diamId))
+          : masters.bolsters;
+
+        list.forEach((b) => {
+          sel.insertAdjacentHTML("beforeend", `<option value="${b.id}">${b.bolster_name}</option>`);
+        });
+
+        /* 以前の選択を復元（径が変わった場合は無効になる） */
+        if (current) sel.value = current;
+      }
+
+      /* ── Toast ── */
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      }
+
+      /* ── CSVアップロード ── */
+      async function uploadCsv() {
+        const file = document.getElementById("csvFile").files[0];
+        if (!file) { showToast("ファイルを選択してください", false); return; }
+
+        const form = new FormData();
+        form.append("csv", file);
+
+        const res    = await fetch("./php/die_import/upload_csv.php", { method: "POST", body: form });
+        const result = await res.json();
+
+        const box = document.getElementById("uploadResult");
+        box.style.display = "block";
+
+        if (result.status === "ok") {
+          let html = `${result.inserted} 件取り込み完了`;
+          if (result.skipped > 0) html += `、${result.skipped} 件スキップ`;
+          if (result.errors.length) {
+            html += "<ul style='margin-top:6px;padding-left:18px;'>";
+            result.errors.forEach((e) => { html += `<li>${e}</li>`; });
+            html += "</ul>";
+          }
+          box.className = "upload-result " + (result.errors.length ? "err" : "ok");
+          box.innerHTML = html;
+          loadList(document.getElementById("flagSelect").value);
+        } else {
+          box.className = "upload-result err";
+          box.textContent = result.message || "取り込みに失敗しました";
+        }
+      }
+
+      /* ── 一覧読み込み ── */
+      async function loadList(flag = "pending") {
+        const res  = await fetch(`./php/die_import/get_import_list.php?flag=${flag}`);
+        const data = await res.json();
+
+        document.getElementById("countLabel").textContent = `${data.length} 件`;
+        document.getElementById("checkAll").checked = false;
+        updateSelectedCount();
+
+        const tbody = document.querySelector("#importTable tbody");
+        tbody.innerHTML = "";
+
+        if (!data.length) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          return;
+        }
+
+        data.forEach((row) => {
+          const isPending     = row.import_flag == 0;
+          const isTransferred = row.import_flag == 1;
+
+          /* 品番セル */
+          let pnHtml;
+          if (row.production_number) {
+            pnHtml = `<span class="pn-matched">✔ ${row.production_number}</span>`;
+          } else if (row.production_number_raw) {
+            pnHtml = `<span class="pn-raw">⚠ ${row.production_number_raw}（未マッチ）</span>`;
+          } else {
+            pnHtml = `<span class="pn-empty">—</span>`;
+          }
+
+          /* 状態バッジ */
+          let statusHtml;
+          if (isTransferred) {
+            statusHtml = `<span class="badge s-transferred">転送済</span>`;
+          } else if (row.import_error) {
+            statusHtml = `<span class="badge s-error" title="${row.import_error}">エラー</span>`;
+          } else {
+            statusHtml = `<span class="badge s-pending">未転送</span>`;
+          }
+
+          const tr = document.createElement("tr");
+          tr.dataset.id = row.id;
+          tr.innerHTML = `
+            <td><input type="checkbox" class="row-check" data-id="${row.id}"
+              ${!isPending ? "disabled" : ""}
+              onchange="updateSelectedCount()" /></td>
+            <td class="mono">${row.budget_id ?? "—"}</td>
+            <td class="mono">${row.die_number}</td>
+            <td>${pnHtml}</td>
+            <td>${statusHtml}</td>
+            <td><button class="edit-btn" onclick="openEdit(${JSON.stringify(row).replace(/"/g,'&quot;')})"
+              ${!isPending ? "disabled" : ""}>編集</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* ── 全選択 ── */
+      function toggleAll(checked) {
+        document.querySelectorAll(".row-check:not(:disabled)").forEach((cb) => {
+          cb.checked = checked;
+        });
+        updateSelectedCount();
+      }
+
+      function updateSelectedCount() {
+        const n = document.querySelectorAll(".row-check:checked").length;
+        document.getElementById("selectedCount").textContent = `${n} 件選択中`;
+        document.getElementById("transferBtn").disabled = n === 0;
+      }
+
+      /* ── 編集パネル ── */
+      function openEdit(row) {
+        /* 前の選択行のハイライト解除 */
+        document.querySelectorAll("tr.editing").forEach((tr) => tr.classList.remove("editing"));
+
+        /* 該当行ハイライト */
+        const tr = document.querySelector(`tr[data-id="${row.id}"]`);
+        if (tr) tr.classList.add("editing");
+
+        document.getElementById("editId").value         = row.id;
+        document.getElementById("editPanelTitle").textContent = `編集中：${row.die_number}`;
+
+        document.getElementById("ePn").value     = row.production_number_id ?? "";
+        document.getElementById("eDiam").value   = row.die_diamater_id ?? "";
+
+        /* 径に合わせてボルスターを絞り込んでから選択値を復元 */
+        filterBolster();
+        document.getElementById("eBolster").value = row.bolstar_id ?? "";
+        document.getElementById("eBillet").value  = row.billet_size_id ?? "";
+
+        document.getElementById("editPanel").classList.add("open");
+        document.getElementById("editPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+
+      function closeEdit() {
+        document.getElementById("editPanel").classList.remove("open");
+        document.querySelectorAll("tr.editing").forEach((tr) => tr.classList.remove("editing"));
+      }
+
+      async function saveEdit() {
+        const id = document.getElementById("editId").value;
+        if (!id) return;
+
+        const body = {
+          id,
+          production_number_id: document.getElementById("ePn").value     || null,
+          die_diamater_id:      document.getElementById("eDiam").value    || null,
+          billet_size_id:       document.getElementById("eBillet").value  || null,
+          bolstar_id:           document.getElementById("eBolster").value || null,
+        };
+
+        const res    = await fetch("./php/die_import/update_import_row.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast("保存しました");
+          closeEdit();
+          loadList(document.getElementById("flagSelect").value);
+        } else {
+          showToast(result.message || "保存に失敗しました", false);
+        }
+      }
+
+      /* ── 転送 ── */
+      async function transferSelected() {
+        const ids = [...document.querySelectorAll(".row-check:checked")].map((cb) => cb.dataset.id);
+        if (!ids.length) return;
+
+        if (!confirm(`${ids.length} 件を m_dies へ転送しますか？`)) return;
+
+        const res    = await fetch("./php/die_import/transfer_to_dies.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        });
+        const result = await res.json();
+
+        let msg = `${result.ok_count} 件転送完了`;
+        if (result.errors && result.errors.length) {
+          msg += `、${result.errors.length} 件エラー`;
+          showToast(msg, false);
+        } else {
+          showToast(msg);
+        }
+        loadList(document.getElementById("flagSelect").value);
+      }
+
+      /* ── 初期化 ── */
+      loadMasters();
+      loadList("pending");
+    </script>
+  </body>
+</html>
