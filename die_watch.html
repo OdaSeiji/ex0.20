@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>重点管理金型リスト</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      /* ── ヘッダー ── */
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .back-btn {
+        background: #2b6ca3;
+        color: #fff;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 {
+        font-size: 20px;
+        border-left: 6px solid #0078d4;
+        padding-left: 10px;
+      }
+      .new-btn {
+        margin-left: auto;
+        background: #2e7d32;
+        color: #fff;
+        padding: 8px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      /* ── フォームカード ── */
+      .form-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 22px 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        display: none;
+      }
+      .form-card.open { display: block; }
+
+      .form-title {
+        font-size: 15px;
+        font-weight: bold;
+        color: #1565c0;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #e8f1ff;
+        padding-bottom: 8px;
+      }
+      .form-title.edit { color: #e65100; }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px 24px;
+      }
+      .form-group { display: flex; flex-direction: column; gap: 4px; }
+      .form-group.full { grid-column: 1 / -1; }
+
+      label {
+        font-size: 12px;
+        font-weight: bold;
+        color: #555;
+      }
+      input[type="text"],
+      input[type="date"],
+      textarea,
+      select.form-select {
+        padding: 7px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 13px;
+        font-family: inherit;
+      }
+      input[readonly], input.readonly {
+        background: #f5f5f5;
+        color: #666;
+        cursor: default;
+      }
+      .mono { font-family: "Roboto Mono", monospace; }
+      textarea { resize: vertical; min-height: 60px; }
+
+      /* Die search */
+      .search-wrap { position: relative; }
+      .suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ccc;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+      }
+      .suggestion-item {
+        padding: 8px 10px;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: "Roboto Mono", monospace;
+      }
+      .suggestion-item:hover { background: #e8f1ff; }
+
+      /* Priority radio */
+      .radio-group {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 6px 0;
+      }
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        font-weight: normal;
+        cursor: pointer;
+      }
+      .radio-high   { color: #c62828; font-weight: bold; }
+      .radio-middle { color: #e65100; font-weight: bold; }
+      .radio-low    { color: #1565c0; font-weight: bold; }
+
+      /* Status radio (edit only) */
+      .status-group {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 6px 0;
+      }
+      .status-group label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 13px;
+        font-weight: normal;
+        cursor: pointer;
+      }
+
+      /* Form buttons */
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 16px;
+        border-top: 1px solid #eee;
+      }
+      .btn-cancel { padding: 8px 18px; background: #9e9e9e; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+      .btn-save   { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-delete { padding: 8px 18px; background: #c62828; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-right: auto; }
+
+      /* ── 一覧 ── */
+      .list-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      }
+      .list-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .list-header h2 { font-size: 15px; color: #333; }
+      .list-header select {
+        padding: 5px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 13px;
+        margin-left: auto;
+      }
+      .count-label { font-size: 12px; color: #888; }
+
+      table { width: 100%; border-collapse: collapse; }
+      th, td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+        text-align: left;
+      }
+      th {
+        background: #e8f1ff;
+        font-weight: bold;
+        color: #333;
+        white-space: nowrap;
+      }
+      tr:hover { background: #f7f9ff; }
+
+      .die-num { font-family: "Roboto Mono", monospace; }
+      .pn-num  { font-family: "Roboto Mono", monospace; color: #555; }
+
+      /* Priority badges */
+      .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .p-high   { background: #c62828; }
+      .p-middle { background: #e65100; }
+      .p-low    { background: #1565c0; }
+      .s-active { background: #2e7d32; }
+      .s-closed { background: #9e9e9e; }
+
+      .overdue { color: #c62828; font-weight: bold; }
+
+      .edit-btn {
+        padding: 4px 12px;
+        background: #1565c0;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .issue-btn {
+        padding: 4px 12px;
+        background: #e65100;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        margin-left: 6px;
+      }
+
+      /* Toast */
+      #toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #323232;
+        color: #fff;
+        padding: 10px 24px;
+        border-radius: 6px;
+        font-size: 13px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- ヘッダー -->
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1>重点管理金型リスト</h1>
+        <button class="new-btn" onclick="openNewForm()">＋ 新規登録</button>
+      </div>
+
+      <!-- フォームカード -->
+      <div class="form-card" id="formCard">
+        <div class="form-title" id="formTitle">✚ 新規登録</div>
+
+        <input type="hidden" id="fId" />
+        <input type="hidden" id="fDieId" />
+
+        <div class="form-grid">
+
+          <!-- 金型番号 検索 -->
+          <div class="form-group">
+            <label>金型番号 *</label>
+            <div class="search-wrap" id="searchWrap">
+              <input type="text" id="dieSearchInput" class="mono"
+                placeholder="型番を入力して検索..."
+                oninput="onDieInput(this.value)"
+                autocomplete="off" />
+              <div class="suggestions" id="suggestions"></div>
+            </div>
+          </div>
+
+          <!-- 品番（自動表示） -->
+          <div class="form-group">
+            <label>品番</label>
+            <input type="text" id="fPn" class="mono readonly" readonly placeholder="金型選択後に表示" />
+          </div>
+
+          <!-- 到着日（自動表示） -->
+          <div class="form-group">
+            <label>到着日</label>
+            <input type="text" id="fArrival" class="mono readonly" readonly placeholder="金型選択後に表示" />
+          </div>
+
+          <!-- 目標納期 -->
+          <div class="form-group">
+            <label>目標納期</label>
+            <input type="date" id="fTargetDate" />
+          </div>
+
+          <!-- 理由 JP -->
+          <div class="form-group">
+            <label>理由（JP）</label>
+            <input type="text" id="fReasonJp" placeholder="日本語で入力" />
+          </div>
+
+          <!-- 理由 VN -->
+          <div class="form-group">
+            <label>理由（VN）</label>
+            <input type="text" id="fReasonVn" placeholder="Nhập bằng tiếng Việt" />
+          </div>
+
+          <!-- 優先度 -->
+          <div class="form-group">
+            <label>優先度</label>
+            <div class="radio-group">
+              <label><input type="radio" name="priority" value="high" /> <span class="radio-high">high</span></label>
+              <label><input type="radio" name="priority" value="middle" checked /> <span class="radio-middle">middle</span></label>
+              <label><input type="radio" name="priority" value="low" /> <span class="radio-low">low</span></label>
+            </div>
+          </div>
+
+          <!-- ステータス（編集時のみ） -->
+          <div class="form-group" id="statusGroup" style="display:none;">
+            <label>ステータス</label>
+            <div class="status-group">
+              <label><input type="radio" name="fStatus" value="active" checked /> active</label>
+              <label><input type="radio" name="fStatus" value="closed" /> closed</label>
+            </div>
+          </div>
+
+          <!-- メモ -->
+          <div class="form-group full">
+            <label>メモ</label>
+            <textarea id="fMemo" placeholder="備考があれば入力"></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteWatch()">削除</button>
+          <button class="btn-cancel" onclick="closeForm()">キャンセル</button>
+          <button class="btn-save" onclick="saveForm()">登録する</button>
+        </div>
+      </div>
+
+      <!-- 一覧 -->
+      <div class="list-card">
+        <div class="list-header">
+          <h2>登録一覧</h2>
+          <span class="count-label" id="countLabel"></span>
+          <select onchange="loadList(this.value)">
+            <option value="active">active のみ</option>
+            <option value="closed">closed のみ</option>
+            <option value="all">すべて</option>
+          </select>
+        </div>
+
+        <table id="watchTable">
+          <thead>
+            <tr>
+              <th>金型番号</th>
+              <th>品番</th>
+              <th>到着日</th>
+              <th>理由(JP)</th>
+              <th>優先度</th>
+              <th>目標納期</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── Toast ── */
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2200);
+      }
+
+      /* ── 日付フォーマット ── */
+      function fmtDate(str) {
+        if (!str) return "—";
+        const d  = new Date(str);
+        const yy = String(d.getFullYear()).slice(2);
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yy}-${mm}-${dd}`;
+      }
+
+      function isOverdue(dateStr) {
+        if (!dateStr) return false;
+        return new Date(dateStr) < new Date();
+      }
+
+      /* ── 金型インクリメンタル検索 ── */
+      let searchTimer;
+      function onDieInput(val) {
+        clearTimeout(searchTimer);
+        if (val.length < 1) { hideSuggestions(); return; }
+        searchTimer = setTimeout(() => fetchSuggestions(val), 200);
+      }
+
+      async function fetchSuggestions(q) {
+        const res  = await fetch(`./php/die_watch/get_die_search.php?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const box  = document.getElementById("suggestions");
+        box.innerHTML = "";
+        if (!data.length) { box.style.display = "none"; return; }
+        data.forEach((d) => {
+          const item = document.createElement("div");
+          item.className   = "suggestion-item";
+          item.textContent = `${d.die_number}　(${d.production_number})`;
+          item.onclick     = () => selectDie(d);
+          box.appendChild(item);
+        });
+        box.style.display = "block";
+      }
+
+      function selectDie(d) {
+        document.getElementById("fDieId").value          = d.id;
+        document.getElementById("dieSearchInput").value  = d.die_number;
+        document.getElementById("fPn").value             = d.production_number;
+        document.getElementById("fArrival").value        = fmtDate(d.arrival_at);
+        hideSuggestions();
+      }
+
+      function hideSuggestions() {
+        document.getElementById("suggestions").style.display = "none";
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!document.getElementById("searchWrap").contains(e.target)) hideSuggestions();
+      });
+
+      /* ── フォーム操作 ── */
+      function openNewForm() {
+        resetForm();
+        document.getElementById("formTitle").textContent   = "✚ 新規登録";
+        document.getElementById("formTitle").className     = "form-title";
+        document.getElementById("statusGroup").style.display = "none";
+        document.getElementById("deleteBtn").style.display   = "none";
+        document.querySelector(".btn-save").textContent      = "登録する";
+        document.getElementById("dieSearchInput").readOnly   = false;
+        document.getElementById("dieSearchInput").style.background = "";
+        document.getElementById("formCard").classList.add("open");
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+      }
+
+      function openEditForm(row) {
+        resetForm();
+        document.getElementById("formTitle").textContent   = `✏ 編集中：${row.die_number}`;
+        document.getElementById("formTitle").className     = "form-title edit";
+        document.getElementById("statusGroup").style.display = "";
+        document.getElementById("deleteBtn").style.display   = "";
+        document.querySelector(".btn-save").textContent      = "更新する";
+
+        document.getElementById("fId").value             = row.id;
+        document.getElementById("fDieId").value          = row.die_id;
+        document.getElementById("dieSearchInput").value  = row.die_number;
+        document.getElementById("dieSearchInput").readOnly = true;
+        document.getElementById("dieSearchInput").style.background = "#f5f5f5";
+        document.getElementById("fPn").value             = row.production_number;
+        document.getElementById("fArrival").value        = fmtDate(row.arrival_at);
+        document.getElementById("fReasonJp").value       = row.reason_jp ?? "";
+        document.getElementById("fReasonVn").value       = row.reason_vn ?? "";
+        document.getElementById("fTargetDate").value     = row.target_date ?? "";
+        document.getElementById("fMemo").value           = row.memo ?? "";
+
+        document.querySelectorAll("input[name='priority']").forEach((r) => {
+          r.checked = r.value === row.priority;
+        });
+        document.querySelectorAll("input[name='fStatus']").forEach((r) => {
+          r.checked = r.value === row.status;
+        });
+
+        document.getElementById("formCard").classList.add("open");
+        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
+      }
+
+      function closeForm() {
+        document.getElementById("formCard").classList.remove("open");
+        resetForm();
+      }
+
+      function resetForm() {
+        document.getElementById("fId").value            = "";
+        document.getElementById("fDieId").value         = "";
+        document.getElementById("dieSearchInput").value = "";
+        document.getElementById("fPn").value            = "";
+        document.getElementById("fArrival").value       = "";
+        document.getElementById("fReasonJp").value      = "";
+        document.getElementById("fReasonVn").value      = "";
+        document.getElementById("fTargetDate").value    = "";
+        document.getElementById("fMemo").value          = "";
+        document.querySelectorAll("input[name='priority']").forEach((r) => {
+          r.checked = r.value === "middle";
+        });
+        document.querySelectorAll("input[name='fStatus']").forEach((r) => {
+          r.checked = r.value === "active";
+        });
+      }
+
+      /* ── 保存 ── */
+      async function saveForm() {
+        const id     = document.getElementById("fId").value;
+        const die_id = document.getElementById("fDieId").value;
+
+        if (!die_id) { showToast("金型番号を選択してください", false); return; }
+
+        const priority = document.querySelector("input[name='priority']:checked")?.value ?? "middle";
+        const status   = document.querySelector("input[name='fStatus']:checked")?.value ?? "active";
+
+        const body = {
+          action:      id ? "update" : "insert",
+          id:          id || undefined,
+          die_id,
+          reason_jp:   document.getElementById("fReasonJp").value,
+          reason_vn:   document.getElementById("fReasonVn").value,
+          priority,
+          target_date: document.getElementById("fTargetDate").value,
+          memo:        document.getElementById("fMemo").value,
+          status,
+        };
+
+        const res    = await fetch("./php/die_watch/save_die_watch.php", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify(body),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast(id ? "更新しました" : "登録しました");
+          closeForm();
+          loadList(document.querySelector(".list-header select").value);
+        } else {
+          showToast(result.message || "保存に失敗しました", false);
+        }
+      }
+
+      /* ── 削除 ── */
+      async function deleteWatch() {
+        const id = document.getElementById("fId").value;
+        if (!id) return;
+        if (!confirm("この登録を削除しますか？")) return;
+
+        const res    = await fetch("./php/die_watch/delete_die_watch.php", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ id }),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast("削除しました");
+          closeForm();
+          loadList(document.querySelector(".list-header select").value);
+        } else {
+          showToast(result.message || "削除に失敗しました", false);
+        }
+      }
+
+      /* ── 一覧読み込み ── */
+      async function loadList(status = "active") {
+        const res  = await fetch(`./php/die_watch/get_die_watch_list.php?status=${status}`);
+        const data = await res.json();
+
+        document.getElementById("countLabel").textContent = `${data.length} 件`;
+
+        const tbody = document.querySelector("#watchTable tbody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">登録がありません</td></tr>`;
+          return;
+        }
+
+        const today = new Date().toISOString().slice(0, 10);
+
+        data.forEach((row) => {
+          const pClass = { high: "p-high", middle: "p-middle", low: "p-low" }[row.priority] ?? "p-low";
+          const sClass = row.status === "active" ? "s-active" : "s-closed";
+          const od     = row.target_date && row.target_date < today && row.status === "active";
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="die-num">${row.die_number}</td>
+            <td class="pn-num">${row.production_number}</td>
+            <td>${fmtDate(row.arrival_at)}</td>
+            <td>${row.reason_jp ?? "—"}</td>
+            <td><span class="badge ${pClass}">${row.priority}</span></td>
+            <td class="${od ? "overdue" : ""}">${fmtDate(row.target_date)}</td>
+            <td><span class="badge ${sClass}">${row.status}</span></td>
+            <td style="white-space:nowrap;">
+              <button class="edit-btn" onclick="openEditForm(${JSON.stringify(row).replace(/"/g, '&quot;')})">✏ 編集</button>
+              <button class="issue-btn" onclick="location.href='die_issue_list.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">Issue一覧</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* ── 初期ロード ── */
+      loadList("active");
+    </script>
+  </body>
+</html>

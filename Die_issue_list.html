@@ -148,21 +148,13 @@
     </div>
 
     <div class="container">
-      <!-- ★ メニューへ戻るボタン -->
-      <div style="text-align: right; margin-bottom: 10px">
-        <button
-          onclick="location.href = 'index.html'"
-          style="
-            background: #2b6ca3;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-          "
-        >
+      <!-- 戻るボタン -->
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+        <button id="backBtn"
+          style="background:#2b6ca3;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">
           ← メニューへ戻る
         </button>
+        <span id="filterBadge" style="display:none; background:#e65100; color:#fff; padding:4px 12px; border-radius:4px; font-size:13px; font-family:'Roboto Mono',monospace;"></span>
       </div>
 
       <h1 data-key="title">🛠 Issue List（課題一覧）</h1>
@@ -219,15 +211,34 @@
         localStorage.setItem("lang", lang);
       }
 
+      /* URLパラメータから die_id / die_number を取得 */
+      const urlParams  = new URLSearchParams(location.search);
+      const filterDieId = urlParams.get("die_id");
+      const filterDieNo = urlParams.get("die_number");
+
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
+
+        if (filterDieId) {
+          document.getElementById("backBtn").textContent = "← 重点管理リストへ戻る";
+          document.getElementById("backBtn").onclick = () => location.href = "die_watch.html";
+          const badge = document.getElementById("filterBadge");
+          badge.textContent = filterDieNo ? `金型: ${filterDieNo}` : `die_id: ${filterDieId}`;
+          badge.style.display = "inline-block";
+        } else {
+          document.getElementById("backBtn").onclick = () => location.href = "index.html";
+        }
+
         loadIssueList();
       };
 
       /* 一覧データ読み込み */
       function loadIssueList() {
-        fetch("./php/die_progress_php/get_die_issue_list.php")
+        const url = filterDieId
+          ? `./php/die_progress_php/get_die_issue_list.php?die_id=${filterDieId}`
+          : "./php/die_progress_php/get_die_issue_list.php";
+        fetch(url)
           .then((res) => res.json())
           .then((data) => {
             const tbody = document.querySelector("#issueTable tbody");
