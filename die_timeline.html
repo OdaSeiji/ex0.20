@@ -151,7 +151,13 @@
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.22);
         white-space: nowrap;
         min-width: 88px;
-        cursor: default;
+        cursor: pointer;
+        transition: filter 0.15s, transform 0.15s, box-shadow 0.15s;
+      }
+      .badge-card:hover {
+        filter: brightness(1.18);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.32);
       }
       .badge-type {
         display: block;
@@ -241,6 +247,19 @@
         const mm = String(d.getMonth() + 1).padStart(2, "0");
         const dd = String(d.getDate()).padStart(2, "0");
         return `${yy}-${mm}-${dd}`;
+      }
+
+      function urlFor(type, row) {
+        const pid = row.press_id;
+        switch (type) {
+          case "press":      return `die_inspection.html?press_id=${pid}`;
+          case "inspection": return `die_inspection.html?press_id=${pid}&mode=edit`;
+          case "diagnosis":  return `die_diagnosis.html?press_id=${pid}`;
+          case "approval":   return `die_diagnosis.html?press_id=${pid}`;
+          case "fix_plan":   return `die_fix_plan.html?press_id=${pid}`;
+          case "fix_report": return `die_fix_report.html?press_id=${pid}`;
+          default:           return null;
+        }
       }
 
       function datePropFor(type) {
@@ -393,6 +412,8 @@
             card.innerHTML  =
               `<span class="badge-type">${ev.label}</span>` +
               `<span class="badge-date">${fmtDate(ev.dateStr)}</span>`;
+            const url = urlFor(ev.type, ev.row);
+            if (url) card.onclick = () => location.href = url;
             stack.appendChild(card);
           });
 

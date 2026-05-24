@@ -1,13 +1,12 @@
 <?php
 require_once "./../db.php";
 
-/*
-  t_die_issue の一覧を返す API
-  issue_detail を含めて返すように修正済み
-*/
+$dieId = isset($_GET["die_id"]) ? (int)$_GET["die_id"] : null;
+
+$where = $dieId ? "WHERE i.die_id = ?" : "";
 
 $sql = "
-    SELECT 
+    SELECT
         i.id,
         i.die_id,
         d.die_number,
@@ -16,7 +15,7 @@ $sql = "
         i.issue_title_vn,
         i.issue_detail,
         i.priority,
-        CASE 
+        CASE
             WHEN i.status = 'open' THEN '未完了'
             ELSE '完了'
         END AS completion_status,
@@ -28,17 +27,19 @@ $sql = "
             ORDER BY p.press_date_at DESC
             LIMIT 1
         ) AS latest_press_date,
-        CASE 
+        CASE
             WHEN i.priority = 1 THEN '高'
             WHEN i.priority = 2 THEN '中'
             ELSE '低'
         END AS priority_label
     FROM t_die_issue i
     JOIN m_dies d ON i.die_id = d.id
+    {$where}
     ORDER BY i.created_at DESC
 ";
 
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+$stmt->execute($dieId ? [$dieId] : []);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 header("Content-Type: application/json; charset=UTF-8");
