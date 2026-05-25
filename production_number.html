@@ -3,12 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <title>品番管理</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
-        font-family: "Segoe UI", sans-serif;
+        font-family: "Roboto Mono", "Segoe UI", monospace;
         background: #f0f2f5;
         padding: 20px;
       }
@@ -121,9 +123,12 @@
         font-size: 13px; width: 220px; margin-left: auto;
       }
 
+      .table-wrap { overflow-y: auto; max-height: 60vh; }
+
       table { width: 100%; border-collapse: collapse; font-size: 13px; }
       th, td { padding: 9px 12px; border-bottom: 1px solid #eee; text-align: left; }
       th {
+        position: sticky; top: 0; z-index: 2;
         background: #e8f1ff; font-weight: bold; color: #333;
         white-space: nowrap; user-select: none;
       }
@@ -131,6 +136,13 @@
       th.sortable:hover { background: #d0e4ff; }
       .sort-icon { font-size: 10px; margin-left: 3px; color: #999; }
       tr:hover { background: #f7f9ff; }
+
+      /* カラム幅 */
+      .col-cat1, .col-cat2 { width: 110px; max-width: 110px; }
+      .col-pn   { min-width: 130px; }
+      .col-mat, .col-age { width: 70px; }
+      .col-num  { width: 110px; }
+      .col-act  { width: 72px; }
 
       .edit-btn {
         padding: 4px 12px; background: #1565c0; color: #fff;
@@ -142,9 +154,113 @@
         position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
         background: #323232; color: #fff; padding: 10px 24px;
         border-radius: 6px; font-size: 13px; opacity: 0;
-        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+        transition: opacity 0.3s; pointer-events: none; z-index: 1100;
       }
       #toast.show { opacity: 1; }
+
+      /* ── カテゴリ管理モーダル ── */
+      .modal-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.5); z-index: 1000;
+        align-items: center; justify-content: center;
+      }
+      .modal-overlay.open { display: flex; }
+      .modal-box {
+        background: #fff; border-radius: 10px; padding: 24px;
+        width: 760px; max-width: 96vw; max-height: 88vh;
+        overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+      }
+      .modal-header {
+        display: flex; align-items: center; margin-bottom: 18px;
+      }
+      .modal-header h3 { font-size: 16px; color: #1565c0; flex: 1; }
+      .modal-close {
+        background: none; border: none; font-size: 22px;
+        cursor: pointer; color: #888; line-height: 1;
+      }
+      .modal-close:hover { color: #c62828; }
+
+      .cat-mgr-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .cat-mgr-panel { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
+      .cat-mgr-head {
+        background: #e8f1ff; padding: 8px 12px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .cat-mgr-head span { font-size: 13px; font-weight: bold; color: #333; flex: 1; }
+      .cat-mgr-add {
+        background: #2e7d32; color: #fff; border: none;
+        border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 12px;
+      }
+      .cat-mgr-list { overflow-y: auto; max-height: 320px; }
+      .cat-mgr-item {
+        display: flex; align-items: center; padding: 8px 12px;
+        border-bottom: 1px solid #f0f0f0; cursor: pointer; font-size: 13px;
+      }
+      .cat-mgr-item:hover { background: #f7f9ff; }
+      .cat-mgr-item.selected { background: #e8f1ff; font-weight: bold; }
+      .cat-mgr-item > span { flex: 1; }
+      .cat-mgr-edit {
+        background: none; border: 1px solid #bbb; border-radius: 3px;
+        padding: 2px 8px; cursor: pointer; font-size: 11px; margin-left: 6px;
+        flex-shrink: 0;
+      }
+      .cat-mgr-edit:hover { background: #f0f0f0; }
+      .cat-mgr-empty { padding: 16px 12px; font-size: 12px; color: #aaa; text-align: center; }
+      .count-badge {
+        font-size: 11px; background: #e8f1ff; color: #1565c0;
+        border-radius: 10px; padding: 1px 7px; margin-left: 4px; flex-shrink: 0;
+      }
+      .count-badge.zero { background: #f5f5f5; color: #bbb; }
+      .cat-mgr-del {
+        background: none; border: 1px solid #e57373; color: #c62828;
+        border-radius: 3px; padding: 2px 7px; cursor: pointer;
+        font-size: 11px; margin-left: 4px; flex-shrink: 0;
+      }
+      .cat-mgr-del:hover { background: #ffebee; }
+
+      /* 品番一覧セクション */
+      .pn-section { margin-top: 14px; border: 1px solid #ffe0b2; border-radius: 8px; overflow: hidden; }
+      .pn-section-head {
+        background: #fff3e0; padding: 8px 14px;
+        font-size: 13px; display: flex; align-items: center; gap: 8px;
+      }
+      .pn-section-head span { color: #555; }
+      .pn-section-head strong { color: #e65100; }
+      .pn-section-list { overflow-y: auto; max-height: 160px; }
+      .pn-section-item {
+        padding: 6px 14px; border-bottom: 1px solid #fff3e0;
+        font-size: 13px; display: flex; align-items: center; gap: 10px;
+      }
+      .pn-section-item:last-child { border-bottom: none; }
+      .pn-section-item:hover { background: #fff8f0; }
+      .pn-no { font-weight: bold; color: #333; flex: 1; }
+
+      .cat-inline-form {
+        padding: 10px 12px; background: #f5f8ff;
+        border-bottom: 2px solid #1565c0; display: none;
+      }
+      .cat-inline-form.open { display: block; }
+      .cat-inline-label {
+        font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px;
+      }
+      .cat-inline-form input[type="text"] {
+        width: 100%; padding: 6px 8px; border: 1px solid #ccc;
+        border-radius: 4px; font-size: 13px; margin-bottom: 8px;
+        font-family: inherit;
+      }
+      .cat-inline-btns { display: flex; gap: 6px; justify-content: flex-end; }
+      .cat-inline-save {
+        background: #1565c0; color: #fff; border: none;
+        border-radius: 4px; padding: 5px 14px; cursor: pointer; font-size: 12px;
+      }
+      .cat-inline-cancel {
+        background: #9e9e9e; color: #fff; border: none;
+        border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;
+      }
+      .cat-mgr-btn {
+        background: #546e7a; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
+      }
     </style>
   </head>
 
@@ -159,6 +275,7 @@
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
           <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
         </div>
+        <button class="cat-mgr-btn" onclick="openCatMgr()" data-key="btn_cat_mgr">🗂 カテゴリ管理</button>
         <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
       </div>
 
@@ -278,23 +395,88 @@
           <input type="text" class="search-input" id="searchInput"
             placeholder="品番で絞り込み..." oninput="filterTable(this.value)" />
         </div>
+        <div class="table-wrap">
         <table id="mainTable">
           <thead>
             <tr>
-              <th class="sortable" onclick="sortBy('id')">No<span class="sort-icon" data-sortkey="id">↕</span></th>
-              <th class="sortable" onclick="sortBy('cat1')" data-key="col_cat1">カテゴリ1<span class="sort-icon" data-sortkey="cat1">↕</span></th>
-              <th class="sortable" onclick="sortBy('cat2')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="cat2">↕</span></th>
-              <th class="sortable" onclick="sortBy('production_number')" data-key="col_pn">品番<span class="sort-icon" data-sortkey="production_number">↕</span></th>
-              <th data-key="col_material">材質</th>
-              <th data-key="col_aging">時効</th>
-              <th data-key="col_area">断面積 (mm²)</th>
-              <th data-key="col_weight">比重 (kg/m)</th>
-              <th data-key="col_length">製品長 (m)</th>
-              <th data-key="col_action">操作</th>
+              <th class="sortable col-cat1" onclick="sortBy('category1_jp')" data-key="col_cat1">カテゴリ1<span class="sort-icon" data-sortkey="category1_jp">↕</span></th>
+              <th class="sortable col-cat2" onclick="sortBy('category2_jp')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="category2_jp">↕</span></th>
+              <th class="sortable col-pn"   onclick="sortBy('production_number')" data-key="col_pn">品番<span class="sort-icon" data-sortkey="production_number">↕</span></th>
+              <th class="col-mat" data-key="col_material">材質</th>
+              <th class="col-age" data-key="col_aging">時効</th>
+              <th class="col-num" data-key="col_area">断面積 (mm²)</th>
+              <th class="col-num" data-key="col_weight">比重 (kg/m)</th>
+              <th class="col-num" data-key="col_length">製品長 (m)</th>
+              <th class="col-act" data-key="col_action">操作</th>
             </tr>
           </thead>
           <tbody id="mainTbody"></tbody>
         </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- カテゴリ管理モーダル -->
+    <div id="catMgrModal" class="modal-overlay">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>🗂 カテゴリ管理</h3>
+          <button class="modal-close" onclick="closeCatMgr()">✕</button>
+        </div>
+        <div class="cat-mgr-wrap">
+
+          <!-- カテゴリ1 -->
+          <div class="cat-mgr-panel">
+            <div class="cat-mgr-head">
+              <span>カテゴリ1</span>
+              <button class="cat-mgr-add" onclick="showCatInlineForm('cat1', null)">＋ 追加</button>
+            </div>
+            <div class="cat-inline-form" id="cat1InlineForm">
+              <div class="cat-inline-label" id="cat1InlineLabel">新規追加</div>
+              <input type="text" id="cat1InlineName" placeholder="カテゴリ1名を入力" />
+              <input type="hidden" id="cat1InlineId" />
+              <div class="cat-inline-btns">
+                <button class="cat-inline-cancel" onclick="hideCatInlineForm('cat1')">キャンセル</button>
+                <button class="cat-inline-save" onclick="saveCatInline('cat1')">保存</button>
+              </div>
+            </div>
+            <div class="cat-mgr-list" id="cat1MgrList">
+              <div class="cat-mgr-empty">読み込み中...</div>
+            </div>
+          </div>
+
+          <!-- カテゴリ2 -->
+          <div class="cat-mgr-panel">
+            <div class="cat-mgr-head">
+              <span>カテゴリ2 <small id="cat2MgrSub" style="font-weight:normal;color:#666"></small></span>
+              <button class="cat-mgr-add" onclick="showCatInlineForm('cat2', null)">＋ 追加</button>
+            </div>
+            <div class="cat-inline-form" id="cat2InlineForm">
+              <div class="cat-inline-label" id="cat2InlineLabel">新規追加</div>
+              <input type="text" id="cat2InlineName" placeholder="カテゴリ2名を入力" />
+              <input type="hidden" id="cat2InlineId" />
+              <div class="cat-inline-btns">
+                <button class="cat-inline-cancel" onclick="hideCatInlineForm('cat2')">キャンセル</button>
+                <button class="cat-inline-save" onclick="saveCatInline('cat2')">保存</button>
+              </div>
+            </div>
+            <div class="cat-mgr-list" id="cat2MgrList">
+              <div class="cat-mgr-empty">← カテゴリ1を選択してください</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 品番一覧（cat2選択時に表示） -->
+        <div id="pnSection" class="pn-section" style="display:none">
+          <div class="pn-section-head">
+            <span>紐づき品番：</span>
+            <strong id="pnSectionCat2Name"></strong>
+            <span id="pnSectionCount" style="margin-left:auto;font-size:12px;color:#888"></span>
+          </div>
+          <div class="pn-section-list" id="pnSectionList"></div>
+        </div>
+
       </div>
     </div>
 
@@ -306,6 +488,7 @@
         ja: {
           title: "品番管理",
           btn_new: "＋ 新規登録",
+          btn_cat_mgr: "🗂 カテゴリ管理",
           btn_save: "登録する",
           btn_update: "更新する",
           btn_cancel: "キャンセル",
@@ -340,6 +523,7 @@
         vi: {
           title: "Quản lý mã sản phẩm",
           btn_new: "＋ Thêm mới",
+          btn_cat_mgr: "🗂 Quản lý danh mục",
           btn_save: "Lưu",
           btn_update: "Cập nhật",
           btn_cancel: "Hủy",
@@ -390,9 +574,6 @@
         setTimeout(() => t.classList.remove("show"), 2200);
       }
 
-      /* ── マスタ定数 ── */
-      const MATERIAL = { "1":"A6061", "2":"A6063", "3":"A6N01A", "4":"A6N01" };
-      const AGING    = { "1":"O", "2":"T5", "3":"T6" };
 
       /* ── POST helper ── */
       async function postForm(url, params) {
@@ -426,20 +607,18 @@
         tbody.innerHTML = "";
 
         if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
           return;
         }
 
         data.forEach((row) => {
-          /* カテゴリ名：PHPが返すキー名に合わせて複数候補を試みる */
-          const cat1 = row.category1_name ?? row.category1 ?? row.cate1 ?? "—";
-          const cat2 = row.category2_name ?? row.category2 ?? row.cate2 ?? "—";
-          const mat  = row.material_name  ?? MATERIAL[String(row.billet_material_id)] ?? "—";
-          const agi  = row.aging_name     ?? AGING[String(row.aging_type_id)]         ?? "—";
+          const cat1 = row.category1_jp    ?? "—";
+          const cat2 = row.category2_jp    ?? "—";
+          const mat  = row.billet_material ?? "—";
+          const agi  = row.aging_type      ?? "—";
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${row.id}</td>
             <td>${cat1}</td>
             <td>${cat2}</td>
             <td><strong>${row.production_number ?? ""}</strong></td>
@@ -495,7 +674,7 @@
           const name = vals[1] ?? "";
           const tr   = document.createElement("tr");
           tr.dataset.id  = id;
-          tr.innerHTML   = `<td>${id}</td><td>${name}</td>`;
+          tr.innerHTML   = `<td>${name}</td>`;
           tr.onclick     = () => onCat1Click(id, tr);
           tbody.appendChild(tr);
         });
@@ -517,7 +696,7 @@
           const name = vals[1] ?? "";
           const tr2  = document.createElement("tr");
           tr2.dataset.id = cid;
-          tr2.innerHTML  = `<td>${cid}</td><td>${name}</td>`;
+          tr2.innerHTML  = `<td>${name}</td>`;
           tr2.onclick    = () => onCat2Click(cid, tr2);
           tbody.appendChild(tr2);
         });
@@ -673,6 +852,268 @@
         showToast("削除しました");
         closeForm();
         loadList();
+      }
+
+      /* ════════════════════════════
+         カテゴリ管理モーダル
+      ════════════════════════════ */
+      let mgrCat1Id   = null;
+      let mgrCat1Name = null;
+      let mgrCat2Id   = null;
+      let mgrCat2Name = null;
+
+      async function openCatMgr() {
+        document.getElementById("catMgrModal").classList.add("open");
+        await loadCat1Mgr();
+      }
+
+      function closeCatMgr() {
+        document.getElementById("catMgrModal").classList.remove("open");
+        hideCatInlineForm("cat1");
+        hideCatInlineForm("cat2");
+        mgrCat1Id = null; mgrCat1Name = null;
+        mgrCat2Id = null; mgrCat2Name = null;
+        document.getElementById("cat2MgrList").innerHTML = '<div class="cat-mgr-empty">← カテゴリ1を選択してください</div>';
+        document.getElementById("cat2MgrSub").textContent = "";
+        document.getElementById("pnSection").style.display = "none";
+        loadCat1();
+      }
+
+      async function loadCat1Mgr() {
+        const data = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
+        renderCat1MgrList(data);
+      }
+
+      function renderCat1MgrList(data) {
+        const list = document.getElementById("cat1MgrList");
+        list.innerHTML = "";
+        if (!data.length) {
+          list.innerHTML = '<div class="cat-mgr-empty">データがありません</div>';
+          return;
+        }
+        data.forEach((row) => {
+          const id    = row.id;
+          const name  = row.name_jp ?? "";
+          const count = parseInt(row.count ?? 0);
+
+          const div = document.createElement("div");
+          div.className  = "cat-mgr-item";
+          div.dataset.id = id;
+
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = name;
+
+          const badge = document.createElement("span");
+          badge.className   = "count-badge" + (count === 0 ? " zero" : "");
+          badge.textContent = `cat2: ${count}`;
+          badge.title       = `カテゴリ2が ${count} 件`;
+
+          const editBtn = document.createElement("button");
+          editBtn.className    = "cat-mgr-edit";
+          editBtn.textContent  = "✎";
+          editBtn.title        = "名前を編集";
+          editBtn.dataset.id   = id;
+          editBtn.dataset.name = name;
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            showCatInlineForm("cat1", e.currentTarget.dataset.id, e.currentTarget.dataset.name);
+          };
+
+          div.appendChild(nameSpan);
+          div.appendChild(badge);
+          div.appendChild(editBtn);
+
+          if (count === 0) {
+            const delBtn = document.createElement("button");
+            delBtn.className    = "cat-mgr-del";
+            delBtn.textContent  = "🗑";
+            delBtn.title        = "削除（紐づきなし）";
+            delBtn.dataset.id   = id;
+            delBtn.dataset.name = name;
+            delBtn.onclick = (e) => {
+              e.stopPropagation();
+              deleteCat1(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
+            };
+            div.appendChild(delBtn);
+          }
+
+          div.onclick = () => selectCat1Mgr(id, name, div);
+          if (String(id) === String(mgrCat1Id)) div.classList.add("selected");
+          list.appendChild(div);
+        });
+      }
+
+      async function selectCat1Mgr(id, name, el) {
+        document.querySelectorAll("#cat1MgrList .cat-mgr-item").forEach((d) => d.classList.remove("selected"));
+        el.classList.add("selected");
+        mgrCat1Id = id; mgrCat1Name = name;
+        mgrCat2Id = null; mgrCat2Name = null;
+        document.getElementById("cat2MgrSub").textContent = `(${name})`;
+        document.getElementById("pnSection").style.display = "none";
+        hideCatInlineForm("cat2");
+        await loadCat2Mgr(id);
+      }
+
+      async function loadCat2Mgr(cat1Id) {
+        const data = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: cat1Id });
+        const list = document.getElementById("cat2MgrList");
+        list.innerHTML = "";
+        if (!data.length) {
+          list.innerHTML = '<div class="cat-mgr-empty">データがありません</div>';
+          return;
+        }
+        data.forEach((row) => {
+          const id    = row.id;
+          const name  = row.name_jp ?? "";
+          const count = parseInt(row.count ?? 0);
+
+          const div = document.createElement("div");
+          div.className  = "cat-mgr-item";
+          div.dataset.id = id;
+
+          const nameSpan = document.createElement("span");
+          nameSpan.textContent = name;
+
+          const badge = document.createElement("span");
+          badge.className   = "count-badge" + (count === 0 ? " zero" : "");
+          badge.textContent = `品番: ${count}`;
+          badge.title       = `品番が ${count} 件`;
+
+          const editBtn = document.createElement("button");
+          editBtn.className    = "cat-mgr-edit";
+          editBtn.textContent  = "✎";
+          editBtn.title        = "名前を編集";
+          editBtn.dataset.id   = id;
+          editBtn.dataset.name = name;
+          editBtn.onclick = (e) => {
+            e.stopPropagation();
+            showCatInlineForm("cat2", e.currentTarget.dataset.id, e.currentTarget.dataset.name);
+          };
+
+          div.appendChild(nameSpan);
+          div.appendChild(badge);
+          div.appendChild(editBtn);
+
+          if (count === 0) {
+            const delBtn = document.createElement("button");
+            delBtn.className    = "cat-mgr-del";
+            delBtn.textContent  = "🗑";
+            delBtn.title        = "削除（紐づきなし）";
+            delBtn.dataset.id   = id;
+            delBtn.dataset.name = name;
+            delBtn.onclick = (e) => {
+              e.stopPropagation();
+              deleteCat2(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
+            };
+            div.appendChild(delBtn);
+          }
+
+          div.onclick = () => selectCat2Mgr(id, name, div, count);
+          if (String(id) === String(mgrCat2Id)) div.classList.add("selected");
+          list.appendChild(div);
+        });
+      }
+
+      async function selectCat2Mgr(id, name, el, count) {
+        document.querySelectorAll("#cat2MgrList .cat-mgr-item").forEach((d) => d.classList.remove("selected"));
+        el.classList.add("selected");
+        mgrCat2Id = id; mgrCat2Name = name;
+
+        const section = document.getElementById("pnSection");
+        section.style.display = "";
+        document.getElementById("pnSectionCat2Name").textContent = name;
+
+        if (count === 0) {
+          document.getElementById("pnSectionCount").textContent = "";
+          document.getElementById("pnSectionList").innerHTML =
+            '<div class="cat-mgr-empty" style="padding:12px">品番の紐づきはありません</div>';
+          return;
+        }
+
+        document.getElementById("pnSectionList").innerHTML =
+          '<div class="cat-mgr-empty" style="padding:10px">読み込み中...</div>';
+
+        const data = await postForm("./php/ProductionNumber/SelPnByCat2.php", { cat2Id: id });
+        document.getElementById("pnSectionCount").textContent = `${data.length} 件`;
+        const list = document.getElementById("pnSectionList");
+        if (!data.length) {
+          list.innerHTML = '<div class="cat-mgr-empty" style="padding:12px">データがありません</div>';
+          return;
+        }
+        list.innerHTML = data.map((r) =>
+          `<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`
+        ).join("");
+      }
+
+      async function deleteCat1(id, name) {
+        if (!confirm(`「${name}」を削除しますか？`)) return;
+        const result = await postForm("./php/ProductionNumber/DelCategory1.php", { id });
+        if (result.status === "ok") {
+          showToast("削除しました");
+          await loadCat1Mgr();
+        } else {
+          showToast(result.message || "削除に失敗しました", false);
+        }
+      }
+
+      async function deleteCat2(id, name) {
+        if (!confirm(`「${name}」を削除しますか？`)) return;
+        const result = await postForm("./php/ProductionNumber/DelCategory2.php", { id });
+        if (result.status === "ok") {
+          showToast("削除しました");
+          document.getElementById("pnSection").style.display = "none";
+          await loadCat2Mgr(mgrCat1Id);
+        } else {
+          showToast(result.message || "削除に失敗しました", false);
+        }
+      }
+
+      function showCatInlineForm(type, id, name = "") {
+        hideCatInlineForm("cat1");
+        hideCatInlineForm("cat2");
+        const isEdit = !!id;
+        document.getElementById(`${type}InlineLabel`).textContent = isEdit ? "✎ 編集中" : "新規追加";
+        document.getElementById(`${type}InlineName`).value = name;
+        document.getElementById(`${type}InlineId`).value   = id ?? "";
+        document.getElementById(`${type}InlineForm`).classList.add("open");
+        document.getElementById(`${type}InlineName`).focus();
+      }
+
+      function hideCatInlineForm(type) {
+        document.getElementById(`${type}InlineForm`).classList.remove("open");
+        document.getElementById(`${type}InlineName`).value = "";
+        document.getElementById(`${type}InlineId`).value   = "";
+      }
+
+      async function saveCatInline(type) {
+        const name = document.getElementById(`${type}InlineName`).value.trim();
+        if (!name) { showToast("名称を入力してください", false); return; }
+
+        const id     = document.getElementById(`${type}InlineId`).value;
+        const isEdit = !!id;
+
+        let url, params;
+        if (type === "cat1") {
+          url    = isEdit ? "./php/ProductionNumber/UpdateCategory1.php" : "./php/ProductionNumber/InsCategory1.php";
+          params = isEdit ? { id, name_jp: name } : { name_jp: name };
+        } else {
+          if (!mgrCat1Id) { showToast("カテゴリ1を選択してください", false); return; }
+          url    = isEdit ? "./php/ProductionNumber/UpdateCategory2.php" : "./php/ProductionNumber/InsCategory2.php";
+          params = isEdit ? { id, name_jp: name } : { name_jp: name, category1_id: mgrCat1Id };
+        }
+
+        const result = await postForm(url, params);
+        if (result.status === "ok") {
+          showToast(isEdit ? "更新しました" : "追加しました");
+          hideCatInlineForm(type);
+          if (type === "cat1") {
+            await loadCat1Mgr();
+          } else {
+            await loadCat2Mgr(mgrCat1Id);
+          }
+        } else {
+          showToast(result.message || "エラーが発生しました", false);
+        }
       }
 
       /* ── 初期化 ── */
