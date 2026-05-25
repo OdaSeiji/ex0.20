@@ -99,6 +99,22 @@
       .cat-hint { font-size: 11px; color: #c62828; padding: 4px 12px; display: none; flex-shrink: 0; }
       .cat-hint.show { display: block; }
 
+      /* ── 必須バッジ ── */
+      .f-label.req::after,
+      .cat-title.req::after {
+        content: "必須";
+        display: inline-block;
+        margin-left: 6px;
+        background: #c62828;
+        color: #fff;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 1px 6px;
+        border-radius: 3px;
+        vertical-align: middle;
+        letter-spacing: 0.03em;
+      }
+
       /* ── フォームボタン ── */
       .form-actions {
         display: flex; justify-content: flex-end; gap: 10px;
@@ -286,8 +302,8 @@
 
         <div class="form-grid">
           <div class="form-group">
-            <label class="f-label" data-key="lbl_pn">品番 *</label>
-            <input type="text" id="fPn" placeholder="例: ABC-001" />
+            <label class="f-label req" data-key="lbl_pn">品番</label>
+            <input type="text" id="fPn" placeholder="例: ABC-001" oninput="this.value = this.value.toUpperCase()" />
           </div>
           <div class="form-group">
             <label class="f-label" data-key="lbl_dept">図面部門</label>
@@ -306,7 +322,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="f-label" data-key="lbl_material">材質</label>
+            <label class="f-label req" data-key="lbl_material">材質</label>
             <select class="f-select" id="fMaterial">
               <option value="0">—</option>
               <option value="1">A6061</option>
@@ -325,7 +341,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label class="f-label" data-key="lbl_length">製品長 (m)</label>
+            <label class="f-label req" data-key="lbl_length">製品長 (m)</label>
             <input type="text" id="fLength" />
           </div>
           <div class="form-group">
@@ -337,7 +353,7 @@
             <input type="text" id="fWeight" />
           </div>
           <div class="form-group">
-            <label class="f-label" data-key="lbl_area">断面積 (mm²)</label>
+            <label class="f-label req" data-key="lbl_area">断面積 (mm²)</label>
             <input type="text" id="fArea" />
           </div>
           <div class="form-group">
@@ -365,14 +381,14 @@
         <!-- カテゴリ選択 -->
         <div class="cat-wrap">
           <div class="cat-card">
-            <div class="cat-title" data-key="lbl_cat1">カテゴリ1 *</div>
+            <div class="cat-title req" data-key="lbl_cat1">カテゴリ1</div>
             <div class="cat-scroll">
               <table class="cat-table"><tbody id="cat1Tbody"></tbody></table>
             </div>
             <div class="cat-hint" id="cat1Hint" data-key="hint_cat">選択してください</div>
           </div>
           <div class="cat-card">
-            <div class="cat-title" data-key="lbl_cat2">カテゴリ2 *</div>
+            <div class="cat-title req" data-key="lbl_cat2">カテゴリ2</div>
             <div class="cat-scroll">
               <table class="cat-table"><tbody id="cat2Tbody"></tbody></table>
             </div>
@@ -494,7 +510,7 @@
           btn_cancel: "キャンセル",
           btn_delete: "削除",
           list_title: "品番一覧",
-          lbl_pn: "品番 *",
+          lbl_pn: "品番",
           lbl_dept: "図面部門",
           lbl_material: "材質",
           lbl_aging: "時効処理",
@@ -507,8 +523,8 @@
           lbl_pack_col: "梱包 列",
           lbl_hardness: "硬さ (HRF)",
           lbl_hardness_note: "硬さ備考",
-          lbl_cat1: "カテゴリ1 *",
-          lbl_cat2: "カテゴリ2 *",
+          lbl_cat1: "カテゴリ1",
+          lbl_cat2: "カテゴリ2",
           hint_cat: "選択してください",
           col_cat1: "カテゴリ1",
           col_cat2: "カテゴリ2",
@@ -529,7 +545,7 @@
           btn_cancel: "Hủy",
           btn_delete: "Xóa",
           list_title: "Danh sách mã sản phẩm",
-          lbl_pn: "Mã SP *",
+          lbl_pn: "Mã SP",
           lbl_dept: "Bộ phận thiết kế",
           lbl_material: "Vật liệu",
           lbl_aging: "Xử lý lão hóa",
@@ -542,8 +558,8 @@
           lbl_pack_col: "Cột đóng gói",
           lbl_hardness: "Độ cứng (HRF)",
           lbl_hardness_note: "Ghi chú độ cứng",
-          lbl_cat1: "Danh mục 1 *",
-          lbl_cat2: "Danh mục 2 *",
+          lbl_cat1: "Danh mục 1",
+          lbl_cat2: "Danh mục 2",
           hint_cat: "Vui lòng chọn",
           col_cat1: "Danh mục 1",
           col_cat2: "Danh mục 2",
@@ -806,6 +822,15 @@
       async function saveForm() {
         const pn = document.getElementById("fPn").value.trim().toUpperCase();
         if (!pn) { showToast("品番を入力してください", false); return; }
+
+        const length = document.getElementById("fLength").value.trim();
+        if (!length) { showToast("製品長を入力してください", false); return; }
+
+        const area = document.getElementById("fArea").value.trim();
+        if (!area) { showToast("断面積を入力してください", false); return; }
+
+        const material = document.getElementById("fMaterial").value;
+        if (!material || material === "0") { showToast("材質を選択してください", false); return; }
 
         if (!selectedCat2Id) {
           document.getElementById("cat1Hint").classList.toggle("show", !selectedCat1Id);
