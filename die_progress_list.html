@@ -160,8 +160,46 @@
         position: sticky;
         top: 0;
         z-index: 10;
-        background: #e8f1ff; /* ← 既存のヘッダー色 */
+        background: #e8f1ff;
       }
+
+      /* ★ 列幅制御 */
+      #progressTable { table-layout: fixed; }
+
+      /* 3列目：重点管理バッジ */
+      #progressTable th:nth-child(3),
+      #progressTable td:nth-child(3) { width: 68px; text-align: center; }
+
+      /* 4列目：押出種別 */
+      #progressTable th:nth-child(4),
+      #progressTable td:nth-child(4) { width: 100px; }
+      #progressTable th:nth-child(4) select.die-search { width: 48px; margin-left: 4px; }
+
+      /* 5,6,8,9,10列目：均等幅 */
+      #progressTable th:nth-child(5),
+      #progressTable td:nth-child(5),
+      #progressTable th:nth-child(6),
+      #progressTable td:nth-child(6),
+      #progressTable th:nth-child(8),
+      #progressTable td:nth-child(8),
+      #progressTable th:nth-child(9),
+      #progressTable td:nth-child(9),
+      #progressTable th:nth-child(10),
+      #progressTable td:nth-child(10) { width: 68px; text-align: center; }
+
+      /* 重点管理バッジ */
+      .watch-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .watch-high   { background: #c62828; }
+      .watch-middle { background: #e65100; }
+      .watch-low    { background: #1565c0; }
 
       .preview-wide {
         width: 900px;
@@ -386,6 +424,8 @@
               />
             </th>
 
+            <th data-key="col_watch">重点管理</th>
+
             <th data-key="col_type">
               押出種別
               <select
@@ -591,6 +631,7 @@
           title: "📊 金型進捗一覧（Progress List）",
           col_date: "押出日",
           col_die: "金型番号",
+          col_watch: "重点管理",
           col_type: "押出種別",
 
           col_ins: "測定",
@@ -643,6 +684,7 @@
           title: "📊 Danh sách tiến độ",
           col_date: "Ngày ép",
           col_die: "Mã khuôn",
+          col_watch: "Theo dõi",
           col_type: "Loại ép",
 
           col_ins: "Đo",
@@ -922,9 +964,14 @@
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
+          const watchCell = row.watch_priority
+            ? `<td><span class="watch-badge watch-${row.watch_priority}">${row.watch_priority}</span></td>`
+            : `<td></td>`;
+
           tr.innerHTML = `
             <td>${row.press_date}</td>
             <td class="die-number">${row.die_number}</td>
+            ${watchCell}
             <td class="pressing-type">${row.pressing_symbol}</td>
 
             <!-- ★ 測定（プレビュー対応） -->
@@ -1030,8 +1077,7 @@
       function approveDiagnosis(id) {
         const pin = prompt("診断承認 PIN を入力してください");
 
-        // ★ 1031 か 2054 のどちらかなら OK
-        if (pin === "1031" || pin === "2054") {
+        if (pin === "1031" || pin === "6767" || pin === "5375") {
           location.href = `die_diagnosis.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
@@ -1041,7 +1087,7 @@
       function approveFixPlan(id) {
         const pin = prompt("修理計画承認 PIN を入力してください");
 
-        if (pin === "1031" || pin === "2054") {
+        if (pin === "1031" || pin === "6767" || pin === "5375") {
           location.href = `die_fix_plan.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
@@ -1051,7 +1097,7 @@
       function approveFixReport(id) {
         const pin = prompt("修理報告承認 PIN を入力してください");
 
-        if (pin === "1031" || pin === "2054") {
+        if (pin === "1031" || pin === "6767" || pin === "5375") {
           location.href = `die_fix_report.html?press_id=${id}&mode=approval`;
         } else {
           alert("PINコードが違います");
