@@ -100,7 +100,10 @@ SELECT
         WHEN f.actual_approval_status = 'approved' THEN 1
         WHEN f.actual_approval_status = 'pending' THEN 0
         ELSE NULL
-    END AS fix_report_approval
+    END AS fix_report_approval,
+
+    -- 重点管理フラグ（active な t_die_watch があれば priority を返す）
+    w.priority AS watch_priority
 
 FROM t_press p
 
@@ -111,6 +114,14 @@ LEFT JOIN m_dies md
 -- 押出種別（〇◎●）
 LEFT JOIN m_pressing_type pt
   ON p.pressing_type_id = pt.id
+
+-- 重点管理（同じ die_id で active なレコードが存在するか）
+LEFT JOIN (
+    SELECT die_id, priority
+    FROM t_die_watch
+    WHERE status = 'active'
+    GROUP BY die_id
+) w ON md.id = w.die_id
 
 -- 測定
 LEFT JOIN t_die_inspection i

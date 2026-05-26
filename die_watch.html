@@ -6,10 +6,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
 
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,10 +17,7 @@
         padding: 20px;
       }
 
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
+      .container { max-width: 1200px; margin: 0 auto; }
 
       /* ── ヘッダー ── */
       .page-header {
@@ -33,32 +27,26 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         display: flex;
         align-items: center;
-        gap: 16px;
+        gap: 12px;
         margin-bottom: 20px;
+        flex-wrap: wrap;
       }
       .back-btn {
-        background: #2b6ca3;
-        color: #fff;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        white-space: nowrap;
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px;
+        cursor: pointer; white-space: nowrap;
       }
-      h1 {
-        font-size: 20px;
-        border-left: 6px solid #0078d4;
-        padding-left: 10px;
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
       }
+      .lang-btn:hover { background: #e8f1ff; }
       .new-btn {
-        margin-left: auto;
-        background: #2e7d32;
-        color: #fff;
-        padding: 8px 18px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
+        background: #2e7d32; color: #fff;
+        padding: 8px 18px; border: none; border-radius: 5px;
+        cursor: pointer; font-size: 14px;
       }
 
       /* ── フォームカード ── */
@@ -73,12 +61,8 @@
       .form-card.open { display: block; }
 
       .form-title {
-        font-size: 15px;
-        font-weight: bold;
-        color: #1565c0;
-        margin-bottom: 18px;
-        border-bottom: 2px solid #e8f1ff;
-        padding-bottom: 8px;
+        font-size: 15px; font-weight: bold; color: #1565c0;
+        margin-bottom: 18px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
       }
       .form-title.edit { color: #e65100; }
 
@@ -90,11 +74,7 @@
       .form-group { display: flex; flex-direction: column; gap: 4px; }
       .form-group.full { grid-column: 1 / -1; }
 
-      label {
-        font-size: 12px;
-        font-weight: bold;
-        color: #555;
-      }
+      label { font-size: 12px; font-weight: bold; color: #555; }
       input[type="text"],
       input[type="date"],
       textarea,
@@ -106,9 +86,7 @@
         font-family: inherit;
       }
       input[readonly], input.readonly {
-        background: #f5f5f5;
-        color: #666;
-        cursor: default;
+        background: #f5f5f5; color: #666; cursor: default;
       }
       .mono { font-family: "Roboto Mono", monospace; }
       textarea { resize: vertical; min-height: 60px; }
@@ -116,70 +94,38 @@
       /* Die search */
       .search-wrap { position: relative; }
       .suggestions {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        background: #fff;
-        border: 1px solid #ccc;
-        border-top: none;
-        border-radius: 0 0 5px 5px;
-        max-height: 200px;
-        overflow-y: auto;
-        z-index: 100;
-        display: none;
+        position: absolute; top: 100%; left: 0; right: 0;
+        background: #fff; border: 1px solid #ccc; border-top: none;
+        border-radius: 0 0 5px 5px; max-height: 200px;
+        overflow-y: auto; z-index: 100; display: none;
       }
       .suggestion-item {
-        padding: 8px 10px;
-        font-size: 13px;
-        cursor: pointer;
+        padding: 8px 10px; font-size: 13px; cursor: pointer;
         font-family: "Roboto Mono", monospace;
       }
       .suggestion-item:hover { background: #e8f1ff; }
 
       /* Priority radio */
-      .radio-group {
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        padding: 6px 0;
-      }
+      .radio-group { display: flex; gap: 16px; align-items: center; padding: 6px 0; }
       .radio-group label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 13px;
-        font-weight: normal;
-        cursor: pointer;
+        display: flex; align-items: center; gap: 5px;
+        font-size: 13px; font-weight: normal; cursor: pointer;
       }
       .radio-high   { color: #c62828; font-weight: bold; }
       .radio-middle { color: #e65100; font-weight: bold; }
       .radio-low    { color: #1565c0; font-weight: bold; }
 
-      /* Status radio (edit only) */
-      .status-group {
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        padding: 6px 0;
-      }
+      /* Status radio */
+      .status-group { display: flex; gap: 16px; align-items: center; padding: 6px 0; }
       .status-group label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-size: 13px;
-        font-weight: normal;
-        cursor: pointer;
+        display: flex; align-items: center; gap: 5px;
+        font-size: 13px; font-weight: normal; cursor: pointer;
       }
 
       /* Form buttons */
       .form-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 20px;
-        padding-top: 16px;
-        border-top: 1px solid #eee;
+        display: flex; justify-content: flex-end; gap: 10px;
+        margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee;
       }
       .btn-cancel { padding: 8px 18px; background: #9e9e9e; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
       .btn-save   { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -187,54 +133,48 @@
 
       /* ── 一覧 ── */
       .list-card {
-        background: #fff;
-        border-radius: 10px;
-        padding: 20px 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        background: #fff; border-radius: 10px;
+        padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       }
-      .list-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 16px;
-      }
+      .list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
       .list-header h2 { font-size: 15px; color: #333; }
       .list-header select {
-        padding: 5px 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 13px;
-        margin-left: auto;
+        padding: 5px 10px; border: 1px solid #ccc;
+        border-radius: 5px; font-size: 13px; margin-left: auto;
       }
       .count-label { font-size: 12px; color: #888; }
 
+      .table-wrap { overflow-y: auto; max-height: 65vh; }
       table { width: 100%; border-collapse: collapse; }
       th, td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #eee;
-        font-size: 13px;
-        text-align: left;
+        padding: 10px 12px; border-bottom: 1px solid #eee;
+        font-size: 13px; text-align: left;
       }
       th {
-        background: #e8f1ff;
-        font-weight: bold;
-        color: #333;
-        white-space: nowrap;
+        position: sticky; top: 0; z-index: 2;
+        background: #e8f1ff; font-weight: bold; color: #333; white-space: nowrap;
       }
       tr:hover { background: #f7f9ff; }
 
       .die-num { font-family: "Roboto Mono", monospace; }
       .pn-num  { font-family: "Roboto Mono", monospace; color: #555; }
 
-      /* Priority badges */
+      /* 理由セル：JP / VN 2行表示 */
+      .reason-cell { display: flex; flex-direction: column; gap: 3px; }
+      .reason-row  { display: flex; align-items: baseline; gap: 5px; font-size: 12px; }
+      .reason-row:empty { display: none; }
+      .lang-tag {
+        font-size: 10px; font-weight: bold; border-radius: 3px;
+        padding: 1px 4px; flex-shrink: 0; color: #fff;
+      }
+      .tag-jp { background: #546e7a; }
+      .tag-vn { background: #1565c0; }
+      .reason-text { color: #333; }
+
+      /* Priority / Status badges */
       .badge {
-        display: inline-block;
-        padding: 3px 10px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: bold;
-        color: #fff;
-        white-space: nowrap;
+        display: inline-block; padding: 3px 10px; border-radius: 4px;
+        font-size: 11px; font-weight: bold; color: #fff; white-space: nowrap;
       }
       .p-high   { background: #c62828; }
       .p-middle { background: #e65100; }
@@ -245,40 +185,21 @@
       .overdue { color: #c62828; font-weight: bold; }
 
       .edit-btn {
-        padding: 4px 12px;
-        background: #1565c0;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
+        padding: 4px 12px; background: #1565c0; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
       }
       .issue-btn {
-        padding: 4px 12px;
-        background: #e65100;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 12px;
-        margin-left: 6px;
+        padding: 4px 12px; background: #e65100; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer;
+        font-size: 12px; margin-left: 6px;
       }
 
       /* Toast */
       #toast {
-        position: fixed;
-        bottom: 28px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #323232;
-        color: #fff;
-        padding: 10px 24px;
-        border-radius: 6px;
-        font-size: 13px;
-        opacity: 0;
-        transition: opacity 0.3s;
-        pointer-events: none;
-        z-index: 999;
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
       }
       #toast.show { opacity: 1; }
     </style>
@@ -289,9 +210,13 @@
 
       <!-- ヘッダー -->
       <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
-        <h1>重点管理金型リスト</h1>
-        <button class="new-btn" onclick="openNewForm()">＋ 新規登録</button>
+        <button class="back-btn" onclick="location.href='index.html'" data-key="back">← メニューへ戻る</button>
+        <h1 data-key="title">重点管理金型リスト</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+        <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
       </div>
 
       <!-- フォームカード -->
@@ -303,9 +228,8 @@
 
         <div class="form-grid">
 
-          <!-- 金型番号 検索 -->
           <div class="form-group">
-            <label>金型番号 *</label>
+            <label data-key="lbl_die">金型番号 *</label>
             <div class="search-wrap" id="searchWrap">
               <input type="text" id="dieSearchInput" class="mono"
                 placeholder="型番を入力して検索..."
@@ -315,39 +239,33 @@
             </div>
           </div>
 
-          <!-- 品番（自動表示） -->
           <div class="form-group">
-            <label>品番</label>
+            <label data-key="lbl_pn">品番</label>
             <input type="text" id="fPn" class="mono readonly" readonly placeholder="金型選択後に表示" />
           </div>
 
-          <!-- 到着日（自動表示） -->
           <div class="form-group">
-            <label>到着日</label>
+            <label data-key="lbl_arrival">到着日</label>
             <input type="text" id="fArrival" class="mono readonly" readonly placeholder="金型選択後に表示" />
           </div>
 
-          <!-- 目標納期 -->
           <div class="form-group">
-            <label>目標納期</label>
+            <label data-key="lbl_target">目標納期</label>
             <input type="date" id="fTargetDate" />
           </div>
 
-          <!-- 理由 JP -->
           <div class="form-group">
-            <label>理由（JP）</label>
+            <label data-key="lbl_reason_jp">理由（JP）</label>
             <input type="text" id="fReasonJp" placeholder="日本語で入力" />
           </div>
 
-          <!-- 理由 VN -->
           <div class="form-group">
-            <label>理由（VN）</label>
+            <label data-key="lbl_reason_vn">理由（VN）</label>
             <input type="text" id="fReasonVn" placeholder="Nhập bằng tiếng Việt" />
           </div>
 
-          <!-- 優先度 -->
           <div class="form-group">
-            <label>優先度</label>
+            <label data-key="lbl_priority">優先度</label>
             <div class="radio-group">
               <label><input type="radio" name="priority" value="high" /> <span class="radio-high">high</span></label>
               <label><input type="radio" name="priority" value="middle" checked /> <span class="radio-middle">middle</span></label>
@@ -355,63 +273,145 @@
             </div>
           </div>
 
-          <!-- ステータス（編集時のみ） -->
           <div class="form-group" id="statusGroup" style="display:none;">
-            <label>ステータス</label>
+            <label data-key="lbl_status">ステータス</label>
             <div class="status-group">
               <label><input type="radio" name="fStatus" value="active" checked /> active</label>
               <label><input type="radio" name="fStatus" value="closed" /> closed</label>
             </div>
           </div>
 
-          <!-- メモ -->
           <div class="form-group full">
-            <label>メモ</label>
+            <label data-key="lbl_memo">メモ</label>
             <textarea id="fMemo" placeholder="備考があれば入力"></textarea>
           </div>
 
         </div>
 
         <div class="form-actions">
-          <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteWatch()">削除</button>
-          <button class="btn-cancel" onclick="closeForm()">キャンセル</button>
-          <button class="btn-save" onclick="saveForm()">登録する</button>
+          <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteWatch()" data-key="btn_delete">削除</button>
+          <button class="btn-cancel" onclick="closeForm()" data-key="btn_cancel">キャンセル</button>
+          <button class="btn-save" id="saveBtn" onclick="saveForm()" data-key="btn_save">登録する</button>
         </div>
       </div>
 
       <!-- 一覧 -->
       <div class="list-card">
         <div class="list-header">
-          <h2>登録一覧</h2>
+          <h2 data-key="list_title">登録一覧</h2>
           <span class="count-label" id="countLabel"></span>
           <select onchange="loadList(this.value)">
-            <option value="active">active のみ</option>
-            <option value="closed">closed のみ</option>
-            <option value="all">すべて</option>
+            <option value="active" data-key="filter_active">active のみ</option>
+            <option value="closed" data-key="filter_closed">closed のみ</option>
+            <option value="all"    data-key="filter_all">すべて</option>
           </select>
         </div>
 
-        <table id="watchTable">
-          <thead>
-            <tr>
-              <th>金型番号</th>
-              <th>品番</th>
-              <th>到着日</th>
-              <th>理由(JP)</th>
-              <th>優先度</th>
-              <th>目標納期</th>
-              <th>状態</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <div class="table-wrap">
+          <table id="watchTable">
+            <thead>
+              <tr>
+                <th data-key="col_die">金型番号</th>
+                <th data-key="col_arrival">到着日</th>
+                <th data-key="col_reason">理由</th>
+                <th data-key="col_priority">優先度</th>
+                <th data-key="col_target">目標納期</th>
+                <th data-key="col_status">状態</th>
+                <th data-key="col_action">操作</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <div id="toast"></div>
 
     <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          title:         "重点管理金型リスト",
+          back:          "← メニューへ戻る",
+          btn_new:       "＋ 新規登録",
+          list_title:    "登録一覧",
+          col_die:       "金型番号",
+          col_pn:        "品番",
+          col_arrival:   "到着日",
+          col_reason:    "理由",
+          col_priority:  "優先度",
+          col_target:    "目標納期",
+          col_status:    "状態",
+          col_action:    "操作",
+          lbl_die:       "金型番号 *",
+          lbl_pn:        "品番",
+          lbl_arrival:   "到着日",
+          lbl_target:    "目標納期",
+          lbl_reason_jp: "理由（JP）",
+          lbl_reason_vn: "理由（VN）",
+          lbl_priority:  "優先度",
+          lbl_status:    "ステータス",
+          lbl_memo:      "メモ",
+          filter_active: "active のみ",
+          filter_closed: "closed のみ",
+          filter_all:    "すべて",
+          btn_save:      "登録する",
+          btn_update:    "更新する",
+          btn_cancel:    "キャンセル",
+          btn_delete:    "削除",
+          btn_edit:      "✏ 編集",
+          btn_issue:     "Issue一覧",
+          empty:         "登録がありません",
+        },
+        vi: {
+          title:         "Danh sách khuôn quản lý trọng điểm",
+          back:          "← Quay lại menu",
+          btn_new:       "＋ Thêm mới",
+          list_title:    "Danh sách đăng ký",
+          col_die:       "Số khuôn",
+          col_pn:        "Mã SP",
+          col_arrival:   "Ngày đến",
+          col_reason:    "Lý do",
+          col_priority:  "Ưu tiên",
+          col_target:    "Ngày mục tiêu",
+          col_status:    "Trạng thái",
+          col_action:    "Thao tác",
+          lbl_die:       "Số khuôn *",
+          lbl_pn:        "Mã SP",
+          lbl_arrival:   "Ngày đến",
+          lbl_target:    "Ngày mục tiêu",
+          lbl_reason_jp: "Lý do（JP）",
+          lbl_reason_vn: "Lý do（VN）",
+          lbl_priority:  "Mức ưu tiên",
+          lbl_status:    "Trạng thái",
+          lbl_memo:      "Ghi chú",
+          filter_active: "Chỉ active",
+          filter_closed: "Chỉ closed",
+          filter_all:    "Tất cả",
+          btn_save:      "Lưu",
+          btn_update:    "Cập nhật",
+          btn_cancel:    "Hủy",
+          btn_delete:    "Xóa",
+          btn_edit:      "✏ Sửa",
+          btn_issue:     "Danh sách Issue",
+          empty:         "Không có dữ liệu",
+        },
+      };
+
+      let currentLang = localStorage.getItem("lang_watch") || "ja";
+      let cachedData  = [];
+
+      function setLang(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang_watch", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        renderList(cachedData);
+      }
+
       /* ── Toast ── */
       function showToast(msg, ok = true) {
         const t = document.getElementById("toast");
@@ -461,10 +461,10 @@
       }
 
       function selectDie(d) {
-        document.getElementById("fDieId").value          = d.id;
-        document.getElementById("dieSearchInput").value  = d.die_number;
-        document.getElementById("fPn").value             = d.production_number;
-        document.getElementById("fArrival").value        = fmtDate(d.arrival_at);
+        document.getElementById("fDieId").value         = d.id;
+        document.getElementById("dieSearchInput").value = d.die_number;
+        document.getElementById("fPn").value            = d.production_number;
+        document.getElementById("fArrival").value       = fmtDate(d.arrival_at);
         hideSuggestions();
       }
 
@@ -479,12 +479,12 @@
       /* ── フォーム操作 ── */
       function openNewForm() {
         resetForm();
-        document.getElementById("formTitle").textContent   = "✚ 新規登録";
-        document.getElementById("formTitle").className     = "form-title";
-        document.getElementById("statusGroup").style.display = "none";
-        document.getElementById("deleteBtn").style.display   = "none";
-        document.querySelector(".btn-save").textContent      = "登録する";
-        document.getElementById("dieSearchInput").readOnly   = false;
+        document.getElementById("formTitle").textContent       = "✚ " + dict[currentLang].btn_save;
+        document.getElementById("formTitle").className         = "form-title";
+        document.getElementById("statusGroup").style.display   = "none";
+        document.getElementById("deleteBtn").style.display     = "none";
+        document.getElementById("saveBtn").textContent         = dict[currentLang].btn_save;
+        document.getElementById("dieSearchInput").readOnly     = false;
         document.getElementById("dieSearchInput").style.background = "";
         document.getElementById("formCard").classList.add("open");
         document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
@@ -492,23 +492,23 @@
 
       function openEditForm(row) {
         resetForm();
-        document.getElementById("formTitle").textContent   = `✏ 編集中：${row.die_number}`;
-        document.getElementById("formTitle").className     = "form-title edit";
-        document.getElementById("statusGroup").style.display = "";
-        document.getElementById("deleteBtn").style.display   = "";
-        document.querySelector(".btn-save").textContent      = "更新する";
+        document.getElementById("formTitle").textContent       = `✏ ${row.die_number}`;
+        document.getElementById("formTitle").className         = "form-title edit";
+        document.getElementById("statusGroup").style.display   = "";
+        document.getElementById("deleteBtn").style.display     = "";
+        document.getElementById("saveBtn").textContent         = dict[currentLang].btn_update;
 
-        document.getElementById("fId").value             = row.id;
-        document.getElementById("fDieId").value          = row.die_id;
-        document.getElementById("dieSearchInput").value  = row.die_number;
+        document.getElementById("fId").value            = row.id;
+        document.getElementById("fDieId").value         = row.die_id;
+        document.getElementById("dieSearchInput").value = row.die_number;
         document.getElementById("dieSearchInput").readOnly = true;
         document.getElementById("dieSearchInput").style.background = "#f5f5f5";
-        document.getElementById("fPn").value             = row.production_number;
-        document.getElementById("fArrival").value        = fmtDate(row.arrival_at);
-        document.getElementById("fReasonJp").value       = row.reason_jp ?? "";
-        document.getElementById("fReasonVn").value       = row.reason_vn ?? "";
-        document.getElementById("fTargetDate").value     = row.target_date ?? "";
-        document.getElementById("fMemo").value           = row.memo ?? "";
+        document.getElementById("fPn").value            = row.production_number;
+        document.getElementById("fArrival").value       = fmtDate(row.arrival_at);
+        document.getElementById("fReasonJp").value      = row.reason_jp ?? "";
+        document.getElementById("fReasonVn").value      = row.reason_vn ?? "";
+        document.getElementById("fTargetDate").value    = row.target_date ?? "";
+        document.getElementById("fMemo").value          = row.memo ?? "";
 
         document.querySelectorAll("input[name='priority']").forEach((r) => {
           r.checked = r.value === row.priority;
@@ -527,15 +527,9 @@
       }
 
       function resetForm() {
-        document.getElementById("fId").value            = "";
-        document.getElementById("fDieId").value         = "";
-        document.getElementById("dieSearchInput").value = "";
-        document.getElementById("fPn").value            = "";
-        document.getElementById("fArrival").value       = "";
-        document.getElementById("fReasonJp").value      = "";
-        document.getElementById("fReasonVn").value      = "";
-        document.getElementById("fTargetDate").value    = "";
-        document.getElementById("fMemo").value          = "";
+        ["fId","fDieId","dieSearchInput","fPn","fArrival",
+         "fReasonJp","fReasonVn","fTargetDate","fMemo"]
+          .forEach((id) => { document.getElementById(id).value = ""; });
         document.querySelectorAll("input[name='priority']").forEach((r) => {
           r.checked = r.value === "middle";
         });
@@ -549,10 +543,13 @@
         const id     = document.getElementById("fId").value;
         const die_id = document.getElementById("fDieId").value;
 
-        if (!die_id) { showToast("金型番号を選択してください", false); return; }
+        if (!die_id) {
+          showToast(currentLang === "vi" ? "Vui lòng chọn số khuôn" : "金型番号を選択してください", false);
+          return;
+        }
 
         const priority = document.querySelector("input[name='priority']:checked")?.value ?? "middle";
-        const status   = document.querySelector("input[name='fStatus']:checked")?.value ?? "active";
+        const status   = document.querySelector("input[name='fStatus']:checked")?.value  ?? "active";
 
         const body = {
           action:      id ? "update" : "insert",
@@ -574,11 +571,12 @@
         const result = await res.json();
 
         if (result.status === "ok") {
-          showToast(id ? "更新しました" : "登録しました");
+          showToast(id ? (currentLang === "vi" ? "Đã cập nhật" : "更新しました")
+                       : (currentLang === "vi" ? "Đã lưu"     : "登録しました"));
           closeForm();
           loadList(document.querySelector(".list-header select").value);
         } else {
-          showToast(result.message || "保存に失敗しました", false);
+          showToast(result.message || (currentLang === "vi" ? "Lỗi khi lưu" : "保存に失敗しました"), false);
         }
       }
 
@@ -586,7 +584,8 @@
       async function deleteWatch() {
         const id = document.getElementById("fId").value;
         if (!id) return;
-        if (!confirm("この登録を削除しますか？")) return;
+        const msg = currentLang === "vi" ? "Bạn có muốn xóa không？" : "この登録を削除しますか？";
+        if (!confirm(msg)) return;
 
         const res    = await fetch("./php/die_watch/delete_die_watch.php", {
           method:  "POST",
@@ -596,26 +595,29 @@
         const result = await res.json();
 
         if (result.status === "ok") {
-          showToast("削除しました");
+          showToast(currentLang === "vi" ? "Đã xóa" : "削除しました");
           closeForm();
           loadList(document.querySelector(".list-header select").value);
         } else {
-          showToast(result.message || "削除に失敗しました", false);
+          showToast(result.message || "エラー", false);
         }
       }
 
       /* ── 一覧読み込み ── */
       async function loadList(status = "active") {
         const res  = await fetch(`./php/die_watch/get_die_watch_list.php?status=${status}`);
-        const data = await res.json();
+        cachedData = await res.json();
+        renderList(cachedData);
+      }
 
+      function renderList(data) {
         document.getElementById("countLabel").textContent = `${data.length} 件`;
 
         const tbody = document.querySelector("#watchTable tbody");
         tbody.innerHTML = "";
 
         if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">登録がありません</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">${dict[currentLang].empty}</td></tr>`;
           return;
         }
 
@@ -626,18 +628,27 @@
           const sClass = row.status === "active" ? "s-active" : "s-closed";
           const od     = row.target_date && row.target_date < today && row.status === "active";
 
+          const jpRow = row.reason_jp
+            ? `<div class="reason-row"><span class="lang-tag tag-jp">JP</span><span class="reason-text">${row.reason_jp}</span></div>`
+            : "";
+          const vnRow = row.reason_vn
+            ? `<div class="reason-row"><span class="lang-tag tag-vn">VN</span><span class="reason-text">${row.reason_vn}</span></div>`
+            : "";
+          const reasonHtml = (jpRow || vnRow)
+            ? `<div class="reason-cell">${jpRow}${vnRow}</div>`
+            : "—";
+
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td class="die-num">${row.die_number}</td>
-            <td class="pn-num">${row.production_number}</td>
             <td>${fmtDate(row.arrival_at)}</td>
-            <td>${row.reason_jp ?? "—"}</td>
+            <td>${reasonHtml}</td>
             <td><span class="badge ${pClass}">${row.priority}</span></td>
             <td class="${od ? "overdue" : ""}">${fmtDate(row.target_date)}</td>
             <td><span class="badge ${sClass}">${row.status}</span></td>
             <td style="white-space:nowrap;">
-              <button class="edit-btn" onclick="openEditForm(${JSON.stringify(row).replace(/"/g, '&quot;')})">✏ 編集</button>
-              <button class="issue-btn" onclick="location.href='die_issue_list.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">Issue一覧</button>
+              <button class="edit-btn" onclick="openEditForm(${JSON.stringify(row).replace(/"/g, '&quot;')})">${dict[currentLang].btn_edit}</button>
+              <button class="issue-btn" onclick="location.href='die_issue_list.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">${dict[currentLang].btn_issue}</button>
             </td>
           `;
           tbody.appendChild(tr);
@@ -645,7 +656,10 @@
       }
 
       /* ── 初期ロード ── */
-      loadList("active");
+      window.onload = function () {
+        setLang(currentLang);
+        loadList("active");
+      };
     </script>
   </body>
 </html>

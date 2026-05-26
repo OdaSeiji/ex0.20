@@ -134,9 +134,16 @@
       .list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
       .list-header h2 { font-size: 15px; color: #333; }
       .count-label { font-size: 12px; color: #888; }
-      .search-input {
-        padding: 6px 12px; border: 1px solid #ccc; border-radius: 5px;
-        font-size: 13px; width: 220px; margin-left: auto;
+      .th-search {
+        width: 20px; padding: 2px 4px; margin-left: 6px;
+        border: 1px solid #bbb; border-radius: 3px;
+        font-size: 11px; font-family: inherit;
+        vertical-align: middle; cursor: text;
+        transition: width 0.2s ease;
+      }
+      .th-search:focus {
+        width: 120px; outline: none;
+        border-color: #0078d4;
       }
 
       .table-wrap { overflow-y: auto; max-height: 60vh; }
@@ -396,6 +403,18 @@
           </div>
         </div>
 
+        <!-- カテゴリ2選択時：紐づき品番 -->
+        <div id="formPnSection" style="display:none; margin-bottom:12px;">
+          <div class="pn-section">
+            <div class="pn-section-head">
+              <span>紐づき品番：</span>
+              <strong id="formPnCat2Name"></strong>
+              <span id="formPnCount" style="margin-left:auto;font-size:12px;color:#888"></span>
+            </div>
+            <div class="pn-section-list" id="formPnList"></div>
+          </div>
+        </div>
+
         <div class="form-actions">
           <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteRecord()" data-key="btn_delete">削除</button>
           <button class="btn-cancel" onclick="closeForm()" data-key="btn_cancel">キャンセル</button>
@@ -408,8 +427,6 @@
         <div class="list-header">
           <h2 data-key="list_title">品番一覧</h2>
           <span class="count-label" id="countLabel"></span>
-          <input type="text" class="search-input" id="searchInput"
-            placeholder="品番で絞り込み..." oninput="filterTable(this.value)" />
         </div>
         <div class="table-wrap">
         <table id="mainTable">
@@ -417,7 +434,7 @@
             <tr>
               <th class="sortable col-cat1" onclick="sortBy('category1_jp')" data-key="col_cat1">カテゴリ1<span class="sort-icon" data-sortkey="category1_jp">↕</span></th>
               <th class="sortable col-cat2" onclick="sortBy('category2_jp')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="category2_jp">↕</span></th>
-              <th class="sortable col-pn"   onclick="sortBy('production_number')" data-key="col_pn">品番<span class="sort-icon" data-sortkey="production_number">↕</span></th>
+              <th class="sortable col-pn"   onclick="sortBy('production_number')"><span data-key="col_pn">品番</span><span class="sort-icon" data-sortkey="production_number">↕</span><input type="text" id="searchInput" class="th-search" placeholder="🔍" oninput="filterTable(this.value)" onclick="event.stopPropagation()" /></th>
               <th class="col-mat" data-key="col_material">材質</th>
               <th class="col-age" data-key="col_aging">時効</th>
               <th class="col-num" data-key="col_area">断面積 (mm²)</th>
@@ -718,11 +735,29 @@
         });
       }
 
-      function onCat2Click(id, tr) {
+      async function onCat2Click(id, tr) {
         document.querySelectorAll("#cat2Tbody tr.selected").forEach((r) => r.classList.remove("selected"));
         tr.classList.add("selected");
         selectedCat2Id = id;
         document.getElementById("cat2Hint").classList.remove("show");
+
+        const name = tr.querySelector("td")?.textContent ?? "";
+        document.getElementById("formPnCat2Name").textContent = name;
+        document.getElementById("formPnCount").textContent    = "";
+        document.getElementById("formPnList").innerHTML =
+          '<div class="cat-mgr-empty" style="padding:8px">読み込み中...</div>';
+        document.getElementById("formPnSection").style.display = "";
+
+        const data = await postForm("./php/ProductionNumber/SelPnByCat2.php", { cat2Id: id });
+        document.getElementById("formPnCount").textContent = `${data.length} 件`;
+        const list = document.getElementById("formPnList");
+        if (!data.length) {
+          list.innerHTML = '<div class="cat-mgr-empty" style="padding:8px">品番の紐づきはありません</div>';
+          return;
+        }
+        list.innerHTML = data.map((r) =>
+          `<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`
+        ).join("");
       }
 
       /* ════════════════════════════
@@ -812,6 +847,7 @@
         document.getElementById("cat2Tbody").innerHTML = "";
         document.getElementById("cat1Hint").classList.remove("show");
         document.getElementById("cat2Hint").classList.remove("show");
+        document.getElementById("formPnSection").style.display = "none";
         selectedCat1Id = null;
         selectedCat2Id = null;
       }
