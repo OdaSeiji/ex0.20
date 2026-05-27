@@ -589,27 +589,24 @@
         // ▼ スタッフ一覧
         loadStaffList();
 
-        // ▼ 押出情報カードは常に表示
+        // ▼ 押出・測定・診断情報は常にロード
         if (pressId) {
-          loadPressInfo(pressId);
+          loadDiagnosisData();
         }
 
         // ▼ 編集モード
         if (mode === "edit") {
-          loadDiagnosisData(pressId);
           enableInputs();
           return;
         }
 
         // ▼ 承認モード
         if (mode === "approval") {
-          loadDiagnosisData(pressId);
           enableApprovalMode();
           return;
         }
 
-        // ▼ 新規モード
-        // 何もしない
+        // ▼ 新規モード：入力欄はデフォルトで有効なのでそのまま
       };
 
       /* ------------------------------
