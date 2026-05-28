@@ -1,72 +1,52 @@
-# 2026/05/26
-
-### 修正1
-
-承認できる時のパスワード
-1031/6767/5375
-の3つ。
+# 2026/05/27
 
 ---
 
-### 修正２
+### 不具合
 
-「重点管理金型」リストの、ベトナム語表記の追加。※VN後が入っていないところは入力してください。
+診断画面で、測定結果が表示されません。
 
 <figure style="text-align:center;">
-  <img src="./img/20260527-03.png" width="200">
+  <img src="./img/20260527-04.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+<figure style="text-align:center;">
+  <img src="./img/20260527-05.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
-<figure style="text-align:center;">
-  <img src="./img/20260527-01.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
+### 解決
 
----
-
-### 修正３
-
-管理対象になっている金型は、表記する。まだ、移管状態が反映できない。
+原因、診断モード画面を開くとき、「新規作成モードで開いてしまった」
 
 <figure style="text-align:center;">
-  <img src="./img/20260527-02.png" width="300">
+  <img src="./img/20260528-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
 ---
 
-# 2026/05/26
+### Sự cố
 
-### Sửa đổi 1
-
-Mật khẩu có thể được sử dụng để phê duyệt:
-1031 / 6767 / 5375
-(tổng cộng 3 loại).
-
----
-
-### Sửa đổi 2
-
-Bổ sung hiển thị tiếng Việt. ※ Những phần chưa có nội dung sau "VN" vui lòng nhập bổ sung.
+Trên màn hình chẩn đoán, kết quả đo không được hiển thị.
 
 <figure style="text-align:center;">
-  <img src="./img/20260527-03.png" width="200">
+  <img src="./img/20260527-04.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
 <figure style="text-align:center;">
-  <img src="./img/20260527-01.png" width="300">
+  <img src="./img/20260527-05.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
 ---
 
-### Sửa đổi 3
+### Cách khắc phục
 
-Các khuôn thuộc đối tượng quản lý sẽ được hiển thị. Hiện tại, trạng thái chuyển giao vẫn chưa thể phản ánh.
+Nguyên nhân: Khi mở màn hình chế độ chẩn đoán, hệ thống đã mở ở chế độ tạo mới.
 
 <figure style="text-align:center;">
-  <img src="./img/20260527-02.png" width="300">
+  <img src="./img/20260528-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
-``
