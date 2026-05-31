@@ -1,64 +1,65 @@
 <?php
+header("Content-Type: application/json; charset=UTF-8");
 require_once "./../db.php";
 
-$die_id = $_GET["die_id"] ?? "";
-$start  = $_GET["start"] ?? "";
-$end    = $_GET["end"] ?? "";
-$date_col = $_GET["date_col"] ?? "arrived_at"; // デフォルト arrived_at
+$die_id   = $_GET["die_id"]   ?? "";
+$start    = $_GET["start"]    ?? "";
+$end      = $_GET["end"]      ?? "";
+$date_col = $_GET["date_col"] ?? "die_arrived_at";
 
-// ▼ 期間対象カラムのホワイトリスト
 $allowed_cols = [
-    "arrived_at",
-    "capitalization_date",
-    "press_condition_document_completion_at",
-    "qa_dimension_inspection_completed_at",
-    "dimension_inspection_sample_sent_at"
+    "die_arrived_at",
+    "instruction_created_at",
+    "inspection_passed_at",
+    "submitted_to_japan_at",
+    "submitted_to_vietnam_at",
 ];
 
-// ▼ 不正な値が来た場合は arrived_at にフォールバック
 if (!in_array($date_col, $allowed_cols, true)) {
-    $date_col = "arrived_at";
+    $date_col = "die_arrived_at";
 }
 
-$where = [];
+$where  = [];
+$params = [];
 
-// ▼ 金型フィルター
 if ($die_id !== "") {
-    $where[] = "h.die_id = " . intval($die_id);
+    $where[]  = "h.die_id = ?";
+    $params[] = intval($die_id);
 }
-
-// ▼ 期間フィルター（対象カラムを選択可能）
 if ($start !== "") {
-    $where[] = "h.$date_col >= " . $pdo->quote($start);
+    $where[]  = "h.{$date_col} >= ?";
+    $params[] = $start;
 }
-
 if ($end !== "") {
-    $where[] = "h.$date_col <= " . $pdo->quote($end);
+    $where[]  = "h.{$date_col} <= ?";
+    $params[] = $end;
 }
 
 $whereSql = count($where) ? "WHERE " . implode(" AND ", $where) : "";
 
-// ▼ メイン SQL
 $sql = "
     SELECT
         h.id,
         h.die_id,
-        d.die_number,
-        h.pn as original_pn,
-        p.production_number as database_pn,
-        h.press_condition_document_completion_at,
-        h.qa_dimension_inspection_completed_at,
-        h.qa_dimension_inspection_document_number,
-        h.dimension_inspection_sample_sent_at,
-        h.arrived_at,
-        h.capitalization_date,
-        h.memo
+        COALESCE(d.die_number, h.die_model_code)              AS die_number,
+        COALESCE(p.production_number, h.product_code)         AS production_number,
+        h.instruction_created_at,
+        h.inspection_number,
+        h.inspection_passed_at,
+        h.submitted_to_japan_at,
+        h.submitted_to_vietnam_at,
+        h.is_accessory_item_flag,
+        h.invoice_number,
+        h.die_arrived_at,
+        h.unusable_flag,
+        h.updated_at
     FROM t_die_handover h
-    JOIN m_dies d ON h.die_id = d.id
-    JOIN m_production_numbers p ON d.production_number_id = p.id
+    LEFT JOIN m_dies d ON h.die_id = d.id
+    LEFT JOIN m_production_numbers p ON h.product_code = p.production_number
     $whereSql
     ORDER BY h.id DESC
 ";
 
-$stmt = $pdo->query($sql);
-echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC), JSON_UNESCAPED_UNICODE);

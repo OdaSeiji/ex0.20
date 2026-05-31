@@ -4619,3 +4619,57 @@ die_diagnosis.html承認した時、ページが戻らない問題、解決。�
   <img src="./img/20260529-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/05/31
+
+`t_die_handover`を整理していく。まずは、die_idを割り振ったので、そのデータを取り込んだ。
+
+以下のリストの項目は、`die_id`が無いため、`t_die_handover`に取り込んでいない。
+| No | 型番 | 品番 | 加工条件指示書作成日 | 型検番号 | 型検合格日 | 日本に提出日 | ベトナム原価に提出時 | NOTE | Invoice | 金型到着日 | 使用不可 | Note | m_die.id | 型番重複 |
+| ---- | ------------ | ---------------- | -------------------- | -------- | ---------- | ------------ | -------------------- | -------- | ------- | ---------- | -------- | ---- | -------- | -------- |
+| 169 | CG20R-V01D | CG-020K02-35900A | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 170 | CG25R-V01D | CG-025K02-35901A | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 171 | CG32R-V01D | CG-032K02-35902A | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 172 | CG50R-V01D | CG-050K02-35904A | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 168 | CG63H-V01D | C1G63L-M3325-20K | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 195 | CG20H-V01D | C1G20L-M3320-20K | | | | | | TOOL JIG | CVF015 | 2022/4/14 | | | | 1 |
+| 196 | CG25H-V01D | C1G25L-M3321-20K | | | | | | TOOL JIG | CVF015 | 2022/4/14 | | | | 1 |
+| 173 | CG63R-V01D | CG-063K02-35905A | | | | | | | CVF027 | 2022/4/25 | | | | 1 |
+| 1038 | MHS331B-V01E | XT331-2153-5-M | | | | | | | CVF467 | 2025/12/29 | | | | 1 |
+| 1091 | NCQ63T2-V01C | N8QAGA-AB787-20K | | | | | | | CVF646 | 2026/3/11 | | | | 1 |
+| 1092 | NCQ76T-V01C | N7QAFA-BA356-20K | | | | | | | CVF646 | 2026/3/11 | | | | 1 |
+| 1108 | MHZL20B-V01D | XT481-3074-1-M | | | | | | | CVF733 | 2026/5/4 | | | | 1 |
+| 1109 | XT331P-V01D | XT331-2153-2-M | | | | | | | CVF733 | 2026/5/4 | | | | 1 |
+
+その他、取り込んだデータの整理。
+
+```terminal
+MariaDB [extrusion]> SHOW FULL COLUMNS FROM t_die_handover;
++-------------------------+--------------+--------------------+------+-----+---------------------+-------------------------------+---------------------------------+--------------------------------------------------------------------+
+| Field                   | Type         | Collation          | Null | Key | Default             | Extra                         | Privileges                      | Comment                                                            |
++-------------------------+--------------+--------------------+------+-----+---------------------+-------------------------------+---------------------------------+--------------------------------------------------------------------+
+| id                      | int(11)      | NULL               | NO   | PRI | NULL                | auto_increment                | select,insert,update,references |                                                                    |
+| die_id                  | int(11)      | NULL               | YES  | MUL | NULL                |                               | select,insert,update,references |                                                                    |
+| die_model_code          | varchar(100) | utf8mb4_general_ci | NO   |     | NULL                |                               | select,insert,update,references | Value imported from legacy data; no user input after web migration |
+| product_code            | varchar(100) | utf8mb4_general_ci | NO   |     | NULL                |                               | select,insert,update,references | Value imported from legacy data; no user input after web migration |
+| instruction_created_at  | date         | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| inspection_number       | varchar(50)  | utf8mb4_general_ci | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| inspection_passed_at    | date         | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| submitted_to_japan_at   | date         | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| submitted_to_vietnam_at | date         | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| is_accessory_item_flag  | tinyint(1)   | NULL               | YES  |     | NULL                |                               | select,insert,update,references | Set to 1 when this record represents an accessory item             |
+| invoice_number          | varchar(100) | utf8mb4_general_ci | NO   |     | NULL                |                               | select,insert,update,references |                                                                    |
+| die_arrived_at          | date         | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| unusable_flag           | tinyint(1)   | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| note2                   | text         | utf8mb4_general_ci | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| duplicate_flag          | tinyint(1)   | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| candidate_flag          | tinyint(1)   | NULL               | YES  |     | NULL                |                               | select,insert,update,references |                                                                    |
+| updated_at              | datetime     | NULL               | YES  |     | current_timestamp() | on update current_timestamp() | select,insert,update,references |                                                                    |
+| created_at              | datetime     | NULL               | YES  |     | current_timestamp() |                               | select,insert,update,references |                                                                    |
++-------------------------+--------------+--------------------+------+-----+---------------------+-------------------------------+---------------------------------+--------------------------------------------------------------------+
+18 rows in set (0.023 sec)
+
+MariaDB [extrusion]>
+```
+
+次は、新規追加画面。

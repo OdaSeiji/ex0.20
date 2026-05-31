@@ -90,7 +90,7 @@
         margin-bottom: 20px;
       }
       .cat-card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; max-height: 220px; display: flex; flex-direction: column; }
-      .cat-title { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0; }
+      .cat-title { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
       .cat-scroll { overflow-y: auto; flex: 1; }
       .cat-table { width: 100%; border-collapse: collapse; }
       .cat-table td { padding: 7px 12px; font-size: 13px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
@@ -161,11 +161,14 @@
       tr:hover { background: #f7f9ff; }
 
       /* カラム幅 */
-      .col-cat1, .col-cat2 { width: 110px; max-width: 110px; }
+      .col-cat1 { min-width: 130px; width: 130px; }
+      .col-cat2 { width: 110px; max-width: 110px; }
       .col-pn   { min-width: 130px; }
       .col-mat, .col-age { width: 70px; }
       .col-num  { width: 110px; }
       .col-act  { width: 72px; }
+      .col-date { width: 90px; }
+      .updated-recent { background: #fff3cd; color: #7b4f00; font-weight: bold; }
 
       .edit-btn {
         padding: 4px 12px; background: #1565c0; color: #fff;
@@ -284,6 +287,36 @@
         background: #546e7a; color: #fff;
         padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
       }
+      .import-btn {
+        background: #00695c; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
+      }
+
+      /* ── CSV インポートモーダル ── */
+      .drop-zone {
+        border: 2px dashed #90caf9; border-radius: 8px;
+        padding: 28px 20px; text-align: center; color: #1565c0;
+        background: #f0f7ff; cursor: pointer; transition: background 0.2s;
+        font-size: 14px;
+      }
+      .drop-zone.drag-over { background: #dceeff; border-color: #1565c0; }
+      .drop-zone input[type="file"] { display: none; }
+
+      .import-preview { margin-top: 14px; overflow-x: auto; }
+      .import-preview table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .import-preview th { background: #e8f1ff; padding: 7px 10px; border-bottom: 2px solid #c5d8f5; text-align: left; white-space: nowrap; }
+      .import-preview td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+
+      .badge-new   { display: inline-block; background: #e8f5e9; color: #2e7d32; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
+      .badge-dup   { display: inline-block; background: #ffebee; color: #c62828; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
+      .badge-warn  { display: inline-block; background: #fff3e0; color: #e65100; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
+
+      .import-summary { font-size: 13px; color: #555; margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; }
+      .import-summary span { display: flex; align-items: center; gap: 4px; }
+
+      .import-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; }
+      .btn-import-submit { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-import-submit:disabled { background: #90a4ae; cursor: default; }
     </style>
   </head>
 
@@ -299,6 +332,7 @@
           <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
         </div>
         <button class="cat-mgr-btn" onclick="openCatMgr()" data-key="btn_cat_mgr">🗂 カテゴリ管理</button>
+        <button class="import-btn" onclick="openImportModal()" data-key="btn_import">📂 CSV インポート</button>
         <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
       </div>
 
@@ -388,7 +422,10 @@
         <!-- カテゴリ選択 -->
         <div class="cat-wrap">
           <div class="cat-card">
-            <div class="cat-title req" data-key="lbl_cat1">カテゴリ1</div>
+            <div class="cat-title req">
+              <span data-key="lbl_cat1">カテゴリ1</span>
+              <input type="text" id="cat1Search" class="th-search" style="margin-left:auto;" placeholder="🔍" oninput="filterCat1(this.value)" onclick="event.stopPropagation()" />
+            </div>
             <div class="cat-scroll">
               <table class="cat-table"><tbody id="cat1Tbody"></tbody></table>
             </div>
@@ -432,7 +469,7 @@
         <table id="mainTable">
           <thead>
             <tr>
-              <th class="sortable col-cat1" onclick="sortBy('category1_jp')" data-key="col_cat1">カテゴリ1<span class="sort-icon" data-sortkey="category1_jp">↕</span></th>
+              <th class="sortable col-cat1" onclick="sortBy('category1_jp')"><span data-key="col_cat1">カテゴリ1</span><span class="sort-icon" data-sortkey="category1_jp">↕</span><input type="text" id="searchCat1" class="th-search" placeholder="🔍" oninput="filterByCat1(this.value)" onclick="event.stopPropagation()" /></th>
               <th class="sortable col-cat2" onclick="sortBy('category2_jp')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="category2_jp">↕</span></th>
               <th class="sortable col-pn"   onclick="sortBy('production_number')"><span data-key="col_pn">品番</span><span class="sort-icon" data-sortkey="production_number">↕</span><input type="text" id="searchInput" class="th-search" placeholder="🔍" oninput="filterTable(this.value)" onclick="event.stopPropagation()" /></th>
               <th class="col-mat" data-key="col_material">材質</th>
@@ -441,6 +478,7 @@
               <th class="col-num" data-key="col_weight">比重 (kg/m)</th>
               <th class="col-num" data-key="col_length">製品長 (m)</th>
               <th class="col-act" data-key="col_action">操作</th>
+              <th class="col-date sortable" onclick="sortBy('updated_at')" data-key="col_updated">更新日<span class="sort-icon" data-sortkey="updated_at">↕</span></th>
             </tr>
           </thead>
           <tbody id="mainTbody"></tbody>
@@ -513,6 +551,51 @@
       </div>
     </div>
 
+    <!-- CSV インポートモーダル -->
+    <div id="importModal" class="modal-overlay">
+      <div class="modal-box" style="width:820px;">
+        <div class="modal-header">
+          <h3>📂 品番 CSV インポート</h3>
+          <button class="modal-close" onclick="closeImportModal()">✕</button>
+        </div>
+
+        <!-- ドロップゾーン -->
+        <div class="drop-zone" id="importDropZone"
+             ondragover="event.preventDefault(); this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="handleImportDrop(event)"
+             onclick="document.getElementById('importFileInput').click()">
+          <input type="file" id="importFileInput" accept=".csv,.tsv,.txt" onchange="handleImportFile(this.files[0])">
+          <div>CSVファイルをここにドロップ、またはクリックして選択</div>
+          <div style="font-size:12px;color:#888;margin-top:6px;">列：production_number, billet_material, production_length, cross_section_area</div>
+        </div>
+
+        <!-- プレビュー -->
+        <div id="importPreviewWrap" style="display:none;">
+          <div class="import-preview">
+            <table>
+              <thead>
+                <tr>
+                  <th>品番</th>
+                  <th>材質</th>
+                  <th>製品長 (m)</th>
+                  <th>断面積 (mm²)</th>
+                  <th>状態</th>
+                </tr>
+              </thead>
+              <tbody id="importPreviewTbody"></tbody>
+            </table>
+          </div>
+          <div class="import-summary" id="importSummary"></div>
+        </div>
+
+        <div class="import-actions">
+          <button class="btn-cancel" onclick="closeImportModal()">キャンセル</button>
+          <button class="btn-import-submit" id="importSubmitBtn" disabled onclick="submitImport()">登録 (0件)</button>
+        </div>
+      </div>
+    </div>
+
     <div id="toast"></div>
 
     <script>
@@ -551,7 +634,9 @@
           col_area: "断面積 (mm²)",
           col_weight: "比重 (kg/m)",
           col_length: "製品長 (m)",
-          col_action: "操作",
+          col_action:  "操作",
+          col_updated: "更新日",
+          btn_import: "📂 CSV インポート",
         },
         vi: {
           title: "Quản lý mã sản phẩm",
@@ -586,11 +671,31 @@
           col_area: "Tiết diện (mm²)",
           col_weight: "TL riêng (kg/m)",
           col_length: "Dài (m)",
-          col_action: "Thao tác",
+          col_action:  "Thao tác",
+          col_updated: "Ngày cập nhật",
+          btn_import: "📂 CSV Nhập",
         },
       };
 
+      let currentLang = localStorage.getItem("lang") || "ja";
+
+      function formatDate(dateStr) {
+        if (!dateStr) return "";
+        const parts = String(dateStr).split("-");
+        if (parts.length !== 3) return dateStr;
+        const [yyyy, mm, dd] = parts;
+        const yy = yyyy.slice(2);
+        return currentLang === "vi" ? `${dd}-${mm}-${yy}` : `${yy}-${mm}-${dd}`;
+      }
+
+      function isRecentUpdate(dateStr) {
+        if (!dateStr) return false;
+        const diff = Date.now() - new Date(dateStr).getTime();
+        return diff >= 0 && diff <= 30 * 24 * 60 * 60 * 1000;
+      }
+
       function setLang(lang) {
+        currentLang = lang;
         document.querySelectorAll("[data-key]").forEach((el) => {
           const k = el.getAttribute("data-key");
           if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
@@ -640,7 +745,7 @@
         tbody.innerHTML = "";
 
         if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
           return;
         }
 
@@ -661,17 +766,39 @@
             <td>${row.specific_weight    ?? "—"}</td>
             <td>${row.production_length  ?? "—"}</td>
             <td><button class="edit-btn" onclick="openEditForm(${row.id})">✏ 編集</button></td>
+            <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${formatDate(row.updated_at)}</td>
           `;
           tbody.appendChild(tr);
         });
       }
 
       /* 絞り込み */
+      let searchPn   = "";
+      let searchCat1 = "";
+
       function filterTable(q) {
-        q = q.toUpperCase();
+        searchPn = q.toUpperCase();
+        applyFilters();
+      }
+
+      function filterByCat1(q) {
+        searchCat1 = q.toUpperCase();
+        applyFilters();
+      }
+
+      function applyFilters() {
         renderTable(allData.filter((r) =>
-          String(r.production_number ?? "").toUpperCase().includes(q)
+          String(r.production_number ?? "").toUpperCase().includes(searchPn) &&
+          String(r.category1_jp     ?? "").toUpperCase().includes(searchCat1)
         ));
+      }
+
+      /* cat-card カテゴリ1 絞り込み */
+      function filterCat1(q) {
+        q = q.toUpperCase();
+        document.querySelectorAll("#cat1Tbody tr").forEach((tr) => {
+          tr.style.display = tr.textContent.toUpperCase().includes(q) ? "" : "none";
+        });
       }
 
       /* ソート */
@@ -845,6 +972,8 @@
         document.querySelectorAll("#cat1Tbody tr.selected, #cat2Tbody tr.selected")
           .forEach((tr) => tr.classList.remove("selected"));
         document.getElementById("cat2Tbody").innerHTML = "";
+        document.getElementById("cat1Search").value = "";
+        filterCat1("");
         document.getElementById("cat1Hint").classList.remove("show");
         document.getElementById("cat2Hint").classList.remove("show");
         document.getElementById("formPnSection").style.display = "none";
@@ -1174,6 +1303,178 @@
           }
         } else {
           showToast(result.message || "エラーが発生しました", false);
+        }
+      }
+
+      /* ════════════════════════════
+         CSV インポート
+      ════════════════════════════ */
+      const MATERIAL_MAP = {"A6061": 1, "A6063": 2, "A6N01A": 3, "A6N01": 4};
+
+      let importRows = [];
+
+      function openImportModal() {
+        importRows = [];
+        document.getElementById("importPreviewWrap").style.display = "none";
+        document.getElementById("importFileInput").value = "";
+        document.getElementById("importDropZone").classList.remove("drag-over");
+        document.getElementById("importSubmitBtn").disabled = true;
+        document.getElementById("importSubmitBtn").textContent = "登録 (0件)";
+        document.getElementById("importModal").classList.add("open");
+      }
+
+      function closeImportModal() {
+        document.getElementById("importModal").classList.remove("open");
+      }
+
+      function handleImportDrop(e) {
+        e.preventDefault();
+        document.getElementById("importDropZone").classList.remove("drag-over");
+        const file = e.dataTransfer.files[0];
+        if (file) handleImportFile(file);
+      }
+
+      function handleImportFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const text = e.target.result;
+          const parsed = parseImportCSV(text);
+          if (!parsed.length) { showToast("CSVにデータが見つかりません", false); return; }
+          await processImportRows(parsed);
+        };
+        reader.readAsText(file, "UTF-8");
+      }
+
+      function parseImportCSV(text) {
+        const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
+        if (lines.length < 2) return [];
+
+        const delim = lines[0].includes("\t") ? "\t" : ",";
+        const headers = lines[0].split(delim).map(h => h.trim().toLowerCase());
+
+        const colMap = {
+          production_number: ["production_number", "production_numbers", "pn", "品番"],
+          billet_material:   ["billet_material", "material", "材質"],
+          production_length: ["production_length", "length", "製品長"],
+          cross_section_area:["cross_section_area", "area", "断面積"],
+        };
+
+        const idx = {};
+        for (const [field, aliases] of Object.entries(colMap)) {
+          idx[field] = aliases.reduce((found, alias) => {
+            if (found >= 0) return found;
+            const i = headers.indexOf(alias);
+            return i >= 0 ? i : found;
+          }, -1);
+        }
+
+        const rows = [];
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g, ""));
+          const pn = idx.production_number >= 0 ? cols[idx.production_number] ?? "" : "";
+          if (!pn) continue;
+          rows.push({
+            production_number: pn.toUpperCase(),
+            billet_material:   idx.billet_material   >= 0 ? cols[idx.billet_material]   ?? "" : "",
+            production_length: idx.production_length >= 0 ? cols[idx.production_length] ?? "" : "",
+            cross_section_area:idx.cross_section_area >= 0 ? cols[idx.cross_section_area] ?? "" : "",
+          });
+        }
+        return rows;
+      }
+
+      async function processImportRows(parsed) {
+        const numbers = parsed.map(r => r.production_number);
+        let dupMap = {};
+        try {
+          const res = await fetch("./php/ProductionNumber/check_pn_duplicates.php", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(numbers),
+          });
+          dupMap = await res.json();
+        } catch (_) {}
+
+        importRows = parsed.map(row => {
+          const matId = MATERIAL_MAP[(row.billet_material ?? "").toUpperCase()] ?? 0;
+          const isDup  = dupMap[row.production_number] === true;
+          return { ...row, billet_material_id: matId, status: isDup ? "dup" : "new" };
+        });
+
+        renderImportPreview();
+      }
+
+      function renderImportPreview() {
+        const tbody = document.getElementById("importPreviewTbody");
+        tbody.innerHTML = "";
+        let cntNew = 0, cntDup = 0;
+
+        importRows.forEach(row => {
+          const matLabel = row.billet_material || "—";
+          let badgeHtml;
+          if (row.status === "new") { badgeHtml = '<span class="badge-new">新規</span>';  cntNew++; }
+          else                      { badgeHtml = '<span class="badge-dup">重複</span>';  cntDup++; }
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><strong>${row.production_number}</strong></td>
+            <td>${matLabel}</td>
+            <td>${row.production_length || "—"}</td>
+            <td>${row.cross_section_area || "—"}</td>
+            <td>${badgeHtml}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        const summary = document.getElementById("importSummary");
+        summary.innerHTML =
+          `<span><span class="badge-new">新規</span> ${cntNew}件</span>` +
+          (cntDup ? `<span><span class="badge-dup">重複</span> ${cntDup}件（スキップ）</span>` : "");
+
+        const btn = document.getElementById("importSubmitBtn");
+        btn.disabled = cntNew === 0;
+        btn.textContent = `登録 (${cntNew}件)`;
+
+        document.getElementById("importPreviewWrap").style.display = "";
+      }
+
+      async function submitImport() {
+        const toInsert = importRows
+          .filter(r => r.status === "new")
+          .map(r => ({
+            production_number:  r.production_number,
+            billet_material_id: r.billet_material_id,
+            production_length:  r.production_length,
+            cross_section_area: r.cross_section_area,
+          }));
+
+        if (!toInsert.length) return;
+
+        const btn = document.getElementById("importSubmitBtn");
+        btn.disabled = true;
+        btn.textContent = "登録中...";
+
+        try {
+          const res = await fetch("./php/ProductionNumber/bulk_insert_pn.php", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(toInsert),
+          });
+          const result = await res.json();
+          if (result.status === "ok") {
+            showToast(`${result.inserted}件 登録しました`);
+            closeImportModal();
+            loadList();
+          } else {
+            showToast(result.message || "登録に失敗しました", false);
+            btn.disabled = false;
+            btn.textContent = `登録 (${toInsert.length}件)`;
+          }
+        } catch (_) {
+          showToast("通信エラーが発生しました", false);
+          btn.disabled = false;
+          btn.textContent = `登録 (${toInsert.length}件)`;
         }
       }
 

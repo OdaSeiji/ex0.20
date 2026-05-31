@@ -33,7 +33,8 @@ SELECT
   IFNULL(m_production_numbers.packing_row, '') AS packing_row,
   IFNULL(m_production_numbers.hardness, '') AS hardness,
   IFNULL(m_production_numbers.hardness_note, '') AS hardness_note,
-  DATE_FORMAT(m_production_numbers.created_at,'%y-%m-%d')  as created_at
+  DATE_FORMAT(m_production_numbers.created_at,'%y-%m-%d')  as created_at,
+  DATE_FORMAT(m_production_numbers.updated_at,'%Y-%m-%d')  as updated_at
 FROM m_production_numbers
 LEFT JOIN m_billet_material ON m_production_numbers.billet_material_id = m_billet_material.id
 LEFT JOIN m_aging_type ON m_production_numbers.aging_type_id = m_aging_type.id
