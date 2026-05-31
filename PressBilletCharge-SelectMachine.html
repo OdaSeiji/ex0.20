@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -7,7 +7,15 @@
     <link rel="stylesheet" href="./css/PressBilletCharge-SelectMachine.css" />
     <title>Document</title>
   </head>
-  <body>
+  <body style="visibility:hidden">
+    <script>
+      (async () => {
+        const r = await fetch("php/auth/check_session.php");
+        const d = await r.json();
+        if (!d.ok) { location.replace("login.html"); return; }
+        document.body.style.visibility = "visible";
+      })();
+    </script>
     <header>
       <div>
         <img id="language__mark" src="./img/En.png" alt="Lang" />

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,15 @@
     <link rel="stylesheet" href="./css/DieMaitenanceV3.css" />
     <title>Die Maintenance V3</title>
   </head>
-  <body>
+  <body style="visibility:hidden">
+    <script>
+      (async () => {
+        const r = await fetch("php/auth/check_session.php");
+        const d = await r.json();
+        if (!d.ok) { location.replace("login.html"); return; }
+        document.body.style.visibility = "visible";
+      })();
+    </script>
     <header>
       <div>
         <img id="language__mark" src="./img/En.png" alt="Lang" />
