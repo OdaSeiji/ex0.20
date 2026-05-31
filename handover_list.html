@@ -38,7 +38,6 @@
         padding-left: 10px;
       }
 
-      /* ツールバー */
       .toolbar {
         display: flex;
         align-items: center;
@@ -60,54 +59,44 @@
         font-weight: bold;
       }
 
-      .btn-edit {
-        background: #ff9800;
-        color: white;
-      }
+      .btn-edit { background: #ff9800; color: white; }
       .btn-edit:hover { background: #e68900; }
-      .btn-edit:disabled {
-        background: #ccc;
-        color: #888;
-        cursor: not-allowed;
-      }
+      .btn-edit:disabled { background: #ccc; color: #888; cursor: not-allowed; }
 
-      .btn-save {
-        background: #4caf50;
-        color: white;
-      }
+      .btn-save { background: #4caf50; color: white; }
       .btn-save:hover { background: #388e3c; }
 
-      .btn-cancel {
-        background: #9e9e9e;
-        color: white;
-      }
+      .btn-cancel { background: #9e9e9e; color: white; }
       .btn-cancel:hover { background: #757575; }
 
-      /* テーブル */
       .table-wrap {
         background: white;
         border-radius: 8px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: calc(100vh - 130px);
       }
 
       table {
         width: 100%;
         border-collapse: collapse;
+        table-layout: fixed;
+        min-width: 1200px;
       }
 
       th, td {
-        padding: 8px 10px;
+        padding: 7px 8px;
         border-bottom: 1px solid #ddd;
         text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       td {
         font-family: "Roboto Mono", monospace;
-      }
-
-      td.td-memo {
-        font-family: "Segoe UI", sans-serif;
-        text-align: left;
+        font-size: 13px;
       }
 
       th {
@@ -116,42 +105,27 @@
         position: sticky;
         top: 0;
         z-index: 10;
+        font-size: 12px;
       }
 
-      th.no-sort {
-        cursor: default;
-      }
-
-      th .sort-icon {
-        margin-left: 4px;
-        font-size: 11px;
-        opacity: 0.6;
-      }
+      th.no-sort { cursor: default; }
+      th .sort-icon { margin-left: 3px; font-size: 10px; opacity: 0.6; }
 
       tr:hover { background: #f0f8ff; }
-
-      /* チェック済み行のハイライト */
       tr.checked-row { background: #fff8e1; }
       tr.checked-row:hover { background: #fff3cd; }
 
       /* 編集モードの input */
       td input[type="date"],
-      td input[type="text"],
-      td textarea {
+      td input[type="text"] {
         font-family: "Roboto Mono", monospace;
-        font-size: 13px;
-        padding: 3px 6px;
+        font-size: 12px;
+        padding: 2px 4px;
         border: 1px solid #90c0f0;
         border-radius: 4px;
         width: 100%;
         box-sizing: border-box;
         background: #f0f8ff;
-      }
-
-      td textarea {
-        font-family: "Segoe UI", sans-serif;
-        resize: vertical;
-        min-height: 36px;
       }
 
       .die-number {
@@ -161,26 +135,74 @@
       }
 
       .die-search {
-        width: 80px;
+        width: 70px;
         font-family: "Roboto Mono", monospace;
-        padding: 2px 6px;
-        margin-left: 6px;
+        padding: 2px 5px;
+        margin-left: 5px;
         border: 1px solid #aac4e8;
         border-radius: 4px;
-        font-size: 12px;
+        font-size: 11px;
       }
 
-      /* チェックボックス列 */
       th.col-check, td.col-check {
         width: 36px;
         min-width: 36px;
         cursor: default;
       }
+
+      /* フラグ表示 */
+      .flag-on  { color: #1565c0; font-weight: bold; }
+      .flag-bad { color: #c62828; font-weight: bold; }
+
+      /* インポートモーダル */
+      .updated-recent { background: #fff3cd; color: #7b4f00; font-weight: bold; }
+
+      .import-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 200;
+        display: flex; justify-content: center; align-items: flex-start;
+        padding-top: 60px; box-sizing: border-box;
+      }
+      .import-box {
+        background: white; border-radius: 10px; padding: 24px;
+        width: 700px; max-width: 95vw; max-height: 80vh;
+        overflow-y: auto; box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      }
+      .import-box h2 { margin-top: 0; font-size: 18px; }
+      .drop-zone {
+        border: 2px dashed #90c0f0; border-radius: 8px;
+        padding: 40px; text-align: center; color: #888;
+        background: #f8fbff; cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+        font-size: 15px;
+      }
+      .drop-zone.drag-over { background: #e0f0ff; border-color: #0078d4; }
+      .drop-zone small { display: block; margin-top: 8px; font-size: 12px; color: #aaa; }
+      .import-table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+      .import-table th, .import-table td {
+        padding: 7px 10px; border-bottom: 1px solid #ddd; text-align: left;
+      }
+      .import-table th { background: #e8f1ff; }
+      .import-table select { width: 100%; font-size: 13px; padding: 3px; }
+      .status-ok   { color: #2e7d32; font-weight: bold; }
+      .status-warn { color: #e65100; font-weight: bold; }
+      .status-none { color: #c62828; font-weight: bold; }
+      .import-footer { margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end; }
+      .btn-import { background: #0078d4; color: white; }
+      .btn-import:hover { background: #005fa3; }
+      .btn-back { background: #546e7a; color: white; }
+      .btn-back:hover { background: #37474f; }
+
+      /* 列幅 */
+      .col-die-num  { width: 110px; }
+      .col-pn       { width: 130px; }
+      .col-date     { width: 92px; }
+      .col-text     { width: 110px; }
+      .col-flag     { width: 72px; }
     </style>
   </head>
 
   <body>
-    <!-- 多言語ボタン -->
     <div class="lang-buttons">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
@@ -188,8 +210,9 @@
 
     <h1 data-key="title">金型移管書類一覧</h1>
 
-    <!-- ツールバー -->
     <div class="toolbar">
+      <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
+      <button class="btn btn-import" onclick="openImportModal()" data-key="btn_import">📂 CSV インポート</button>
       <button class="btn btn-edit" id="editBtn" onclick="enterEditMode()" disabled
         data-key="btn_edit">✏️ チェックのみ編集</button>
       <button class="btn btn-save" id="saveBtn" onclick="saveAll()"
@@ -199,40 +222,80 @@
       <span class="checked-count" id="checkedCount"></span>
     </div>
 
-    <!-- 一覧テーブル -->
     <div class="table-wrap">
       <table id="handoverTable">
+        <colgroup>
+          <col class="col-check" />
+          <col class="col-die-num" />
+          <col class="col-pn" />
+          <col class="col-date" />
+          <col class="col-text" />
+          <col class="col-date" />
+          <col class="col-date" />
+          <col class="col-date" />
+          <col class="col-flag" />
+          <col class="col-text" />
+          <col class="col-date" />
+          <col class="col-flag" />
+          <col style="width:112px" />
+        </colgroup>
         <thead>
           <tr>
             <th class="col-check no-sort">
               <input type="checkbox" id="checkAll" onclick="toggleCheckAll(this)" />
             </th>
             <th data-col="die_number" data-key="col_die">型番
-              <input type="text" id="searchDie" placeholder="検索…" class="die-search" />
+              <input type="text" id="searchDie" placeholder="検索…" class="die-search"
+                onclick="event.stopPropagation()" />
               <span class="sort-icon"></span>
             </th>
-            <th data-col="original_pn" data-key="col_pn">品番 <span class="sort-icon"></span></th>
-            <th data-col="press_condition_document_completion_at" data-key="col_press_cond">
-              押出条件書 <span class="sort-icon"></span>
-            </th>
-            <th data-col="qa_dimension_inspection_completed_at" data-key="col_dim_insp">
-              寸法検査 <span class="sort-icon"></span>
-            </th>
-            <th data-col="qa_dimension_inspection_document_number" data-key="col_insp_doc">
-              検査書番号 <span class="sort-icon"></span>
-            </th>
-            <th data-col="dimension_inspection_sample_sent_at" data-key="col_sample">
-              サンプル送付 <span class="sort-icon"></span>
-            </th>
-            <th data-col="arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
-            <th data-col="capitalization_date" data-key="col_capital">
-              資産化日 <span class="sort-icon"></span>
-            </th>
-            <th class="no-sort" data-key="col_memo">メモ</th>
+            <th data-col="production_number" data-key="col_pn">品番 <span class="sort-icon"></span></th>
+            <th data-col="instruction_created_at" data-key="col_ins_created">指示書作成日 <span class="sort-icon"></span></th>
+            <th data-col="inspection_number" data-key="col_insp_num">検査書番号 <span class="sort-icon"></span></th>
+            <th data-col="inspection_passed_at" data-key="col_insp_passed">検査合格日 <span class="sort-icon"></span></th>
+            <th data-col="submitted_to_japan_at" data-key="col_sub_jp">日本送付日 <span class="sort-icon"></span></th>
+            <th data-col="submitted_to_vietnam_at" data-key="col_sub_vn">VN送付日 <span class="sort-icon"></span></th>
+            <th data-col="is_accessory_item_flag" data-key="col_accessory" class="no-sort">付属品</th>
+            <th data-col="invoice_number" data-key="col_invoice">インボイス番号 <span class="sort-icon"></span></th>
+            <th data-col="die_arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
+            <th data-col="unusable_flag" data-key="col_unusable" class="no-sort">使用不可</th>
+            <th data-col="updated_at" data-key="col_updated">更新日時 <span class="sort-icon"></span></th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+
+    <!-- インポートモーダル -->
+    <div id="importModal" class="import-overlay" style="display:none">
+      <div class="import-box">
+        <h2>📂 CSV インポート</h2>
+
+        <div id="dropZone" class="drop-zone">
+          <div>ここに CSV をドロップ</div>
+          <div style="margin-top:6px;font-size:13px">またはクリックしてファイルを選択</div>
+          <small>形式: UTF-8 CSV &nbsp;|&nbsp; ヘッダー: die_name, invoice_number</small>
+        </div>
+
+        <div id="importPreview" style="display:none">
+          <table class="import-table">
+            <thead>
+              <tr>
+                <th>型番 (CSV)</th>
+                <th>型番の候補</th>
+                <th>インボイス番号</th>
+                <th>状態</th>
+              </tr>
+            </thead>
+            <tbody id="importTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="import-footer">
+          <button class="btn btn-save" id="importSubmitBtn" onclick="submitImport()" disabled>登録 (0件)</button>
+          <button class="btn btn-cancel" onclick="closeImportModal()">キャンセル</button>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -241,36 +304,44 @@
       ============================================================ */
       const dict = {
         ja: {
-          title:         "金型移管書類一覧",
-          col_die:       "型番",
-          col_pn:        "品番",
-          col_press_cond:"押出条件書",
-          col_dim_insp:  "寸法検査",
-          col_insp_doc:  "検査書番号",
-          col_sample:    "サンプル送付",
-          col_arrived:   "到着日",
-          col_capital:   "資産化日",
-          col_memo:      "メモ",
-          btn_edit:      "✏️ チェックのみ編集",
-          btn_save:      "💾 一括保存",
-          btn_cancel:    "✕ キャンセル",
-          checked_count: (n) => `${n}件選択中`,
+          title:           "金型移管書類一覧",
+          col_die:         "型番",
+          col_pn:          "品番",
+          col_ins_created: "指示書作成日",
+          col_insp_num:    "検査書番号",
+          col_insp_passed: "検査合格日",
+          col_sub_jp:      "日本送付日",
+          col_sub_vn:      "VN送付日",
+          col_accessory:   "付属品",
+          col_invoice:     "インボイス番号",
+          col_arrived:     "到着日",
+          col_unusable:    "使用不可",
+          col_updated:     "更新日時",
+          btn_import:      "📂 CSV インポート",
+          btn_edit:        "✏️ チェックのみ編集",
+          btn_save:        "💾 一括保存",
+          btn_cancel:      "✕ キャンセル",
+          checked_count:   (n) => `${n}件選択中`,
         },
         vi: {
-          title:         "Danh sách tài liệu chuyển giao khuôn",
-          col_die:       "Số khuôn",
-          col_pn:        "Số sản phẩm",
-          col_press_cond:"Tài liệu điều kiện ép",
-          col_dim_insp:  "Kiểm tra kích thước",
-          col_insp_doc:  "Số phiếu kiểm tra",
-          col_sample:    "Gửi mẫu",
-          col_arrived:   "Ngày đến",
-          col_capital:   "Ngày vốn hóa",
-          col_memo:      "Ghi chú",
-          btn_edit:      "✏️ Chỉnh sửa mục đã chọn",
-          btn_save:      "💾 Lưu tất cả",
-          btn_cancel:    "✕ Hủy",
-          checked_count: (n) => `Đã chọn ${n} mục`,
+          title:           "Danh sách tài liệu chuyển giao khuôn",
+          col_die:         "Số khuôn",
+          col_pn:          "Số sản phẩm",
+          col_ins_created: "Ngày tạo chỉ thị",
+          col_insp_num:    "Số phiếu kiểm tra",
+          col_insp_passed: "Ngày qua kiểm tra",
+          col_sub_jp:      "Ngày gửi Nhật",
+          col_sub_vn:      "Ngày gửi VN",
+          col_accessory:   "Phụ kiện",
+          col_invoice:     "Số hóa đơn",
+          col_arrived:     "Ngày đến",
+          col_unusable:    "Không dùng được",
+          col_updated:     "Ngày cập nhật",
+          btn_import:      "📂 Nhập CSV",
+          btn_edit:        "✏️ Chỉnh sửa mục đã chọn",
+          btn_save:        "💾 Lưu tất cả",
+          btn_cancel:      "✕ Hủy",
+          checked_count:   (n) => `Đã chọn ${n} mục`,
         },
       };
 
@@ -284,7 +355,7 @@
           if (!val || typeof val === "function") return;
           if (el.tagName === "TH") {
             const textNode = Array.from(el.childNodes).find(
-              (n) => n.nodeType === Node.TEXT_NODE,
+              (n) => n.nodeType === Node.TEXT_NODE
             );
             if (textNode) textNode.textContent = val + " ";
           } else {
@@ -297,8 +368,7 @@
       }
 
       /* ============================================================
-        日付フォーマット
-          ja: yy-mm-dd  /  vi: dd-mm-yy
+        日付フォーマット  ja: yy-mm-dd  /  vi: dd-mm-yy
       ============================================================ */
       function formatDate(dateStr) {
         if (!dateStr) return "";
@@ -309,6 +379,16 @@
         const mm = parts[1];
         const dd = parts[2];
         return currentLang === "vi" ? `${dd}-${mm}-${yy}` : `${yy}-${mm}-${dd}`;
+      }
+
+      function rawDate(val) {
+        return val ? String(val).split(" ")[0] : "";
+      }
+
+      function formatDateTime(dateStr) {
+        if (!dateStr) return "";
+        const [datePart, timePart] = String(dateStr).split(" ");
+        return formatDate(datePart) + " " + (timePart ? timePart.slice(0, 5) : "");
       }
 
       /* ============================================================
@@ -322,14 +402,12 @@
         if (checked) checkedIds.add(id);
         else checkedIds.delete(id);
         updateCheckedCount();
-        // 該当行のハイライト更新
         const tr = document.querySelector(`tr[data-id="${id}"]`);
         if (tr) tr.classList.toggle("checked-row", checked);
       }
 
       function toggleCheckAll(cbAll) {
-        const visibleRows = document.querySelectorAll("#handoverTable tbody tr[data-id]");
-        visibleRows.forEach((tr) => {
+        document.querySelectorAll("#handoverTable tbody tr[data-id]").forEach((tr) => {
           const id = Number(tr.dataset.id);
           const cb = tr.querySelector("input[type=checkbox]");
           if (cb) cb.checked = cbAll.checked;
@@ -354,7 +432,6 @@
         document.getElementById("saveBtn").style.display = "";
         document.getElementById("cancelBtn").style.display = "";
         document.getElementById("searchDie").disabled = true;
-        // チェック済みのみ表示・編集モードで再描画
         const checked = (window._tableData || []).filter((r) => checkedIds.has(Number(r.id)));
         renderTable(checked);
       }
@@ -375,14 +452,16 @@
         const rows = [];
         document.querySelectorAll("#handoverTable tbody tr[data-id]").forEach((tr) => {
           rows.push({
-            id: Number(tr.dataset.id),
-            press_condition_document_completion_at: tr.querySelector('[name="press_cond"]').value || null,
-            qa_dimension_inspection_completed_at:   tr.querySelector('[name="dim_insp"]').value || null,
-            qa_dimension_inspection_document_number:tr.querySelector('[name="insp_doc"]').value || null,
-            dimension_inspection_sample_sent_at:    tr.querySelector('[name="sample"]').value || null,
-            arrived_at:         tr.querySelector('[name="arrived"]').value || null,
-            capitalization_date:tr.querySelector('[name="capital"]').value || null,
-            memo:               tr.querySelector('[name="memo"]').value || null,
+            id:                      Number(tr.dataset.id),
+            instruction_created_at:  tr.querySelector('[name="ins_created"]').value  || null,
+            inspection_number:       tr.querySelector('[name="insp_num"]').value      || null,
+            inspection_passed_at:    tr.querySelector('[name="insp_passed"]').value   || null,
+            submitted_to_japan_at:   tr.querySelector('[name="sub_jp"]').value        || null,
+            submitted_to_vietnam_at: tr.querySelector('[name="sub_vn"]').value        || null,
+            is_accessory_item_flag:  tr.querySelector('[name="accessory"]').checked   ? 1 : null,
+            invoice_number:          tr.querySelector('[name="invoice"]').value       || null,
+            die_arrived_at:          tr.querySelector('[name="arrived"]').value       || null,
+            unusable_flag:           tr.querySelector('[name="unusable"]').checked    ? 1 : null,
           });
         });
 
@@ -423,10 +502,9 @@
         const sorted = [...data];
         if (sortCol) {
           sorted.sort((a, b) => {
-            const v1 = a[sortCol] || "";
-            const v2 = b[sortCol] || "";
-            if (sortDir === "asc") return v1 > v2 ? 1 : -1;
-            else return v1 < v2 ? 1 : -1;
+            const v1 = a[sortCol] ?? "";
+            const v2 = b[sortCol] ?? "";
+            return sortDir === "asc" ? (v1 > v2 ? 1 : -1) : (v1 < v2 ? 1 : -1);
           });
         }
 
@@ -440,38 +518,43 @@
           if (isChecked) tr.classList.add("checked-row");
 
           if (isEditMode) {
-            // 編集モード：inputで表示
-            const rawDate = (val) => val ? String(val).split(" ")[0] : "";
             tr.innerHTML = `
-              <td class="col-check">
-                <input type="checkbox" checked disabled />
-              </td>
+              <td class="col-check"><input type="checkbox" checked disabled /></td>
               <td class="die-number">${row.die_number ?? ""}</td>
-              <td class="die-number">${row.original_pn ?? ""}</td>
-              <td><input type="date" name="press_cond" value="${rawDate(row.press_condition_document_completion_at)}" /></td>
-              <td><input type="date" name="dim_insp"   value="${rawDate(row.qa_dimension_inspection_completed_at)}" /></td>
-              <td><input type="text" name="insp_doc"   value="${row.qa_dimension_inspection_document_number ?? ""}" /></td>
-              <td><input type="date" name="sample"     value="${rawDate(row.dimension_inspection_sample_sent_at)}" /></td>
-              <td><input type="date" name="arrived"    value="${rawDate(row.arrived_at)}" /></td>
-              <td><input type="date" name="capital"    value="${rawDate(row.capitalization_date)}" /></td>
-              <td class="td-memo"><textarea name="memo">${row.memo ?? ""}</textarea></td>
+              <td class="die-number">${row.production_number ?? ""}</td>
+              <td><input type="date" name="ins_created"  value="${rawDate(row.instruction_created_at)}" /></td>
+              <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
+              <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>
+              <td><input type="date" name="sub_jp"       value="${rawDate(row.submitted_to_japan_at)}" /></td>
+              <td><input type="date" name="sub_vn"       value="${rawDate(row.submitted_to_vietnam_at)}" /></td>
+              <td><input type="checkbox" name="accessory" ${row.is_accessory_item_flag ? "checked" : ""} /></td>
+              <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
+              <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
+              <td><input type="checkbox" name="unusable" ${row.unusable_flag ? "checked" : ""} /></td>
+              <td>${row.updated_at ? formatDateTime(row.updated_at) : ""}</td>
             `;
           } else {
-            // 通常モード：テキスト表示
+            const accFlag = row.is_accessory_item_flag
+              ? `<span class="flag-on">●</span>` : "";
+            const unusableFlag = row.unusable_flag
+              ? `<span class="flag-bad">●</span>` : "";
             tr.innerHTML = `
               <td class="col-check">
                 <input type="checkbox" ${isChecked ? "checked" : ""}
                   onchange="toggleCheck(${row.id}, this.checked)" />
               </td>
               <td class="die-number">${row.die_number ?? ""}</td>
-              <td class="die-number">${row.original_pn ?? ""}</td>
-              <td>${formatDate(row.press_condition_document_completion_at)}</td>
-              <td>${formatDate(row.qa_dimension_inspection_completed_at)}</td>
-              <td>${row.qa_dimension_inspection_document_number ?? ""}</td>
-              <td>${formatDate(row.dimension_inspection_sample_sent_at)}</td>
-              <td>${formatDate(row.arrived_at)}</td>
-              <td>${formatDate(row.capitalization_date)}</td>
-              <td class="td-memo">${row.memo ?? ""}</td>
+              <td class="die-number">${row.production_number ?? ""}</td>
+              <td>${formatDate(row.instruction_created_at)}</td>
+              <td>${row.inspection_number ?? ""}</td>
+              <td>${formatDate(row.inspection_passed_at)}</td>
+              <td>${formatDate(row.submitted_to_japan_at)}</td>
+              <td>${formatDate(row.submitted_to_vietnam_at)}</td>
+              <td>${accFlag}</td>
+              <td>${row.invoice_number ?? ""}</td>
+              <td>${formatDate(row.die_arrived_at)}</td>
+              <td>${unusableFlag}</td>
+              <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${row.updated_at ? formatDateTime(row.updated_at) : ""}</td>
             `;
           }
 
@@ -483,6 +566,7 @@
         ソート
       ============================================================ */
       document.querySelectorAll("th[data-col]").forEach((th) => {
+        if (th.classList.contains("no-sort")) return;
         th.addEventListener("click", () => {
           if (isEditMode) return;
           const col = th.dataset.col;
@@ -493,7 +577,8 @@
             sortDir = "asc";
           }
           document.querySelectorAll(".sort-icon").forEach((i) => (i.textContent = ""));
-          th.querySelector(".sort-icon").textContent = sortDir === "asc" ? "▲" : "▼";
+          const icon = th.querySelector(".sort-icon");
+          if (icon) icon.textContent = sortDir === "asc" ? "▲" : "▼";
           if (window._tableData) renderTable(window._tableData);
         });
       });
@@ -504,16 +589,196 @@
       document.getElementById("searchDie").addEventListener("input", function () {
         const keyword = this.value.trim().toUpperCase();
         const filtered = (window._tableData || []).filter((row) =>
-          (row.die_number ?? "").toUpperCase().startsWith(keyword),
+          (row.die_number ?? "").toUpperCase().startsWith(keyword)
         );
         renderTable(filtered);
       });
+
+      function isRecentUpdate(dateStr) {
+        if (!dateStr) return false;
+        const diff = Date.now() - new Date(dateStr).getTime();
+        return diff >= 0 && diff <= 30 * 24 * 60 * 60 * 1000;
+      }
+
+      /* ============================================================
+        CSV インポート
+      ============================================================ */
+      let importRows = [];
+
+      function openImportModal() {
+        document.getElementById("importModal").style.display = "flex";
+      }
+
+      function closeImportModal() {
+        document.getElementById("importModal").style.display = "none";
+        document.getElementById("dropZone").style.display = "";
+        document.getElementById("importPreview").style.display = "none";
+        document.getElementById("importTableBody").innerHTML = "";
+        importRows = [];
+      }
+
+      function initDropZone() {
+        const dz = document.getElementById("dropZone");
+        dz.addEventListener("dragover",  (e) => { e.preventDefault(); dz.classList.add("drag-over"); });
+        dz.addEventListener("dragleave", ()  => dz.classList.remove("drag-over"));
+        dz.addEventListener("drop", (e) => {
+          e.preventDefault();
+          dz.classList.remove("drag-over");
+          const file = e.dataTransfer.files[0];
+          if (file) readCSVFile(file);
+        });
+        dz.addEventListener("click", () => {
+          const inp = document.createElement("input");
+          inp.type = "file"; inp.accept = ".csv";
+          inp.onchange = (e) => { if (e.target.files[0]) readCSVFile(e.target.files[0]); };
+          inp.click();
+        });
+      }
+
+      function readCSVFile(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => processCSV(e.target.result);
+        reader.readAsText(file, "UTF-8");
+      }
+
+      function parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+
+        // タブ区切り / カンマ区切り 自動判定
+        const delim = lines[0].includes("\t") ? "\t" : ",";
+
+        const headers = lines[0].split(delim).map(h => h.trim().replace(/^"|"$/g, ""));
+        return lines.slice(1)
+          .map(line => {
+            const vals = line.split(delim).map(v => v.trim().replace(/^"|"$/g, ""));
+            const obj = {};
+            headers.forEach((h, i) => { obj[h] = vals[i] ?? ""; });
+            // die_number を die_name として扱う
+            if (!obj.die_name && obj.die_number) obj.die_name = obj.die_number;
+            return obj;
+          })
+          .filter(r => r.die_name || r.invoice_number);
+      }
+
+      async function processCSV(text) {
+        const rows = parseCSV(text);
+        if (rows.length === 0) { alert("有効なデータがありません"); return; }
+        importRows = rows;
+
+        const dieNames = [...new Set(rows.map(r => r.die_name).filter(Boolean))];
+        let candidatesMap = {};
+        try {
+          const res = await fetch("./php/handover/search_dies.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ names: dieNames }),
+          });
+          candidatesMap = await res.json();
+        } catch (e) { console.error(e); }
+
+        renderImportPreview(rows, candidatesMap);
+        document.getElementById("dropZone").style.display = "none";
+        document.getElementById("importPreview").style.display = "";
+      }
+
+      function renderImportPreview(rows, candidatesMap) {
+        const tbody = document.getElementById("importTableBody");
+        tbody.innerHTML = "";
+
+        rows.forEach((row, idx) => {
+          const candidates = candidatesMap[row.die_name] || [];
+          let selectHtml = "";
+          let initialDieId = "";
+
+          if (candidates.length === 1) {
+            initialDieId = candidates[0].id;
+            selectHtml = `<select data-idx="${idx}" onchange="onDieSelect(this)">
+              <option value="${candidates[0].id}" selected>${candidates[0].die_number}</option>
+            </select>`;
+          } else if (candidates.length > 1) {
+            const opts = candidates.map(c => `<option value="${c.id}">${c.die_number}</option>`).join("");
+            selectHtml = `<select data-idx="${idx}" onchange="onDieSelect(this)">
+              <option value="">-- 選択してください --</option>${opts}
+            </select>`;
+          } else {
+            selectHtml = `<span class="status-none">候補なし</span>`;
+          }
+
+          const statusHtml = initialDieId
+            ? `<span class="status-ok">✓</span>`
+            : candidates.length > 1
+              ? `<span class="status-warn">要選択</span>`
+              : `<span class="status-none">⚠ 未確定</span>`;
+
+          const tr = document.createElement("tr");
+          tr.dataset.idx   = idx;
+          tr.dataset.dieId = initialDieId;
+          tr.innerHTML = `
+            <td>${row.die_name ?? ""}</td>
+            <td>${selectHtml}</td>
+            <td>${row.invoice_number ?? ""}</td>
+            <td id="imp_status_${idx}">${statusHtml}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        checkImportReady();
+      }
+
+      function onDieSelect(sel) {
+        const idx = sel.dataset.idx;
+        const tr  = document.querySelector(`#importTableBody tr[data-idx="${idx}"]`);
+        tr.dataset.dieId = sel.value;
+        document.getElementById(`imp_status_${idx}`).innerHTML = sel.value
+          ? `<span class="status-ok">✓</span>`
+          : `<span class="status-warn">要選択</span>`;
+        checkImportReady();
+      }
+
+      function checkImportReady() {
+        let readyCount = 0;
+        document.querySelectorAll("#importTableBody tr[data-idx]").forEach(tr => {
+          if (tr.dataset.dieId) readyCount++;
+        });
+        const btn = document.getElementById("importSubmitBtn");
+        btn.disabled    = readyCount === 0;
+        btn.textContent = `登録 (${readyCount}件)`;
+      }
+
+      async function submitImport() {
+        const payload = [];
+        document.querySelectorAll("#importTableBody tr[data-idx]").forEach((tr) => {
+          if (!tr.dataset.dieId) return;
+          const idx = Number(tr.dataset.idx);
+          payload.push({
+            die_id:         Number(tr.dataset.dieId),
+            invoice_number: importRows[idx]?.invoice_number || "",
+          });
+        });
+        if (payload.length === 0) return;
+
+        const res    = await fetch("./php/handover/insert_die_handover.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json();
+        if (result.status === "ok") {
+          alert(`${result.inserted}件 登録しました。`);
+          closeImportModal();
+          await loadTable();
+        } else {
+          alert("登録に失敗しました: " + (result.message ?? ""));
+        }
+      }
 
       /* ============================================================
         初期ロード
       ============================================================ */
       window.onload = () => {
         setLang(currentLang);
+        initDropZone();
         loadTable();
       };
     </script>

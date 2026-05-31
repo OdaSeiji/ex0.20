@@ -11,13 +11,15 @@ if (!$rows || !is_array($rows)) {
 
 $sql = "
     UPDATE t_die_handover SET
-        press_condition_document_completion_at      = ?,
-        qa_dimension_inspection_completed_at        = ?,
-        qa_dimension_inspection_document_number     = ?,
-        dimension_inspection_sample_sent_at         = ?,
-        arrived_at                                  = ?,
-        capitalization_date                         = ?,
-        memo                                        = ?
+        instruction_created_at  = ?,
+        inspection_number       = ?,
+        inspection_passed_at    = ?,
+        submitted_to_japan_at   = ?,
+        submitted_to_vietnam_at = ?,
+        is_accessory_item_flag  = ?,
+        invoice_number          = ?,
+        die_arrived_at          = ?,
+        unusable_flag           = ?
     WHERE id = ?
 ";
 
@@ -26,13 +28,15 @@ $updated = 0;
 
 foreach ($rows as $row) {
     $stmt->execute([
-        $row["press_condition_document_completion_at"]       ?: null,
-        $row["qa_dimension_inspection_completed_at"]         ?: null,
-        $row["qa_dimension_inspection_document_number"]      ?: null,
-        $row["dimension_inspection_sample_sent_at"]          ?: null,
-        $row["arrived_at"]                                   ?: null,
-        $row["capitalization_date"]                          ?: null,
-        $row["memo"]                                         ?: null,
+        $row["instruction_created_at"]  ?: null,
+        $row["inspection_number"]       ?: null,
+        $row["inspection_passed_at"]    ?: null,
+        $row["submitted_to_japan_at"]   ?: null,
+        $row["submitted_to_vietnam_at"] ?: null,
+        $row["is_accessory_item_flag"] !== null ? (int)$row["is_accessory_item_flag"] : null,
+        $row["invoice_number"]          ?: null,
+        $row["die_arrived_at"]          ?: null,
+        $row["unusable_flag"] !== null  ? (int)$row["unusable_flag"] : null,
         $row["id"],
     ]);
     $updated++;

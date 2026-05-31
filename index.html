@@ -204,6 +204,37 @@
         margin-left: 10px;
         margin-bottom: 20px;
       }
+
+      /* 進捗サマリーカード */
+      .progress-summary {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .progress-card {
+        flex: 1;
+        min-width: 140px;
+        background: #fff;
+        border: 1px solid #c5d1dd;
+        border-radius: 10px;
+        padding: 14px 12px 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        cursor: pointer;
+        transition: 0.15s;
+        text-align: center;
+      }
+      .progress-card:hover {
+        background: #f2f7fc;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 14px rgba(0,120,212,0.18);
+        border-color: #0078d4;
+      }
+      .pc-label { font-size: 0.82rem; color: #555; margin-bottom: 8px; }
+      .pc-count { font-size: 2rem; font-weight: bold; color: #2b6ca3; line-height: 1; margin-bottom: 6px; }
+      .pc-delta { font-size: 0.82rem; font-weight: bold; }
+      .delta-up   { color: #d93025; }
+      .delta-down { color: #1b9e3f; }
+      .delta-flat { color: #999; }
     </style>
   </head>
 
@@ -349,6 +380,14 @@
       <div class="dashboard-days" id="latestInspectionCards"></div>
     </div>
 
+    <!-- 📋 進捗サマリー（直近90日） -->
+    <div class="dashboard-section">
+      <div class="dashboard-title" data-key="progress_summary_title">
+        📋 進捗サマリー（直近90日）
+      </div>
+      <div class="progress-summary" id="progressSummaryCards"></div>
+    </div>
+
     <!-- ============================
        ▼ JavaScript（最適化済み）
        ============================ -->
@@ -395,6 +434,14 @@
           count_unit: "件",
 
           latest_inspections: "🆕 最新の測定（直近10件）",
+          progress_summary_title: "📋 進捗サマリー（直近90日）",
+          ps_inspection: "測定未完了",
+          ps_diagnosis:  "診断未完了",
+          ps_approval:   "承認未完了",
+          ps_fix_plan:   "修理計画未完了",
+          ps_fix_report: "修理報告未完了",
+          ps_delta_label: "昨日比",
+          ps_no_change:   "昨日比 変動なし",
         },
 
         vi: {
@@ -437,6 +484,14 @@
           count_unit: "件",
 
           latest_inspections: "🆕 Danh sách đo mới nhất (10 mục gần đây)",
+          progress_summary_title: "📋 Tóm tắt tiến độ (90 ngày gần đây)",
+          ps_inspection: "Chưa đo",
+          ps_diagnosis:  "Chưa chẩn đoán",
+          ps_approval:   "Chưa phê duyệt",
+          ps_fix_plan:   "Chưa lên KHSC",
+          ps_fix_report: "Chưa báo cáo SC",
+          ps_delta_label: "so hôm qua",
+          ps_no_change:   "Không thay đổi",
         },
       };
 
@@ -450,9 +505,11 @@
 
         localStorage.setItem("lang", lang);
 
-        // ★ 言語切り替え時にダッシュボードを再描画
         if (window.dashboardData) {
           renderDashboard(window.dashboardData);
+        }
+        if (window.progressSummaryData) {
+          renderProgressSummary(window.progressSummaryData);
         }
       }
 
@@ -592,6 +649,55 @@
 
       // ページ読み込み時に実行
       loadLatestInspections();
+
+      /* -------------------------
+         進捗サマリー
+      ------------------------- */
+      async function loadProgressSummary() {
+        const res = await fetch("php/die_progress_php/get_progress_summary.php");
+        window.progressSummaryData = await res.json();
+        renderProgressSummary(window.progressSummaryData);
+      }
+
+      function renderProgressSummary(data) {
+        const lang = localStorage.getItem("lang") || "ja";
+        const container = document.getElementById("progressSummaryCards");
+        container.innerHTML = "";
+
+        const steps = [
+          { key: "inspection", labelKey: "ps_inspection" },
+          { key: "diagnosis",  labelKey: "ps_diagnosis"  },
+          { key: "approval",   labelKey: "ps_approval"   },
+          { key: "fix_plan",   labelKey: "ps_fix_plan"   },
+          { key: "fix_report", labelKey: "ps_fix_report" },
+        ];
+
+        steps.forEach(({ key, labelKey }) => {
+          const step = data[key];
+          const delta = step.delta;
+
+          let deltaHtml;
+          if (delta > 0) {
+            deltaHtml = `<span class="pc-delta delta-up">▲ +${delta}　${dict[lang].ps_delta_label}</span>`;
+          } else if (delta < 0) {
+            deltaHtml = `<span class="pc-delta delta-down">▼ ${delta}　${dict[lang].ps_delta_label}</span>`;
+          } else {
+            deltaHtml = `<span class="pc-delta delta-flat">${dict[lang].ps_no_change}</span>`;
+          }
+
+          const card = document.createElement("div");
+          card.className = "progress-card";
+          card.onclick = () => location.href = "die_progress_list.html";
+          card.innerHTML = `
+            <div class="pc-label">${dict[lang][labelKey]}</div>
+            <div class="pc-count">${step.current}</div>
+            ${deltaHtml}
+          `;
+          container.appendChild(card);
+        });
+      }
+
+      loadProgressSummary();
     </script>
   </body>
 </html>

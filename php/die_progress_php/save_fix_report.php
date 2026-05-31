@@ -51,10 +51,11 @@ $diagnosis_id = $row["diagnosis_id"];
 -------------------------------------------------- */
 $sql = "
     UPDATE t_die_fix
-    SET 
+    SET
         actual_fix_date = ?,
         actual_fix_staff_id = ?,
-        actual_fix_content = ?
+        actual_fix_content = ?,
+        actual_fix_reported_at = NOW()
     WHERE id = ?
 ";
 $stmt = $pdo->prepare($sql);
