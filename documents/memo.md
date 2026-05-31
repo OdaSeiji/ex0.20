@@ -4673,3 +4673,12 @@ MariaDB [extrusion]>
 ```
 
 次は、新規追加画面。
+
+## V6系とV7系（ログインあり）に分ける。
+
+🎯 V6 と V7 の切り替えは “git checkout” だけ
+やりたいこと コマンド
+V6 系の作業をしたい git checkout main
+V7 系の作業をしたい git checkout V7
+
+これだけで完全に切り替わる。

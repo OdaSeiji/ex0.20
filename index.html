@@ -238,12 +238,14 @@
     </style>
   </head>
 
-  <body>
+  <body style="visibility:hidden">
     <!-- 🌐 多言語切替 -->
     <div class="lang-switch">
       <button onclick="setLang('ja')">日本語</button>
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
+
+    <div id="userBar" style="text-align:right; padding: 4px 20px 0; font-size:13px; color:#555;"></div>
 
     <h1 id="title">トップメニュー</h1>
 
@@ -395,6 +397,24 @@
       /* -------------------------
        多言語辞書
       ------------------------- */
+      /* ── 認証チェック ── */
+      (async () => {
+        const res  = await fetch("php/auth/check_session.php");
+        const data = await res.json();
+        if (!data.ok) {
+          location.replace("login.html");
+          return;
+        }
+        document.body.style.visibility = "visible";
+        document.getElementById("userBar").innerHTML =
+          `👤 ${data.name}　<button onclick="doLogout()" style="padding:3px 10px;font-size:12px;background:#9e9e9e;color:#fff;border:none;border-radius:4px;cursor:pointer;">ログアウト</button>`;
+      })();
+
+      async function doLogout() {
+        await fetch("php/auth/logout.php");
+        location.replace("login.html");
+      }
+
       const dict = {
         ja: {
           title: "トップメニュー",
