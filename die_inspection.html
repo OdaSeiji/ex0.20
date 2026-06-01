@@ -278,6 +278,15 @@
           <option value="NG">NG</option>
         </select>
 
+        <label data-key="lbl_cmm">CMM</label>
+        <textarea id="cmm" rows="2" maxlength="200"></textarea>
+
+        <label data-key="lbl_lm_im">LM/IM</label>
+        <textarea id="lm_im" rows="2" maxlength="200"></textarea>
+
+        <label data-key="lbl_gage">Gage</label>
+        <textarea id="gage" rows="2" maxlength="200"></textarea>
+
         <label data-key="lbl_memo">メモ</label>
         <textarea id="memo" rows="4"></textarea>
 
@@ -468,6 +477,9 @@
           lbl_shape: "形状判定",
           lbl_overall: "総合判定",
           lbl_memo: "メモ",
+          lbl_cmm: "CMM",
+          lbl_lm_im: "LM/IM",
+          lbl_gage: "Gage",
           lbl_files: "添付ファイル（必須）",
           btn_save: "保存して一覧へ戻る",
         },
@@ -482,6 +494,9 @@
           lbl_shape: "Kết quả hình dạng",
           lbl_overall: "Kết quả tổng hợp",
           lbl_memo: "Ghi chú",
+          lbl_cmm: "CMM",
+          lbl_lm_im: "LM/IM",
+          lbl_gage: "Gage",
           lbl_files: "Tệp đính kèm (bắt buộc)",
           btn_save: "Lưu và quay lại danh sách",
         },
@@ -622,7 +637,10 @@
           "overall_result",
           document.getElementById("overall_result").value,
         );
-        fd.append("memo", document.getElementById("memo").value);
+        fd.append("memo",  document.getElementById("memo").value);
+        fd.append("cmm",   document.getElementById("cmm").value);
+        fd.append("lm_im", document.getElementById("lm_im").value);
+        fd.append("gage",  document.getElementById("gage").value);
 
         // --- 添付ファイル（複数） ---
         for (let i = 0; i < files.length; i++) {
@@ -721,7 +739,10 @@
             document.getElementById("overall_result").value =
               ins.overall_result || "";
 
-            document.getElementById("memo").value = ins.memo || "";
+            document.getElementById("memo").value  = ins.memo  || "";
+            document.getElementById("cmm").value   = ins.cmm   || "";
+            document.getElementById("lm_im").value = ins.lm_im || "";
+            document.getElementById("gage").value  = ins.gage  || "";
 
             // ▼ 添付ファイルプレビュー
             if (data.inspection_files) {

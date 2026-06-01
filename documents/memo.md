@@ -4682,3 +4682,12 @@ Hieuさんから、下記画面の修正依頼。測定画面に3項目を追加
   <img src="./img/20260601-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+これをやるには、`t_die_inspection`の改善が必要。
+
+```SQL
+ALTER TABLE t_die_inspection
+  ADD COLUMN cmm   VARCHAR(255) NULL AFTER memo,
+  ADD COLUMN lm_im VARCHAR(255) NULL AFTER cmm,
+  ADD COLUMN gage  VARCHAR(255) NULL AFTER lm_im;
+```

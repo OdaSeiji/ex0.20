@@ -13,6 +13,9 @@ $dim        = $_POST["dimension_result"];
 $shape      = $_POST["shape_result"];
 $overall    = $_POST["overall_result"];
 $memo       = $_POST["memo"];
+$cmm        = $_POST["cmm"]   ?? null;
+$lm_im      = $_POST["lm_im"] ?? null;
+$gage       = $_POST["gage"]  ?? null;
 
 // --------------------------------------------------
 // 2. press_id のレコードが存在するか確認
@@ -37,7 +40,10 @@ if ($existing) {
             dimension_result = ?,
             shape_result = ?,
             overall_result = ?,
-            memo = ?
+            memo = ?,
+            cmm = ?,
+            lm_im = ?,
+            gage = ?
         WHERE press_id = ?
     ";
 
@@ -49,6 +55,9 @@ if ($existing) {
         $shape,
         $overall,
         $memo,
+        $cmm,
+        $lm_im,
+        $gage,
         $press_id
     ]);
 
@@ -57,8 +66,8 @@ if ($existing) {
     $sql = "
         INSERT INTO t_die_inspection
         (press_id, die_id, inspection_date, inspection_staff_id,
-         dimension_result, shape_result, overall_result, memo, created_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+         dimension_result, shape_result, overall_result, memo, cmm, lm_im, gage, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ";
 
     $stmt = $pdo->prepare($sql);
@@ -70,7 +79,10 @@ if ($existing) {
         $dim,
         $shape,
         $overall,
-        $memo
+        $memo,
+        $cmm,
+        $lm_im,
+        $gage
     ]);
 
     $inspection_id = $pdo->lastInsertId();

@@ -236,6 +236,18 @@
         ><span id="ins_overall"></span>
       </div>
       <div class="row">
+        <label data-key="label_ins_cmm">CMM：</label
+        ><span id="ins_cmm"></span>
+      </div>
+      <div class="row">
+        <label data-key="label_ins_lm_im">LM/IM：</label
+        ><span id="ins_lm_im"></span>
+      </div>
+      <div class="row">
+        <label data-key="label_ins_gage">Gage：</label
+        ><span id="ins_gage"></span>
+      </div>
+      <div class="row">
         <label data-key="label_ins_memo">メモ：</label
         ><span id="ins_memo"></span>
       </div>
@@ -475,6 +487,9 @@
           label_ins_dim: "寸法結果：",
           label_ins_shape: "形状結果：",
           label_ins_overall: "総合結果：",
+          label_ins_cmm: "CMM：",
+          label_ins_lm_im: "LM/IM：",
+          label_ins_gage: "Gage：",
           label_ins_memo: "メモ：",
           sec_ins_files: "■ 測定時の添付ファイル",
 
@@ -523,6 +538,9 @@
           label_ins_dim: "Kết quả kích thước:",
           label_ins_shape: "Kết quả hình dạng:",
           label_ins_overall: "Kết quả tổng thể:",
+          label_ins_cmm: "CMM:",
+          label_ins_lm_im: "LM/IM:",
+          label_ins_gage: "Gage:",
           label_ins_memo: "Ghi chú:",
           sec_ins_files: "■ Tệp đính kèm khi đo",
 
@@ -822,7 +840,10 @@
         document.getElementById("ins_dim").textContent = ins.dimension_result;
         document.getElementById("ins_shape").textContent = ins.shape_result;
         document.getElementById("ins_overall").textContent = ins.overall_result;
-        document.getElementById("ins_memo").textContent = ins.memo || "";
+        document.getElementById("ins_cmm").textContent   = ins.cmm   || "";
+        document.getElementById("ins_lm_im").textContent = ins.lm_im || "";
+        document.getElementById("ins_gage").textContent  = ins.gage  || "";
+        document.getElementById("ins_memo").textContent  = ins.memo  || "";
 
         const area = document.getElementById("inspection_files");
         area.innerHTML = "";

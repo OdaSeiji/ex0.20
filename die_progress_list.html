@@ -508,6 +508,21 @@
               <span id="pv_overall"></span>
             </p>
 
+            <p id="pv_cmm_row">
+              <strong>CMM</strong>：
+              <span id="pv_cmm"></span>
+            </p>
+
+            <p id="pv_lm_im_row">
+              <strong>LM/IM</strong>：
+              <span id="pv_lm_im"></span>
+            </p>
+
+            <p id="pv_gage_row">
+              <strong>Gage</strong>：
+              <span id="pv_gage"></span>
+            </p>
+
             <!-- 対策（診断・修理で使用） -->
             <p id="pv_action_row">
               <strong data-key="label_action">対策</strong>：
@@ -1304,6 +1319,10 @@
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
 
+        document.getElementById("pv_cmm").textContent   = data.inspection.cmm   || "-";
+        document.getElementById("pv_lm_im").textContent = data.inspection.lm_im || "-";
+        document.getElementById("pv_gage").textContent  = data.inspection.gage  || "-";
+
         document.getElementById("pv_memo").textContent =
           data.inspection.memo || "-";
 
@@ -1375,6 +1394,11 @@
         document.getElementById("pv_memo").textContent =
           data.diagnosis.memo || "-";
 
+        // CMM/LM-IM/Gage は診断では非表示
+        document.getElementById("pv_cmm_row").style.display   = "none";
+        document.getElementById("pv_lm_im_row").style.display = "none";
+        document.getElementById("pv_gage_row").style.display  = "none";
+
         // 9. 承認情報（診断のみ表示）
         document.getElementById("previewApprovalBlock").style.display = "block";
 
@@ -1429,6 +1453,9 @@
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
         document.getElementById("pv_memo").parentElement.style.display = "none";
+        document.getElementById("pv_cmm_row").style.display   = "none";
+        document.getElementById("pv_lm_im_row").style.display = "none";
+        document.getElementById("pv_gage_row").style.display  = "none";
 
         // ★ 修理計画の内容を pv_memo に表示するのが自然
         document.getElementById("pv_memo").parentElement.style.display =
@@ -1498,6 +1525,9 @@
         // document.getElementById("pv_ng").parentElement.style.display = "none";
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
+        document.getElementById("pv_cmm_row").style.display   = "none";
+        document.getElementById("pv_lm_im_row").style.display = "none";
+        document.getElementById("pv_gage_row").style.display  = "none";
 
         // 7. 診断メモは修理報告では使わないので非表示
         // （ただし pv_memo は修理内容として使う）
@@ -1526,6 +1556,9 @@
           "block";
         document.getElementById("pv_memo").parentElement.style.display =
           "block";
+        document.getElementById("pv_cmm_row").style.display   = "block";
+        document.getElementById("pv_lm_im_row").style.display = "block";
+        document.getElementById("pv_gage_row").style.display  = "block";
         document.getElementById("pv_action_row").style.display = "block";
 
         // 承認情報もデフォルト非表示に戻す

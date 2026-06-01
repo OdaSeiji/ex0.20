@@ -18,6 +18,9 @@ SELECT
     i.shape_result,
     i.overall_result,
     i.memo,
+    i.cmm,
+    i.lm_im,
+    i.gage,
 
     d.die_number,
     p.press_machine_no,
