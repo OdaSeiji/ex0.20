@@ -4673,3 +4673,12 @@ MariaDB [extrusion]>
 ```
 
 次は、新規追加画面。
+
+# 2026/06/01
+
+Hieuさんから、下記画面の修正依頼。測定画面に3項目を追加。
+
+<figure style="text-align:center;">
+  <img src="./img/20260601-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>

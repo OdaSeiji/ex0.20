@@ -1,5 +1,5 @@
 <!DOCTYPE html><html><head>
-      <title>temp</title>
+      <title>pn_import_guide</title>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       
@@ -26,42 +26,200 @@
     <body for="html-export">
       <div class="crossnote markdown-preview  ">
       
-<h1 id="20260527">2026/05/27 </h1>
+<h1 id="品番-csv-インポート手順">品番 CSV インポート手順 </h1>
+<h2 id="1-csv-ファイルの作成">1. CSV ファイルの作成 </h2>
+<p>Google スプレッドシートまたは Excel で、以下の形式でデータを入力します。</p>
+<p><strong>1行目（ヘッダー）は固定</strong></p>
+<table>
+<thead>
+<tr>
+<th>production_numbers</th>
+<th>billet_material</th>
+<th>production_length</th>
+<th>cross_section_area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ABC-001</td>
+<td>A6063</td>
+<td>2</td>
+<td>45.5</td>
+</tr>
+<tr>
+<td>ABC-002</td>
+<td>A6061</td>
+<td>5</td>
+<td>120.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>注意事項</strong></p>
+<ul>
+<li>列名は <code>production_numbers</code>（またはスペルは <code>production_number</code> でも可）を使用すること</li>
+<li><code>production_numbers</code> 列のみ必須。他の列は空欄でも読み込み可能</li>
+<li>材質（<code>billet_material</code>）に入力できる値：<code>A6061</code> / <code>A6063</code> / <code>A6N01A</code> / <code>A6N01</code>（大文字・小文字どちらでも可）</li>
+<li>材質が空欄または上記以外の値の場合、材質なし（NULL）で登録されます</li>
+<li><strong>保存形式は UTF-8 CSV で保存すること</strong></li>
+</ul>
+<blockquote>
+<p><strong>Google スプレッドシートでの保存方法</strong><br>
+ファイル → ダウンロード → CSV（.csv）</p>
+</blockquote>
+<blockquote>
+<p><strong>Excel での保存方法</strong><br>
+名前を付けて保存 → ファイルの種類 →「CSV UTF-8（コンマ区切り）」を選択</p>
+</blockquote>
 <hr>
-<h3 id="不具合">不具合 </h3>
-<p>診断画面で、測定結果が表示されません。</p>
-<figure style="text-align:center;">
-  <img src="./img/20260527-04.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
-<figure style="text-align:center;">
-  <img src="./img/20260527-05.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
-<h3 id="解決">解決 </h3>
-<p>原因、診断モード画面を開くとき、「新規作成モードで開いてしまった」</p>
-<figure style="text-align:center;">
-  <img src="./img/20260528-01.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
+<h2 id="2-インポート画面を開く">2. インポート画面を開く </h2>
+<p><code>production_number.html</code> を開き、画面左上の <strong>「📂 CSV インポート」</strong> ボタンをクリックします。</p>
 <hr>
-<h3 id="sự-cố">Sự cố </h3>
-<p>Trên màn hình chẩn đoán, kết quả đo không được hiển thị.</p>
-<figure style="text-align:center;">
-  <img src="./img/20260527-04.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
-<figure style="text-align:center;">
-  <img src="./img/20260527-05.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
+<h2 id="3-csv-ファイルの読み込み">3. CSV ファイルの読み込み </h2>
+<p>インポートウィンドウが開きます。</p>
+<p><strong>方法 A：ドラッグ＆ドロップ</strong><br>
+作成した CSV ファイルをドロップゾーンにドラッグします。</p>
+<p><strong>方法 B：クリックして選択</strong><br>
+ドロップゾーンをクリックし、ファイル選択ダイアログからファイルを選びます。</p>
 <hr>
-<h3 id="cách-khắc-phục">Cách khắc phục </h3>
-<p>Nguyên nhân: Khi mở màn hình chế độ chẩn đoán, hệ thống đã mở ở chế độ tạo mới.</p>
-<figure style="text-align:center;">
-  <img src="./img/20260528-01.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
+<h2 id="4-プレビューの確認">4. プレビューの確認 </h2>
+<p>CSV が読み込まれると、プレビューテーブルが表示されます。</p>
+<table>
+<thead>
+<tr>
+<th>表示</th>
+<th>意味</th>
+<th>登録</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新規（緑）</td>
+<td>DB に存在しない品番</td>
+<td>される</td>
+</tr>
+<tr>
+<td>重複（赤）</td>
+<td>すでに登録済みの品番</td>
+<td>されない（スキップ）</td>
+</tr>
+</tbody>
+</table>
+<p>画面下部に「新規 N件 / 重複 N件」のサマリーが表示されます。</p>
+<hr>
+<h2 id="5-登録">5. 登録 </h2>
+<p>「<strong>登録 (N件)</strong>」ボタンをクリックします。</p>
+<ul>
+<li>N は新規の行数です</li>
+<li>重複の行は登録されません</li>
+<li>登録完了後、自動的に一覧が更新されます</li>
+</ul>
+<hr>
+<h2 id="6-登録内容の確認補完">6. 登録内容の確認・補完 </h2>
+<p>一覧画面に戻ったら、<strong>「更新日」列の見出しをクリックして降順ソート</strong>します。</p>
+<ul>
+<li>直前に登録したデータが上部に表示されます</li>
+<li><strong>更新日セルが黄色</strong> のものは登録・更新から1ヶ月以内のデータです</li>
+</ul>
+<p>CSV インポートでは <code>production_numbers</code>（品番）以外の項目は省略して登録できます。<br>
+カテゴリ・梱包数・比重など追記が必要な場合は、行の <strong>「✏ 編集」</strong> ボタンから個別に補完してください。</p>
+<hr>
+<hr>
+<h1 id="hướng-dẫn-nhập-csv-mã-sản-phẩm">Hướng dẫn nhập CSV mã sản phẩm </h1>
+<h2 id="1-tạo-file-csv">1. Tạo file CSV </h2>
+<p>Nhập dữ liệu theo định dạng dưới đây trong Google Spreadsheet hoặc Excel.</p>
+<p><strong>Dòng 1 (tiêu đề) là cố định</strong></p>
+<table>
+<thead>
+<tr>
+<th>production_numbers</th>
+<th>billet_material</th>
+<th>production_length</th>
+<th>cross_section_area</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ABC-001</td>
+<td>A6063</td>
+<td>2</td>
+<td>45.5</td>
+</tr>
+<tr>
+<td>ABC-002</td>
+<td>A6061</td>
+<td>5</td>
+<td>120.0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Lưu ý</strong></p>
+<ul>
+<li>Tên cột phải là <code>production_numbers</code>（hoặc <code>production_number</code> cũng được chấp nhận）</li>
+<li>Chỉ cột <code>production_numbers</code> là bắt buộc. Các cột còn lại có thể để trống</li>
+<li>Các giá trị hợp lệ cho <code>billet_material</code>：<code>A6061</code> / <code>A6063</code> / <code>A6N01A</code> / <code>A6N01</code>（chữ hoa hoặc chữ thường đều được）</li>
+<li>Nếu vật liệu để trống hoặc nhập giá trị khác, sẽ được đăng ký với vật liệu NULL</li>
+<li><strong>Lưu file dưới định dạng UTF-8 CSV</strong></li>
+</ul>
+<blockquote>
+<p><strong>Lưu từ Google Spreadsheet</strong><br>
+File → Tải xuống → CSV (.csv)</p>
+</blockquote>
+<blockquote>
+<p><strong>Lưu từ Excel</strong><br>
+Lưu dưới dạng → Loại file →「CSV UTF-8 (có dấu phẩy)」</p>
+</blockquote>
+<hr>
+<h2 id="2-mở-màn-hình-nhập">2. Mở màn hình nhập </h2>
+<p>Mở <code>production_number.html</code>, nhấn nút <strong>「📂 CSV インポート」</strong> ở góc trên bên trái màn hình.</p>
+<hr>
+<h2 id="3-đọc-file-csv">3. Đọc file CSV </h2>
+<p>Cửa sổ nhập sẽ mở ra.</p>
+<p><strong>Cách A：Kéo &amp; thả</strong><br>
+Kéo file CSV vào vùng thả.</p>
+<p><strong>Cách B：Nhấn để chọn</strong><br>
+Nhấn vào vùng thả, chọn file từ hộp thoại chọn file.</p>
+<hr>
+<h2 id="4-kiểm-tra-bản-xem-trước">4. Kiểm tra bản xem trước </h2>
+<p>Sau khi đọc CSV, bảng xem trước sẽ hiển thị.</p>
+<table>
+<thead>
+<tr>
+<th>Hiển thị</th>
+<th>Ý nghĩa</th>
+<th>Đăng ký</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>新規 / Mới（xanh lá）</td>
+<td>Mã SP chưa có trong DB</td>
+<td>Được đăng ký</td>
+</tr>
+<tr>
+<td>重複 / Trùng（đỏ）</td>
+<td>Mã SP đã tồn tại</td>
+<td>Bỏ qua</td>
+</tr>
+</tbody>
+</table>
+<p>Tóm tắt「Mới N件 / Trùng N件」hiển thị ở cuối bảng.</p>
+<hr>
+<h2 id="5-đăng-ký">5. Đăng ký </h2>
+<p>Nhấn nút <strong>「登録 (N件)」</strong>.</p>
+<ul>
+<li>N là số dòng mới</li>
+<li>Các dòng trùng sẽ không được đăng ký</li>
+<li>Sau khi đăng ký, danh sách tự động cập nhật</li>
+</ul>
+<hr>
+<h2 id="6-kiểm-tra-và-bổ-sung-sau-khi-đăng-ký">6. Kiểm tra và bổ sung sau khi đăng ký </h2>
+<p>Sau khi trở về màn hình danh sách, <strong>nhấn tiêu đề cột「更新日」để sắp xếp giảm dần</strong>.</p>
+<ul>
+<li>Dữ liệu vừa đăng ký sẽ hiển thị ở trên cùng</li>
+<li><strong>Ô「更新日」màu vàng</strong> là dữ liệu được đăng ký hoặc cập nhật trong vòng 1 tháng</li>
+</ul>
+<p>Khi nhập CSV, các mục ngoài <code>production_numbers</code> có thể bỏ qua.<br>
+Nếu cần bổ sung danh mục, số lượng đóng gói, trọng lượng riêng v.v., hãy dùng nút <strong>「✏ 編集」</strong> để chỉnh sửa từng dòng.</p>
 
       </div>
       
