@@ -4691,3 +4691,30 @@ ALTER TABLE t_die_inspection
   ADD COLUMN lm_im VARCHAR(255) NULL AFTER cmm,
   ADD COLUMN gage  VARCHAR(255) NULL AFTER lm_im;
 ```
+
+# 2026/06/02
+
+### 1
+
+要修正点、`die_inspection.html`ページの下部、サムネイルをクリックしても拡大されない？`edit-mode`の時。
+
+### 2
+
+- `die_diagnosis.html`の日付入力しなくても保存できるか？
+- 添付ファイルの拡大をもっとしたい。
+- 何も紐づいていない品番を消せるようにしたい。その発見もしたい。
+- `die_import.html`の「品番」は英語にした方がいい。
+
+下記の状態で、CJからCJ2に変更できない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260602-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+この画面、一度取り込もうとしたデータを忘れないね。。。（リロードしても）で、今回は予算番号を間違えた。新たに読み込もうとしても、2重登録として、読み込めない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260602-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
