@@ -106,6 +106,12 @@
         border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
       }
       .edit-btn:disabled { background: #ccc; cursor: default; }
+      .del-btn {
+        padding: 4px 10px; background: #c62828; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+        margin-left: 4px;
+      }
+      .del-btn:disabled { background: #ccc; cursor: default; }
 
       /* チェックボックス列 */
       td input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
@@ -188,7 +194,7 @@
           <input type="file" id="csvFile" accept=".csv" />
           <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
         </div>
-        <p class="csv-hint">列順: A列 = budget_id　B列 = die_number　C列 = 品番（1行目はヘッダーとしてスキップ）</p>
+        <p class="csv-hint">列順: A列 = budget_id　B列 = die_number　C列 = production_number（1行目はヘッダーとしてスキップ）</p>
         <div class="upload-result" id="uploadResult"></div>
       </div>
 
@@ -224,6 +230,14 @@
         <div class="edit-panel-title" id="editPanelTitle">編集中：</div>
         <input type="hidden" id="editId" />
         <div class="edit-grid">
+          <div class="edit-group">
+            <label class="edit-label">型番 (die_number) *</label>
+            <input type="text" class="edit-select" id="eDieNumber" style="font-family:'Roboto Mono',monospace;" />
+          </div>
+          <div class="edit-group">
+            <label class="edit-label">budget_id</label>
+            <input type="text" class="edit-select" id="eBudgetId" />
+          </div>
           <div class="edit-group">
             <label class="edit-label">品番 *</label>
             <select class="edit-select" id="ePn">
@@ -371,7 +385,7 @@
         }
 
         data.forEach((row) => {
-          const isPending     = row.import_flag == 0;
+          const isPending     = row.import_flag != 1;
           const isTransferred = row.import_flag == 1;
 
           /* 品番セル */
@@ -398,14 +412,17 @@
           tr.dataset.id = row.id;
           tr.innerHTML = `
             <td><input type="checkbox" class="row-check" data-id="${row.id}"
-              ${!isPending ? "disabled" : ""}
-              onchange="updateSelectedCount()" /></td>
+              ${!isPending ? "disabled" : ""} /></td>
             <td class="mono">${row.budget_id ?? "—"}</td>
             <td class="mono">${row.die_number}</td>
             <td>${pnHtml}</td>
             <td>${statusHtml}</td>
-            <td><button class="edit-btn" onclick="openEdit(${JSON.stringify(row).replace(/"/g,'&quot;')})"
-              ${!isPending ? "disabled" : ""}>編集</button></td>
+            <td>
+              <button class="edit-btn" onclick="openEdit(${JSON.stringify(row).replace(/"/g,'&quot;')})"
+                ${!isPending ? "disabled" : ""}>編集</button>
+              <button class="del-btn" onclick="deleteRow(${row.id})"
+                ${!isPending ? "disabled" : ""}>削除</button>
+            </td>
           `;
           tbody.appendChild(tr);
         });
@@ -437,8 +454,10 @@
         document.getElementById("editId").value         = row.id;
         document.getElementById("editPanelTitle").textContent = `編集中：${row.die_number}`;
 
-        document.getElementById("ePn").value     = row.production_number_id ?? "";
-        document.getElementById("eDiam").value   = row.die_diamater_id ?? "";
+        document.getElementById("eDieNumber").value = row.die_number   ?? "";
+        document.getElementById("eBudgetId").value  = row.budget_id    ?? "";
+        document.getElementById("ePn").value        = row.production_number_id ?? "";
+        document.getElementById("eDiam").value      = row.die_diamater_id ?? "";
 
         /* 径に合わせてボルスターを絞り込んでから選択値を復元 */
         filterBolster();
@@ -458,8 +477,13 @@
         const id = document.getElementById("editId").value;
         if (!id) return;
 
+        const dieNum = document.getElementById("eDieNumber").value.trim().toUpperCase();
+        if (!dieNum) { showToast("型番を入力してください", false); return; }
+
         const body = {
           id,
+          die_number:           dieNum,
+          budget_id:            document.getElementById("eBudgetId").value.trim() || null,
           production_number_id: document.getElementById("ePn").value     || null,
           die_diamater_id:      document.getElementById("eDiam").value    || null,
           billet_size_id:       document.getElementById("eBillet").value  || null,
@@ -478,6 +502,24 @@
           loadList(document.getElementById("flagSelect").value);
         } else {
           showToast(result.message || "保存に失敗しました", false);
+        }
+      }
+
+      /* ── 削除 ── */
+      async function deleteRow(id) {
+        if (!confirm("この行を一覧から削除しますか？")) return;
+
+        const res    = await fetch("./php/die_import/delete_import_row.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast("削除しました");
+          loadList(document.getElementById("flagSelect").value);
+        } else {
+          showToast(result.message || "削除に失敗しました", false);
         }
       }
 
@@ -503,6 +545,13 @@
         }
         loadList(document.getElementById("flagSelect").value);
       }
+
+      /* ── チェックボックス変更検知（イベントデリゲーション） ── */
+      document.querySelector("#importTable tbody").addEventListener("change", function (e) {
+        if (e.target.classList.contains("row-check")) {
+          updateSelectedCount();
+        }
+      });
 
       /* ── 初期化 ── */
       loadMasters();

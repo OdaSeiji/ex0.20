@@ -178,6 +178,22 @@
       .die-value {
         color: #005bbb;
       }
+
+      #modalImg {
+        cursor: zoom-in;
+        transition: max-width 0.2s ease, max-height 0.2s ease;
+      }
+      #modalImg.zoomed {
+        max-width: none !important;
+        max-height: none !important;
+        width: 180vw;
+        cursor: zoom-out;
+      }
+      #imgModal.zoomed {
+        overflow: auto;
+        align-items: flex-start !important;
+        padding: 60px 20px 20px;
+      }
     </style>
   </head>
 
@@ -624,7 +640,11 @@
           return;
         }
 
-        // ▼ 新規モード：入力欄はデフォルトで有効なのでそのまま
+        // ▼ 新規モード：今日の日付をデフォルトセット
+        if (!mode) {
+          document.getElementById("diag_date").value =
+            new Date().toISOString().slice(0, 10);
+        }
       };
 
       /* ------------------------------
@@ -998,6 +1018,10 @@
         )?.value;
 
         // 入力チェック
+        if (!document.getElementById("diag_date").value) {
+          alert("診断日を入力してください");
+          return;
+        }
         if (!dim_judge || !shape_judge || !overall_judge) {
           alert("判定（OK/NG）をすべて選択してください");
           return;
@@ -1081,6 +1105,8 @@
         const modalImg = document.getElementById("modalImg");
 
         modalImg.src = src;
+        modalImg.classList.remove("zoomed");
+        modal.classList.remove("zoomed");
         modal.style.display = "flex";
       }
 
@@ -1088,15 +1114,39 @@
       // モーダルを閉じる
       // ------------------------------
       document.getElementById("modalClose").onclick = function () {
-        document.getElementById("imgModal").style.display = "none";
+        const modal = document.getElementById("imgModal");
+        modal.classList.remove("zoomed");
+        document.getElementById("modalImg").classList.remove("zoomed");
+        modal.style.display = "none";
       };
 
       // 背景クリックでも閉じる
       document.getElementById("imgModal").onclick = function (e) {
         if (e.target.id === "imgModal") {
-          document.getElementById("imgModal").style.display = "none";
+          this.classList.remove("zoomed");
+          document.getElementById("modalImg").classList.remove("zoomed");
+          this.style.display = "none";
         }
       };
+
+      // 画像クリック → ズームトグル
+      document.getElementById("modalImg").onclick = function (e) {
+        e.stopPropagation();
+        this.classList.toggle("zoomed");
+        document.getElementById("imgModal").classList.toggle("zoomed");
+      };
+
+      // ESCキーで閉じる
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          const modal = document.getElementById("imgModal");
+          if (modal.style.display === "flex") {
+            modal.classList.remove("zoomed");
+            document.getElementById("modalImg").classList.remove("zoomed");
+            modal.style.display = "none";
+          }
+        }
+      });
 
       // ------------------------------
       // 翻訳

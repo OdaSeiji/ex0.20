@@ -14,14 +14,19 @@ if (!$id) {
 try {
     $stmt = $pdo->prepare("
         UPDATE t_dies_import_tmp SET
+            die_number           = ?,
+            budget_id            = ?,
             production_number_id = ?,
             die_diamater_id      = ?,
             billet_size_id       = ?,
             bolstar_id           = ?,
+            import_error         = NULL,
             updated_at           = CURDATE()
         WHERE id = ?
     ");
     $stmt->execute([
+        $input["die_number"]           ?: null,
+        $input["budget_id"]            ?: null,
         $input["production_number_id"] ?: null,
         $input["die_diamater_id"]      ?: null,
         $input["billet_size_id"]       ?: null,

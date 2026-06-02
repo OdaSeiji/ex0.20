@@ -157,9 +157,24 @@
       }
 
       .modal-content {
-        max-width: 90%;
-        max-height: 90%;
+        max-width: 90vw;
+        max-height: 90vh;
         border-radius: 6px;
+        cursor: zoom-in;
+        transition: max-width 0.2s ease, max-height 0.2s ease;
+      }
+
+      .modal-content.zoomed {
+        max-width: none;
+        max-height: none;
+        width: 180vw;
+        cursor: zoom-out;
+      }
+
+      .img-modal.zoomed {
+        overflow: auto;
+        align-items: flex-start;
+        padding: 60px 20px 20px;
       }
 
       .modal-close {
@@ -448,19 +463,44 @@
         const modalImg = document.getElementById("modalImg");
 
         modalImg.src = src;
+        modalImg.classList.remove("zoomed");
+        modal.classList.remove("zoomed");
         modal.style.display = "flex";
       }
 
+      // 画像クリック → ズームトグル
+      document.getElementById("modalImg").onclick = function (e) {
+        e.stopPropagation();
+        this.classList.toggle("zoomed");
+        document.getElementById("imgModal").classList.toggle("zoomed");
+      };
+
       document.getElementById("modalClose").onclick = function () {
-        document.getElementById("imgModal").style.display = "none";
+        const modal = document.getElementById("imgModal");
+        modal.classList.remove("zoomed");
+        modal.style.display = "none";
       };
 
       // 背景クリックで閉じる
       document.getElementById("imgModal").onclick = function (e) {
         if (e.target === this) {
+          this.classList.remove("zoomed");
+          document.getElementById("modalImg").classList.remove("zoomed");
           this.style.display = "none";
         }
       };
+
+      // ESCキーで閉じる
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          const modal = document.getElementById("imgModal");
+          if (modal.style.display === "flex") {
+            modal.classList.remove("zoomed");
+            document.getElementById("modalImg").classList.remove("zoomed");
+            modal.style.display = "none";
+          }
+        }
+      });
 
       /* --------------------------------------------------
         多言語辞書
@@ -548,7 +588,10 @@
         }
 
         // ▼ 新規モード（mode=null）
-        // 何もしない（空欄のまま入力）
+        if (!mode) {
+          document.getElementById("inspection_date").value =
+            new Date().toISOString().slice(0, 10);
+        }
       };
 
       /* --------------------------------------------------
@@ -605,6 +648,12 @@
         event.preventDefault(); // ← これで画面遷移を完全に止める
 
         const files = document.getElementById("inspection_files").files;
+        const dateVal = document.getElementById("inspection_date").value;
+
+        if (!dateVal) {
+          alert("測定日を入力してください。");
+          return;
+        }
 
         if (files.length === 0) {
           alert("Attachment is required.");

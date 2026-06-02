@@ -234,6 +234,23 @@
         cursor: pointer;
       }
 
+      /* ===== 画像ズーム ===== */
+      #modalImg {
+        cursor: zoom-in;
+        transition: max-width 0.2s ease, max-height 0.2s ease;
+      }
+      #modalImg.zoomed {
+        max-width: none !important;
+        max-height: none !important;
+        width: 180vw;
+        cursor: zoom-out;
+      }
+      #imgModal.zoomed {
+        overflow: auto;
+        align-items: flex-start !important;
+        padding: 60px 20px 20px;
+      }
+
       /* ===== モーダル全体 ===== */
       .modal {
         display: none; /* ← これが無いと開かない */
@@ -1571,21 +1588,47 @@
         画像モーダルを閉じる
       ============================================================ */
       document.getElementById("imgModalClose").onclick = function () {
-        document.getElementById("imgModal").style.display = "none";
+        const modal = document.getElementById("imgModal");
+        modal.classList.remove("zoomed");
+        document.getElementById("modalImg").classList.remove("zoomed");
+        modal.style.display = "none";
       };
 
       // 背景クリックでも閉じる
       document.getElementById("imgModal").onclick = function (e) {
         if (e.target.id === "imgModal") {
-          document.getElementById("imgModal").style.display = "none";
+          this.classList.remove("zoomed");
+          document.getElementById("modalImg").classList.remove("zoomed");
+          this.style.display = "none";
         }
       };
+
+      // 画像クリック → ズームトグル
+      document.getElementById("modalImg").onclick = function (e) {
+        e.stopPropagation();
+        this.classList.toggle("zoomed");
+        document.getElementById("imgModal").classList.toggle("zoomed");
+      };
+
+      // ESCキーで閉じる
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          const modal = document.getElementById("imgModal");
+          if (modal.style.display === "flex") {
+            modal.classList.remove("zoomed");
+            document.getElementById("modalImg").classList.remove("zoomed");
+            modal.style.display = "none";
+          }
+        }
+      });
 
       function showImageModal(path) {
         const modal = document.getElementById("imgModal");
         const img = document.getElementById("modalImg");
 
         img.src = path;
+        img.classList.remove("zoomed");
+        modal.classList.remove("zoomed");
         modal.style.display = "flex";
       }
 
