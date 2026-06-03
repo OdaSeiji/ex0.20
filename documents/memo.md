@@ -4782,3 +4782,13 @@ ALTER TABLE t_die_inspection
 ### ８：金型
 
 編集画面を作る
+
+# 2026/06/04
+
+```sql
+ALTER TABLE t_die_inspection
+  ADD COLUMN surface_roughness VARCHAR(255) NULL AFTER gage,
+  ADD COLUMN diesmark          VARCHAR(255) NULL AFTER surface_roughness;
+```
+
+をリモート側で実行

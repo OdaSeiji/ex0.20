@@ -302,6 +302,12 @@
         <label data-key="lbl_gage">Gage</label>
         <textarea id="gage" rows="2" maxlength="200"></textarea>
 
+        <label data-key="lbl_surface_roughness">表面粗さ</label>
+        <textarea id="surface_roughness" rows="2" maxlength="200"></textarea>
+
+        <label data-key="lbl_diesmark">Diesmark</label>
+        <textarea id="diesmark" rows="2" maxlength="200"></textarea>
+
         <label data-key="lbl_memo">メモ</label>
         <textarea id="memo" rows="4"></textarea>
 
@@ -520,6 +526,8 @@
           lbl_cmm: "CMM",
           lbl_lm_im: "LM/IM",
           lbl_gage: "Gage",
+          lbl_surface_roughness: "表面粗さ",
+          lbl_diesmark: "Diesmark",
           lbl_files: "添付ファイル（必須）",
           btn_save: "保存して一覧へ戻る",
         },
@@ -537,6 +545,8 @@
           lbl_cmm: "CMM",
           lbl_lm_im: "LM/IM",
           lbl_gage: "Gage",
+          lbl_surface_roughness: "Độ nhám bề mặt",
+          lbl_diesmark: "Diesmark",
           lbl_files: "Tệp đính kèm (bắt buộc)",
           btn_save: "Lưu và quay lại danh sách",
         },
@@ -689,7 +699,9 @@
         fd.append("memo",  document.getElementById("memo").value);
         fd.append("cmm",   document.getElementById("cmm").value);
         fd.append("lm_im", document.getElementById("lm_im").value);
-        fd.append("gage",  document.getElementById("gage").value);
+        fd.append("gage",             document.getElementById("gage").value);
+        fd.append("surface_roughness", document.getElementById("surface_roughness").value);
+        fd.append("diesmark",          document.getElementById("diesmark").value);
 
         // --- 添付ファイル（複数） ---
         for (let i = 0; i < files.length; i++) {
@@ -791,7 +803,9 @@
             document.getElementById("memo").value  = ins.memo  || "";
             document.getElementById("cmm").value   = ins.cmm   || "";
             document.getElementById("lm_im").value = ins.lm_im || "";
-            document.getElementById("gage").value  = ins.gage  || "";
+            document.getElementById("gage").value             = ins.gage             || "";
+            document.getElementById("surface_roughness").value = ins.surface_roughness || "";
+            document.getElementById("diesmark").value          = ins.diesmark          || "";
 
             // ▼ 添付ファイルプレビュー
             if (data.inspection_files) {

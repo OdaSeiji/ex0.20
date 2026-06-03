@@ -264,6 +264,14 @@
         ><span id="ins_gage"></span>
       </div>
       <div class="row">
+        <label data-key="label_ins_surface_roughness">表面粗さ：</label
+        ><span id="ins_surface_roughness"></span>
+      </div>
+      <div class="row">
+        <label data-key="label_ins_diesmark">Diesmark：</label
+        ><span id="ins_diesmark"></span>
+      </div>
+      <div class="row">
         <label data-key="label_ins_memo">メモ：</label
         ><span id="ins_memo"></span>
       </div>
@@ -506,6 +514,8 @@
           label_ins_cmm: "CMM：",
           label_ins_lm_im: "LM/IM：",
           label_ins_gage: "Gage：",
+          label_ins_surface_roughness: "表面粗さ：",
+          label_ins_diesmark: "Diesmark：",
           label_ins_memo: "メモ：",
           sec_ins_files: "■ 測定時の添付ファイル",
 
@@ -557,6 +567,8 @@
           label_ins_cmm: "CMM:",
           label_ins_lm_im: "LM/IM:",
           label_ins_gage: "Gage:",
+          label_ins_surface_roughness: "Độ nhám bề mặt:",
+          label_ins_diesmark: "Diesmark:",
           label_ins_memo: "Ghi chú:",
           sec_ins_files: "■ Tệp đính kèm khi đo",
 
@@ -862,7 +874,9 @@
         document.getElementById("ins_overall").textContent = ins.overall_result;
         document.getElementById("ins_cmm").textContent   = ins.cmm   || "";
         document.getElementById("ins_lm_im").textContent = ins.lm_im || "";
-        document.getElementById("ins_gage").textContent  = ins.gage  || "";
+        document.getElementById("ins_gage").textContent             = ins.gage             || "";
+        document.getElementById("ins_surface_roughness").textContent = ins.surface_roughness || "";
+        document.getElementById("ins_diesmark").textContent          = ins.diesmark          || "";
         document.getElementById("ins_memo").textContent  = ins.memo  || "";
 
         const area = document.getElementById("inspection_files");
@@ -1258,8 +1272,6 @@
         )
           .then((response) => response.json())
           .then((data) => {
-            alert(data.message);
-
             // ③ PHP が返した redirect に移動
             if (data.redirect) {
               window.location.href = data.redirect;

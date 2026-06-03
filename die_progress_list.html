@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -538,6 +538,16 @@
             <p id="pv_gage_row">
               <strong>Gage</strong>：
               <span id="pv_gage"></span>
+            </p>
+
+            <p id="pv_surface_roughness_row">
+              <strong>表面粗さ</strong>：
+              <span id="pv_surface_roughness"></span>
+            </p>
+
+            <p id="pv_diesmark_row">
+              <strong>Diesmark</strong>：
+              <span id="pv_diesmark"></span>
             </p>
 
             <!-- 対策（診断・修理で使用） -->
@@ -1336,9 +1346,11 @@
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
 
-        document.getElementById("pv_cmm").textContent   = data.inspection.cmm   || "-";
-        document.getElementById("pv_lm_im").textContent = data.inspection.lm_im || "-";
-        document.getElementById("pv_gage").textContent  = data.inspection.gage  || "-";
+        document.getElementById("pv_cmm").textContent              = data.inspection.cmm              || "-";
+        document.getElementById("pv_lm_im").textContent            = data.inspection.lm_im            || "-";
+        document.getElementById("pv_gage").textContent             = data.inspection.gage             || "-";
+        document.getElementById("pv_surface_roughness").textContent = data.inspection.surface_roughness || "-";
+        document.getElementById("pv_diesmark").textContent          = data.inspection.diesmark          || "-";
 
         document.getElementById("pv_memo").textContent =
           data.inspection.memo || "-";
@@ -1415,6 +1427,8 @@
         document.getElementById("pv_cmm_row").style.display   = "none";
         document.getElementById("pv_lm_im_row").style.display = "none";
         document.getElementById("pv_gage_row").style.display  = "none";
+        document.getElementById("pv_surface_roughness_row").style.display = "none";
+        document.getElementById("pv_diesmark_row").style.display          = "none";
 
         // 9. 承認情報（診断のみ表示）
         document.getElementById("previewApprovalBlock").style.display = "block";
@@ -1470,9 +1484,11 @@
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
         document.getElementById("pv_memo").parentElement.style.display = "none";
-        document.getElementById("pv_cmm_row").style.display   = "none";
-        document.getElementById("pv_lm_im_row").style.display = "none";
-        document.getElementById("pv_gage_row").style.display  = "none";
+        document.getElementById("pv_cmm_row").style.display              = "none";
+        document.getElementById("pv_lm_im_row").style.display             = "none";
+        document.getElementById("pv_gage_row").style.display              = "none";
+        document.getElementById("pv_surface_roughness_row").style.display = "none";
+        document.getElementById("pv_diesmark_row").style.display          = "none";
 
         // ★ 修理計画の内容を pv_memo に表示するのが自然
         document.getElementById("pv_memo").parentElement.style.display =
@@ -1542,9 +1558,11 @@
         // document.getElementById("pv_ng").parentElement.style.display = "none";
         document.getElementById("pv_condition").parentElement.style.display =
           "none";
-        document.getElementById("pv_cmm_row").style.display   = "none";
-        document.getElementById("pv_lm_im_row").style.display = "none";
-        document.getElementById("pv_gage_row").style.display  = "none";
+        document.getElementById("pv_cmm_row").style.display              = "none";
+        document.getElementById("pv_lm_im_row").style.display             = "none";
+        document.getElementById("pv_gage_row").style.display              = "none";
+        document.getElementById("pv_surface_roughness_row").style.display = "none";
+        document.getElementById("pv_diesmark_row").style.display          = "none";
 
         // 7. 診断メモは修理報告では使わないので非表示
         // （ただし pv_memo は修理内容として使う）
@@ -1573,10 +1591,12 @@
           "block";
         document.getElementById("pv_memo").parentElement.style.display =
           "block";
-        document.getElementById("pv_cmm_row").style.display   = "block";
-        document.getElementById("pv_lm_im_row").style.display = "block";
-        document.getElementById("pv_gage_row").style.display  = "block";
-        document.getElementById("pv_action_row").style.display = "block";
+        document.getElementById("pv_cmm_row").style.display              = "block";
+        document.getElementById("pv_lm_im_row").style.display             = "block";
+        document.getElementById("pv_gage_row").style.display              = "block";
+        document.getElementById("pv_surface_roughness_row").style.display = "block";
+        document.getElementById("pv_diesmark_row").style.display          = "block";
+        document.getElementById("pv_action_row").style.display            = "block";
 
         // 承認情報もデフォルト非表示に戻す
         document.getElementById("previewApprovalBlock").style.display = "none";

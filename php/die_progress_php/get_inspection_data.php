@@ -21,6 +21,8 @@ SELECT
     i.cmm,
     i.lm_im,
     i.gage,
+    i.surface_roughness,
+    i.diesmark,
 
     d.die_number,
     p.press_machine_no,
