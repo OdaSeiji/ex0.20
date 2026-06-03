@@ -4704,6 +4704,7 @@ ALTER TABLE t_die_inspection
 - 添付ファイルの拡大をもっとしたい。
 - 何も紐づいていない品番を消せるようにしたい。その発見もしたい。
 - `die_import.html`の「品番」は英語にした方がいい。
+- 測定画面に粗さの測定入力欄の追加
 
 下記の状態で、CJからCJ2に変更できない。
 
@@ -4718,3 +4719,62 @@ ALTER TABLE t_die_inspection
   <img src="./img/20260602-03.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/06/03
+
+課題
+
+### １：測定画面に粗さの測定入力欄の追加
+
+### ２：修理計画プレビュー画面
+
+測定日が表示されているが、押出日と、型番の表示にするべき。
+
+<figure style="text-align:center;">
+  <img src="./img/20260603-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+### ３：進捗サマリーの表示位置
+
+ダッシュボード内、以下表示位置を一番上に。
+
+<figure style="text-align:center;">
+  <img src="./img/20260603-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+### ４：移管書類一覧
+
+##### １：テーブルのタイトル行のベトナム語おかしい
+
+<figure style="text-align:center;">
+  <img src="./img/20260603-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+| 項目       | Web | 型番     | 品番        | 指示書作成日     | 検査書番号        | 検査合格日        | 日本送付日    | VN送付日    | 付属品   | インボイス番号 | 到着日   | 使用不可        | 更新日時      |
+| ---------- | --- | -------- | ----------- | ---------------- | ----------------- | ----------------- | ------------- | ----------- | -------- | -------------- | -------- | --------------- | ------------- |
+| ベトナム語 | Web | Số khuôn | Số sản phẩm | Ngày tạo chỉ thị | Số phiếu kiểm tra | Ngày qua kiểm tra | Ngày gửi Nhật | Ngày gửi VN | Phụ kiện | Số hóa đơn     | Ngày đến | Không dùng được | Ngày cập nhật |
+
+##### ２：登録されている型番、品番、Invoice Noの確認
+
+元データの`Excel`との相違が無いことを確認する。
+
+### ５：承認画面の保存処理
+
+保存処理後、エラーが出ないときは、これの表示は必要なし。
+
+<figure style="text-align:center;">
+  <img src="./img/20260603-05.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+### ６：測定入力、診断入力画面などのスタッフのフィルタリング
+
+測定は、測定者が選べるようにする。
+
+### ７：測定編集モード
+
+編集モードで開いた場合で、既に添付ファイルが有るにもかかわらず、
+新しく読み込まないと、添付ファイルを要求される。
