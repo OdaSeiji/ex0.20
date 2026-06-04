@@ -423,6 +423,8 @@
         <button onclick="setStepFilter('need_approval', this)" data-key="filter_approval">診断承認待ち</button>
         <button onclick="setStepFilter('need_fix_plan', this)" data-key="filter_fix_plan">修理計画待ち</button>
         <button onclick="setStepFilter('need_fix_report', this)" data-key="filter_fix_report">修理報告待ち</button>
+        <button onclick="setStepFilter('done', this)" data-key="filter_done">完了のみ</button>
+        <button onclick="setStepFilter('not_done', this)" data-key="filter_not_done">未完了のみ</button>
       </div>
 
       <!-- 一覧テーブル -->
@@ -484,6 +486,16 @@
           <!-- 左カラム：基本情報 -->
           <div class="preview-card">
             <h3 data-key="preview_basic_info">基本情報</h3>
+
+            <p id="pv_fp_die_row" style="display:none">
+              <strong>押出金型</strong>：
+              <span id="pv_fp_die"></span>
+            </p>
+
+            <p id="pv_fp_press_date_row" style="display:none">
+              <strong>押出日</strong>：
+              <span id="pv_fp_press_date"></span>
+            </p>
 
             <p id="pv_date_row">
               <strong data-key="label_date">日付</strong>：
@@ -720,6 +732,8 @@
           filter_approval: "診断承認待ち",
           filter_fix_plan: "修理計画待ち",
           filter_fix_report: "修理報告待ち",
+          filter_done:       "完了のみ",
+          filter_not_done:   "未完了のみ",
         },
 
         vi: {
@@ -773,6 +787,8 @@
           filter_approval: "Chờ duyệt chẩn đoán",
           filter_fix_plan: "Chờ kế hoạch sửa",
           filter_fix_report: "Chờ báo cáo sửa",
+          filter_done:       "Chỉ hoàn tất",
+          filter_not_done:   "Chỉ chưa hoàn tất",
         },
       };
 
@@ -907,6 +923,16 @@
               return row.approved === 1 && !row.fix_plan && needsRepair;
             case "need_fix_report":
               return row.fix_plan && !row.fix_report && needsRepair;
+            case "done":
+              return (
+                ((ng === 1 || ng === 4) && row.approved == 1) ||
+                (needsRepair && row.fix_report)
+              );
+            case "not_done":
+              return !(
+                ((ng === 1 || ng === 4) && row.approved == 1) ||
+                (needsRepair && row.fix_report)
+              );
             default:
               return true;
           }
@@ -1464,6 +1490,11 @@
         document.getElementById("previewTitle").textContent = "修理計画";
 
         // 3. 基本情報
+        document.getElementById("pv_fp_die").textContent        = data.die_number  || "-";
+        document.getElementById("pv_fp_press_date").textContent = data.press_date  || "-";
+        document.getElementById("pv_fp_die_row").style.display        = "block";
+        document.getElementById("pv_fp_press_date_row").style.display = "block";
+
         document.getElementById("pv_date").textContent =
           formatDate(data.plan_fix_date);
 
@@ -1597,6 +1628,8 @@
         document.getElementById("pv_surface_roughness_row").style.display = "block";
         document.getElementById("pv_diesmark_row").style.display          = "block";
         document.getElementById("pv_action_row").style.display            = "block";
+        document.getElementById("pv_fp_die_row").style.display            = "none";
+        document.getElementById("pv_fp_press_date_row").style.display     = "none";
 
         // 承認情報もデフォルト非表示に戻す
         document.getElementById("previewApprovalBlock").style.display = "none";

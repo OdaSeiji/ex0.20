@@ -4802,3 +4802,5 @@ ALTER TABLE t_die_inspection
   <img src="./img/20260604-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+これは、ならない。押出種別が◎だったため、通常では表示されていなかっただけ。

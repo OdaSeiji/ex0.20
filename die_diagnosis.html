@@ -1179,7 +1179,7 @@
       // staff listを読み込ませる
       // ------------------------------
       function loadStaffList() {
-        fetch("./php/die_progress_php/get_staff_list.php")
+        fetch("./php/die_progress_php/get_staff_list.php?roles=die_setup,admin,null")
           .then((res) => res.json())
           .then((list) => {
             const sel = document.getElementById("diag_staff");

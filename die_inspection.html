@@ -638,7 +638,7 @@
         スタッフ一覧
       -------------------------------------------------- */
       function loadStaffList() {
-        fetch("./php/die_progress_php/get_staff_list.php")
+        fetch("./php/die_progress_php/get_staff_list.php?role=inspector")
           .then((res) => res.json())
           .then((staffList) => {
             const sel = document.getElementById("inspection_staff_id");
@@ -665,7 +665,10 @@
           return;
         }
 
-        if (files.length === 0) {
+        const hasExistingFiles =
+          document.querySelectorAll("#preview_area .preview-item").length > 0;
+
+        if (files.length === 0 && !hasExistingFiles) {
           alert("Attachment is required.");
           return;
         }

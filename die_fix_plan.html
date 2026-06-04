@@ -194,6 +194,12 @@
         <h2>■ 診断情報（読み取り専用）</h2>
 
         <div class="row">
+          <label>型番：</label><span id="fp_die_number"></span>
+        </div>
+        <div class="row">
+          <label>押出日：</label><span id="fp_press_date"></span>
+        </div>
+        <div class="row">
           <label>診断日：</label><span id="diag_date"></span>
         </div>
         <div class="row">
@@ -332,6 +338,11 @@
 
             diagnosis_id = diag ? diag.id : null;
 
+            document.getElementById("fp_die_number").textContent =
+              data.press?.die_number || "";
+            document.getElementById("fp_press_date").textContent =
+              (data.press?.press_date_at || "").slice(0, 10);
+
             document.getElementById("diag_date").textContent =
               diag?.diagnosis_date || "";
             document.getElementById("diag_staff").textContent =
@@ -394,7 +405,7 @@
      スタッフ一覧
   ------------------------------ */
       function loadStaffList() {
-        fetch("./php/die_progress_php/get_staff_list.php")
+        fetch("./php/die_progress_php/get_staff_list.php?roles=die_setup,admin,null")
           .then((res) => res.json())
           .then((list) => {
             const sel = document.getElementById("plan_fix_staff_id");

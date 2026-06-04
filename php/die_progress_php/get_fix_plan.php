@@ -103,8 +103,26 @@ foreach ($files_raw as $f) {
 /* --------------------------------------------------
    5. JSON で返す
 -------------------------------------------------- */
-$fix["files"] = $files;
-$fix["inspection_id"] = $inspection_id;
-$fix["fix_id"] = $fix_id;
+/* --------------------------------------------------
+   6. 押出日・金型番号（t_press + m_dies）
+-------------------------------------------------- */
+$sql = "
+    SELECT
+        m.die_number,
+        DATE_FORMAT(p.press_date_at, '%Y-%m-%d') AS press_date
+    FROM t_die_inspection i
+    LEFT JOIN m_dies m ON i.die_id = m.id
+    LEFT JOIN t_press p ON i.press_id = p.id
+    WHERE i.id = ?
+";
+$stmt = $pdo->prepare($sql);
+$stmt->execute([$inspection_id]);
+$press_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$fix["files"]          = $files;
+$fix["inspection_id"]  = $inspection_id;
+$fix["fix_id"]         = $fix_id;
+$fix["die_number"]     = $press_info["die_number"] ?? null;
+$fix["press_date"]     = $press_info["press_date"]  ?? null;
 
 echo json_encode($fix);
