@@ -4753,9 +4753,10 @@ ALTER TABLE t_die_inspection
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
-| 項目       | Web | 型番     | 品番        | 指示書作成日     | 検査書番号        | 検査合格日        | 日本送付日    | VN送付日    | 付属品   | インボイス番号 | 到着日   | 使用不可        | 更新日時      |
-| ---------- | --- | -------- | ----------- | ---------------- | ----------------- | ----------------- | ------------- | ----------- | -------- | -------------- | -------- | --------------- | ------------- |
-| ベトナム語 | Web | Số khuôn | Số sản phẩm | Ngày tạo chỉ thị | Số phiếu kiểm tra | Ngày qua kiểm tra | Ngày gửi Nhật | Ngày gửi VN | Phụ kiện | Số hóa đơn     | Ngày đến | Không dùng được | Ngày cập nhật |
+| Web | 型番     | 品番        | 指示書作成日                | 検査書番号        | 検査合格日            | 日本送付日                          | VN送付日                | 付属品    | インボイス番号 | 到着日          | 使用不可              | 更新日時      |
+| --- | -------- | ----------- | --------------------------- | ----------------- | --------------------- | ----------------------------------- | ----------------------- | --------- | -------------- | --------------- | --------------------- | ------------- |
+| Web | Số khuôn | Số sản phẩm | Ngày tạo chỉ thị            | Số phiếu kiểm tra | Ngày qua kiểm tra     | Ngày gửi Nhật                       | Ngày gửi VN             | Phụ kiện  | Số hóa đơn     | Ngày đến        | Không dùng được       | Ngày cập nhật |
+| Web | Mã khuôn | Mã sản phẩm | Ngày tạo điều kiện gia công | Số kataken        | Ngày xác nhận kataken | Ngày gửi mail qua Nhật yêu cầu ikan | Ngày đăng ký tài sản VN | Nửa khuôn | Số invoice     | Ngày nhập khuôn | Khuôn không dùng được | Ngày cập nhật |
 
 ##### ２：登録されている型番、品番、Invoice Noの確認
 
@@ -4792,3 +4793,12 @@ ALTER TABLE t_die_inspection
 ```
 
 をリモート側で実行
+
+### 不具合
+
+これ、検索できない範囲にならないか？
+
+<figure style="text-align:center;">
+  <img src="./img/20260604-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
