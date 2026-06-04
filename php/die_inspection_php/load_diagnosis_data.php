@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once "./../db.php";
 
 $inspection_id = $_GET["inspection_id"];
@@ -19,7 +19,7 @@ $press_id = $inspection["press_id"];
 
 /* ---------------------------------------------------------
    ② Inspection Images（検査画像）
-   絶対パス: /ex0.20/uploads/inspection/{inspection_id}/{file_name}
+   絶対パス: /uploads/inspection/{inspection_id}/{file_name}
 --------------------------------------------------------- */
 $sql = "SELECT file_name 
         FROM t_die_attachment
@@ -29,7 +29,7 @@ $stmt->execute([$inspection_id]);
 
 $inspection_images = [];
 foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-    $inspection_images[] = "/ex0.20/uploads/inspection/" . $inspection_id . "/" . $row["file_name"];
+    $inspection_images[] = "/uploads/inspection/" . $inspection_id . "/" . $row["file_name"];
 }
 
 /* ---------------------------------------------------------
@@ -84,7 +84,7 @@ foreach ($history as &$h) {
 
     $h["images"] = [];
     foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $h["images"][] = "/ex0.20/uploads/diagnosis/" . $h["id"] . "/" . $row["file_name"];
+        $h["images"][] = "/uploads/diagnosis/" . $h["id"] . "/" . $row["file_name"];
     }
 }
 

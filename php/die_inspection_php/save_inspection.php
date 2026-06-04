@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 header("Content-Type: application/json; charset=UTF-8");
 
 // DB接続
@@ -55,7 +55,7 @@ try {
     if (!empty($_FILES["file"]["name"][0])) {
 
         // 保存先フォルダ inspection/{inspection_id}/
-        $upload_dir = "../../uploads/inspection/" . $inspection_id . "/";
+        $upload_dir = "../../../uploads/inspection/" . $inspection_id . "/";
 
         if (!file_exists($upload_dir)) {
             mkdir($upload_dir, 0777, true);

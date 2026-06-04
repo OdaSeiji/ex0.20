@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -557,16 +557,16 @@
           if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
             html = `
         <img 
-          src="./uploads/inspection/${ins.id}/${f.file_path}" 
+          src="../uploads/inspection/${ins.id}/${f.file_path}" 
           class="thumb"
-          onclick="openModal('./uploads/inspection/${ins.id}/${f.file_path}')"
+          onclick="openModal('../uploads/inspection/${ins.id}/${f.file_path}')"
         >
       `;
           }
           // その他ファイル → 通常リンク
           else {
             html = `
-        <a href="./uploads/inspection/${ins.id}/${f.file_path}" target="_blank">
+        <a href="../uploads/inspection/${ins.id}/${f.file_path}" target="_blank">
           📄 ${f.file_path}
         </a>
       `;

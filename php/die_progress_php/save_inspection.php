@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once "../db.php";
 header("Content-Type: application/json; charset=utf-8");
 
@@ -100,7 +100,7 @@ if ($existing) {
 // --------------------------------------------------
 // 4. 添付ファイル保存（UPDATE の場合は古いファイル削除）
 // --------------------------------------------------
-$upload_dir = "../../uploads/inspection/" . $inspection_id . "/";
+$upload_dir = "../../../uploads/inspection/" . $inspection_id . "/";
 
 if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0777, true);

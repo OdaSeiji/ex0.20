@@ -4804,3 +4804,18 @@ ALTER TABLE t_die_inspection
 </figure>
 
 これは、ならない。押出種別が◎だったため、通常では表示されていなかっただけ。
+
+# 2026/06/05
+
+修理計画の、修理者のフィルターと、日付のデフォルトが無い。
+
+承認画面のエラー
+
+```
+<br />
+<b>Fatal error</b>:  Uncaught PDOException: SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '34' for key 'uk_t_die_diagnosis_die_issue_id' in C:\xampp\htdocs\ex0.20\php\die_progress_php\approve_diagnosis.php:113
+Stack trace:
+#0 C:\xampp\htdocs\ex0.20\php\die_progress_php\approve_diagnosis.php(113): PDOStatement-&gt;execute(Array)
+#1 {main}
+  thrown in <b>C:\xampp\htdocs\ex0.20\php\die_progress_php\approve_diagnosis.php</b> on line <b>113</b><br />
+```

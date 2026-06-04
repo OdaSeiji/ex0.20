@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
@@ -30,9 +30,9 @@ $condition_change   = $_POST["condition_change"] ?? null;
 $memo               = $_POST["memo"] ?? null;
 
 // --------------------------------------------------
-// 2. press_id → inspection_id を取得
+// 2. press_id → inspection_id を取得（最新を使用）
 // --------------------------------------------------
-$sql = "SELECT id FROM t_die_inspection WHERE press_id = ?";
+$sql = "SELECT id FROM t_die_inspection WHERE press_id = ? ORDER BY id DESC LIMIT 1";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$press_id]);
 $inspection = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -129,7 +129,7 @@ if ($exist) {
 // --------------------------------------------------
 // 5. 添付ファイル保存（UPDATE 時は古いファイル削除）
 // --------------------------------------------------
-$dir = "../../uploads/diagnosis/" . $diagnosis_id;
+$dir = "../../../uploads/diagnosis/" . $diagnosis_id;
 
 if (!file_exists($dir)) {
     mkdir($dir, 0777, true);

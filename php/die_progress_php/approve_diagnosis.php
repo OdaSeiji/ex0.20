@@ -95,41 +95,48 @@ $should_create_issue =
 
 /* ----------------------------------------
    7. Issue 自動登録
+   ・t_die_issue と t_die_diagnosis は 1:1 のため、
+     既存 open issue がすでに別 diagnosis に紐づいていれば
+     新規 issue を作成してリンクする
 ---------------------------------------- */
 if ($should_create_issue && empty($die_issue_id)) {
 
-    /* 7-1. 同じ die_id の open Issue があるか確認 */
-    $sql = "SELECT id FROM t_die_issue 
-            WHERE die_id = ? AND status = 'open' 
-            LIMIT 1";
+    /* 7-1. 同じ die_id の open Issue で、どの diagnosis にも紐づいていないものを探す */
+    $sql = "
+        SELECT i.id FROM t_die_issue i
+        WHERE i.die_id = ? AND i.status = 'open'
+          AND NOT EXISTS (
+              SELECT 1 FROM t_die_diagnosis d WHERE d.die_issue_id = i.id
+          )
+        LIMIT 1
+    ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$die_id]);
-    $existing_issue = $stmt->fetch(PDO::FETCH_ASSOC);
+    $free_issue = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($existing_issue) {
-        // 既存 issue を紐づける
-        $sql = "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$existing_issue["id"], $diagnosis_id]);
+    if ($free_issue) {
+        /* 7-2. 空き issue にリンク（die_issue_id が NULL のときのみ安全に更新） */
+        $upd = $pdo->prepare(
+            "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ? AND die_issue_id IS NULL"
+        );
+        $upd->execute([$free_issue["id"], $diagnosis_id]);
 
     } else {
-        /* 7-2. 新規 Issue 作成 */
-        $sql = "INSERT INTO t_die_issue 
-                (die_id, issue_title, issue_detail, priority, status)
-                VALUES (?, ?, ?, 3, 'open')";
-        $stmt = $pdo->prepare($sql);
-
+        /* 7-3. 空き issue がない（すべて使用済み or 存在しない）→ 新規 Issue を作成 */
+        $ins = $pdo->prepare("
+            INSERT INTO t_die_issue (die_id, issue_title, issue_detail, priority, status)
+            VALUES (?, ?, ?, 3, 'open')
+        ");
         $title  = "診断結果による自動登録（診断ID: {$diagnosis_id}）";
         $detail = "診断結果に基づき自動登録されました";
-
-        $stmt->execute([$die_id, $title, $detail]);
+        $ins->execute([$die_id, $title, $detail]);
 
         $new_issue_id = $pdo->lastInsertId();
 
-        // diagnosis に issue_id を紐づける
-        $sql = "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$new_issue_id, $diagnosis_id]);
+        $upd = $pdo->prepare(
+            "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?"
+        );
+        $upd->execute([$new_issue_id, $diagnosis_id]);
     }
 }
 

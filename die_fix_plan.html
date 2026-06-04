@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -381,7 +381,7 @@
           div.classList.add("file-item");
 
           // ★ file_path は "diagnosis/13/xxx.jpg" なので、そのまま使う
-          const base = `../ex0.20/uploads/${f.file_path}`;
+          const base = `../uploads/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
             div.innerHTML = `
@@ -470,7 +470,7 @@
           div.classList.add("file-item");
 
           // ★ file_path は "fix/14/xxx.jpg" のように既にパスが入っている前提
-          const base = `../ex0.20/uploads/${f.file_path}`;
+          const base = `../uploads/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
             div.innerHTML = `

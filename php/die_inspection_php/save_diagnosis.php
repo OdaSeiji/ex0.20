@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once "./../db.php";
 
 try {
@@ -33,7 +33,7 @@ try {
     /* ---------------------------------------------------------
        ② 診断画像の保存先フォルダを作成
     --------------------------------------------------------- */
-    $dir = "../../uploads/diagnosis/" . $diagnosis_id;
+    $dir = "../../../uploads/diagnosis/" . $diagnosis_id;
 
     if (!file_exists($dir)) {
         mkdir($dir, 0777, true);

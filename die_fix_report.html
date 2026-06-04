@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -377,7 +377,7 @@
         container.innerHTML = "";
 
         files.forEach((f) => {
-          const url = `../ex0.20/uploads/${f.file_path}`;
+          const url = `../uploads/${f.file_path}`;
           if (f.file_type.startsWith("image/")) {
             const img = document.createElement("img");
             img.src = url;
@@ -435,7 +435,7 @@
 
         files.forEach((f) => {
           // ★ file_path は "fix/14/xxx.jpg" なので、そのまま使う
-          const url = `../ex0.20/uploads/${f.file_path}`;
+          const url = `../uploads/${f.file_path}`;
 
           if (f.file_type.startsWith("image/")) {
             const img = document.createElement("img");

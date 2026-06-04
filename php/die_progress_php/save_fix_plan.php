@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
@@ -76,7 +76,7 @@ if ($fix_id) {
 -------------------------------------------------- */
 if (!empty($_FILES["plan_files"]["name"][0])) {
 
-    $dir = "../../uploads/fix/" . $fix_id;
+    $dir = "../../../uploads/fix/" . $fix_id;
 
     if (!file_exists($dir)) {
         mkdir($dir, 0777, true);

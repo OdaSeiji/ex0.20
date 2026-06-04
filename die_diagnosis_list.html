@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
@@ -464,7 +464,7 @@
             modalImages = [];
 
             files.forEach((f, index) => {
-              const imgPath = `./uploads/diagnosis/${f.diagnosis_id}/${f.file_name}`;
+              const imgPath = `../uploads/diagnosis/${f.diagnosis_id}/${f.file_name}`;
               modalImages.push(imgPath);
 
               const img = document.createElement("img");
