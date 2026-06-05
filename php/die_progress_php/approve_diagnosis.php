@@ -95,34 +95,25 @@ $should_create_issue =
 
 /* ----------------------------------------
    7. Issue 自動登録
-   ・t_die_issue と t_die_diagnosis は 1:1 のため、
-     既存 open issue がすでに別 diagnosis に紐づいていれば
-     新規 issue を作成してリンクする
+   ・die_id に紐づく open な issue があればリンク
+   ・なければ新規作成してリンク
+   ・1つの issue に複数 diagnosis がリンクされる（issue が close するまで）
 ---------------------------------------- */
 if ($should_create_issue && empty($die_issue_id)) {
 
-    /* 7-1. 同じ die_id の open Issue で、どの diagnosis にも紐づいていないものを探す */
-    $sql = "
-        SELECT i.id FROM t_die_issue i
-        WHERE i.die_id = ? AND i.status = 'open'
-          AND NOT EXISTS (
-              SELECT 1 FROM t_die_diagnosis d WHERE d.die_issue_id = i.id
-          )
-        LIMIT 1
-    ";
+    /* 7-1. 同じ die_id の open Issue を探す */
+    $sql = "SELECT id FROM t_die_issue WHERE die_id = ? AND status = 'open' LIMIT 1";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$die_id]);
-    $free_issue = $stmt->fetch(PDO::FETCH_ASSOC);
+    $existing_issue = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($free_issue) {
-        /* 7-2. 空き issue にリンク（die_issue_id が NULL のときのみ安全に更新） */
-        $upd = $pdo->prepare(
-            "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ? AND die_issue_id IS NULL"
-        );
-        $upd->execute([$free_issue["id"], $diagnosis_id]);
+    if ($existing_issue) {
+        /* 7-2. 既存 open issue にリンク */
+        $upd = $pdo->prepare("UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?");
+        $upd->execute([$existing_issue["id"], $diagnosis_id]);
 
     } else {
-        /* 7-3. 空き issue がない（すべて使用済み or 存在しない）→ 新規 Issue を作成 */
+        /* 7-3. open issue がない → 新規 Issue を作成してリンク */
         $ins = $pdo->prepare("
             INSERT INTO t_die_issue (die_id, issue_title, issue_detail, priority, status)
             VALUES (?, ?, ?, 3, 'open')
@@ -133,9 +124,7 @@ if ($should_create_issue && empty($die_issue_id)) {
 
         $new_issue_id = $pdo->lastInsertId();
 
-        $upd = $pdo->prepare(
-            "UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?"
-        );
+        $upd = $pdo->prepare("UPDATE t_die_diagnosis SET die_issue_id = ? WHERE id = ?");
         $upd->execute([$new_issue_id, $diagnosis_id]);
     }
 }
