@@ -4819,3 +4819,11 @@ Stack trace:
 #1 {main}
   thrown in <b>C:\xampp\htdocs\ex0.20\php\die_progress_php\approve_diagnosis.php</b> on line <b>113</b><br />
 ```
+
+このエラーの内容を精査して、懸念している
+t_press.id
+t_die_inspection
+t_die_diagnosis
+t_die_fix
+が、一対一の関係になっているか？慎重に確認すること。
+ちゃんと、複数die_idが保存されているか？ですかね。
