@@ -162,10 +162,16 @@
       <table id="issueTable">
         <thead>
           <tr>
-            <th data-key="col_die">金型番号</th>
+            <th style="cursor:pointer; user-select:none;" onclick="sortByDieNo()">
+              <span data-key="col_die">金型番号</span>
+              <span id="sortIndicator"></span>
+              <input id="searchDieNo" type="text" placeholder="検索..."
+                style="margin-left:8px; padding:3px 7px; font-size:12px; border:1px solid #aaa; border-radius:4px; width:100px; font-weight:normal;"
+                oninput="filterAndRender()"
+                onclick="event.stopPropagation()" />
+            </th>
             <th data-key="col_title_jp">テーマ(JP)</th>
             <th data-key="col_title_vn">テーマ(VN)</th>
-            <th data-key="col_detail">詳細</th>
             <th data-key="col_priority">優先度</th>
             <th data-key="col_latest">最終押出日</th>
             <th data-key="col_status">完了状態</th>
@@ -184,7 +190,6 @@
           col_die: "金型番号",
           col_title_jp: "テーマ(JP)",
           col_title_vn: "テーマ(VN)",
-          col_detail: "詳細",
           col_priority: "優先度",
           col_latest: "最終押出日",
           col_status: "完了状態",
@@ -195,7 +200,6 @@
           col_die: "Mã khuôn",
           col_title_jp: "Chủ đề(JP)",
           col_title_vn: "Chủ đề(VN)",
-          col_detail: "Chi tiết",
           col_priority: "Ưu tiên",
           col_latest: "Ngày ép cuối",
           col_status: "Trạng thái",
@@ -233,6 +237,10 @@
         loadIssueList();
       };
 
+      /* 全データ保持・ソート状態 */
+      let allData  = [];
+      let sortDir  = 0; // 0=未ソート, 1=昇順, -1=降順
+
       /* 一覧データ読み込み */
       function loadIssueList() {
         const url = filterDieId
@@ -241,48 +249,59 @@
         fetch(url)
           .then((res) => res.json())
           .then((data) => {
-            const tbody = document.querySelector("#issueTable tbody");
-            tbody.innerHTML = "";
-
-            data.forEach((row) => {
-              const tr = document.createElement("tr");
-
-              let priorityClass =
-                row.priority == 1
-                  ? "high"
-                  : row.priority == 2
-                    ? "medium"
-                    : "low";
-
-              let compClass =
-                row.completion_status === "完了" ? "complete" : "incomplete";
-
-              tr.innerHTML = `
-                <td class="die-number">${row.die_number}</td>
-                <td class="editable-cell" data-id="${row.id}" data-field="issue_title_jp">
-                  <div class="detail-view">${row.issue_title_jp ?? ""}</div>
-                  <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_jp ?? "").replace(/"/g, "&quot;")}" />
-                  <button class="save-btn" style="display:none;">保存</button>
-                </td>
-                <td class="editable-cell" data-id="${row.id}" data-field="issue_title_vn">
-                  <div class="detail-view">${row.issue_title_vn ?? ""}</div>
-                  <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_vn ?? "").replace(/"/g, "&quot;")}" />
-                  <button class="save-btn" style="display:none;">保存</button>
-                </td>
-                <td class="editable-cell" data-id="${row.id}" data-field="issue_detail">
-                  <div class="detail-view">${row.issue_detail ?? ""}</div>
-                  <textarea class="detail-edit" style="display:none;">${row.issue_detail ?? ""}</textarea>
-                  <button class="save-btn" style="display:none;">保存</button>
-                </td>
-                <td><span class="badge ${priorityClass}">${row.priority_label}</span></td>
-                <td>${row.latest_press_date?.split(" ")[0] ?? "—"}</td>
-                <td><span class="badge ${compClass}">${row.completion_status}</span></td>
-                <td><button class="btn" onclick="location.href='die_timeline.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">タイムライン</button></td>
-              `;
-
-              tbody.appendChild(tr);
-            });
+            allData = data;
+            filterAndRender();
           });
+      }
+
+      /* 型番ソート */
+      function sortByDieNo() {
+        sortDir = sortDir === 1 ? -1 : 1;
+        document.getElementById("sortIndicator").textContent = sortDir === 1 ? "▲" : "▼";
+        allData.sort((a, b) => a.die_number.localeCompare(b.die_number, "ja") * sortDir);
+        filterAndRender();
+      }
+
+      /* 型番フィルタ → 描画 */
+      function filterAndRender() {
+        const q = document.getElementById("searchDieNo").value.trim().toLowerCase();
+        const rows = q ? allData.filter(r => r.die_number.toLowerCase().includes(q)) : allData;
+        renderTable(rows);
+      }
+
+      /* テーブル描画 */
+      function renderTable(data) {
+        const tbody = document.querySelector("#issueTable tbody");
+        tbody.innerHTML = "";
+
+        data.forEach((row) => {
+          const tr = document.createElement("tr");
+
+          const priorityClass =
+            row.priority == 1 ? "high" : row.priority == 2 ? "medium" : "low";
+          const compClass =
+            row.completion_status === "完了" ? "complete" : "incomplete";
+
+          tr.innerHTML = `
+            <td class="die-number">${row.die_number}</td>
+            <td class="editable-cell" data-id="${row.id}" data-field="issue_title_jp">
+              <div class="detail-view">${row.issue_title_jp ?? ""}</div>
+              <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_jp ?? "").replace(/"/g, "&quot;")}" />
+              <button class="save-btn" style="display:none;">保存</button>
+            </td>
+            <td class="editable-cell" data-id="${row.id}" data-field="issue_title_vn">
+              <div class="detail-view">${row.issue_title_vn ?? ""}</div>
+              <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_vn ?? "").replace(/"/g, "&quot;")}" />
+              <button class="save-btn" style="display:none;">保存</button>
+            </td>
+            <td><span class="badge ${priorityClass}">${row.priority_label}</span></td>
+            <td>${row.latest_press_date?.split(" ")[0] ?? "—"}</td>
+            <td><span class="badge ${compClass}">${row.completion_status}</span></td>
+            <td><button class="btn" onclick="location.href='die_timeline.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">タイムライン</button></td>
+          `;
+
+          tbody.appendChild(tr);
+        });
       }
 
       /* クリックで編集モードへ */
