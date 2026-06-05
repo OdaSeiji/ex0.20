@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="ja">
+<html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>ログイン</title>
+    <title>Đăng nhập</title>
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -13,6 +13,26 @@
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+
+      .lang-buttons {
+        position: fixed;
+        top: 12px;
+        right: 14px;
+      }
+      .lang-buttons button {
+        padding: 5px 11px;
+        margin-left: 4px;
+        border: 1px solid #2b6ca3;
+        background: #fff;
+        color: #2b6ca3;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .lang-buttons button.active {
+        background: #2b6ca3;
+        color: #fff;
       }
 
       .login-card {
@@ -93,25 +113,77 @@
     </style>
   </head>
   <body>
+    <div class="lang-buttons">
+      <button id="btnVi" onclick="setLang('vi')">VI</button>
+      <button id="btnJa" onclick="setLang('ja')">JP</button>
+    </div>
+
     <div class="login-card">
-      <div class="login-title">🔐 ログイン</div>
+      <div class="login-title">🔐 <span data-key="title">Đăng nhập</span></div>
 
       <div class="form-group">
-        <label for="empNum">社員番号</label>
-        <input type="text" id="empNum" placeholder="例：1001" inputmode="numeric" />
+        <label for="empNum" data-key="label_emp">Mã nhân viên</label>
+        <input type="text" id="empNum" data-key-ph="ph_emp" placeholder="Ví dụ：1001" inputmode="numeric" />
       </div>
 
       <div class="form-group">
-        <label for="pw">パスワード</label>
-        <input type="password" id="pw" placeholder="パスワード" />
+        <label for="pw" data-key="label_pw">Mật khẩu</label>
+        <input type="password" id="pw" data-key-ph="ph_pw" placeholder="Mật khẩu" />
       </div>
 
-      <button class="login-btn" id="loginBtn" onclick="doLogin()">ログイン</button>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()" data-key="btn_login">Đăng nhập</button>
       <div class="error-msg" id="errMsg"></div>
-      <div class="hint">初期パスワードは社員番号です</div>
+      <div class="hint" data-key="hint">Mật khẩu ban đầu là mã nhân viên</div>
     </div>
 
     <script>
+      const dict = {
+        vi: {
+          title:        "Đăng nhập",
+          label_emp:    "Mã nhân viên",
+          ph_emp:       "Ví dụ：1001",
+          label_pw:     "Mật khẩu",
+          ph_pw:        "Mật khẩu",
+          btn_login:    "Đăng nhập",
+          hint:         "Mật khẩu ban đầu là mã nhân viên",
+          err_empty:    "Vui lòng nhập mã nhân viên và mật khẩu",
+          btn_checking: "Đang kiểm tra...",
+          err_failed:   "Đăng nhập thất bại",
+          err_network:  "Lỗi kết nối",
+        },
+        ja: {
+          title:        "ログイン",
+          label_emp:    "社員番号",
+          ph_emp:       "例：1001",
+          label_pw:     "パスワード",
+          ph_pw:        "パスワード",
+          btn_login:    "ログイン",
+          hint:         "初期パスワードは社員番号です",
+          err_empty:    "社員番号とパスワードを入力してください",
+          btn_checking: "確認中...",
+          err_failed:   "ログインに失敗しました",
+          err_network:  "通信エラーが発生しました",
+        },
+      };
+
+      let currentLang = "vi";
+
+      function setLang(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang_login", lang);
+
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          el.textContent = dict[lang][el.dataset.key] ?? el.textContent;
+        });
+        document.querySelectorAll("[data-key-ph]").forEach((el) => {
+          el.placeholder = dict[lang][el.dataset.keyPh] ?? el.placeholder;
+        });
+
+        document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+        document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+        document.documentElement.lang = lang;
+      }
+
       document.getElementById("pw").addEventListener("keydown", (e) => {
         if (e.key === "Enter") doLogin();
       });
@@ -121,15 +193,16 @@
         const pw     = document.getElementById("pw").value;
         const btn    = document.getElementById("loginBtn");
         const err    = document.getElementById("errMsg");
+        const t      = dict[currentLang];
 
         err.textContent = "";
         if (!empNum || !pw) {
-          err.textContent = "社員番号とパスワードを入力してください";
+          err.textContent = t.err_empty;
           return;
         }
 
-        btn.disabled = true;
-        btn.textContent = "確認中...";
+        btn.disabled    = true;
+        btn.textContent = t.btn_checking;
 
         try {
           const res    = await fetch("php/auth/login.php", {
@@ -142,16 +215,20 @@
           if (result.status === "ok") {
             location.replace("index.html");
           } else {
-            err.textContent = result.message || "ログインに失敗しました";
+            err.textContent = result.message || t.err_failed;
             btn.disabled    = false;
-            btn.textContent = "ログイン";
+            btn.textContent = t.btn_login;
           }
         } catch (_) {
-          err.textContent = "通信エラーが発生しました";
+          err.textContent = t.err_network;
           btn.disabled    = false;
-          btn.textContent = "ログイン";
+          btn.textContent = t.btn_login;
         }
       }
+
+      // 初期化（デフォルト：ベトナム語）
+      const saved = localStorage.getItem("lang_login") || "vi";
+      setLang(saved);
     </script>
   </body>
 </html>
