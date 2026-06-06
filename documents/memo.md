@@ -4828,4 +4828,51 @@ t_die_fix
 が、一対一の関係になっているか？慎重に確認すること。
 ちゃんと、複数die_idが保存されているか？ですかね。
 
-`die_issue_list.html`の金型が増えて、よく分からなくなる。ソート、フィルターが必要。
+これは、ai側が判断を誤った。t_die_issueのdie_idがユニークだったことも問題。修正。ok。
+
+`die_issue_list.html`の金型が増えて、よく分からなくなる。ソート、フィルターが必要。完了。
+
+# 2026/06/06
+
+いよいよ、金型移管リストの取り込み。
+
+テーブルとしては、こんな感じか？
+
+```sql
+CREATE TABLE t_die_handover_progress (
+id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Unique identifier for each progress record',
+die_id INT NOT NULL COMMENT 'Die ID referencing m_dies.id',
+
+    original_table_no INT COMMENT 'Original table reference number',
+    die_planning_phase_steps INT COMMENT 'Step number in the die planning phase',
+
+    arrival_at DATE DEFAULT NULL COMMENT 'Date when the die arrived',
+    vn_production_dimensional_inspection_at DATE DEFAULT NULL COMMENT 'Date of dimensional inspection by VN Production',
+    vn_qa_dimensional_inspection_at DATE DEFAULT NULL COMMENT 'Date of dimensional inspection by VN QA',
+    submit_dimensional_inspection_to_japan_at DATE DEFAULT NULL COMMENT 'Date when dimensional inspection results were submitted to Japan',
+    jp_dimensional_inspection_at DATE DEFAULT NULL COMMENT 'Date of dimensional inspection conducted in Japan',
+    jp_dimensional_inspection_document_number VARCHAR(50) DEFAULT NULL COMMENT 'Document number for Japan’s dimensional inspection report',
+
+    anodizing_quality_check_required_flag TINYINT(1) DEFAULT 0 COMMENT 'Flag indicating whether anodizing quality check is required',
+    anodizing_quality_check_at DATE DEFAULT NULL COMMENT 'Date when anodizing quality check was performed',
+
+    mass_production_trial_at DATE DEFAULT NULL COMMENT 'Date of mass production trial',
+    die_handover_at DATE DEFAULT NULL COMMENT 'Date when the die was handed over',
+    mass_production_start_at DATE DEFAULT NULL COMMENT 'Date when mass production started',
+
+    production_site_change_notice VARCHAR(100) DEFAULT NULL COMMENT 'Production site change notice number (e.g., vol.xxx)',
+    dimensional_inspection_by VARCHAR(50) DEFAULT NULL COMMENT 'Person or department who performed the dimensional inspection',
+
+    bcp_flag TINYINT(1) DEFAULT 0 COMMENT 'Flag indicating BCP (Business Continuity Plan) relevance',
+
+    die_transfer_ready_flag TINYINT(1) DEFAULT 0 COMMENT 'Flag indicating readiness for die transfer',
+    memo VARCHAR(255) DEFAULT NULL COMMENT 'Additional notes or remarks',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Timestamp updated automatically on record modification',
+
+    CONSTRAINT fk_handover_progress_die
+        FOREIGN KEY (die_id) REFERENCES m_dies(id)
+
+) COMMENT='Progress tracking table for die handover process';
+```
