@@ -82,7 +82,7 @@
         width: 100%;
         border-collapse: collapse;
         table-layout: fixed;
-        min-width: 1200px;
+        min-width: 1400px;
       }
 
       th, td {
@@ -199,6 +199,30 @@
       .col-date     { width: 92px; }
       .col-text     { width: 110px; }
       .col-flag     { width: 72px; }
+
+      /* 型番列固定 */
+      th.col-check, td.col-check {
+        position: sticky;
+        left: 0;
+        z-index: 11;
+      }
+      th.col-check { background: #e8f1ff; z-index: 12; }
+      td.col-check { background: #fff; }
+      tr:hover td.col-check { background: #f0f8ff; }
+      tr.checked-row td.col-check { background: #fff8e1; }
+      tr.checked-row:hover td.col-check { background: #fff3cd; }
+
+      th.die-num-th, td.die-num-td {
+        position: sticky;
+        left: 36px;
+        z-index: 11;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.08);
+      }
+      th.die-num-th { background: #e8f1ff; z-index: 12; }
+      td.die-num-td { background: #fff; }
+      tr:hover td.die-num-td { background: #f0f8ff; }
+      tr.checked-row td.die-num-td { background: #fff8e1; }
+      tr.checked-row:hover td.die-num-td { background: #fff3cd; }
     </style>
   </head>
 
@@ -229,6 +253,8 @@
           <col class="col-die-num" />
           <col class="col-pn" />
           <col class="col-date" />
+          <col class="col-date" />
+          <col class="col-date" />
           <col class="col-text" />
           <col class="col-date" />
           <col class="col-date" />
@@ -244,12 +270,14 @@
             <th class="col-check no-sort">
               <input type="checkbox" id="checkAll" onclick="toggleCheckAll(this)" />
             </th>
-            <th data-col="die_number" data-key="col_die">型番
+            <th class="die-num-th" data-col="die_number" data-key="col_die">型番
               <input type="text" id="searchDie" placeholder="検索…" class="die-search"
                 onclick="event.stopPropagation()" />
               <span class="sort-icon"></span>
             </th>
             <th data-col="production_number" data-key="col_pn">品番 <span class="sort-icon"></span></th>
+            <th data-col="ordered_at" data-key="col_ordered">発注日 <span class="sort-icon"></span></th>
+            <th data-col="shipped_at" data-key="col_shipped">出荷日 <span class="sort-icon"></span></th>
             <th data-col="instruction_created_at" data-key="col_ins_created">指示書作成日 <span class="sort-icon"></span></th>
             <th data-col="inspection_number" data-key="col_insp_num">検査書番号 <span class="sort-icon"></span></th>
             <th data-col="inspection_passed_at" data-key="col_insp_passed">検査合格日 <span class="sort-icon"></span></th>
@@ -307,6 +335,8 @@
           title:           "金型移管書類一覧",
           col_die:         "型番",
           col_pn:          "品番",
+          col_ordered:     "発注日",
+          col_shipped:     "出荷日",
           col_ins_created: "指示書作成日",
           col_insp_num:    "検査書番号",
           col_insp_passed: "検査合格日",
@@ -327,6 +357,8 @@
           title:           "Danh sách tài liệu chuyển giao khuôn",
           col_die:         "Mã khuôn",
           col_pn:          "Mã sản phẩm",
+          col_ordered:     "Ngày đặt hàng",
+          col_shipped:     "Ngày xuất khẩu",
           col_ins_created: "Ngày tạo điều kiện gia công",
           col_insp_num:    "Số kataken",
           col_insp_passed: "Ngày xác nhận kataken",
@@ -453,6 +485,8 @@
         document.querySelectorAll("#handoverTable tbody tr[data-id]").forEach((tr) => {
           rows.push({
             id:                      Number(tr.dataset.id),
+            ordered_at:              tr.querySelector('[name="ordered"]').value       || null,
+            shipped_at:              tr.querySelector('[name="shipped"]').value       || null,
             instruction_created_at:  tr.querySelector('[name="ins_created"]').value  || null,
             inspection_number:       tr.querySelector('[name="insp_num"]').value      || null,
             inspection_passed_at:    tr.querySelector('[name="insp_passed"]').value   || null,
@@ -520,8 +554,10 @@
           if (isEditMode) {
             tr.innerHTML = `
               <td class="col-check"><input type="checkbox" checked disabled /></td>
-              <td class="die-number">${row.die_number ?? ""}</td>
+              <td class="die-number die-num-td">${row.die_number ?? ""}</td>
               <td class="die-number">${row.production_number ?? ""}</td>
+              <td><input type="date" name="ordered"      value="${rawDate(row.ordered_at)}" /></td>
+              <td><input type="date" name="shipped"      value="${rawDate(row.shipped_at)}" /></td>
               <td><input type="date" name="ins_created"  value="${rawDate(row.instruction_created_at)}" /></td>
               <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
               <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>
@@ -543,8 +579,10 @@
                 <input type="checkbox" ${isChecked ? "checked" : ""}
                   onchange="toggleCheck(${row.id}, this.checked)" />
               </td>
-              <td class="die-number">${row.die_number ?? ""}</td>
+              <td class="die-number die-num-td">${row.die_number ?? ""}</td>
               <td class="die-number">${row.production_number ?? ""}</td>
+              <td>${formatDate(row.ordered_at)}</td>
+              <td>${formatDate(row.shipped_at)}</td>
               <td>${formatDate(row.instruction_created_at)}</td>
               <td>${row.inspection_number ?? ""}</td>
               <td>${formatDate(row.inspection_passed_at)}</td>

@@ -11,6 +11,8 @@ if (!$rows || !is_array($rows)) {
 
 $sql = "
     UPDATE t_die_handover SET
+        ordered_at              = ?,
+        shipped_at              = ?,
         instruction_created_at  = ?,
         inspection_number       = ?,
         inspection_passed_at    = ?,
@@ -28,6 +30,8 @@ $updated = 0;
 
 foreach ($rows as $row) {
     $stmt->execute([
+        $row["ordered_at"]              ?: null,
+        $row["shipped_at"]              ?: null,
         $row["instruction_created_at"]  ?: null,
         $row["inspection_number"]       ?: null,
         $row["inspection_passed_at"]    ?: null,

@@ -43,6 +43,8 @@ $sql = "
         h.die_id,
         COALESCE(d.die_number, h.die_model_code)              AS die_number,
         COALESCE(p.production_number, h.product_code)         AS production_number,
+        h.ordered_at,
+        h.shipped_at,
         h.instruction_created_at,
         h.inspection_number,
         h.inspection_passed_at,

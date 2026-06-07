@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>金型 発注・出荷日入力</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1000px; margin: 0 auto; }
+
+      /* ── ヘッダー ── */
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        font-size: 13px; white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+
+      /* ── カード共通 ── */
+      .card {
+        background: #fff; border-radius: 10px;
+        padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 13px; font-weight: bold; color: #1565c0;
+        margin-bottom: 14px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+      }
+
+      /* ── 一括入力エリア ── */
+      .bulk-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px 24px;
+      }
+      .bulk-row {
+        display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      }
+      .bulk-row label { font-size: 13px; color: #444; white-space: nowrap; min-width: 50px; }
+      .bulk-row input[type="date"] {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; font-family: "Roboto Mono", monospace;
+      }
+      .btn-bulk {
+        background: #0078d4; color: #fff;
+        padding: 7px 14px; border: none; border-radius: 5px;
+        cursor: pointer; font-size: 13px; white-space: nowrap;
+      }
+      .btn-bulk:hover { background: #005fa3; }
+      .btn-bulk:disabled { background: #ccc; cursor: default; }
+      .selected-info { font-size: 12px; color: #888; margin-top: 10px; }
+
+      /* ── テーブル ── */
+      .table-wrap {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 450px;
+      }
+      table { width: 100%; border-collapse: collapse; min-width: 700px; }
+      th, td { padding: 9px 12px; border-bottom: 1px solid #eee; font-size: 13px; text-align: left; }
+      th { background: #e8f1ff; font-weight: bold; color: #333; white-space: nowrap; position: sticky; top: 0; z-index: 10; }
+      tr:hover { background: #f7f9ff; }
+      tr.selected { background: #fff8e1; }
+      tr.selected:hover { background: #fff3cd; }
+
+      .mono { font-family: "Roboto Mono", monospace; }
+
+      /* 発注日済みの行（出荷待ち） */
+      tr.ordered td.ordered-cell { color: #888; }
+
+      td input[type="date"] {
+        padding: 5px 8px; border: 1px solid #90c0f0;
+        border-radius: 4px; font-size: 12px;
+        font-family: "Roboto Mono", monospace;
+        background: #f0f8ff; width: 140px;
+      }
+      td input[type="date"]:focus {
+        outline: none; border-color: #0078d4; background: #e8f4ff;
+      }
+      td input[type="date"]:disabled {
+        background: #f5f5f5; border-color: #ddd; color: #aaa; cursor: default;
+      }
+      td input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
+      .empty-msg {
+        text-align: center; color: #aaa; padding: 32px; font-size: 14px;
+      }
+
+      /* ステータスバッジ */
+      .badge {
+        display: inline-block; padding: 2px 8px; border-radius: 4px;
+        font-size: 11px; font-weight: bold;
+      }
+      .badge-ordered  { background: #e3f2fd; color: #1565c0; }
+      .badge-pending  { background: #fff8e1; color: #e65100; }
+
+      /* ── 保存バー ── */
+      .save-bar {
+        background: #fff; border-radius: 10px;
+        padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 16px;
+      }
+      .input-count { font-size: 14px; color: #555; }
+      .btn-save {
+        background: #2e7d32; color: #fff;
+        padding: 10px 28px; border: none; border-radius: 5px;
+        cursor: pointer; font-weight: bold; font-size: 14px;
+        margin-left: auto;
+      }
+      .btn-save:hover { background: #1b5e20; }
+      .btn-save:disabled { background: #ccc; cursor: default; }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+
+      <!-- ヘッダー -->
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1>金型 発注・出荷日入力</h1>
+      </div>
+
+      <!-- 一括入力 -->
+      <div class="card">
+        <div class="card-title">一括入力</div>
+        <div class="bulk-grid">
+          <div>
+            <div class="bulk-row">
+              <label>発注日：</label>
+              <input type="date" id="bulkOrdered" />
+              <button class="btn-bulk" id="bulkOrderedBtn" onclick="applyBulk('ordered')" disabled>選択行に適用</button>
+            </div>
+          </div>
+          <div>
+            <div class="bulk-row">
+              <label>出荷日：</label>
+              <input type="date" id="bulkShipped" />
+              <button class="btn-bulk" id="bulkShippedBtn" onclick="applyBulk('shipped')" disabled>選択行に適用</button>
+            </div>
+          </div>
+        </div>
+        <div class="selected-info" id="selectedInfo">0 件選択中</div>
+      </div>
+
+      <!-- 一覧テーブル -->
+      <div class="card">
+        <div class="card-title">
+          未入力の金型一覧 &nbsp;<span id="countLabel" style="font-weight:normal;color:#888;font-size:12px;"></span>
+        </div>
+        <div class="table-wrap">
+          <table id="dieTable">
+            <thead>
+              <tr>
+                <th style="width:36px;"><input type="checkbox" id="checkAll" onchange="toggleAll(this.checked)" /></th>
+                <th>型番
+                  <input type="text" id="searchDie" placeholder="検索…"
+                    style="width:70px;font-family:'Roboto Mono',monospace;padding:2px 5px;margin-left:5px;border:1px solid #aac4e8;border-radius:4px;font-size:11px;"
+                    oninput="renderTable()" onclick="event.stopPropagation()" />
+                </th>
+                <th>品番</th>
+                <th>状態</th>
+                <th>発注日</th>
+                <th>出荷日</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 保存バー -->
+      <div class="save-bar">
+        <span class="input-count" id="inputCount">入力済み：0 件</span>
+        <button class="btn-save" id="saveBtn" onclick="saveAll()" disabled>保存</button>
+      </div>
+
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      let tableData = [];
+
+      /* ── Toast ── */
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      }
+
+      /* ── 一覧読み込み ── */
+      async function loadList() {
+        const res = await fetch("./php/die_order/get_pending.php");
+        tableData = await res.json();
+
+        document.getElementById("countLabel").textContent = `${tableData.length} 件`;
+        document.getElementById("checkAll").checked = false;
+        renderTable();
+        updateStatus();
+      }
+
+      /* ── テーブル描画 ── */
+      function renderTable() {
+        const keyword = document.getElementById("searchDie").value.trim().toUpperCase();
+        const filtered = keyword
+          ? tableData.filter((r) => (r.die_number ?? "").toUpperCase().startsWith(keyword))
+          : tableData;
+
+        const tbody = document.querySelector("#dieTable tbody");
+        tbody.innerHTML = "";
+
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">未入力の金型はありません</td></tr>`;
+          return;
+        }
+
+        filtered.forEach((row) => {
+          const hasOrdered = !!row.ordered_at;
+          const tr = document.createElement("tr");
+          tr.dataset.id = row.id;
+          if (hasOrdered) tr.classList.add("ordered");
+
+          const badge = hasOrdered
+            ? `<span class="badge badge-ordered">発注済・出荷待</span>`
+            : `<span class="badge badge-pending">発注待</span>`;
+
+          tr.innerHTML = `
+            <td><input type="checkbox" class="row-check" data-id="${row.id}" onchange="onCheckChange()" /></td>
+            <td class="mono">${row.die_number ?? "—"}</td>
+            <td>${row.production_number ?? '<span style="color:#aaa">—</span>'}</td>
+            <td>${badge}</td>
+            <td class="${hasOrdered ? 'ordered-cell' : ''}">
+              <input type="date" class="ordered-input" data-id="${row.id}"
+                value="${row.ordered_at ?? ''}"
+                ${hasOrdered ? "disabled" : ""}
+                onchange="onDateChange()" />
+            </td>
+            <td>
+              <input type="date" class="shipped-input" data-id="${row.id}"
+                value="${row.shipped_at ?? ''}"
+                onchange="onDateChange()" />
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* ── チェック変更 ── */
+      function onCheckChange() {
+        const n = document.querySelectorAll(".row-check:checked").length;
+        document.getElementById("selectedInfo").textContent = `${n} 件選択中`;
+        document.getElementById("bulkOrderedBtn").disabled = n === 0;
+        document.getElementById("bulkShippedBtn").disabled = n === 0;
+
+        document.querySelectorAll("#dieTable tbody tr").forEach((tr) => {
+          const cb = tr.querySelector(".row-check");
+          if (cb) tr.classList.toggle("selected", cb.checked);
+        });
+      }
+
+      function toggleAll(checked) {
+        document.querySelectorAll(".row-check").forEach((cb) => { cb.checked = checked; });
+        onCheckChange();
+      }
+
+      /* ── 日付変更 ── */
+      function onDateChange() { updateStatus(); }
+
+      function updateStatus() {
+        /* 発注日・出荷日のどちらかが入力されている行数 */
+        let count = 0;
+        document.querySelectorAll("#dieTable tbody tr[data-id]").forEach((tr) => {
+          const o = tr.querySelector(".ordered-input");
+          const s = tr.querySelector(".shipped-input");
+          if ((o && !o.disabled && o.value) || (s && s.value)) count++;
+        });
+        document.getElementById("inputCount").textContent = `入力済み：${count} 件`;
+        document.getElementById("saveBtn").disabled = count === 0;
+      }
+
+      /* ── 一括適用 ── */
+      function applyBulk(type) {
+        const date = type === "ordered"
+          ? document.getElementById("bulkOrdered").value
+          : document.getElementById("bulkShipped").value;
+        if (!date) {
+          showToast("日付を選択してください", false);
+          return;
+        }
+
+        document.querySelectorAll(".row-check:checked").forEach((cb) => {
+          const id    = cb.dataset.id;
+          const sel   = type === "ordered" ? `.ordered-input` : `.shipped-input`;
+          const input = document.querySelector(`${sel}[data-id="${id}"]`);
+          if (input && !input.disabled) input.value = date;
+        });
+        updateStatus();
+      }
+
+      /* ── 保存 ── */
+      async function saveAll() {
+        const rows = [];
+        document.querySelectorAll("#dieTable tbody tr[data-id]").forEach((tr) => {
+          const orderedInput = tr.querySelector(".ordered-input");
+          const shippedInput = tr.querySelector(".shipped-input");
+          const ordered = orderedInput && !orderedInput.disabled ? orderedInput.value : null;
+          const shipped = shippedInput ? shippedInput.value : null;
+          if (ordered || shipped) {
+            rows.push({
+              id:         tr.dataset.id,
+              ordered_at: ordered || null,
+              shipped_at: shipped || null,
+            });
+          }
+        });
+
+        if (!rows.length) return;
+
+        const res    = await fetch("./php/die_order/save.php", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify(rows),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast(`${result.updated} 件を保存しました`);
+          setTimeout(() => loadList(), 800);
+        } else {
+          showToast(result.message || "保存に失敗しました", false);
+        }
+      }
+
+      /* ── 初期化 ── */
+      loadList();
+    </script>
+  </body>
+</html>

@@ -251,15 +251,10 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_press">🏭 押出工程</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div
-          class="menu-card"
-          onclick="location.href = 'PressBilletCharge-SelectMachine.html'"
-        >
+        <div class="menu-card" onclick="location.href = 'PressBilletCharge-SelectMachine.html'">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
           <div class="menu-title" data-key="billet_title">ビレット投入</div>
-          <div class="menu-desc" data-key="billet_desc">
-            ビレット投入に関するページ
-          </div>
+          <div class="menu-desc" data-key="billet_desc">ビレット投入に関するページ</div>
         </div>
       </div>
     </div>
@@ -270,12 +265,8 @@
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
           <img class="menu-icon" src="./img/wrench.svg" alt="" />
-          <div class="menu-title" data-key="maintenance_title">
-            金型メンテナンス
-          </div>
-          <div class="menu-desc" data-key="maintenance_desc">
-            金型メンテナンスに関するページ
-          </div>
+          <div class="menu-title" data-key="maintenance_title">金型メンテナンス</div>
+          <div class="menu-desc" data-key="maintenance_desc">金型メンテナンスに関するページ</div>
         </div>
       </div>
     </div>
@@ -284,79 +275,79 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_progress">📊 金型進捗管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div
-          class="menu-card"
-          onclick="location.href = 'die_progress_list.html'"
-        >
+        <div class="menu-card" onclick="location.href = 'die_progress_list.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
-          <div class="menu-desc" data-key="progress_desc">
-            測定 → 診断 → 承認 → 修理 の進捗管理
-          </div>
+          <div class="menu-desc" data-key="progress_desc">測定 → 診断 → 承認 → 修理 の進捗管理</div>
         </div>
-      </div>
-
-      <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_issue_list.html'">
           <img class="menu-icon" src="./img/warning.svg" alt="" />
           <div class="menu-title" data-key="issue_title">対策必要金型一覧</div>
-          <div class="menu-desc" data-key="issue_desc">
-            NG診断が承認された金型の一覧
-          </div>
+          <div class="menu-desc" data-key="issue_desc">NG診断が承認された金型の一覧</div>
         </div>
-      </div>
-
-      <div class="menu-row">
-        <div class="menu-card" onclick="location.href = 'handover_list.html'">
-          <img class="menu-icon" src="./img/handover.svg" alt="" />
-          <div class="menu-title" data-key="handover_title">金型移管書類進捗一覧</div>
-          <div class="menu-desc" data-key="handover_desc">
-            書類・検査・到着・資産化の進捗管理
-          </div>
-        </div>
-      </div>
-
-      <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_watch.html'">
           <img class="menu-icon" src="./img/warning.svg" alt="" />
           <div class="menu-title" data-key="watch_title">重点管理金型リスト</div>
-          <div class="menu-desc" data-key="watch_desc">
-            押出前を含む、重点管理が必要な金型の登録・管理
-          </div>
+          <div class="menu-desc" data-key="watch_desc">押出前を含む、重点管理が必要な金型の登録・管理</div>
         </div>
       </div>
     </div>
 
-    <!-- ⚙️ 各種情報 -->
+    <!-- 📈 実績レポート -->
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_report">📈 実績レポート</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_startup_report.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="startup_report_title">金型立上 実績レポート</div>
+          <div class="menu-desc" data-key="startup_report_desc">到着・型検・移管・試押の月別集計</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'machine_report.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="machine_report_title">設備稼働 実績レポート</div>
+          <div class="menu-desc" data-key="machine_report_desc">設備別・月別の稼働時間と押出回数</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⚙️ 各種設定 -->
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_settings">⚙️ 各種設定</span></div>
     <div class="accordion-content">
       <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_handover_progress.html'">
+          <img class="menu-icon" src="./img/handover.svg" alt="" />
+          <div class="menu-title" data-key="handover_progress_title">型検進捗一覧</div>
+          <div class="menu-desc" data-key="handover_progress_desc">到着・型検・量産トライ・移管の進捗管理</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'handover_list.html'">
+          <img class="menu-icon" src="./img/handover.svg" alt="" />
+          <div class="menu-title" data-key="handover_title">金型移管書類進捗一覧</div>
+          <div class="menu-desc" data-key="handover_desc">書類・検査・到着・資産化の進捗管理</div>
+        </div>
         <div class="menu-card" onclick="location.href = 'staff_settings.html'">
           <img class="menu-icon" src="./img/wrench.svg" alt="" />
           <div class="menu-title" data-key="staff_title">スタッフ設定</div>
-          <div class="menu-desc" data-key="staff_desc">
-            スタッフのロール・パスワードの管理
-          </div>
+          <div class="menu-desc" data-key="staff_desc">スタッフのロール・パスワードの管理</div>
         </div>
-      </div>
-
-      <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_import.html'">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
-          <div class="menu-title" data-key="import_title">金型インポート</div>
-          <div class="menu-desc" data-key="import_desc">
-            CSVから金型を一括登録
-          </div>
+          <div class="menu-title" data-key="import_title">新規金型登録</div>
+          <div class="menu-desc" data-key="import_desc">CSVから金型を一括登録</div>
         </div>
-      </div>
-
-      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_order.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="order_title">発注・出荷日入力</div>
+          <div class="menu-desc" data-key="order_desc">金型の発注日・出荷日を登録</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'die_arrival.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="arrival_title">金型 到着日入力</div>
+          <div class="menu-desc" data-key="arrival_desc">現場に到着した金型の到着日を登録</div>
+        </div>
         <div class="menu-card" onclick="location.href = 'production_number.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="pn_title">品番管理</div>
-          <div class="menu-desc" data-key="pn_desc">
-            品番の登録・編集・カテゴリ設定
-          </div>
+          <div class="menu-desc" data-key="pn_desc">品番の登録・編集・カテゴリ設定</div>
         </div>
       </div>
     </div>
@@ -413,12 +404,23 @@
           issue_desc: "NG診断が承認された金型の一覧",
           handover_title: "金型移管書類進捗一覧",
           handover_desc: "書類・検査・到着・資産化の進捗管理",
+          section_report: "📈 実績レポート",
+          startup_report_title: "金型立上 実績レポート",
+          startup_report_desc: "到着・型検・移管・試押の月別集計",
+          machine_report_title: "設備稼働 実績レポート",
+          machine_report_desc: "設備別・月別の稼働時間と押出回数",
+          handover_progress_title: "型検進捗一覧",
+          handover_progress_desc: "到着・型検・量産トライ・移管の進捗管理",
           watch_title: "重点管理金型リスト",
           watch_desc: "押出前を含む、重点管理が必要な金型の登録・管理",
           staff_title: "スタッフ設定",
           staff_desc: "スタッフのロール・パスワードの管理",
-          import_title: "金型インポート",
+          import_title: "新規金型登録",
           import_desc: "CSVから金型を一括登録",
+          order_title: "発注・出荷日入力",
+          order_desc: "金型の発注日・出荷日を登録",
+          arrival_title: "金型 到着日入力",
+          arrival_desc: "現場に到着した金型の到着日を登録",
           pn_title: "品番管理",
           pn_desc: "品番の登録・編集・カテゴリ設定",
 
@@ -461,8 +463,14 @@
           issue_title: "Danh sách khuôn cần xử lý",
           issue_desc: "Danh sách khuôn có chẩn đoán NG đã được phê duyệt",
           handover_title: "Danh sách bàn giao khuôn",
-          handover_desc:
-            "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
+          handover_desc: "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
+          section_report: "📈 Báo cáo thực tế",
+          startup_report_title: "Báo cáo thực tế khởi động khuôn",
+          startup_report_desc: "Tổng hợp theo tháng: đến, KT, bàn giao, thử ép",
+          machine_report_title: "Báo cáo hoạt động máy",
+          machine_report_desc: "Giờ hoạt động & số lần ép theo máy và tháng",
+          handover_progress_title: "Quản lý tiến độ chuyển giao khuôn",
+          handover_progress_desc: "Quản lý tiến độ: đến nơi, kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
           watch_desc: "Đăng ký và quản lý khuôn cần theo dõi, kể cả trước khi ép",
           staff_title: "Cài đặt nhân viên",
