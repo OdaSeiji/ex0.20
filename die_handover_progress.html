@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>型検進捗管理</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 300; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 14px; border-left: 6px solid #0078d4; padding-left: 10px; }
+
+    .toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-back   { background: #546e7a; color: #fff; }
+    .btn-edit   { background: #ff9800; color: #fff; }
+    .btn-save   { background: #4caf50; color: #fff; }
+    .btn-cancel { background: #9e9e9e; color: #fff; }
+
+    #searchDie {
+      padding: 5px 10px; border: 1px solid #aac4e8; border-radius: 4px;
+      font-family: "Roboto Mono", monospace; font-size: 13px; width: 160px;
+    }
+    .checked-count { font-size: 13px; color: #555; margin-left: 4px; }
+
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-height: calc(100vh - 140px);
+    }
+    table { border-collapse: collapse; width: max-content; min-width: 100%; }
+    th, td { padding: 6px 8px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: center; font-size: 12px; }
+    th { background: #e8f1ff; position: sticky; top: 0; z-index: 5; cursor: pointer; font-size: 11px; }
+    th.no-sort { cursor: default; }
+    th .sort-icon { font-size: 9px; margin-left: 2px; opacity: 0.6; }
+    td.die-num { font-family: "Roboto Mono", monospace; text-align: left; font-weight: bold; min-width: 100px; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    tr:hover { background: #f0f8ff; }
+    tr.checked-row { background: #fff8e1; }
+    tr.checked-row:hover { background: #fff3cd; }
+
+    td.sticky-check { position: sticky; left: 0;    z-index: 2; background: #fff; }
+    td.sticky-die   { position: sticky; left: 32px; z-index: 2; background: #fff; }
+    tr:hover        td.sticky-check, tr:hover        td.sticky-die { background: #f0f8ff; }
+    tr.checked-row  td.sticky-check, tr.checked-row  td.sticky-die { background: #fff8e1; }
+    tr.checked-row:hover td.sticky-check, tr.checked-row:hover td.sticky-die { background: #fff3cd; }
+
+    .badge-unregistered { background: #eceff1; color: #90a4ae; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+    .badge-registered   { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+    .flag-on { color: #1565c0; font-weight: bold; }
+
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 200; display: flex; justify-content: center; align-items: flex-start;
+      padding: 30px 16px; overflow-y: auto;
+    }
+    .modal-box {
+      background: #fff; border-radius: 10px; padding: 24px;
+      width: 100%; max-width: 1200px; box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .modal-box h2 { font-size: 17px; margin-bottom: 16px; border-left: 5px solid #0078d4; padding-left: 10px; }
+
+    .compare-wrap { overflow: auto; margin-bottom: 16px; max-height: 70vh; }
+    .compare-table { border-collapse: collapse; font-size: 12px; }
+    .compare-table th, .compare-table td { border: 1px solid #ddd; padding: 5px 8px; white-space: nowrap; }
+    .compare-table thead th { background: #e8f1ff; text-align: center; min-width: 130px; position: sticky; top: 0; z-index: 2; }
+    .compare-table tbody th {
+      background: #f5f5f5; text-align: left; font-weight: normal;
+      color: #444; min-width: 190px; position: sticky; left: 0; z-index: 1; font-size: 11px;
+    }
+    .compare-table input[type="date"],
+    .compare-table input[type="text"],
+    .compare-table input[type="number"] {
+      width: 118px; padding: 3px 5px; border: 1px solid #90c0f0; border-radius: 3px;
+      font-size: 12px; font-family: "Roboto Mono", monospace; background: #f0f8ff;
+    }
+    .compare-table textarea {
+      width: 160px; height: 48px; padding: 3px 5px; border: 1px solid #90c0f0;
+      border-radius: 3px; font-size: 12px; resize: vertical; background: #f0f8ff;
+    }
+    .compare-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🔄 型検進捗管理</h1>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <input type="text" id="searchDie" data-key-ph="search_ph" placeholder="型番で絞り込み…" oninput="filterTable()" />
+    <button class="btn btn-edit" id="editBtn" onclick="openEditModal()" disabled data-key="btn_edit">✏️ 選択を編集</button>
+    <button class="btn" style="background:#217346;color:#fff;" onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+    <span class="checked-count" id="checkedCount"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th class="no-sort" style="width:32px; position:sticky; left:0; z-index:6; background:#e8f1ff;">
+            <input type="checkbox" id="checkAll" onchange="toggleCheckAll(this)" />
+          </th>
+          <th data-col="die_number" data-key="col_die" style="position:sticky; left:32px; z-index:6; background:#e8f1ff;">
+            型番 <span class="sort-icon"></span>
+            <button id="zzzBtn" onclick="event.stopPropagation(); toggleZZZ()"
+              style="margin-left:6px; padding:1px 7px; font-size:10px; border:1px solid #888;
+                     border-radius:3px; background:#eceff1; color:#555; cursor:pointer;">
+            </button>
+          </th>
+          <th data-col="original_table_no"                        data-key="col_original">元表番号 <span class="sort-icon"></span></th>
+          <th data-col="die_planning_phase_steps"                 data-key="col_step">Step <span class="sort-icon"></span></th>
+          <th data-col="arrival_at"                               data-key="col_arrival">到着日 <span class="sort-icon"></span></th>
+          <th data-col="vn_production_dimensional_inspection_at"  data-key="col_vn_prod">VN製造型検日 <span class="sort-icon"></span></th>
+          <th data-col="vn_qa_dimensional_inspection_at"          data-key="col_vn_qa">VN QA型検日 <span class="sort-icon"></span></th>
+          <th data-col="submit_dimensional_inspection_to_japan_at" data-key="col_submit_jp">型検日本提出日 <span class="sort-icon"></span></th>
+          <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検日 <span class="sort-icon"></span></th>
+          <th data-col="jp_dimensional_inspection_document_number" data-key="col_jp_doc">日本型検文書番号 <span class="sort-icon"></span></th>
+          <th class="no-sort"                                     data-key="col_anodize_req">アルマイト確認要否</th>
+          <th data-col="anodizing_quality_check_at"               data-key="col_anodize_at">アルマイト確認日 <span class="sort-icon"></span></th>
+          <th data-col="mass_production_trial_at"                 data-key="col_trial">量産トライ日 <span class="sort-icon"></span></th>
+          <th data-col="die_handover_at"                          data-key="col_handover">金型移管日 <span class="sort-icon"></span></th>
+          <th data-col="mass_production_start_at"                 data-key="col_prod_start">量産開始日 <span class="sort-icon"></span></th>
+          <th data-col="production_site_change_notice"            data-key="col_notice">切替業連発行日 <span class="sort-icon"></span></th>
+          <th data-col="dimensional_inspection_by"                data-key="col_inspector">寸法検査担当者 <span class="sort-icon"></span></th>
+          <th class="no-sort"                                     data-key="col_bcp">BCP</th>
+          <th class="no-sort"                                     data-key="col_ready">移管準備完了</th>
+          <th data-col="memo"                                     data-key="col_memo">メモ <span class="sort-icon"></span></th>
+          <th class="no-sort"                                     data-key="col_status">状態</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- 編集モーダル -->
+  <div class="modal-overlay" id="editModal" style="display:none" onclick="onOverlayClick(event)">
+    <div class="modal-box">
+      <h2 data-key="modal_title">✏️ 移管進捗 編集・比較</h2>
+      <div class="compare-wrap">
+        <table class="compare-table" id="compareTable">
+          <thead><tr id="compareHead"></tr></thead>
+          <tbody id="compareBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-save"   onclick="saveAll()"        data-key="btn_save">💾 一括保存</button>
+        <button class="btn btn-cancel" onclick="closeEditModal()" data-key="btn_cancel">✕ キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語辞書
+    ===================================================== */
+    const dict = {
+      ja: {
+        title:        "🔄 型検進捗管理",
+        btn_back:     "← 戻る",
+        search_ph:    "型番で絞り込み…",
+        btn_edit:     "✏️ 選択を編集",
+        btn_csv:      "📥 CSV出力",
+        zzz_hide:     "-ZZZ 非表示",
+        zzz_show:     "-ZZZ 表示中",
+        checked_count: n => `${n}件選択中`,
+        col_die:       "型番",
+        col_original:  "元表番号",
+        col_step:      "Step",
+        col_arrival:   "到着日",
+        col_vn_prod:   "VN製造型検日",
+        col_vn_qa:     "VN QA型検日",
+        col_submit_jp: "型検日本提出日",
+        col_jp_insp:   "日本型検日",
+        col_jp_doc:    "日本型検文書番号",
+        col_anodize_req: "アルマイト確認要否",
+        col_anodize_at:  "アルマイト確認日",
+        col_trial:     "量産トライ日",
+        col_handover:  "金型移管日",
+        col_prod_start:"量産開始日",
+        col_notice:    "切替業連発行日",
+        col_inspector: "寸法検査担当者",
+        col_bcp:       "BCP",
+        col_ready:     "移管準備完了",
+        col_memo:      "メモ",
+        col_status:    "状態",
+        modal_title:   "✏️ 移管進捗 編集・比較",
+        modal_item:    "項目",
+        btn_save:      "💾 一括保存",
+        btn_cancel:    "✕ キャンセル",
+        registered:    "登録済",
+        unregistered:  "未登録",
+        save_err:      "保存に失敗しました",
+        del_confirm:   name => `「${name}」の移管進捗データを削除しますか？`,
+        del_err:       "削除に失敗しました",
+        // FIELDS labels
+        f_original:    "元表番号",
+        f_step:        "Step",
+        f_arrival:     "到着日",
+        f_vn_prod:     "VN製造型検日",
+        f_vn_qa:       "VN QA型検日",
+        f_submit_jp:   "型検日本提出日",
+        f_jp_insp:     "日本型検日",
+        f_jp_doc:      "日本型検文書番号",
+        f_anodize_req: "アルマイト確認要否",
+        f_anodize_at:  "アルマイト確認日",
+        f_trial:       "量産トライ日",
+        f_handover:    "金型移管日",
+        f_prod_start:  "量産開始日",
+        f_notice:      "切替業連発行日",
+        f_inspector:   "寸法検査担当者",
+        f_bcp:         "BCP",
+        f_ready:       "移管準備完了",
+        f_memo:        "メモ",
+      },
+      vi: {
+        title:        "🔄 Quản lý tiến độ kiểm tra khuôn",
+        btn_back:     "← Quay lại",
+        search_ph:    "Lọc theo số khuôn…",
+        btn_edit:     "✏️ Chỉnh sửa đã chọn",
+        btn_csv:      "📥 Xuất CSV",
+        zzz_hide:     "-ZZZ Ẩn",
+        zzz_show:     "-ZZZ Đang hiện",
+        checked_count: n => `Đã chọn ${n} mục`,
+        col_die:       "Số khuôn",
+        col_original:  "Số bảng gốc",
+        col_step:      "Step",
+        col_arrival:   "Ngày đến",
+        col_vn_prod:   "KT khuôn SX VN",
+        col_vn_qa:     "KT khuôn QA VN",
+        col_submit_jp: "Ngày gửi KT JP",
+        col_jp_insp:   "Ngày KT JP",
+        col_jp_doc:    "Số VB KT JP",
+        col_anodize_req: "Cần XN anodize",
+        col_anodize_at:  "Ngày XN anodize",
+        col_trial:     "Ngày thử SX",
+        col_handover:  "Ngày bàn giao",
+        col_prod_start:"Ngày bắt đầu SX",
+        col_notice:    "Ngày phát hành BC",
+        col_inspector: "Người KT KT",
+        col_bcp:       "BCP",
+        col_ready:     "Hoàn tất CB BG",
+        col_memo:      "Ghi chú",
+        col_status:    "Trạng thái",
+        modal_title:   "✏️ Chỉnh sửa & so sánh tiến độ",
+        modal_item:    "Hạng mục",
+        btn_save:      "💾 Lưu tất cả",
+        btn_cancel:    "✕ Hủy",
+        registered:    "Đã đăng ký",
+        unregistered:  "Chưa đăng ký",
+        save_err:      "Lưu thất bại",
+        del_confirm:   name => `Xóa dữ liệu tiến độ của「${name}」?`,
+        del_err:       "Xóa thất bại",
+        f_original:    "Số bảng gốc",
+        f_step:        "Step",
+        f_arrival:     "Ngày đến",
+        f_vn_prod:     "KT khuôn SX VN",
+        f_vn_qa:       "KT khuôn QA VN",
+        f_submit_jp:   "Ngày gửi KT JP",
+        f_jp_insp:     "Ngày KT JP",
+        f_jp_doc:      "Số VB KT JP",
+        f_anodize_req: "Cần XN anodize",
+        f_anodize_at:  "Ngày XN anodize",
+        f_trial:       "Ngày thử SX",
+        f_handover:    "Ngày bàn giao",
+        f_prod_start:  "Ngày bắt đầu SX",
+        f_notice:      "Ngày phát hành BC",
+        f_inspector:   "Người KT KT",
+        f_bcp:         "BCP",
+        f_ready:       "Hoàn tất CB BG",
+        f_memo:        "Ghi chú",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const val = dict[lang][el.dataset.key];
+        if (!val || typeof val === "function") return;
+        if (el.tagName === "TH") {
+          const tn = Array.from(el.childNodes).find(n => n.nodeType === Node.TEXT_NODE);
+          if (tn) tn.textContent = val + " ";
+        } else {
+          el.textContent = val;
+        }
+      });
+      document.querySelectorAll("[data-key-ph]").forEach(el => {
+        el.placeholder = dict[lang][el.dataset.keyPh] ?? el.placeholder;
+      });
+
+      // ZZZ ボタン
+      const zzzBtn = document.getElementById("zzzBtn");
+      if (zzzBtn) zzzBtn.textContent = showZZZ ? dict[lang].zzz_show : dict[lang].zzz_hide;
+
+      // 言語ボタン active
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+
+      // 再描画（バッジ・件数テキスト更新）
+      if (filteredData.length) renderTable(filteredData);
+      updateCheckedCount();
+    }
+
+    /* =====================================================
+       データ管理
+    ===================================================== */
+    let allData      = [];
+    let filteredData = [];
+    let sortCol      = "";
+    let sortDir      = "asc";
+    let showZZZ      = false;
+    const checkedIds = new Set();
+
+    const FIELDS = [
+      { key: "original_table_no",                         labelKey: "f_original",    type: "number"   },
+      { key: "die_planning_phase_steps",                  labelKey: "f_step",        type: "number"   },
+      { key: "arrival_at",                                labelKey: "f_arrival",     type: "date"     },
+      { key: "vn_production_dimensional_inspection_at",   labelKey: "f_vn_prod",     type: "date"     },
+      { key: "vn_qa_dimensional_inspection_at",           labelKey: "f_vn_qa",       type: "date"     },
+      { key: "submit_dimensional_inspection_to_japan_at", labelKey: "f_submit_jp",   type: "date"     },
+      { key: "jp_dimensional_inspection_at",              labelKey: "f_jp_insp",     type: "date"     },
+      { key: "jp_dimensional_inspection_document_number", labelKey: "f_jp_doc",      type: "text"     },
+      { key: "anodizing_quality_check_required_flag",     labelKey: "f_anodize_req", type: "check"    },
+      { key: "anodizing_quality_check_at",                labelKey: "f_anodize_at",  type: "date"     },
+      { key: "mass_production_trial_at",                  labelKey: "f_trial",       type: "date"     },
+      { key: "die_handover_at",                           labelKey: "f_handover",    type: "date"     },
+      { key: "mass_production_start_at",                  labelKey: "f_prod_start",  type: "date"     },
+      { key: "production_site_change_notice",             labelKey: "f_notice",      type: "text"     },
+      { key: "dimensional_inspection_by",                 labelKey: "f_inspector",   type: "text"     },
+      { key: "bcp_flag",                                  labelKey: "f_bcp",         type: "check"    },
+      { key: "die_transfer_ready_flag",                   labelKey: "f_ready",       type: "check"    },
+      { key: "memo",                                      labelKey: "f_memo",        type: "textarea" },
+    ];
+
+    function fmtDate(val) {
+      if (!val) return "";
+      const s = String(val).split(" ")[0];
+      const p = s.split("-");
+      if (p.length !== 3) return val;
+      return `${p[0].slice(2)}/${p[1]}/${p[2]}`;
+    }
+
+    function rawDate(val) {
+      return val ? String(val).split(" ")[0] : "";
+    }
+
+    /* =====================================================
+       データ読み込み
+    ===================================================== */
+    async function loadData() {
+      const res = await fetch("./php/die_handover_progress_php/get_list.php");
+      allData = await res.json();
+      applyFilters();
+    }
+
+    /* =====================================================
+       テーブル描画
+    ===================================================== */
+    function renderTable(data) {
+      const sorted = [...data];
+      if (sortCol) {
+        sorted.sort((a, b) => {
+          const v1 = a[sortCol] ?? "";
+          const v2 = b[sortCol] ?? "";
+          return sortDir === "asc" ? (v1 > v2 ? 1 : -1) : (v1 < v2 ? 1 : -1);
+        });
+      }
+
+      const tbody = document.querySelector("#mainTable tbody");
+      tbody.innerHTML = "";
+      const t = dict[currentLang];
+
+      sorted.forEach(row => {
+        const tr    = document.createElement("tr");
+        const dieId = String(row.die_id);
+        tr.dataset.dieId = dieId;
+        const checked = checkedIds.has(dieId);
+        if (checked) tr.classList.add("checked-row");
+
+        const registered  = row.id != null;
+        const statusBadge = registered
+          ? `<span class="badge-registered">${t.registered}</span>`
+          : `<span class="badge-unregistered">${t.unregistered}</span>`;
+        const flag = v => v ? `<span class="flag-on">●</span>` : "";
+
+        tr.innerHTML = `
+          <td class="sticky-check">
+            <input type="checkbox" ${checked ? "checked" : ""}
+              onchange="toggleCheck('${dieId}', this.checked)" />
+          </td>
+          <td class="die-num sticky-die">${row.die_number ?? ""}</td>
+          <td class="mono">${row.original_table_no ?? ""}</td>
+          <td class="mono">${row.die_planning_phase_steps ?? ""}</td>
+          <td class="mono">${fmtDate(row.arrival_at)}</td>
+          <td class="mono">${fmtDate(row.vn_production_dimensional_inspection_at)}</td>
+          <td class="mono">${fmtDate(row.vn_qa_dimensional_inspection_at)}</td>
+          <td class="mono">${fmtDate(row.submit_dimensional_inspection_to_japan_at)}</td>
+          <td class="mono">${fmtDate(row.jp_dimensional_inspection_at)}</td>
+          <td class="mono">${row.jp_dimensional_inspection_document_number ?? ""}</td>
+          <td>${flag(row.anodizing_quality_check_required_flag)}</td>
+          <td class="mono">${fmtDate(row.anodizing_quality_check_at)}</td>
+          <td class="mono">${fmtDate(row.mass_production_trial_at)}</td>
+          <td class="mono">${fmtDate(row.die_handover_at)}</td>
+          <td class="mono">${fmtDate(row.mass_production_start_at)}</td>
+          <td class="mono">${row.production_site_change_notice ?? ""}</td>
+          <td class="mono">${row.dimensional_inspection_by ?? ""}</td>
+          <td>${flag(row.bcp_flag)}</td>
+          <td>${flag(row.die_transfer_ready_flag)}</td>
+          <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">${row.memo ?? ""}</td>
+          <td>${statusBadge}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    /* =====================================================
+       チェック管理
+    ===================================================== */
+    function toggleCheck(dieId, checked) {
+      dieId = String(dieId);
+      if (checked) checkedIds.add(dieId);
+      else         checkedIds.delete(dieId);
+      updateCheckedCount();
+    }
+
+    function toggleCheckAll(cb) {
+      document.querySelectorAll("#mainTable tbody tr").forEach(tr => {
+        const dieId = tr.dataset.dieId;
+        const inp   = tr.querySelector("input[type=checkbox]");
+        if (inp) inp.checked = cb.checked;
+        if (cb.checked) checkedIds.add(dieId);
+        else            checkedIds.delete(dieId);
+        tr.classList.toggle("checked-row", cb.checked);
+      });
+      updateCheckedCount();
+    }
+
+    function updateCheckedCount() {
+      const n = checkedIds.size;
+      const t = dict[currentLang];
+      document.getElementById("checkedCount").textContent = n > 0 ? t.checked_count(n) : "";
+      document.getElementById("editBtn").disabled = n === 0;
+    }
+
+    /* =====================================================
+       フィルタ
+    ===================================================== */
+    function applyFilters() {
+      const q = document.getElementById("searchDie").value.trim().toUpperCase();
+      filteredData = allData.filter(r => {
+        const dn = (r.die_number ?? "").toUpperCase();
+        if (!showZZZ && dn.endsWith("-ZZZ")) return false;
+        if (q && !dn.includes(q)) return false;
+        return true;
+      });
+      renderTable(filteredData);
+    }
+
+    function filterTable() { applyFilters(); }
+
+    function toggleZZZ() {
+      showZZZ = !showZZZ;
+      const btn = document.getElementById("zzzBtn");
+      const t   = dict[currentLang];
+      btn.textContent      = showZZZ ? t.zzz_show : t.zzz_hide;
+      btn.style.background = showZZZ ? "#fff3e0" : "#eceff1";
+      btn.style.color      = showZZZ ? "#e65100" : "#555";
+      applyFilters();
+    }
+
+    /* =====================================================
+       ソート
+    ===================================================== */
+    document.querySelectorAll("th[data-col]").forEach(th => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.col;
+        if (sortCol === col) sortDir = sortDir === "asc" ? "desc" : "asc";
+        else { sortCol = col; sortDir = "asc"; }
+        document.querySelectorAll(".sort-icon").forEach(i => i.textContent = "");
+        const icon = th.querySelector(".sort-icon");
+        if (icon) icon.textContent = sortDir === "asc" ? "▲" : "▼";
+        renderTable(filteredData);
+      });
+    });
+
+    /* =====================================================
+       編集モーダル
+    ===================================================== */
+    function openEditModal() {
+      if (checkedIds.size === 0) return;
+      const selected = allData.filter(r => checkedIds.has(String(r.die_id)));
+      buildCompareTable(selected);
+      document.getElementById("editModal").style.display = "flex";
+    }
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+    }
+
+    function onOverlayClick(e) {
+      if (e.target === document.getElementById("editModal")) closeEditModal();
+    }
+
+    function buildCompareTable(rows) {
+      const t    = dict[currentLang];
+      const head = document.getElementById("compareHead");
+      head.innerHTML = `<th style="min-width:190px;position:sticky;left:0;top:0;z-index:3;background:#e8f1ff;">${t.modal_item}</th>`;
+      rows.forEach(r => {
+        head.innerHTML += `<th style="font-family:'Roboto Mono',monospace;">${r.die_number ?? r.die_id}</th>`;
+      });
+
+      const body = document.getElementById("compareBody");
+      body.innerHTML = "";
+
+      FIELDS.forEach(f => {
+        const tr = document.createElement("tr");
+        let html = `<th>${t[f.labelKey]}</th>`;
+
+        rows.forEach(r => {
+          const val  = r[f.key] ?? "";
+          const dieId = r.die_id;
+          const hpId  = r.id ?? "";
+
+          if (f.type === "check") {
+            html += `<td style="text-align:center"><input type="checkbox" name="${f.key}"
+                       data-die-id="${dieId}" data-hp-id="${hpId}" ${val ? "checked" : ""} /></td>`;
+          } else if (f.type === "textarea") {
+            html += `<td><textarea name="${f.key}" data-die-id="${dieId}"
+                       data-hp-id="${hpId}">${val}</textarea></td>`;
+          } else {
+            const v = f.type === "date" ? rawDate(val) : val;
+            html += `<td><input type="${f.type}" name="${f.key}"
+                       data-die-id="${dieId}" data-hp-id="${hpId}" value="${v}" /></td>`;
+          }
+        });
+
+        tr.innerHTML = html;
+        body.appendChild(tr);
+      });
+    }
+
+    /* =====================================================
+       一括保存
+    ===================================================== */
+    async function saveAll() {
+      const payloadMap = {};
+      document.querySelectorAll("#compareTable [data-die-id]").forEach(el => {
+        const dieId = el.dataset.dieId;
+        const hpId  = el.dataset.hpId;
+        const field = el.name;
+        if (!payloadMap[dieId]) {
+          payloadMap[dieId] = { die_id: Number(dieId), id: hpId ? Number(hpId) : null };
+        }
+        payloadMap[dieId][field] = el.type === "checkbox"
+          ? (el.checked ? 1 : 0)
+          : (el.value || null);
+      });
+
+      const res = await fetch("./php/die_handover_progress_php/save.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.values(payloadMap)),
+      });
+      const result = await res.json();
+
+      if (result.status === "ok") {
+        closeEditModal();
+        checkedIds.clear();
+        await loadData();
+        updateCheckedCount();
+      } else {
+        alert(dict[currentLang].save_err + ": " + (result.message ?? ""));
+      }
+    }
+
+    /* =====================================================
+       削除
+    ===================================================== */
+    async function deleteRow(id, dieName) {
+      const t = dict[currentLang];
+      if (!confirm(t.del_confirm(dieName))) return;
+      const res = await fetch("./php/die_handover_progress_php/delete.php", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const result = await res.json();
+      if (result.status === "ok") {
+        const deleted = allData.find(r => r.id === id);
+        if (deleted) checkedIds.delete(String(deleted.die_id));
+        await loadData();
+        updateCheckedCount();
+      } else {
+        alert(t.del_err);
+      }
+    }
+
+    /* =====================================================
+       CSV出力
+    ===================================================== */
+    function exportCSV() {
+      const headersJa = [
+        "型番","元表番号","Step","到着日","VN製造型検日","VN QA型検日",
+        "型検日本提出日","日本型検日","日本型検文書番号","アルマイト確認要否",
+        "アルマイト確認日","量産トライ日","金型移管日","量産開始日",
+        "切替業連発行日","寸法検査担当者","BCP","移管準備完了","メモ","状態"
+      ];
+      const headersVi = [
+        "Số khuôn","Số bảng gốc","Step","Ngày đến","KT khuôn SX VN","KT khuôn QA VN",
+        "Ngày gửi KT JP","Ngày KT JP","Số VB KT JP","Cần XN anodize",
+        "Ngày XN anodize","Ngày thử SX","Ngày bàn giao","Ngày bắt đầu SX",
+        "Ngày phát hành BC","Người KT KT","BCP","Hoàn tất CB BG","Ghi chú","Trạng thái"
+      ];
+      const t = dict[currentLang];
+      const rows = filteredData.map(r => [
+        r.die_number ?? "", r.original_table_no ?? "", r.die_planning_phase_steps ?? "",
+        fmtDate(r.arrival_at), fmtDate(r.vn_production_dimensional_inspection_at),
+        fmtDate(r.vn_qa_dimensional_inspection_at), fmtDate(r.submit_dimensional_inspection_to_japan_at),
+        fmtDate(r.jp_dimensional_inspection_at), r.jp_dimensional_inspection_document_number ?? "",
+        r.anodizing_quality_check_required_flag ? "●" : "", fmtDate(r.anodizing_quality_check_at),
+        fmtDate(r.mass_production_trial_at), fmtDate(r.die_handover_at),
+        fmtDate(r.mass_production_start_at), r.production_site_change_notice ?? "",
+        r.dimensional_inspection_by ?? "", r.bcp_flag ? "●" : "",
+        r.die_transfer_ready_flag ? "●" : "", r.memo ?? "",
+        r.id != null ? t.registered : t.unregistered
+      ]);
+
+      const escape = v => `"${String(v).replace(/"/g, '""')}"`;
+      const csv = [
+        headersJa.map(escape).join(","),
+        headersVi.map(escape).join(","),
+        ...rows.map(row => row.map(escape).join(","))
+      ].join("\r\n");
+
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = `型検進捗_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    /* =====================================================
+       初期化
+    ===================================================== */
+    window.onload = async () => {
+      setLang(currentLang);
+      await loadData();
+    };
+  </script>
+</body>
+</html>

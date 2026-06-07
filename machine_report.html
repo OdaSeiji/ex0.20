@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>設備稼働 実績レポート</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-csv  { background: #217346; color: #fff; }
+
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .filter-row label { font-size: 13px; color: #555; }
+    .filter-row select { padding: 5px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+
+    /* テーブル共通 */
+    .section-title {
+      font-size: 15px; font-weight: bold; color: #2b6ca3;
+      margin: 24px 0 8px; padding-left: 8px;
+      border-left: 4px solid #0078d4;
+    }
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow-x: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 8px;
+    }
+    table { border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 7px 11px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
+    th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; }
+    td.label-col { text-align: left; font-weight: bold; min-width: 80px; background: #f5f5f5; position: sticky; left: 0; font-family: "Roboto Mono", monospace; }
+    td.total-col { font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+    tr.sum-row td { background: #e3f2fd; font-weight: bold; color: #1565c0; }
+    tr.sum-row td.label-col { background: #bbdefb; }
+    tr:hover td { background: #f0f8ff; }
+    tr:hover td.label-col { background: #e8f1ff; }
+    tr.sum-row:hover td { background: #bbdefb; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+
+    /* グラフ */
+    .chart-wrap {
+      background: #fff; border-radius: 8px; padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-top: 28px;
+    }
+    .chart-title { font-size: 15px; font-weight: bold; color: #2b6ca3; margin-bottom: 14px; }
+    canvas { max-height: 360px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🏭 設備稼働 実績レポート</h1>
+  <div class="subtitle" data-key="subtitle">設備番号別・月別：稼働時間 / 押出回数</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-csv"  onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+  </div>
+
+  <div class="filter-row">
+    <label data-key="label_year">年度絞り込み：</label>
+    <select id="yearFilter" onchange="applyFilter()">
+      <option value="" data-key="opt_all">全期間</option>
+    </select>
+  </div>
+
+  <div class="section-title" data-key="sec_hours">⏱ 稼働時間（時間）</div>
+  <div class="table-wrap">
+    <table id="hoursTable">
+      <thead><tr id="hoursHead"></tr></thead>
+      <tbody id="hoursBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section-title" data-key="sec_extrusion">⚖️ 押出量（t）</div>
+  <div class="table-wrap">
+    <table id="extrusionTable">
+      <thead><tr id="extrusionHead"></tr></thead>
+      <tbody id="extrusionBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section-title" data-key="sec_counts">🔢 押出回数</div>
+  <div class="table-wrap">
+    <table id="countsTable">
+      <thead><tr id="countsHead"></tr></thead>
+      <tbody id="countsBody"></tbody>
+    </table>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title" data-key="chart_title">📈 設備別稼働時間（積み上げ）＋ 押出回数</div>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title:      "🏭 設備稼働 実績レポート",
+        subtitle:   "設備番号別・月別：稼働時間 / 押出回数",
+        btn_back:   "← 戻る",
+        btn_csv:    "📥 CSV出力",
+        label_year: "年度絞り込み：",
+        opt_all:    "全期間",
+        sec_hours:      "⏱ 稼働時間（時間）",
+        sec_extrusion:  "⚖️ 押出量（t）",
+        sec_counts:     "🔢 押出回数",
+        chart_title:"📈 設備別稼働時間（積み上げ）＋ 押出回数",
+        col_total:  "合計",
+        machine:    n => `設備${n}`,
+        sum_row:    "合計",
+        count_line: "押出量 t（合計）",
+      },
+      vi: {
+        title:      "🏭 Báo cáo hoạt động máy",
+        subtitle:   "Theo máy & tháng：Giờ hoạt động / Số lần ép",
+        btn_back:   "← Quay lại",
+        btn_csv:    "📥 Xuất CSV",
+        label_year: "Lọc theo năm：",
+        opt_all:    "Tất cả",
+        sec_hours:      "⏱ Giờ hoạt động",
+        sec_extrusion:  "⚖️ Sản lượng ép（t）",
+        sec_counts:     "🔢 Số lần ép",
+        chart_title:"📈 Giờ HĐ theo máy（tích lũy）＋ Số lần ép",
+        col_total:  "Tổng",
+        machine:    n => `Máy ${n}`,
+        sum_row:    "Tổng",
+        count_line: "Sản lượng t（tổng）",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const val = dict[lang][el.dataset.key];
+        if (val && typeof val === "string") el.textContent = val;
+      });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rawData) renderAll(rawData);
+    }
+
+    /* =====================================================
+       データ
+    ===================================================== */
+    let rawData = null;
+
+    // 設備ごとの色（最大10設備想定）
+    const PALETTE = [
+      "#1976d2","#2e7d32","#f57c00","#7b1fa2",
+      "#00838f","#c62828","#4e342e","#37474f","#558b2f","#ad1457"
+    ];
+
+    async function loadData() {
+      const res = await fetch("./php/report_php/get_machine_monthly.php");
+      rawData = await res.json();
+      buildYearFilter(rawData.months);
+      renderAll(rawData);
+    }
+
+    /* =====================================================
+       年度フィルタ
+    ===================================================== */
+    function buildYearFilter(months) {
+      const years = [...new Set(months.map(m => m.slice(0, 4)))].sort();
+      const sel   = document.getElementById("yearFilter");
+      years.forEach(y => {
+        const opt = document.createElement("option");
+        opt.value = y; opt.textContent = y;
+        sel.appendChild(opt);
+      });
+    }
+
+    function applyFilter() { if (rawData) renderAll(rawData); }
+
+    function filteredMonths() {
+      const y = document.getElementById("yearFilter").value;
+      return y ? rawData.months.filter(m => m.startsWith(y)) : rawData.months;
+    }
+
+    /* =====================================================
+       描画
+    ===================================================== */
+    function renderAll(data) {
+      const months = filteredMonths();
+      renderTable("hours",     data, months);
+      renderTable("extrusion", data, months);
+      renderTable("counts",    data, months);
+      renderChart(data, months);
+    }
+
+    function renderTable(type, data, months) {
+      const t         = dict[currentLang];
+      const isHours   = type === "hours";
+      const isExtrus  = type === "extrusion";
+      const dataObj   = isHours ? data.hours : isExtrus ? data.extrusions : data.counts;
+      const headId    = type === "hours" ? "hoursHead" : type === "extrusion" ? "extrusionHead" : "countsHead";
+      const bodyId    = type === "hours" ? "hoursBody" : type === "extrusion" ? "extrusionBody" : "countsBody";
+      const isDecimal = isHours || isExtrus;
+
+      // ヘッダー
+      const head = document.getElementById(headId);
+      head.innerHTML = `<th class="label-col">設備 / 年月</th>`;
+      months.forEach(m => head.innerHTML += `<th>${m.slice(2).replace("-", "/")}</th>`);
+      head.innerHTML += `<th>${t.col_total}</th>`;
+
+      // 行
+      const body = document.getElementById(bodyId);
+      body.innerHTML = "";
+
+      const colTotals = {};
+      months.forEach(m => colTotals[m] = 0);
+      let grandTotal = 0;
+
+      const decimals = isExtrus ? 0 : 1;
+      const fmt = (v) => isDecimal ? v.toFixed(decimals) : v;
+
+      data.machines.forEach(mno => {
+        const tr  = document.createElement("tr");
+        const mObj = dataObj[mno] ?? {};
+        let rowTotal = 0;
+        let cells = `<td class="label-col">${t.machine(mno)}</td>`;
+
+        months.forEach(m => {
+          const v = mObj[m] ?? 0;
+          rowTotal     += v;
+          colTotals[m] += v;
+          grandTotal   += v;
+          cells += `<td class="mono">${v > 0 ? fmt(v) : ""}</td>`;
+        });
+        cells += `<td class="total-col">${fmt(rowTotal)}</td>`;
+        tr.innerHTML = cells;
+        body.appendChild(tr);
+      });
+
+      // 合計行
+      const sumTr = document.createElement("tr");
+      sumTr.className = "sum-row";
+      let sumCells = `<td class="label-col">${t.sum_row}</td>`;
+      months.forEach(m => {
+        const v = colTotals[m];
+        sumCells += `<td>${v > 0 ? fmt(v) : ""}</td>`;
+      });
+      sumCells += `<td class="total-col">${fmt(grandTotal)}</td>`;
+      sumTr.innerHTML = sumCells;
+      body.appendChild(sumTr);
+    }
+
+    /* =====================================================
+       グラフ（積み上げ棒 + 折れ線）
+    ===================================================== */
+    let chartInstance = null;
+
+    function renderChart(data, months) {
+      const t      = dict[currentLang];
+      const labels = months.map(m => m.slice(2).replace("-", "/"));
+
+      // 積み上げ棒：設備別稼働時間
+      const datasets = data.machines.map((mno, i) => {
+        const mObj = data.hours[mno] ?? {};
+        return {
+          type:            "bar",
+          label:           t.machine(mno),
+          data:            months.map(m => mObj[m] ?? 0),
+          backgroundColor: PALETTE[i % PALETTE.length] + "bb",
+          borderColor:     PALETTE[i % PALETTE.length],
+          borderWidth:     1,
+          stack:           "hours",
+          yAxisID:         "y",
+        };
+      });
+
+      // 折れ線：押出量合計（右軸）
+      const extrusionTotals = months.map(m =>
+        Math.round(data.machines.reduce((sum, mno) => sum + (data.extrusions[mno]?.[m] ?? 0), 0))
+      );
+      datasets.push({
+        type:            "line",
+        label:           t.count_line,
+        data:            extrusionTotals,
+        borderColor:     "#e53935",
+        backgroundColor: "transparent",
+        borderWidth:     2,
+        pointRadius:     4,
+        pointBackgroundColor: "#e53935",
+        tension:         0.3,
+        yAxisID:         "y2",
+      });
+
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(document.getElementById("myChart"), {
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "top" } },
+          scales: {
+            y: {
+              type:     "linear",
+              position: "left",
+              stacked:  true,
+              beginAtZero: true,
+              title: { display: true, text: "稼働時間 (h)" },
+            },
+            y2: {
+              type:     "linear",
+              position: "right",
+              beginAtZero: true,
+              grid: { drawOnChartArea: false },
+              title: { display: true, text: "押出量 (t)" },
+            },
+          },
+        },
+      });
+    }
+
+    /* =====================================================
+       CSV出力
+    ===================================================== */
+    function exportCSV() {
+      const t      = dict[currentLang];
+      const months = filteredMonths();
+      const header = ["", ...months.map(m => m.slice(2).replace("-","/")), t.col_total];
+      const escape = v => `"${String(v).replace(/"/g,'""')}"`;
+      const lines  = [header.map(escape).join(",")];
+
+      // 稼働時間
+      lines.push([escape(t.sec_hours)].join(","));
+      rawData.machines.forEach(mno => {
+        const mObj = rawData.hours[mno] ?? {};
+        let total  = 0;
+        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v.toFixed(1); });
+        lines.push([t.machine(mno), ...vals, total.toFixed(1)].map(escape).join(","));
+      });
+
+      // 押出量
+      lines.push([escape(t.sec_extrusion)].join(","));
+      rawData.machines.forEach(mno => {
+        const mObj = rawData.extrusions[mno] ?? {};
+        let total  = 0;
+        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return Math.round(v); });
+        lines.push([t.machine(mno), ...vals, Math.round(total)].map(escape).join(","));
+      });
+
+      // 押出回数
+      lines.push([escape(t.sec_counts)].join(","));
+      rawData.machines.forEach(mno => {
+        const mObj = rawData.counts[mno] ?? {};
+        let total  = 0;
+        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v; });
+        lines.push([t.machine(mno), ...vals, total].map(escape).join(","));
+      });
+
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
+      a.download = `設備稼働実績_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    /* =====================================================
+       初期化
+    ===================================================== */
+    window.onload = async () => {
+      setLang(currentLang);
+      await loadData();
+    };
+  </script>
+</body>
+</html>

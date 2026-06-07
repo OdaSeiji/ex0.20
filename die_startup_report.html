@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>金型立上 実績レポート</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-csv  { background: #217346; color: #fff; }
+
+    /* 年度フィルタ */
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-row label { font-size: 13px; color: #555; }
+    .filter-row select {
+      padding: 5px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px;
+    }
+
+    /* テーブル */
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow-x: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 28px;
+    }
+    table { border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
+    th { background: #e8f1ff; text-align: center; font-size: 12px; position: sticky; top: 0; }
+    th.label-col, td.label-col { text-align: left; font-weight: bold; min-width: 130px; background: #f5f5f5; position: sticky; left: 0; }
+    td.total-col { font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+    tr:hover td { background: #f0f8ff; }
+    tr:hover td.label-col { background: #e8f1ff; }
+
+    /* グラフ */
+    .chart-wrap {
+      background: #fff; border-radius: 8px; padding: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .chart-title { font-size: 15px; font-weight: bold; color: #2b6ca3; margin-bottom: 14px; }
+    canvas { max-height: 320px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📊 金型立上 実績レポート</h1>
+  <div class="subtitle" data-key="subtitle">月別集計：到着 / 型検合格 / 移管 / 試押</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-csv"  onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+  </div>
+
+  <div class="filter-row">
+    <label data-key="label_year">年度絞り込み：</label>
+    <select id="yearFilter" onchange="applyFilter()">
+      <option value="" data-key="opt_all">全期間</option>
+    </select>
+  </div>
+
+  <div class="table-wrap">
+    <table id="reportTable">
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title" data-key="chart_title">📈 月別推移</div>
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title:       "📊 金型立上 実績レポート",
+        subtitle:    "月別集計：到着 / 型検合格 / 移管 / 試押",
+        btn_back:    "← 戻る",
+        btn_csv:     "📥 CSV出力",
+        label_year:  "年度絞り込み：",
+        opt_all:     "全期間",
+        chart_title: "📈 月別推移",
+        col_total:   "合計",
+        metrics: {
+          arrival:     "金型到着数",
+          inspection:  "型検合格数",
+          handover:    "金型移管数",
+          trial_press: "試押回数",
+        },
+        diff_label: "移管数ー到着数",
+      },
+      vi: {
+        title:       "📊 Báo cáo thực tế khởi động khuôn",
+        subtitle:    "Tổng hợp theo tháng：Đến / KT đạt / Bàn giao / Thử ép",
+        btn_back:    "← Quay lại",
+        btn_csv:     "📥 Xuất CSV",
+        label_year:  "Lọc theo năm：",
+        opt_all:     "Tất cả",
+        chart_title: "📈 Xu hướng theo tháng",
+        col_total:   "Tổng",
+        metrics: {
+          arrival:     "Số khuôn đến",
+          inspection:  "KT khuôn đạt",
+          handover:    "Số bàn giao",
+          trial_press: "Số lần thử ép",
+        },
+        diff_label: "Bàn giao - Đến",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const val = dict[lang][el.dataset.key];
+        if (val && typeof val === "string") el.textContent = val;
+      });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rawData) renderAll(rawData);
+    }
+
+    /* =====================================================
+       データ
+    ===================================================== */
+    let rawData = null;
+
+    const METRIC_KEYS   = ["arrival", "inspection", "handover", "trial_press"];
+    const CHART_COLORS  = ["#1976d2", "#2e7d32", "#f57c00", "#7b1fa2"];
+
+    async function loadData() {
+      const res = await fetch("./php/report_php/get_startup_monthly.php");
+      rawData = await res.json();
+      buildYearFilter(rawData.months);
+      renderAll(rawData);
+    }
+
+    /* =====================================================
+       年度フィルタ
+    ===================================================== */
+    function buildYearFilter(months) {
+      const years = [...new Set(months.map(m => m.slice(0, 4)))].sort();
+      const sel   = document.getElementById("yearFilter");
+      years.forEach(y => {
+        const opt = document.createElement("option");
+        opt.value       = y;
+        opt.textContent = y;
+        sel.appendChild(opt);
+      });
+    }
+
+    function applyFilter() {
+      if (rawData) renderAll(rawData);
+    }
+
+    function filteredMonths() {
+      const y = document.getElementById("yearFilter").value;
+      return y ? rawData.months.filter(m => m.startsWith(y)) : rawData.months;
+    }
+
+    /* =====================================================
+       描画
+    ===================================================== */
+    function renderAll(data) {
+      const months = filteredMonths();
+      renderTable(data, months);
+      renderChart(data, months);
+    }
+
+    function renderTable(data, months) {
+      const t = dict[currentLang];
+
+      // ヘッダー
+      const head = document.getElementById("tableHead");
+      head.innerHTML = `<th class="label-col">項目 / 年月</th>`;
+      months.forEach(m => head.innerHTML += `<th>${m.slice(2).replace("-", "/")}</th>`);
+      head.innerHTML += `<th>${t.col_total}</th>`;
+
+      // 行
+      const body = document.getElementById("tableBody");
+      body.innerHTML = "";
+
+      METRIC_KEYS.forEach(key => {
+        const tr   = document.createElement("tr");
+        const mObj = data.data[key] ?? {};
+        let total  = 0;
+        let cells  = `<td class="label-col">${t.metrics[key]}</td>`;
+
+        months.forEach(m => {
+          const v = mObj[m] ?? 0;
+          total  += v;
+          cells  += `<td class="mono">${v > 0 ? v : ""}</td>`;
+        });
+        cells += `<td class="total-col">${total}</td>`;
+        tr.innerHTML = cells;
+        body.appendChild(tr);
+      });
+    }
+
+    /* =====================================================
+       グラフ（Chart.js）
+    ===================================================== */
+    let chartInstance = null;
+
+    function renderChart(data, months) {
+      const t      = dict[currentLang];
+      const labels = months.map(m => m.slice(2).replace("-", "/"));
+
+      const datasets = METRIC_KEYS.map((key, i) => {
+        const mObj = data.data[key] ?? {};
+        return {
+          label:           t.metrics[key],
+          data:            months.map(m => mObj[m] ?? 0),
+          backgroundColor: CHART_COLORS[i] + "99",
+          borderColor:     CHART_COLORS[i],
+          borderWidth:     2,
+          tension:         0.3,
+        };
+      });
+
+      // 折れ線：移管数ー到着数
+      const arrivalObj  = data.data["arrival"]  ?? {};
+      const handoverObj = data.data["handover"] ?? {};
+      datasets.push({
+        type:            "line",
+        label:           t.diff_label,
+        data:            months.map(m => (handoverObj[m] ?? 0) - (arrivalObj[m] ?? 0)),
+        borderColor:     "#e53935",
+        backgroundColor: "transparent",
+        borderWidth:     2,
+        pointRadius:     4,
+        pointBackgroundColor: "#e53935",
+        tension:         0.3,
+        yAxisID:         "y",
+      });
+
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(document.getElementById("myChart"), {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "top" } },
+          scales: {
+            x: { stacked: false },
+            y: { beginAtZero: true, ticks: { stepSize: 1 } },
+          },
+        },
+      });
+    }
+
+    /* =====================================================
+       CSV出力
+    ===================================================== */
+    function exportCSV() {
+      const t      = dict[currentLang];
+      const months = filteredMonths();
+      const header = ["項目", ...months.map(m => m.slice(2).replace("-","/")), t.col_total];
+      const rows   = METRIC_KEYS.map(key => {
+        const mObj = rawData.data[key] ?? {};
+        let total  = 0;
+        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v; });
+        return [t.metrics[key], ...vals, total];
+      });
+
+      const escape = v => `"${String(v).replace(/"/g,'""')}"`;
+      const csv = [header, ...rows].map(r => r.map(escape).join(",")).join("\r\n");
+
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
+      a.download = `金型立上実績_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    /* =====================================================
+       初期化
+    ===================================================== */
+    window.onload = async () => {
+      setLang(currentLang);
+      await loadData();
+    };
+  </script>
+</body>
+</html>
