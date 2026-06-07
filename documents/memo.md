@@ -4930,3 +4930,41 @@ die_id INT NOT NULL COMMENT 'Die ID referencing m_dies.id',
 | `die_arrival.html`   | 出荷日列を追加                                                                          |
 | `die_import.html`    | タイトルを「新規金型登録」に変更                                                        |
 | `index.html`         | 新カード追加（発注・出荷日入力、到着日入力）、「金型インポート」→「新規金型登録」に変更 |
+
+# 良品の計算
+
+```sql
+SELECT
+    DATE_FORMAT(p.press_date_at, '%Y-%m-%d') AS press_date_at,
+    d.die_number,
+    pn.specific_weight,
+    pn.production_length,
+    ROUND(pn.specific_weight * pn.production_length, 3) AS production_weight,
+    p.actual_billet_quantities,
+    p.billet_length,
+    p.billet_size,
+    agg.work_quantity,
+    agg.total_ng,
+    agg.work_quantity - agg.total_ng AS total_ok,
+    ROUND(p.billet_size * 25.4 * p.billet_size * 25.4 / 4 * 3.14 * p.billet_length * 2.7 / 1000 / 1000 * p.actual_billet_quantities, 2) AS input_weight,
+    ROUND((agg.work_quantity - agg.total_ng) * pn.specific_weight * pn.production_length, 3) AS good_weight
+FROM t_press p
+LEFT JOIN m_dies d ON p.dies_id = d.id
+LEFT JOIN m_production_numbers pn ON d.production_number_id = pn.id
+LEFT JOIN (
+    SELECT
+        uar.t_press_id,
+        SUM(uar.work_quantity)             AS work_quantity,
+        COALESCE(SUM(pq.ng_quantities), 0) AS total_ng
+    FROM t_using_aging_rack uar
+    LEFT JOIN t_press_quality pq ON pq.using_aging_rack_id = uar.id
+    GROUP BY uar.t_press_id
+) agg ON agg.t_press_id = p.id
+WHERE
+    p.press_date_at BETWEEN '2022-1-1' AND '2025-12-31'
+ORDER BY p.press_date_at DESC, p.press_start_at;
+
+```
+
+これで、押出ごとの良品数が抽出できる。重量の計算が出来る。
+ちょっと見ると、単重の問題か、INPUTより良品が多いものが見られる。これは課題。
