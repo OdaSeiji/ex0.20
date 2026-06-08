@@ -4968,3 +4968,42 @@ ORDER BY p.press_date_at DESC, p.press_start_at;
 
 これで、押出ごとの良品数が抽出できる。重量の計算が出来る。
 ちょっと見ると、単重の問題か、INPUTより良品が多いものが見られる。これは課題。
+
+# 2026/06/08
+
+## 1
+
+金型登録画面。今、どこまで登録されているかわかりにくい。品番の様に、まずは一覧を出して、かつ更新日順にソートできる必要がある。
+
+<figure style="text-align:center;">
+  <img src="./img/20260608-09.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+## 2
+
+`die_order.html`の発注日の入力画面だけど、金型の登録日などでソートできないと、未登録の金型が多すぎて適正に入力で聞きない。かつ、`t_die_handover`にレコードが無いと、`m_dies`にデータが有っても、入力できない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260608-10.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+これは、金型登録画面で、新規に金型を登録したら、こちらにもレコードを追加しておかないと、入力ができない。そして、このCSVでの登録はこの目的では必要ないかも。CSVで登録するとすれば、型番と、Invoce番号とかではないのかな。でも、付属品の場合、ここから新規に追加する必要がある。
+
+<figure style="text-align:center;">
+  <img src="./img/20260608-11.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+## 方向性
+
+- 付属品に関しては、`handover_list.html`で追加
+- 金型本体に関しては、`die_import.html`で追加
+
+というルールにしなけれならない。
+それに対して、現状は、
+
+- `die_import.html`に金型を登録した際、`t_die_handover`にも登録する機能を追加の事
+- `handover_list.html`はmemoが無いか？note2が有るのでここに記録をした方がいい。
+- `handover_list.html`はInvoceNoを入力しなくても登録できるようにする事
