@@ -260,6 +260,7 @@
           <col class="col-date" />
           <col class="col-date" />
           <col class="col-flag" />
+          <col style="width:80px" />
           <col class="col-text" />
           <col class="col-date" />
           <col class="col-flag" />
@@ -284,6 +285,7 @@
             <th data-col="submitted_to_japan_at" data-key="col_sub_jp">日本送付日 <span class="sort-icon"></span></th>
             <th data-col="submitted_to_vietnam_at" data-key="col_sub_vn">VN送付日 <span class="sort-icon"></span></th>
             <th data-col="is_accessory_item_flag" data-key="col_accessory" class="no-sort">付属品</th>
+            <th data-col="note2" data-key="col_note2">備考 <span class="sort-icon"></span></th>
             <th data-col="invoice_number" data-key="col_invoice">インボイス番号 <span class="sort-icon"></span></th>
             <th data-col="die_arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
             <th data-col="unusable_flag" data-key="col_unusable" class="no-sort">使用不可</th>
@@ -302,7 +304,7 @@
         <div id="dropZone" class="drop-zone">
           <div>ここに CSV をドロップ</div>
           <div style="margin-top:6px;font-size:13px">またはクリックしてファイルを選択</div>
-          <small>形式: UTF-8 CSV &nbsp;|&nbsp; ヘッダー: die_name, invoice_number</small>
+          <small>形式: UTF-8 CSV &nbsp;|&nbsp; ヘッダー: die_name</small>
         </div>
 
         <div id="importPreview" style="display:none">
@@ -311,7 +313,6 @@
               <tr>
                 <th>型番 (CSV)</th>
                 <th>型番の候補</th>
-                <th>インボイス番号</th>
                 <th>状態</th>
               </tr>
             </thead>
@@ -343,6 +344,7 @@
           col_sub_jp:      "日本送付日",
           col_sub_vn:      "VN送付日",
           col_accessory:   "付属品",
+          col_note2:       "備考",
           col_invoice:     "インボイス番号",
           col_arrived:     "到着日",
           col_unusable:    "使用不可",
@@ -365,6 +367,7 @@
           col_sub_jp:      "Ngày gửi mail qua Nhật yêu cầu ikan",
           col_sub_vn:      "Ngày đăng ký tài sản VN",
           col_accessory:   "Nửa khuôn",
+          col_note2:       "Ghi chú",
           col_invoice:     "Số invoice",
           col_arrived:     "Ngày nhập khuôn",
           col_unusable:    "Khuôn không dùng được",
@@ -493,6 +496,7 @@
             submitted_to_japan_at:   tr.querySelector('[name="sub_jp"]').value        || null,
             submitted_to_vietnam_at: tr.querySelector('[name="sub_vn"]').value        || null,
             is_accessory_item_flag:  tr.querySelector('[name="accessory"]').checked   ? 1 : null,
+            note2:                   tr.querySelector('[name="note2"]').value         || null,
             invoice_number:          tr.querySelector('[name="invoice"]').value       || null,
             die_arrived_at:          tr.querySelector('[name="arrived"]').value       || null,
             unusable_flag:           tr.querySelector('[name="unusable"]').checked    ? 1 : null,
@@ -564,6 +568,7 @@
               <td><input type="date" name="sub_jp"       value="${rawDate(row.submitted_to_japan_at)}" /></td>
               <td><input type="date" name="sub_vn"       value="${rawDate(row.submitted_to_vietnam_at)}" /></td>
               <td><input type="checkbox" name="accessory" ${row.is_accessory_item_flag ? "checked" : ""} /></td>
+              <td><input type="text" name="note2"        value="${row.note2 ?? ""}" /></td>
               <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
               <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
               <td><input type="checkbox" name="unusable" ${row.unusable_flag ? "checked" : ""} /></td>
@@ -589,6 +594,7 @@
               <td>${formatDate(row.submitted_to_japan_at)}</td>
               <td>${formatDate(row.submitted_to_vietnam_at)}</td>
               <td>${accFlag}</td>
+              <td>${row.note2 ?? ""}</td>
               <td>${row.invoice_number ?? ""}</td>
               <td>${formatDate(row.die_arrived_at)}</td>
               <td>${unusableFlag}</td>
@@ -696,7 +702,7 @@
             if (!obj.die_name && obj.die_number) obj.die_name = obj.die_number;
             return obj;
           })
-          .filter(r => r.die_name || r.invoice_number);
+          .filter(r => r.die_name);
       }
 
       async function processCSV(text) {
@@ -755,7 +761,6 @@
           tr.innerHTML = `
             <td>${row.die_name ?? ""}</td>
             <td>${selectHtml}</td>
-            <td>${row.invoice_number ?? ""}</td>
             <td id="imp_status_${idx}">${statusHtml}</td>
           `;
           tbody.appendChild(tr);
@@ -790,8 +795,7 @@
           if (!tr.dataset.dieId) return;
           const idx = Number(tr.dataset.idx);
           payload.push({
-            die_id:         Number(tr.dataset.dieId),
-            invoice_number: importRows[idx]?.invoice_number || "",
+            die_id: Number(tr.dataset.dieId),
           });
         });
         if (payload.length === 0) return;

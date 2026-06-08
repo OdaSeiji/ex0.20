@@ -16,14 +16,16 @@ $errors  = [];
 
 $stmtGet   = $pdo->prepare("SELECT * FROM t_dies_import_tmp WHERE id = ?");
 $stmtCheck = $pdo->prepare("SELECT id FROM m_dies WHERE die_number = ?");
-$stmtIns   = $pdo->prepare("
+$stmtIns      = $pdo->prepare("
     INSERT INTO m_dies
         (die_number, budget_id, production_number_id, die_diamater_id,
          billet_size_id, bolstar_id, created_at)
     VALUES (?, ?, ?, ?, ?, ?, CURDATE())
 ");
-$stmtDone  = $pdo->prepare("UPDATE t_dies_import_tmp SET import_flag = 1, import_error = NULL WHERE id = ?");
-$stmtErr   = $pdo->prepare("UPDATE t_dies_import_tmp SET import_error = ? WHERE id = ?");
+$stmtHO       = $pdo->prepare("INSERT INTO t_die_handover (die_id) VALUES (?)");
+$stmtProg     = $pdo->prepare("INSERT INTO t_die_handover_progress (die_id) VALUES (?)");
+$stmtDone     = $pdo->prepare("UPDATE t_dies_import_tmp SET import_flag = 1, import_error = NULL WHERE id = ?");
+$stmtErr      = $pdo->prepare("UPDATE t_dies_import_tmp SET import_error = ? WHERE id = ?");
 
 foreach ($ids as $id) {
     $stmtGet->execute([$id]);
@@ -48,6 +50,8 @@ foreach ($ids as $id) {
     }
 
     try {
+        $pdo->beginTransaction();
+
         $stmtIns->execute([
             $row["die_number"],
             $row["budget_id"]            ?: null,
@@ -56,9 +60,16 @@ foreach ($ids as $id) {
             $row["billet_size_id"]       ?: null,
             $row["bolstar_id"]           ?: null,
         ]);
+        $newDieId = $pdo->lastInsertId();
+
+        $stmtHO->execute([$newDieId]);
+        $stmtProg->execute([$newDieId]);
+
         $stmtDone->execute([$id]);
+        $pdo->commit();
         $okCount++;
     } catch (PDOException $e) {
+        $pdo->rollBack();
         $msg = $e->getMessage();
         $errors[] = "{$row['die_number']}: {$msg}";
         $stmtErr->execute([$msg, $id]);

@@ -602,10 +602,15 @@
 
       //　アコーディオン
       function toggleAccordion(el) {
-        el.classList.toggle("open");
-        const content = el.nextElementSibling;
-        content.style.display =
-          content.style.display === "block" ? "none" : "block";
+        const isOpen = el.classList.contains("open");
+        document.querySelectorAll(".accordion.open").forEach((other) => {
+          other.classList.remove("open");
+          other.nextElementSibling.style.display = "none";
+        });
+        if (!isOpen) {
+          el.classList.add("open");
+          el.nextElementSibling.style.display = "block";
+        }
       }
 
       // 上位10件の最新測定を取得してカード表示

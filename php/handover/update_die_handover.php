@@ -19,6 +19,7 @@ $sql = "
         submitted_to_japan_at   = ?,
         submitted_to_vietnam_at = ?,
         is_accessory_item_flag  = ?,
+        note2                   = ?,
         invoice_number          = ?,
         die_arrived_at          = ?,
         unusable_flag           = ?
@@ -38,6 +39,7 @@ foreach ($rows as $row) {
         $row["submitted_to_japan_at"]   ?: null,
         $row["submitted_to_vietnam_at"] ?: null,
         $row["is_accessory_item_flag"] !== null ? (int)$row["is_accessory_item_flag"] : null,
+        $row["note2"]                   ?: null,
         $row["invoice_number"]          ?: null,
         $row["die_arrived_at"]          ?: null,
         $row["unusable_flag"] !== null  ? (int)$row["unusable_flag"] : null,

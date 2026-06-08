@@ -51,6 +51,7 @@ $sql = "
         h.submitted_to_japan_at,
         h.submitted_to_vietnam_at,
         h.is_accessory_item_flag,
+        h.note2,
         h.invoice_number,
         h.die_arrived_at,
         h.unusable_flag,
