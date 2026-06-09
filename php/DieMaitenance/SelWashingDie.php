@@ -21,7 +21,7 @@
             t1.id,
             m_dies.die_number,
             t1.tank,
-            date_format(t1.do_sth_at, '%m/%d') as wash_date_at
+            date_format(t1.do_sth_at, '%Y-%m-%d') as wash_date_at
         FROM
             t_dies_status AS t1
             left join

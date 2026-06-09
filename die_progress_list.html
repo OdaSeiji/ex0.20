@@ -165,6 +165,29 @@
         text-align: left;
         letter-spacing: 0.5px;
       }
+      /* ワイルドカードツールチップ */
+      .wildcard-tip {
+        position: fixed;
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        z-index: 500;
+        white-space: pre-wrap;
+        line-height: 1.7;
+        pointer-events: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      .wildcard-tip::before {
+        content: "";
+        position: absolute;
+        top: -5px; left: 12px;
+        border: 5px solid transparent;
+        border-top: none;
+        border-bottom-color: #333;
+      }
+
       /* 型番検索用 */
       .die-search {
         width: 80px;
@@ -524,6 +547,11 @@
               <span id="pv_staff"></span>
             </p>
 
+            <p id="pv_input_staff_row" style="display:none">
+              <strong data-key="label_input_staff">入力者</strong>：
+              <span id="pv_input_staff"></span>
+            </p>
+
             <p id="pv_die_row">
               <strong data-key="label_die">金型番号</strong>：
               <span id="pv_die"></span>
@@ -729,6 +757,8 @@
           preview_title: "測定プレビュー",
           label_date: "測定日",
           label_staff: "担当者",
+          label_input_staff: "入力者",
+          tip_wildcard: "ワイルドカード使用可\n* ：任意の文字列\n? ：任意の1文字\n例）A12*　*123　A??B",
           label_die: "金型番号",
           label_press: "プレス機",
           label_dim: "寸法判定",
@@ -784,6 +814,8 @@
           preview_title: "Xem trước đo kiểm",
           label_date: "Ngày đo",
           label_staff: "Người phụ trách",
+          label_input_staff: "Người nhập liệu",
+          tip_wildcard: "Hỗ trợ ký tự đại diện\n* ：chuỗi ký tự bất kỳ\n? ：1 ký tự bất kỳ\nVD）A12*　*123　A??B",
           label_die: "Số khuôn",
           label_press: "Máy ép",
           label_dim: "Đánh giá kích thước",
@@ -1199,10 +1231,24 @@
       document
         .getElementById("searchDie")
         .addEventListener("input", function () {
-          const keyword = this.value.trim().toUpperCase();
-          const filtered = window._progressData.filter((row) =>
-            row.die_number.toUpperCase().startsWith(keyword),
-          );
+          const raw = this.value.trim().toUpperCase();
+          let filtered;
+          if (raw === "") {
+            filtered = window._progressData;
+          } else if (raw.includes("*") || raw.includes("?")) {
+            const pattern = raw
+              .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+              .replace(/\*/g, ".*")
+              .replace(/\?/g, ".");
+            const re = new RegExp("^" + pattern, "i");
+            filtered = window._progressData.filter((row) =>
+              re.test(row.die_number ?? "")
+            );
+          } else {
+            filtered = window._progressData.filter((row) =>
+              (row.die_number ?? "").toUpperCase().startsWith(raw)
+            );
+          }
           renderTable(applyFilters(filtered));
         });
 
@@ -1585,6 +1631,11 @@
         document.getElementById("pv_staff").textContent =
           data.actual_fix_staff_name || "-";
 
+        if (data.plan_fix_staff_name) {
+          document.getElementById("pv_input_staff_row").style.display = "block";
+          document.getElementById("pv_input_staff").textContent = data.plan_fix_staff_name;
+        }
+
         // 金型番号・プレス番号（診断と同じ構造）
         document.getElementById("pv_die").textContent = data.die_number || "-";
         document.getElementById("pv_press").textContent = data.press_no || "-";
@@ -1657,6 +1708,9 @@
 
         // 結果欄もデフォルト非表示
         document.getElementById("pv_result_row").style.display = "none";
+
+        // 入力者欄もデフォルト非表示
+        document.getElementById("pv_input_staff_row").style.display = "none";
       }
       /* ============================================================
         画像モーダルを閉じる
@@ -1728,6 +1782,27 @@
           alert("編集できるデータではありません。");
         }
       }
+
+      /* ============================================================
+        ワイルドカードツールチップ
+      ============================================================ */
+      (function () {
+        const input = document.getElementById("searchDie");
+        const tip   = document.getElementById("wildcardTip");
+        if (!input || !tip) return;
+
+        input.addEventListener("focus", () => {
+          const rect = input.getBoundingClientRect();
+          tip.style.top  = (rect.bottom + 6) + "px";
+          tip.style.left = rect.left + "px";
+          tip.style.display = "block";
+        });
+        input.addEventListener("blur", () => {
+          tip.style.display = "none";
+        });
+      })();
     </script>
+
+    <div id="wildcardTip" class="wildcard-tip" style="display:none" data-key="tip_wildcard"></div>
   </body>
 </html>

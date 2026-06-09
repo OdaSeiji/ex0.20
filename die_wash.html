@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>金型洗浄・棚入れ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "Roboto Mono", monospace;
+        background: #f0f4f8; color: #333; font-size: 13px;
+      }
+
+      /* ── 言語ボタン ── */
+      .lang-buttons {
+        position: fixed; top: 10px; right: 10px; z-index: 100;
+        display: flex; gap: 6px;
+      }
+      .lang-buttons button {
+        min-width: 88px; height: 32px; padding: 0 16px;
+        border: 2px solid #2b6ca3; border-radius: 16px;
+        background: transparent; color: #2b6ca3;
+        font-size: 13px; font-weight: 700; cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s, color 0.2s;
+      }
+      .lang-buttons button:hover { background: #e8f1ff; }
+      .lang-buttons button.active { background: #2b6ca3; color: #fff; }
+
+      h1 { font-size: 18px; padding: 20px 20px 0; color: #1a3a5c; font-weight: 700; }
+
+      .back-btn-wrap { padding: 8px 20px 0; }
+      .btn-back {
+        padding: 6px 14px; border: none; border-radius: 5px;
+        background: #546e7a; color: #fff; cursor: pointer;
+        font-size: 12px; font-family: inherit;
+      }
+      .btn-back:hover { background: #37474f; }
+
+      /* ── ステップボタン ── */
+      .step-bar { display: flex; gap: 0; padding: 14px 20px 0; flex-wrap: wrap; }
+      .step-btn {
+        padding: 8px 20px; border: 2px solid #2b6ca3;
+        background: #fff; color: #2b6ca3;
+        font-size: 12px; font-weight: 700; cursor: pointer;
+        font-family: inherit;
+        transition: background 0.15s, color 0.15s;
+      }
+      .step-btn:first-child { border-radius: 6px 0 0 6px; }
+      .step-btn:last-child  { border-radius: 0 6px 6px 0; }
+      .step-btn + .step-btn { border-left: none; }
+      .step-btn.active      { background: #2b6ca3; color: #fff; }
+      .step-btn:hover:not(.active) { background: #e8f1ff; }
+
+      /* ── メインレイアウト ── */
+      .main-layout {
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 14px;
+        padding: 14px 20px 30px;
+      }
+      @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+
+      /* ── 左パネル ── */
+      .left-panel {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden;
+      }
+      .panel-header {
+        background: #e8f1ff; padding: 9px 12px;
+        font-weight: 700; font-size: 12px; color: #1a3a5c;
+        display: flex; align-items: center; gap: 10px;
+      }
+      .panel-header input {
+        margin-left: auto; padding: 4px 8px; border: 1px solid #aac4e8;
+        border-radius: 4px; font-size: 12px; width: 110px;
+        font-family: inherit;
+      }
+
+      /* ── テーブル ── */
+      .table-scroll { overflow-x: auto; max-height: calc(100vh - 210px); overflow-y: auto; }
+      table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+
+      col.col-chk   { width: 32px; }
+      col.col-die   { width: 96px; }
+      col.col-date  { width: 72px; }
+      col.col-times { width: 44px; }
+      col.col-ng    { width: 44px; }
+      col.col-act   { width: 64px; }
+      col.col-tank  { width: 48px; }
+
+      thead th {
+        position: sticky; top: 0; background: #e8f1ff;
+        padding: 7px 6px; text-align: center;
+        border-bottom: 2px solid #aac4e8; white-space: nowrap;
+        font-size: 11px; color: #1a3a5c; overflow: hidden; text-overflow: ellipsis;
+      }
+      tbody td {
+        padding: 6px 6px; border-bottom: 1px solid #eee;
+        text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      td.die-num { text-align: left; font-weight: 500; }
+      td.date-cell { font-size: 11px; }
+
+      tbody tr:hover { background: #f7f9ff; cursor: pointer; }
+      tbody tr.selected { background: #dbeafe; }
+      tbody tr.highlight td { color: #c62828; font-weight: 700; }
+
+      .badge-ng { background: #ffebee; color: #c62828; border-radius: 3px; padding: 1px 4px; font-size: 10px; }
+      .badge-ok { background: #e8f5e9; color: #2e7d32; border-radius: 3px; padding: 1px 4px; font-size: 10px; }
+      .empty-msg { padding: 24px; text-align: center; color: #999; font-size: 12px; }
+
+      /* チェックボックスセル */
+      td.chk-cell, th.chk-th {
+        width: 32px; min-width: 32px; text-align: center; padding: 6px 4px;
+      }
+      input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: #2b6ca3; }
+
+      /* ── 右パネル ── */
+      .right-panel {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        display: flex; flex-direction: column;
+      }
+      .right-panel > * { padding: 12px 14px; border-bottom: 1px solid #eee; }
+      .right-panel > *:last-child { border-bottom: none; }
+
+      .selected-info { background: #f0f6ff; border-radius: 8px 8px 0 0; }
+      .sel-label { font-size: 11px; color: #666; margin-bottom: 6px; }
+      .sel-count { font-size: 15px; font-weight: 700; color: #2b6ca3; margin-bottom: 4px; }
+      .sel-list {
+        max-height: 100px; overflow-y: auto;
+        font-size: 11px; color: #1a3a5c;
+        line-height: 1.8;
+      }
+      .no-selection { color: #aaa; font-size: 12px; text-align: center; padding: 20px 0; }
+
+      .form-section { display: flex; flex-direction: column; gap: 10px; }
+      .form-row { display: flex; flex-direction: column; gap: 3px; }
+      .form-row label { font-size: 11px; color: #555; font-weight: 700; }
+      .form-row select, .form-row input[type="date"], .form-row textarea {
+        padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 12px; font-family: inherit; width: 100%;
+      }
+      .form-row select:focus, .form-row input:focus, .form-row textarea:focus {
+        outline: none; border-color: #2b6ca3; box-shadow: 0 0 0 2px rgba(43,108,163,0.15);
+      }
+      .form-row textarea { resize: vertical; min-height: 56px; }
+
+      .action-section {}
+      .btn-register {
+        width: 100%; padding: 11px; border: none; border-radius: 6px;
+        background: #2b6ca3; color: #fff; font-size: 13px; font-weight: 700;
+        cursor: pointer; font-family: inherit;
+        transition: background 0.2s;
+      }
+      .btn-register:hover:not(:disabled) { background: #1a4f7a; }
+      .btn-register:disabled { background: #aaa; cursor: not-allowed; }
+      .btn-cancel-reg {
+        width: 100%; padding: 7px; border: 1px solid #ccc; border-radius: 6px;
+        background: #fff; color: #555; font-size: 12px; cursor: pointer;
+        font-family: inherit; margin-top: 6px;
+        transition: background 0.2s;
+      }
+      .btn-cancel-reg:hover { background: #f5f5f5; }
+
+      /* ── Step1 洗浄/棚入れ モード切替 ── */
+      .mode-toggle {
+        display: flex; border: 2px solid #2b6ca3; border-radius: 6px; overflow: hidden;
+      }
+      .mode-btn {
+        flex: 1; padding: 7px 0; border: none; background: #fff; color: #2b6ca3;
+        font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+        transition: background 0.15s, color 0.15s;
+      }
+      .mode-btn + .mode-btn { border-left: 2px solid #2b6ca3; }
+      .mode-btn.active      { background: #2b6ca3; color: #fff; }
+      .mode-btn:hover:not(.active) { background: #e8f1ff; }
+      .sub-form { display: flex; flex-direction: column; gap: 10px; }
+
+      /* toast */
+      #toast {
+        position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 20px; font-size: 12px; z-index: 999;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        font-family: inherit;
+      }
+      #toast.show  { opacity: 1; }
+      #toast.error { background: #c62828; }
+    </style>
+  </head>
+  <body>
+    <div class="lang-buttons">
+      <button data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <h1 data-key="title">🧼 金型洗浄・棚入れ管理</h1>
+    <div class="back-btn-wrap">
+      <button class="btn-back" onclick="location.href='index.html'">← <span data-key="btn_back">メニューへ戻る</span></button>
+    </div>
+
+    <!-- ステップ切替 -->
+    <div class="step-bar">
+      <button class="step-btn active" data-step="1" onclick="setStep(1)" data-key="step1">① プレス後待ち</button>
+      <button class="step-btn"        data-step="2" onclick="setStep(2)" data-key="step2">② 洗浄中</button>
+      <button class="step-btn"        data-step="3" onclick="setStep(3)" data-key="step3">③ 棚入れ完了</button>
+    </div>
+
+    <!-- メインレイアウト -->
+    <div class="main-layout">
+
+      <!-- 左パネル：テーブル -->
+      <div class="left-panel">
+        <div class="panel-header">
+          <span id="tableTitle" data-key="tbl_after_press">プレス後 金型一覧</span>
+          <input type="text" id="searchDie" placeholder="🔍 型番…" oninput="renderTable(allData)" />
+        </div>
+        <div class="table-scroll">
+          <table id="mainTable">
+            <colgroup id="colgroup"></colgroup>
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div class="empty-msg" id="emptyMsg" style="display:none" data-key="no_data">データがありません</div>
+        </div>
+      </div>
+
+      <!-- 右パネル：フォーム -->
+      <div class="right-panel">
+
+        <!-- 選択情報 -->
+        <div class="selected-info">
+          <div class="no-selection" id="noSelection" data-key="no_selection">← 左の一覧から金型を選択してください</div>
+          <div id="dieDetail" style="display:none">
+            <div class="sel-label" id="selLabel" data-key="selected_die">選択中の金型</div>
+            <div class="sel-count" id="selCount"></div>
+            <div class="sel-list"  id="selList"></div>
+          </div>
+        </div>
+
+        <!-- Step 1：洗浄 / 棚入れ フォーム -->
+        <div class="form-section" id="formStep1">
+          <!-- 登録タイプ切替 -->
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="modeWash" onclick="setStep1Mode('wash')" data-key="mode_wash">洗浄</button>
+            <button class="mode-btn"        id="modeRack" onclick="setStep1Mode('rack')" data-key="mode_rack">棚入れ</button>
+          </div>
+
+          <!-- 洗浄フォーム -->
+          <div class="sub-form" id="s1WashForm">
+            <div class="form-row">
+              <label data-key="lbl_tank">タンク番号</label>
+              <select id="tankSelect">
+                <option value="0">-</option>
+                <option value="1">No.1</option>
+                <option value="2">No.2</option>
+                <option value="3">No.3</option>
+                <option value="4">No.4</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label data-key="lbl_staff">担当者</label>
+              <select id="washStaffSelect"><option value="0">-</option></select>
+            </div>
+            <div class="form-row">
+              <label data-key="lbl_wash_date">洗浄日</label>
+              <input type="date" id="washDate" />
+            </div>
+          </div>
+
+          <!-- 棚入れフォーム（Step1から直接） -->
+          <div class="sub-form" id="s1RackForm" style="display:none">
+            <div class="form-row">
+              <label data-key="lbl_staff">担当者</label>
+              <select id="s1RackStaffSelect"><option value="0">-</option></select>
+            </div>
+            <div class="form-row">
+              <label data-key="lbl_rack_date">棚入れ日</label>
+              <input type="date" id="s1RackDate" />
+            </div>
+            <div class="form-row">
+              <label data-key="lbl_note">メモ</label>
+              <textarea id="s1RackNote" placeholder="…"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2：棚入れ登録フォーム -->
+        <div class="form-section" id="formStep2" style="display:none">
+          <div class="form-row">
+            <label data-key="lbl_staff">担当者</label>
+            <select id="rackStaffSelect"><option value="0">-</option></select>
+          </div>
+          <div class="form-row">
+            <label data-key="lbl_rack_date">棚入れ日</label>
+            <input type="date" id="rackDate" />
+          </div>
+          <div class="form-row">
+            <label data-key="lbl_note">メモ</label>
+            <textarea id="rackNote" placeholder="…"></textarea>
+          </div>
+        </div>
+
+        <!-- Step 3：表示のみ -->
+        <div class="form-section" id="formStep3" style="display:none">
+          <div class="form-row">
+            <label data-key="lbl_rack_date">棚入れ日</label>
+            <div id="viewRackDate" style="padding:6px 0; font-size:12px; color:#333;">—</div>
+          </div>
+          <div class="form-row">
+            <label data-key="lbl_staff">担当者</label>
+            <div id="viewRackStaff" style="padding:6px 0; font-size:12px; color:#333;">—</div>
+          </div>
+        </div>
+
+        <!-- 登録ボタン -->
+        <div class="action-section" id="actionSection">
+          <button class="btn-register" id="registerBtn" disabled onclick="register()" data-key="btn_register">洗浄登録する</button>
+          <button class="btn-cancel-reg" onclick="cancelSelection()" data-key="btn_cancel">選択を解除</button>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ============================================================
+        多言語
+      ============================================================ */
+      const dict = {
+        ja: {
+          title:          "🧼 金型洗浄・棚入れ管理",
+          btn_back:       "メニューへ戻る",
+          step1:          "① プレス後待ち",
+          step2:          "② 洗浄中",
+          step3:          "③ 棚入れ完了",
+          tbl_after_press:"プレス後 金型一覧",
+          tbl_washing:    "洗浄中 金型一覧",
+          tbl_racking:    "棚入れ完了 金型一覧",
+          no_data:        "データがありません",
+          no_selection:   "← 左の一覧から金型を選択してください",
+          selected_die:   "選択中の金型",
+          sel_count:      (n) => `${n} 件選択中`,
+          lbl_tank:       "タンク番号",
+          lbl_staff:      "担当者",
+          lbl_wash_date:  "洗浄日",
+          lbl_rack_date:  "棚入れ日",
+          lbl_note:       "メモ",
+          mode_wash:      "洗浄",
+          mode_rack:      "棚入れ",
+          btn_register:   "洗浄登録する",
+          btn_register2:  "棚入れ登録する",
+          btn_cancel:     "選択を解除",
+          col_date:       "日付",
+          col_die:        "型番",
+          col_times:      "回数",
+          col_ng:         "NG",
+          col_action:     "次工程",
+          col_tank:       "タンク",
+          col_in_date:    "投入日",
+          col_rack_date:  "棚入れ日",
+          toast_saved:    (n) => `${n} 件 登録しました`,
+          toast_error:    "登録に失敗しました",
+          toast_select:   "金型を選択してください",
+          toast_input:    "必須項目を入力してください",
+        },
+        vi: {
+          title:          "🧼 Quản lý rửa & xếp kệ khuôn",
+          btn_back:       "Về menu",
+          step1:          "① Chờ sau ép",
+          step2:          "② Đang rửa",
+          step3:          "③ Đã xếp kệ",
+          tbl_after_press:"Danh sách khuôn sau ép",
+          tbl_washing:    "Danh sách khuôn đang rửa",
+          tbl_racking:    "Danh sách khuôn đã xếp kệ",
+          no_data:        "Không có dữ liệu",
+          no_selection:   "← Chọn khuôn từ danh sách bên trái",
+          selected_die:   "Khuôn đang chọn",
+          sel_count:      (n) => `Đã chọn ${n} khuôn`,
+          lbl_tank:       "Số bể",
+          lbl_staff:      "Nhân viên",
+          lbl_wash_date:  "Ngày rửa",
+          lbl_rack_date:  "Ngày xếp kệ",
+          lbl_note:       "Ghi chú",
+          mode_wash:      "Rửa",
+          mode_rack:      "Xếp kệ",
+          btn_register:   "Đăng ký rửa",
+          btn_register2:  "Đăng ký xếp kệ",
+          btn_cancel:     "Bỏ chọn",
+          col_date:       "Ngày",
+          col_die:        "Số khuôn",
+          col_times:      "Số lần",
+          col_ng:         "NG",
+          col_action:     "Bước tiếp",
+          col_tank:       "Bể",
+          col_in_date:    "Ngày nhập",
+          col_rack_date:  "Ngày xếp kệ",
+          toast_saved:    (n) => `Đã lưu ${n} khuôn`,
+          toast_error:    "Lưu thất bại",
+          toast_select:   "Vui lòng chọn khuôn",
+          toast_input:    "Vui lòng nhập đủ thông tin",
+        },
+      };
+
+      let currentLang  = localStorage.getItem("lang") || "ja";
+      let currentStep  = 1;
+      let step1Mode    = "wash";   // "wash" | "rack"
+      let allData      = [];
+      let selectedRows = [];   // 複数選択
+
+      /* ── 日付フォーマット ──
+         fmtDate : "YYYY-MM-DD" or "YYYY-MM-DD HH:MM:SS"  → ja:YY/MM/DD  vi:DD/MM/YY
+         fmtYYMMDD: "YYMMDD" (6chars)                     → ja:YY/MM/DD  vi:DD/MM/YY
+      */
+      function fmtDate(dateStr) {
+        if (!dateStr) return "";
+        const s = String(dateStr).slice(0, 10);
+        const parts = s.split("-");
+        if (parts.length !== 3) return s;
+        const [y, m, d] = parts;
+        const yy = y.slice(2);
+        return currentLang === "vi" ? `${d}/${m}/${yy}` : `${yy}/${m}/${d}`;
+      }
+
+      function fmtYYMMDD(s) {
+        if (!s || String(s).length < 6) return s ?? "";
+        const str = String(s);
+        const yy = str.slice(0, 2);
+        const mm = str.slice(2, 4);
+        const dd = str.slice(4, 6);
+        return currentLang === "vi" ? `${dd}/${mm}/${yy}` : `${yy}/${mm}/${dd}`;
+      }
+
+      function setLang(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const val = dict[lang][el.getAttribute("data-key")];
+          if (val !== undefined && typeof val === "string") el.textContent = val;
+        });
+        document.querySelectorAll("[data-lang]").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.lang === lang);
+        });
+        updateRegisterBtnLabel();
+        updateSelectionPanel();
+        renderTable(allData);
+      }
+
+      /* ============================================================
+        ステップ切替
+      ============================================================ */
+      function setStep(step) {
+        currentStep = step;
+        document.querySelectorAll(".step-btn").forEach((b) => {
+          b.classList.toggle("active", Number(b.dataset.step) === step);
+        });
+
+        const t = dict[currentLang];
+        document.getElementById("tableTitle").textContent =
+          step === 1 ? t.tbl_after_press :
+          step === 2 ? t.tbl_washing :
+                       t.tbl_racking;
+
+        document.getElementById("formStep1").style.display = step === 1 ? "" : "none";
+        document.getElementById("formStep2").style.display = step === 2 ? "" : "none";
+        document.getElementById("formStep3").style.display = step === 3 ? "" : "none";
+        document.getElementById("actionSection").style.display = step === 3 ? "none" : "";
+
+        if (step === 1) {
+          step1Mode = "wash";
+          setStep1Mode("wash");
+        }
+        updateRegisterBtnLabel();
+        cancelSelection();
+        loadData();
+      }
+
+      function setStep1Mode(mode) {
+        step1Mode = mode;
+        document.getElementById("modeWash").classList.toggle("active", mode === "wash");
+        document.getElementById("modeRack").classList.toggle("active", mode === "rack");
+        document.getElementById("s1WashForm").style.display = mode === "wash" ? "" : "none";
+        document.getElementById("s1RackForm").style.display = mode === "rack" ? "" : "none";
+        updateRegisterBtnLabel();
+        updateRegisterBtn();
+      }
+
+      function updateRegisterBtnLabel() {
+        const btn = document.getElementById("registerBtn");
+        const t   = dict[currentLang];
+        if (currentStep === 1) {
+          btn.textContent = step1Mode === "wash" ? t.btn_register : t.btn_register2;
+        } else {
+          btn.textContent = t.btn_register2;
+        }
+      }
+
+      /* ============================================================
+        データ読み込み
+      ============================================================ */
+      async function loadData() {
+        const endpoints = {
+          1: "./php/DieMaitenance/SelAfterPressDie.php",
+          2: "./php/DieMaitenance/SelWashingDie.php",
+          3: "./php/DieMaitenance/SelRackingDies.php",
+        };
+        try {
+          const res = await fetch(endpoints[currentStep], {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "machine=Dummy",
+          });
+          allData = await res.json();
+        } catch (e) {
+          allData = [];
+        }
+        document.getElementById("searchDie").value = "";
+        renderTable(allData);
+      }
+
+      async function loadStaff() {
+        try {
+          const res  = await fetch("./php/DieMaitenance/SelStaffList.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "staffOrder=4",
+          });
+          const list = await res.json();
+          ["washStaffSelect", "s1RackStaffSelect", "rackStaffSelect"].forEach((id) => {
+            const sel = document.getElementById(id);
+            sel.innerHTML = '<option value="0">-</option>';
+            list.forEach((s) => {
+              const opt = document.createElement("option");
+              opt.value = s.id;
+              opt.textContent = s.staff_name;
+              sel.appendChild(opt);
+            });
+          });
+        } catch (e) {}
+      }
+
+      /* ============================================================
+        テーブル描画
+      ============================================================ */
+      function renderTable(data) {
+        const t    = dict[currentLang];
+        const cg   = document.getElementById("colgroup");
+        const head = document.getElementById("tableHead");
+        const body = document.getElementById("tableBody");
+        const empty= document.getElementById("emptyMsg");
+
+        const keyword = document.getElementById("searchDie").value.trim().toUpperCase();
+        const filtered = keyword
+          ? data.filter((r) => (r.die_number ?? "").toUpperCase().includes(keyword))
+          : data;
+
+        // colgroup + ヘッダー
+        if (currentStep === 1) {
+          cg.innerHTML = `
+            <col class="col-chk"><col class="col-die">
+            <col class="col-date"><col class="col-times">
+            <col class="col-ng"><col class="col-act">`;
+          head.innerHTML = `<tr>
+            <th class="chk-th"><input type="checkbox" id="chkAll" title="全選択" /></th>
+            <th>${t.col_die}</th><th>${t.col_date}</th>
+            <th>${t.col_times}</th><th>${t.col_ng}</th><th>${t.col_action}</th>
+          </tr>`;
+        } else if (currentStep === 2) {
+          cg.innerHTML = `
+            <col class="col-chk"><col class="col-tank">
+            <col class="col-die"><col class="col-date">`;
+          head.innerHTML = `<tr>
+            <th class="chk-th"><input type="checkbox" id="chkAll" title="全選択" /></th>
+            <th>${t.col_tank}</th><th>${t.col_die}</th><th>${t.col_in_date}</th>
+          </tr>`;
+        } else {
+          cg.innerHTML = `<col class="col-die"><col class="col-date">`;
+          head.innerHTML = `<tr>
+            <th>${t.col_die}</th><th>${t.col_rack_date}</th>
+          </tr>`;
+        }
+
+        // 全選択チェックボックス
+        const chkAll = document.getElementById("chkAll");
+        if (chkAll) {
+          chkAll.addEventListener("change", () => {
+            if (chkAll.checked) {
+              selectedRows = [...filtered];
+            } else {
+              selectedRows = [];
+            }
+            updateSelectionPanel();
+            updateRegisterBtn();
+            // 各行のチェック反映
+            document.querySelectorAll("#tableBody tr").forEach((tr, i) => {
+              const row = filtered[i];
+              if (!row) return;
+              const cb = tr.querySelector("input[type=checkbox]");
+              const isSelected = selectedRows.some((r) => r.die_id === row.die_id);
+              tr.classList.toggle("selected", isSelected);
+              if (cb) cb.checked = isSelected;
+            });
+          });
+        }
+
+        body.innerHTML = "";
+
+        if (!filtered.length) {
+          empty.style.display = "";
+          return;
+        }
+        empty.style.display = "none";
+
+        filtered.forEach((row) => {
+          const isSelected = selectedRows.some((r) => r.dies_id === row.dies_id);
+          const tr = document.createElement("tr");
+          if (isSelected) tr.classList.add("selected");
+
+          let cells = "";
+          if (currentStep === 1) {
+            // NG/OK列: エイリアスなしのため if(...) をキーとして動的取得
+            const ngKey = Object.keys(row).find((k) => k.startsWith("if(")) ?? "";
+            const ngVal = row[ngKey] ?? "OK";
+            const ngBadge = ngVal === "NG"
+              ? `<span class="badge-ng">NG</span>`
+              : `<span class="badge-ok">OK</span>`;
+            cells = `
+              <td class="chk-cell"><input type="checkbox" ${isSelected ? "checked" : ""} /></td>
+              <td class="die-num">${row.die_number ?? ""}</td>
+              <td class="date-cell">${fmtYYMMDD(row.yymmdd)}</td>
+              <td>${row.press_count_no_wash ?? ""}</td>
+              <td>${ngBadge}</td>
+              <td>${row.action ?? ""}</td>`;
+            if (row.action === "Wash") tr.classList.add("highlight");
+          } else if (currentStep === 2) {
+            cells = `
+              <td class="chk-cell"><input type="checkbox" ${isSelected ? "checked" : ""} /></td>
+              <td>No.${row.tank ?? ""}</td>
+              <td class="die-num">${row.die_number ?? ""}</td>
+              <td class="date-cell">${fmtDate(row.wash_date_at)}</td>`;
+          } else {
+            cells = `
+              <td class="die-num">${row.die_number ?? ""}</td>
+              <td class="date-cell">${fmtDate(row.on_rack)}</td>`;
+          }
+
+          tr.innerHTML = cells;
+          tr.addEventListener("click", (e) => {
+            if (e.target.type === "checkbox") return;
+            toggleDie(row, tr);
+          });
+          const cb = tr.querySelector("input[type=checkbox]");
+          if (cb) cb.addEventListener("change", () => toggleDie(row, tr));
+          body.appendChild(tr);
+        });
+      }
+
+      /* ============================================================
+        複数選択トグル
+      ============================================================ */
+      function toggleDie(row, trEl) {
+        const idx = selectedRows.findIndex((r) => r.dies_id === row.dies_id);
+        if (idx >= 0) {
+          selectedRows.splice(idx, 1);
+          trEl.classList.remove("selected");
+          const cb = trEl.querySelector("input[type=checkbox]");
+          if (cb) cb.checked = false;
+        } else {
+          selectedRows.push(row);
+          trEl.classList.add("selected");
+          const cb = trEl.querySelector("input[type=checkbox]");
+          if (cb) cb.checked = true;
+        }
+        updateSelectionPanel();
+        updateRegisterBtn();
+      }
+
+      function cancelSelection() {
+        selectedRows = [];
+        document.querySelectorAll("#tableBody tr").forEach((r) => r.classList.remove("selected"));
+        document.querySelectorAll("#tableBody input[type=checkbox]").forEach((cb) => { cb.checked = false; });
+        const chkAll = document.getElementById("chkAll");
+        if (chkAll) chkAll.checked = false;
+        updateSelectionPanel();
+        updateRegisterBtn();
+      }
+
+      function updateSelectionPanel() {
+        const n = selectedRows.length;
+        const noSel  = document.getElementById("noSelection");
+        const detail = document.getElementById("dieDetail");
+        const t      = dict[currentLang];
+
+        if (n === 0) {
+          noSel.style.display  = "";
+          detail.style.display = "none";
+          document.getElementById("viewRackDate").textContent  = "—";
+          document.getElementById("viewRackStaff").textContent = "—";
+          return;
+        }
+        noSel.style.display  = "none";
+        detail.style.display = "";
+
+        document.getElementById("selCount").textContent = t.sel_count(n);
+        document.getElementById("selList").innerHTML =
+          selectedRows.map((r) => `<div>${r.die_number ?? "—"}</div>`).join("");
+
+        if (currentStep === 3 && n === 1) {
+          const row = selectedRows[0];
+          document.getElementById("viewRackDate").textContent  = fmtDate(row.on_rack);
+          document.getElementById("viewRackStaff").textContent = row.staff_name ?? "—";
+        }
+      }
+
+      function updateRegisterBtn() {
+        const btn = document.getElementById("registerBtn");
+        if (!selectedRows.length) { btn.disabled = true; return; }
+        if (currentStep === 1) {
+          if (step1Mode === "wash") {
+            const tank  = document.getElementById("tankSelect").value;
+            const staff = document.getElementById("washStaffSelect").value;
+            btn.disabled = (tank === "0" || staff === "0");
+          } else {
+            btn.disabled = document.getElementById("s1RackStaffSelect").value === "0";
+          }
+        } else if (currentStep === 2) {
+          btn.disabled = document.getElementById("rackStaffSelect").value === "0";
+        } else {
+          btn.disabled = true;
+        }
+      }
+
+      ["tankSelect", "washStaffSelect", "s1RackStaffSelect", "rackStaffSelect"].forEach((id) => {
+        document.getElementById(id).addEventListener("change", updateRegisterBtn);
+      });
+
+      /* ============================================================
+        登録処理（複数まとめて送信）
+      ============================================================ */
+      async function register() {
+        if (!selectedRows.length) { showToast(dict[currentLang].toast_select, true); return; }
+
+        const now  = new Date();
+        const time = `${now.getHours()}:${String(now.getMinutes()).padStart(2,"0")}:${String(now.getSeconds()).padStart(2,"0")}`;
+
+        let insertData = [];
+
+        if (currentStep === 1 && step1Mode === "wash") {
+          const date  = document.getElementById("washDate").value;
+          const tank  = Number(document.getElementById("tankSelect").value);
+          const staff = Number(document.getElementById("washStaffSelect").value);
+          if (!date || tank === 0 || staff === 0) {
+            showToast(dict[currentLang].toast_input, true); return;
+          }
+          insertData = selectedRows.map((row) => [
+            row.dies_id, date + " " + time, tank, date, staff, 4, null,
+          ]);
+        } else if (currentStep === 1 && step1Mode === "rack") {
+          const date  = document.getElementById("s1RackDate").value;
+          const staff = Number(document.getElementById("s1RackStaffSelect").value);
+          const note  = document.getElementById("s1RackNote").value;
+          if (!date || staff === 0) {
+            showToast(dict[currentLang].toast_input, true); return;
+          }
+          insertData = selectedRows.map((row) => [
+            row.dies_id, date + " " + time, null, date, staff, 10, note,
+          ]);
+        } else {
+          const date  = document.getElementById("rackDate").value;
+          const staff = Number(document.getElementById("rackStaffSelect").value);
+          const note  = document.getElementById("rackNote").value;
+          if (!date || staff === 0) {
+            showToast(dict[currentLang].toast_input, true); return;
+          }
+          insertData = selectedRows.map((row) => [
+            row.dies_id, date + " " + time, null, date, staff, 10, note,
+          ]);
+        }
+
+        try {
+          const res = await fetch("./php/DieMaitenance/InsDieStatus.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "tableData=" + encodeURIComponent(JSON.stringify(insertData)),
+          });
+          await res.json();
+          const t = dict[currentLang];
+          showToast(t.toast_saved(insertData.length));
+          cancelSelection();
+          loadData();
+        } catch (e) {
+          showToast(dict[currentLang].toast_error, true);
+        }
+      }
+
+      /* ============================================================
+        Toast
+      ============================================================ */
+      function showToast(msg, isError = false) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.className   = "show" + (isError ? " error" : "");
+        setTimeout(() => { el.className = ""; }, 2500);
+      }
+
+      /* ============================================================
+        初期化
+      ============================================================ */
+      window.onload = async () => {
+        const today = new Date().toISOString().slice(0, 10);
+        document.getElementById("washDate").value   = today;
+        document.getElementById("s1RackDate").value = today;
+        document.getElementById("rackDate").value   = today;
+
+        setLang(currentLang);
+        await loadStaff();
+        await loadData();
+      };
+    </script>
+  </body>
+</html>

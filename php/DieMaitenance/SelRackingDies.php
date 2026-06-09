@@ -21,7 +21,7 @@
             t1.dies_id,
             t1.id,
             m_dies.die_number,
-            date_format(t1.do_sth_at, '%m/%d') AS on_rack
+            date_format(t1.do_sth_at, '%Y-%m-%d') AS on_rack
         FROM
             t_dies_status AS t1
             LEFT JOIN

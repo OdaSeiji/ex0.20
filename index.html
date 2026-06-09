@@ -91,6 +91,19 @@
         transform: translateY(-3px);
       }
 
+      .menu-card.beta {
+        border-color: #f0a000;
+        position: relative;
+      }
+      .menu-card.beta::after {
+        content: "BETA";
+        position: absolute; top: 8px; right: 10px;
+        background: #f0a000; color: #fff;
+        font-size: 10px; font-weight: bold;
+        padding: 2px 6px; border-radius: 4px;
+        letter-spacing: 0.5px;
+      }
+
       .menu-icon {
         width: 40px;
         height: 40px;
@@ -287,6 +300,11 @@
           <div class="menu-title" data-key="maintenance_title">金型メンテナンス</div>
           <div class="menu-desc" data-key="maintenance_desc">金型メンテナンスに関するページ</div>
         </div>
+        <div class="menu-card beta" onclick="location.href = 'die_wash.html'">
+          <img class="menu-icon" src="./img/wrench.svg" alt="" />
+          <div class="menu-title" data-key="die_wash_title">金型洗浄・棚入れ</div>
+          <div class="menu-desc" data-key="die_wash_desc">プレス後 → 洗浄 → 棚入れ の工程管理</div>
+        </div>
       </div>
     </div>
 
@@ -340,7 +358,7 @@
         </div>
         <div class="menu-card" onclick="location.href = 'handover_list.html'">
           <img class="menu-icon" src="./img/handover.svg" alt="" />
-          <div class="menu-title" data-key="handover_title">金型移管書類進捗一覧</div>
+          <div class="menu-title" data-key="handover_title">金型輸出受領移管一覧</div>
           <div class="menu-desc" data-key="handover_desc">書類・検査・到着・資産化の進捗管理</div>
         </div>
         <div class="menu-card" onclick="location.href = 'staff_settings.html'">
@@ -415,13 +433,15 @@
           billet_desc: "ビレット投入に関するページ",
           maintenance_title: "金型メンテナンス",
           maintenance_desc: "金型メンテナンスに関するページ",
+          die_wash_title: "金型洗浄・棚入れ",
+          die_wash_desc: "プレス後 → 洗浄 → 棚入れ の工程管理",
           progress_title: "金型進捗一覧",
           progress_desc: "測定 → 診断 → 承認 → 修理 の進捗管理",
 
           /* ★ 追加：対策必要金型一覧 */
           issue_title: "対策必要金型一覧",
           issue_desc: "NG診断が承認された金型の一覧",
-          handover_title: "金型移管書類進捗一覧",
+          handover_title: "金型輸出受領移管一覧",
           handover_desc: "書類・検査・到着・資産化の進捗管理",
           section_report: "📈 実績レポート",
           startup_report_title: "金型立上 実績レポート",
@@ -474,6 +494,8 @@
           billet_desc: "Trang liên quan đến việc nạp billet",
           maintenance_title: "Bảo trì khuôn",
           maintenance_desc: "Trang liên quan đến bảo trì khuôn",
+          die_wash_title: "Rửa & xếp kệ khuôn",
+          die_wash_desc: "Quản lý quy trình: sau ép → rửa → xếp kệ",
           progress_title: "Danh sách tiến độ khuôn",
           progress_desc:
             "Quản lý tiến độ: đo → chẩn đoán → phê duyệt → sửa chữa",
@@ -481,7 +503,7 @@
           /* ★ 追加：対策必要金型一覧 */
           issue_title: "Danh sách khuôn cần xử lý",
           issue_desc: "Danh sách khuôn có chẩn đoán NG đã được phê duyệt",
-          handover_title: "Danh sách bàn giao khuôn",
+          handover_title: "Danh sách tiếp nhận & bàn giao khuôn NK",
           handover_desc: "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
           section_report: "📈 Báo cáo thực tế",
           startup_report_title: "Báo cáo thực tế khởi động khuôn",

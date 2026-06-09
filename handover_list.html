@@ -2,7 +2,7 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <title>金型移管書類一覧</title>
+    <title>金型輸出受領移管一覧</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap"
       rel="stylesheet"
@@ -134,6 +134,28 @@
         letter-spacing: 0.5px;
       }
 
+      .wildcard-tip {
+        position: fixed;
+        background: #333;
+        color: #fff;
+        font-size: 11px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        z-index: 500;
+        white-space: pre-wrap;
+        line-height: 1.7;
+        pointer-events: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+      .wildcard-tip::before {
+        content: "";
+        position: absolute;
+        top: -5px; left: 12px;
+        border: 5px solid transparent;
+        border-top: none;
+        border-bottom-color: #333;
+      }
+
       .die-search {
         width: 70px;
         font-family: "Roboto Mono", monospace;
@@ -218,7 +240,7 @@
         z-index: 11;
         box-shadow: 2px 0 5px rgba(0,0,0,0.08);
       }
-      th.die-num-th { background: #e8f1ff; z-index: 12; }
+      th.die-num-th { background: #e8f1ff; z-index: 12; overflow: visible; }
       td.die-num-td { background: #fff; }
       tr:hover td.die-num-td { background: #f0f8ff; }
       tr.checked-row td.die-num-td { background: #fff8e1; }
@@ -232,7 +254,7 @@
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
-    <h1 data-key="title">金型移管書類一覧</h1>
+    <h1 data-key="title">金型輸出受領移管一覧</h1>
 
     <div class="toolbar">
       <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
@@ -254,6 +276,8 @@
           <col class="col-pn" />
           <col class="col-date" />
           <col class="col-date" />
+          <col class="col-text" />
+          <col class="col-date" />
           <col class="col-date" />
           <col class="col-text" />
           <col class="col-date" />
@@ -261,8 +285,6 @@
           <col class="col-date" />
           <col class="col-flag" />
           <col style="width:80px" />
-          <col class="col-text" />
-          <col class="col-date" />
           <col class="col-flag" />
           <col style="width:112px" />
         </colgroup>
@@ -279,6 +301,8 @@
             <th data-col="production_number" data-key="col_pn">品番 <span class="sort-icon"></span></th>
             <th data-col="ordered_at" data-key="col_ordered">発注日 <span class="sort-icon"></span></th>
             <th data-col="shipped_at" data-key="col_shipped">出荷日 <span class="sort-icon"></span></th>
+            <th data-col="invoice_number" data-key="col_invoice">インボイス番号 <span class="sort-icon"></span></th>
+            <th data-col="die_arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
             <th data-col="instruction_created_at" data-key="col_ins_created">指示書作成日 <span class="sort-icon"></span></th>
             <th data-col="inspection_number" data-key="col_insp_num">検査書番号 <span class="sort-icon"></span></th>
             <th data-col="inspection_passed_at" data-key="col_insp_passed">検査合格日 <span class="sort-icon"></span></th>
@@ -286,8 +310,6 @@
             <th data-col="submitted_to_vietnam_at" data-key="col_sub_vn">VN送付日 <span class="sort-icon"></span></th>
             <th data-col="is_accessory_item_flag" data-key="col_accessory" class="no-sort">付属品</th>
             <th data-col="note2" data-key="col_note2">備考 <span class="sort-icon"></span></th>
-            <th data-col="invoice_number" data-key="col_invoice">インボイス番号 <span class="sort-icon"></span></th>
-            <th data-col="die_arrived_at" data-key="col_arrived">到着日 <span class="sort-icon"></span></th>
             <th data-col="unusable_flag" data-key="col_unusable" class="no-sort">使用不可</th>
             <th data-col="updated_at" data-key="col_updated">更新日時 <span class="sort-icon"></span></th>
           </tr>
@@ -333,7 +355,7 @@
       ============================================================ */
       const dict = {
         ja: {
-          title:           "金型移管書類一覧",
+          title:           "金型輸出受領移管一覧",
           col_die:         "型番",
           col_pn:          "品番",
           col_ordered:     "発注日",
@@ -354,9 +376,10 @@
           btn_save:        "💾 一括保存",
           btn_cancel:      "✕ キャンセル",
           checked_count:   (n) => `${n}件選択中`,
+          tip_wildcard:    "ワイルドカード使用可\n* ：任意の文字列\n? ：任意の1文字\n例）A12*　*123　A??B",
         },
         vi: {
-          title:           "Danh sách tài liệu chuyển giao khuôn",
+          title:           "Danh sách tiếp nhận & bàn giao khuôn NK",
           col_die:         "Mã khuôn",
           col_pn:          "Mã sản phẩm",
           col_ordered:     "Ngày đặt hàng",
@@ -377,6 +400,7 @@
           btn_save:        "💾 Lưu tất cả",
           btn_cancel:      "✕ Hủy",
           checked_count:   (n) => `Đã chọn ${n} mục`,
+          tip_wildcard:    "Hỗ trợ ký tự đại diện\n* ：chuỗi ký tự bất kỳ\n? ：1 ký tự bất kỳ\nVD）A12*　*123　A??B",
         },
       };
 
@@ -562,6 +586,8 @@
               <td class="die-number">${row.production_number ?? ""}</td>
               <td><input type="date" name="ordered"      value="${rawDate(row.ordered_at)}" /></td>
               <td><input type="date" name="shipped"      value="${rawDate(row.shipped_at)}" /></td>
+              <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
+              <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
               <td><input type="date" name="ins_created"  value="${rawDate(row.instruction_created_at)}" /></td>
               <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
               <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>
@@ -569,8 +595,6 @@
               <td><input type="date" name="sub_vn"       value="${rawDate(row.submitted_to_vietnam_at)}" /></td>
               <td><input type="checkbox" name="accessory" ${row.is_accessory_item_flag ? "checked" : ""} /></td>
               <td><input type="text" name="note2"        value="${row.note2 ?? ""}" /></td>
-              <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
-              <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
               <td><input type="checkbox" name="unusable" ${row.unusable_flag ? "checked" : ""} /></td>
               <td>${row.updated_at ? formatDateTime(row.updated_at) : ""}</td>
             `;
@@ -588,6 +612,8 @@
               <td class="die-number">${row.production_number ?? ""}</td>
               <td>${formatDate(row.ordered_at)}</td>
               <td>${formatDate(row.shipped_at)}</td>
+              <td>${row.invoice_number ?? ""}</td>
+              <td>${formatDate(row.die_arrived_at)}</td>
               <td>${formatDate(row.instruction_created_at)}</td>
               <td>${row.inspection_number ?? ""}</td>
               <td>${formatDate(row.inspection_passed_at)}</td>
@@ -595,8 +621,6 @@
               <td>${formatDate(row.submitted_to_vietnam_at)}</td>
               <td>${accFlag}</td>
               <td>${row.note2 ?? ""}</td>
-              <td>${row.invoice_number ?? ""}</td>
-              <td>${formatDate(row.die_arrived_at)}</td>
               <td>${unusableFlag}</td>
               <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${row.updated_at ? formatDateTime(row.updated_at) : ""}</td>
             `;
@@ -631,10 +655,24 @@
         型番検索
       ============================================================ */
       document.getElementById("searchDie").addEventListener("input", function () {
-        const keyword = this.value.trim().toUpperCase();
-        const filtered = (window._tableData || []).filter((row) =>
-          (row.die_number ?? "").toUpperCase().startsWith(keyword)
-        );
+        const raw = this.value.trim().toUpperCase();
+        let filtered;
+        if (raw === "") {
+          filtered = window._tableData || [];
+        } else if (raw.includes("*") || raw.includes("?")) {
+          const pattern = raw
+            .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+            .replace(/\*/g, ".*")
+            .replace(/\?/g, ".");
+          const re = new RegExp("^" + pattern, "i");
+          filtered = (window._tableData || []).filter((row) =>
+            re.test(row.die_number ?? "")
+          );
+        } else {
+          filtered = (window._tableData || []).filter((row) =>
+            (row.die_number ?? "").toUpperCase().startsWith(raw)
+          );
+        }
         renderTable(filtered);
       });
 
@@ -822,7 +860,21 @@
         setLang(currentLang);
         initDropZone();
         loadTable();
+
+        const input = document.getElementById("searchDie");
+        const tip   = document.getElementById("wildcardTip");
+        input.addEventListener("focus", () => {
+          const rect = input.getBoundingClientRect();
+          tip.style.top  = (rect.bottom + 6) + "px";
+          tip.style.left = rect.left + "px";
+          tip.style.display = "block";
+        });
+        input.addEventListener("blur", () => {
+          tip.style.display = "none";
+        });
       };
     </script>
+
+    <div id="wildcardTip" class="wildcard-tip" style="display:none" data-key="tip_wildcard"></div>
   </body>
 </html>

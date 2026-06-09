@@ -217,6 +217,12 @@
         background: #2e7d32; color: #fff; border: none;
         border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 12px;
       }
+      .cat-mgr-search {
+        width: 100%; box-sizing: border-box;
+        padding: 5px 8px; border: 1px solid #ccc; border-radius: 4px;
+        font-size: 12px; margin: 6px 0 0;
+      }
+      .cat-mgr-search-wrap { padding: 6px 10px 4px; border-bottom: 1px solid #eee; }
       .cat-mgr-list { overflow-y: auto; max-height: 320px; }
       .cat-mgr-item {
         display: flex; align-items: center; padding: 8px 12px;
@@ -501,6 +507,10 @@
             <div class="cat-mgr-head">
               <span>カテゴリ1</span>
               <button class="cat-mgr-add" onclick="showCatInlineForm('cat1', null)">＋ 追加</button>
+            </div>
+            <div class="cat-mgr-search-wrap">
+              <input type="text" class="cat-mgr-search" id="cat1MgrSearch"
+                placeholder="🔍 検索…" oninput="filterCat1Mgr(this.value)" />
             </div>
             <div class="cat-inline-form" id="cat1InlineForm">
               <div class="cat-inline-label" id="cat1InlineLabel">新規追加</div>
@@ -1130,6 +1140,14 @@
           div.onclick = () => selectCat1Mgr(id, name, div);
           if (String(id) === String(mgrCat1Id)) div.classList.add("selected");
           list.appendChild(div);
+        });
+      }
+
+      function filterCat1Mgr(q) {
+        q = q.toUpperCase();
+        document.querySelectorAll("#cat1MgrList .cat-mgr-item").forEach((div) => {
+          const name = (div.dataset.name || div.querySelector("span")?.textContent || "").toUpperCase();
+          div.style.display = name.includes(q) ? "" : "none";
         });
       }
 

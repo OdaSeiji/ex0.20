@@ -87,6 +87,27 @@
     }
     .compare-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
     .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+    .wildcard-tip {
+      position: fixed;
+      background: #333;
+      color: #fff;
+      font-size: 11px;
+      padding: 6px 10px;
+      border-radius: 5px;
+      z-index: 500;
+      white-space: pre-wrap;
+      line-height: 1.7;
+      pointer-events: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .wildcard-tip::before {
+      content: "";
+      position: absolute;
+      top: -5px; left: 12px;
+      border: 5px solid transparent;
+      border-top: none;
+      border-bottom-color: #333;
+    }
   </style>
 </head>
 <body>
@@ -223,6 +244,7 @@
         f_bcp:         "BCP",
         f_ready:       "移管準備完了",
         f_memo:        "メモ",
+        tip_wildcard:  "ワイルドカード使用可\n* ：任意の文字列\n? ：任意の1文字\n例）A12*　*123　A??B",
       },
       vi: {
         title:        "🔄 Quản lý tiến độ kiểm tra khuôn",
@@ -280,6 +302,7 @@
         f_bcp:         "BCP",
         f_ready:       "Hoàn tất CB BG",
         f_memo:        "Ghi chú",
+        tip_wildcard:  "Hỗ trợ ký tự đại diện\n* ：chuỗi ký tự bất kỳ\n? ：1 ký tự bất kỳ\nVD）A12*　*123　A??B",
       },
     };
 
@@ -463,10 +486,23 @@
     ===================================================== */
     function applyFilters() {
       const q = document.getElementById("searchDie").value.trim().toUpperCase();
+      let matchDie;
+      if (!q) {
+        matchDie = () => true;
+      } else if (q.includes("*") || q.includes("?")) {
+        const pattern = q
+          .replace(/[.+^${}()|[\]\\]/g, "\\$&")
+          .replace(/\*/g, ".*")
+          .replace(/\?/g, ".");
+        const re = new RegExp("^" + pattern, "i");
+        matchDie = dn => re.test(dn);
+      } else {
+        matchDie = dn => dn.includes(q);
+      }
       filteredData = allData.filter(r => {
         const dn = (r.die_number ?? "").toUpperCase();
         if (!showZZZ && dn.endsWith("-ZZZ")) return false;
-        if (q && !dn.includes(q)) return false;
+        if (!matchDie(dn)) return false;
         return true;
       });
       renderTable(filteredData);
@@ -663,7 +699,21 @@
     window.onload = async () => {
       setLang(currentLang);
       await loadData();
+
+      const input = document.getElementById("searchDie");
+      const tip   = document.getElementById("wildcardTip");
+      input.addEventListener("focus", () => {
+        const rect = input.getBoundingClientRect();
+        tip.style.top  = (rect.bottom + 6) + "px";
+        tip.style.left = rect.left + "px";
+        tip.style.display = "block";
+      });
+      input.addEventListener("blur", () => {
+        tip.style.display = "none";
+      });
     };
   </script>
+
+  <div id="wildcardTip" class="wildcard-tip" style="display:none" data-key="tip_wildcard"></div>
 </body>
 </html>
