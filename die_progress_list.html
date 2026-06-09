@@ -21,14 +21,31 @@
         top: 10px;
         right: 10px;
         z-index: 100;
+        display: flex;
+        gap: 6px;
       }
       .lang-buttons button {
-        padding: 6px 12px;
-        margin-left: 5px;
-        border: 1px solid #0078d4;
-        background: #fff;
-        border-radius: 5px;
+        min-width: 88px;
+        height: 32px;
+        padding: 0 16px;
+        border: 2px solid #2b6ca3;
+        border-radius: 16px;
+        background: transparent;
+        color: #2b6ca3;
+        font-size: 13px;
+        font-weight: bold;
         cursor: pointer;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        letter-spacing: 0.3px;
+      }
+      .lang-buttons button:hover {
+        background: #e8f1ff;
+        box-shadow: 0 2px 6px rgba(43,108,163,0.15);
+      }
+      .lang-buttons button.active {
+        background: #2b6ca3;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(43,108,163,0.3);
       }
 
       .container {
@@ -398,13 +415,15 @@
   <body>
     <!-- 多言語ボタン -->
     <div class="lang-buttons">
-      <button onclick="setLang('ja')">日本語</button>
-      <button onclick="setLang('vi')">Tiếng Việt</button>
+      <button data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
     <div class="container">
+      <h1 data-key="title">📊 金型進捗一覧（Progress List）</h1>
+
       <!-- メニューへ戻る -->
-      <div style="text-align: right; margin-bottom: 10px">
+      <div style="margin-bottom: 10px">
         <button
           class="btn btn-secondary"
           onclick="location.href = 'index.html'"
@@ -412,8 +431,6 @@
           ← メニューへ戻る
         </button>
       </div>
-
-      <h1 data-key="title">📊 金型進捗一覧（Progress List）</h1>
 
       <!-- ステップフィルター -->
       <div class="step-filter" id="stepFilterArea">
@@ -842,6 +859,10 @@
         });
 
         localStorage.setItem("lang", lang);
+
+        document.querySelectorAll(".lang-buttons button").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.lang === lang);
+        });
 
         if (window._progressData) {
           renderTable(applyFilters(window._progressData));

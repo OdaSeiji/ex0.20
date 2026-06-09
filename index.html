@@ -13,18 +13,37 @@
       }
 
       .lang-switch {
-        text-align: right;
-        padding: 10px 20px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        padding: 12px 20px;
+        gap: 6px;
       }
 
       .lang-switch button {
-        background: #2b6ca3;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
-        margin-left: 6px;
+        min-width: 88px;
+        height: 32px;
+        padding: 0 16px;
+        border: 2px solid #2b6ca3;
+        border-radius: 16px;
+        background: transparent;
+        color: #2b6ca3;
+        font-size: 13px;
+        font-weight: bold;
         cursor: pointer;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        letter-spacing: 0.3px;
+      }
+
+      .lang-switch button:hover {
+        background: #e8f1ff;
+        box-shadow: 0 2px 6px rgba(43,108,163,0.15);
+      }
+
+      .lang-switch button.active {
+        background: #2b6ca3;
+        color: #fff;
+        box-shadow: 0 2px 8px rgba(43,108,163,0.3);
       }
 
       h1 {
@@ -241,8 +260,8 @@
   <body>
     <!-- 🌐 多言語切替 -->
     <div class="lang-switch">
-      <button onclick="setLang('ja')">日本語</button>
-      <button onclick="setLang('vi')">Tiếng Việt</button>
+      <button data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
     <h1 id="title">トップメニュー</h1>
@@ -506,6 +525,10 @@
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
           el.textContent = dict[lang][key];
+        });
+
+        document.querySelectorAll(".lang-switch button").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.lang === lang);
         });
 
         localStorage.setItem("lang", lang);
