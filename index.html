@@ -267,10 +267,43 @@
       .delta-up   { color: #d93025; }
       .delta-down { color: #1b9e3f; }
       .delta-flat { color: #999; }
+
+      /* ── 天気ウィジェット ── */
+      #weatherBar {
+        position: fixed; top: 10px; left: 14px; z-index: 100;
+        display: flex; gap: 8px;
+      }
+      .wx-card {
+        display: flex; align-items: center; gap: 5px;
+        background: rgba(255,255,255,0.88);
+        border: 1px solid #c5d1dd; border-radius: 20px;
+        padding: 4px 12px 4px 8px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        font-size: 13px; line-height: 1;
+        backdrop-filter: blur(4px);
+      }
+      .wx-icon  { font-size: 18px; }
+      .wx-temp  { font-weight: bold; color: #1a3a5c; }
+      .wx-label { font-size: 11px; color: #666; margin-left: 2px; }
+      .wx-card.loading .wx-icon { opacity: 0.4; }
     </style>
   </head>
 
   <body>
+    <!-- 🌤️ 天気ウィジェット -->
+    <div id="weatherBar">
+      <div class="wx-card loading" id="wx-vn">
+        <span class="wx-icon">🌡️</span>
+        <span class="wx-temp">—</span>
+        <span class="wx-label" id="wx-vn-label">ĐN</span>
+      </div>
+      <div class="wx-card loading" id="wx-jp">
+        <span class="wx-icon">🌡️</span>
+        <span class="wx-temp">—</span>
+        <span class="wx-label" id="wx-jp-label">草加</span>
+      </div>
+    </div>
+
     <!-- 🌐 多言語切替 -->
     <div class="lang-switch">
       <button data-lang="ja" onclick="setLang('ja')">日本語</button>
@@ -753,6 +786,69 @@
       }
 
       loadProgressSummary();
+
+      /* ============================================================
+        天気ウィジェット（Open-Meteo、APIキー不要）
+      ============================================================ */
+      const WX_LOCATIONS = [
+        { id: "vn", lat: 10.958, lon: 106.843, tz: "Asia/Ho_Chi_Minh", labelJa: "ĐN", labelVi: "Đồng Nai" },
+        { id: "jp", lat: 35.825, lon: 139.806, tz: "Asia/Tokyo",       labelJa: "草加", labelVi: "Soka" },
+      ];
+
+      // WMO天気コード → 絵文字
+      function wmoEmoji(code) {
+        if (code === 0)                        return "☀️";
+        if (code === 1)                        return "🌤️";
+        if (code === 2)                        return "⛅";
+        if (code === 3)                        return "☁️";
+        if (code === 45 || code === 48)        return "🌫️";
+        if (code >= 51 && code <= 55)          return "🌦️";
+        if (code >= 61 && code <= 65)          return "🌧️";
+        if (code >= 71 && code <= 77)          return "❄️";
+        if (code >= 80 && code <= 82)          return "🌦️";
+        if (code === 85 || code === 86)        return "🌨️";
+        if (code >= 95 && code <= 99)          return "⛈️";
+        return "🌡️";
+      }
+
+      async function loadWeather() {
+        for (const loc of WX_LOCATIONS) {
+          const card = document.getElementById(`wx-${loc.id}`);
+          try {
+            const url = `https://api.open-meteo.com/v1/forecast`
+              + `?latitude=${loc.lat}&longitude=${loc.lon}`
+              + `&current=temperature_2m,weathercode`
+              + `&timezone=${encodeURIComponent(loc.tz)}`;
+            const res  = await fetch(url);
+            const data = await res.json();
+            const temp = Math.round(data.current.temperature_2m);
+            const icon = wmoEmoji(data.current.weathercode);
+            card.querySelector(".wx-icon").textContent = icon;
+            card.querySelector(".wx-temp").textContent = `${temp}°`;
+            card.classList.remove("loading");
+          } catch (e) {
+            card.querySelector(".wx-icon").textContent = "—";
+          }
+        }
+      }
+
+      function updateWeatherLabels() {
+        const lang = localStorage.getItem("lang") || "ja";
+        document.getElementById("wx-vn-label").textContent =
+          lang === "vi" ? WX_LOCATIONS[0].labelVi : WX_LOCATIONS[0].labelJa;
+        document.getElementById("wx-jp-label").textContent =
+          lang === "vi" ? WX_LOCATIONS[1].labelVi : WX_LOCATIONS[1].labelJa;
+      }
+
+      // setLang に天気ラベル更新を追加
+      const _origSetLang = setLang;
+      setLang = function(lang) {
+        _origSetLang(lang);
+        updateWeatherLabels();
+      };
+
+      loadWeather();
+      updateWeatherLabels();
     </script>
   </body>
 </html>
