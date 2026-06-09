@@ -5007,3 +5007,30 @@ ORDER BY p.press_date_at DESC, p.press_start_at;
 - `die_import.html`に金型を登録した際、`t_die_handover`にも登録する機能を追加の事
 - `handover_list.html`はmemoが無いか？note2が有るのでここに記録をした方がいい。
 - `handover_list.html`はInvoceNoを入力しなくても登録できるようにする事
+
+# 2026/06/09
+
+修理計画プレビュー画面、修理計画者を出した方がいい。
+
+`handover_list.html`に型番検索が無い。もとは有ったと思うが、画面が狭いと表示されないか？また、更新日時が欲しい。
+
+あれ、品番が紐づかない型番が挿入されてしまった。なくていい、ここは、今後は無くなる予定。
+
+<figure style="text-align:center;">
+  <img src="./img/20260609-04.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型移管一覧の、金型到着日の日付の位置良くない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260609-05.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+なぜかCJ2のボディは入力できない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260609-06.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
