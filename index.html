@@ -302,6 +302,11 @@
         <span class="wx-temp">—</span>
         <span class="wx-label" id="wx-jp-label">草加</span>
       </div>
+      <div class="wx-card loading" id="wx-cn">
+        <span class="wx-icon">🌡️</span>
+        <span class="wx-temp">—</span>
+        <span class="wx-label" id="wx-cn-label">北京</span>
+      </div>
     </div>
 
     <!-- 🌐 多言語切替 -->
@@ -791,8 +796,9 @@
         天気ウィジェット（Open-Meteo、APIキー不要）
       ============================================================ */
       const WX_LOCATIONS = [
-        { id: "vn", lat: 10.958, lon: 106.843, tz: "Asia/Ho_Chi_Minh", labelJa: "ĐN", labelVi: "Đồng Nai" },
+        { id: "vn", lat: 10.958, lon: 106.843, tz: "Asia/Ho_Chi_Minh", labelJa: "ĐN",  labelVi: "Đồng Nai" },
         { id: "jp", lat: 35.825, lon: 139.806, tz: "Asia/Tokyo",       labelJa: "草加", labelVi: "Soka" },
+        { id: "cn", lat: 39.904, lon: 116.407, tz: "Asia/Shanghai",    labelJa: "北京", labelVi: "Bắc Kinh" },
       ];
 
       // WMO天気コード → 絵文字
@@ -834,10 +840,10 @@
 
       function updateWeatherLabels() {
         const lang = localStorage.getItem("lang") || "ja";
-        document.getElementById("wx-vn-label").textContent =
-          lang === "vi" ? WX_LOCATIONS[0].labelVi : WX_LOCATIONS[0].labelJa;
-        document.getElementById("wx-jp-label").textContent =
-          lang === "vi" ? WX_LOCATIONS[1].labelVi : WX_LOCATIONS[1].labelJa;
+        WX_LOCATIONS.forEach((loc) => {
+          document.getElementById(`wx-${loc.id}-label`).textContent =
+            lang === "vi" ? loc.labelVi : loc.labelJa;
+        });
       }
 
       // setLang に天気ラベル更新を追加
