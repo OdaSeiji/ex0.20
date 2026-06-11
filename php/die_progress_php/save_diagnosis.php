@@ -29,6 +29,9 @@ $ng_action          = $_POST["ng_action"];
 $condition_change   = $_POST["condition_change"] ?? null;
 $memo               = $_POST["memo"] ?? null;
 
+// ng_action 2=修理, 3=修理+条件変更 のとき need_fix = 1
+$need_fix = ($ng_action == 2 || $ng_action == 3) ? 1 : 0;
+
 // --------------------------------------------------
 // 2. press_id → inspection_id を取得（最新を使用）
 // --------------------------------------------------
@@ -66,6 +69,7 @@ if ($exist) {
             shape_judgement = ?,
             overall_judgement = ?,
             ng_action = ?,
+            need_fix = ?,
             condition_change = ?,
             memo = ?,
             approval_status = 'pending',   -- ★ 未承認に戻す
@@ -82,6 +86,7 @@ if ($exist) {
         $shape_judge,
         $overall_judge,
         $ng_action,
+        $need_fix,
         $condition_change,
         $memo,
         $inspection_id
@@ -102,11 +107,12 @@ if ($exist) {
             shape_judgement,
             overall_judgement,
             ng_action,
+            need_fix,
             condition_change,
             memo,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ";
 
     $stmt = $pdo->prepare($sql);
@@ -118,6 +124,7 @@ if ($exist) {
         $shape_judge,
         $overall_judge,
         $ng_action,
+        $need_fix,
         $condition_change,
         $memo
     ]);

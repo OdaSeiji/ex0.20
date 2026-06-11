@@ -170,8 +170,7 @@
                 oninput="filterAndRender()"
                 onclick="event.stopPropagation()" />
             </th>
-            <th data-key="col_title_jp">テーマ(JP)</th>
-            <th data-key="col_title_vn">テーマ(VN)</th>
+            <th data-key="col_title">テーマ</th>
             <th data-key="col_priority">優先度</th>
             <th data-key="col_latest">最終押出日</th>
             <th data-key="col_status">完了状態</th>
@@ -188,8 +187,7 @@
         ja: {
           title: "🛠 テーマ一覧",
           col_die: "金型番号",
-          col_title_jp: "テーマ(JP)",
-          col_title_vn: "テーマ(VN)",
+          col_title: "テーマ",
           col_priority: "優先度",
           col_latest: "最終押出日",
           col_status: "完了状態",
@@ -198,8 +196,7 @@
         vi: {
           title: "🛠 Danh sách chủ đề",
           col_die: "Mã khuôn",
-          col_title_jp: "Chủ đề(JP)",
-          col_title_vn: "Chủ đề(VN)",
+          col_title: "Chủ đề",
           col_priority: "Ưu tiên",
           col_latest: "Ngày ép cuối",
           col_status: "Trạng thái",
@@ -210,9 +207,10 @@
       function setLang(lang) {
         document.querySelectorAll("[data-key]").forEach((el) => {
           const key = el.getAttribute("data-key");
-          el.textContent = dict[lang][key];
+          if (dict[lang][key] !== undefined) el.textContent = dict[lang][key];
         });
         localStorage.setItem("lang", lang);
+        if (allData.length) filterAndRender();
       }
 
       /* URLパラメータから die_id / die_number を取得 */
@@ -274,6 +272,10 @@
         const tbody = document.querySelector("#issueTable tbody");
         tbody.innerHTML = "";
 
+        const lang       = localStorage.getItem("lang") || "ja";
+        const titleField = lang === "vi" ? "issue_title_vn" : "issue_title_jp";
+        const saveBtnLabel = lang === "vi" ? "Lưu" : "保存";
+
         data.forEach((row) => {
           const tr = document.createElement("tr");
 
@@ -282,17 +284,14 @@
           const compClass =
             row.completion_status === "完了" ? "complete" : "incomplete";
 
+          const titleValue = (row[titleField] ?? "").replace(/"/g, "&quot;");
+
           tr.innerHTML = `
             <td class="die-number">${row.die_number}</td>
-            <td class="editable-cell" data-id="${row.id}" data-field="issue_title_jp">
-              <div class="detail-view">${row.issue_title_jp ?? ""}</div>
-              <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_jp ?? "").replace(/"/g, "&quot;")}" />
-              <button class="save-btn" style="display:none;">保存</button>
-            </td>
-            <td class="editable-cell" data-id="${row.id}" data-field="issue_title_vn">
-              <div class="detail-view">${row.issue_title_vn ?? ""}</div>
-              <input class="detail-edit-input" style="display:none;" type="text" value="${(row.issue_title_vn ?? "").replace(/"/g, "&quot;")}" />
-              <button class="save-btn" style="display:none;">保存</button>
+            <td class="editable-cell" data-id="${row.id}" data-field="${titleField}">
+              <div class="detail-view">${row[titleField] ?? ""}</div>
+              <input class="detail-edit-input" style="display:none;" type="text" value="${titleValue}" />
+              <button class="save-btn" style="display:none;">${saveBtnLabel}</button>
             </td>
             <td><span class="badge ${priorityClass}">${row.priority_label}</span></td>
             <td>${row.latest_press_date?.split(" ")[0] ?? "—"}</td>

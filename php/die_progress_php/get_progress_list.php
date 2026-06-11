@@ -103,7 +103,14 @@ SELECT
     END AS fix_report_approval,
 
     -- 重点管理フラグ（active な t_die_watch があれば priority を返す）
-    w.priority AS watch_priority
+    w.priority AS watch_priority,
+
+    -- Issue優先度（open な t_die_issue の最高優先度）
+    iss.issue_priority,
+
+    -- 金型コンディション（Trial / Mass Production Trial / Mass Production）
+    md.die_condition_id,
+    mc.name AS die_condition_name
 
 FROM t_press p
 
@@ -123,6 +130,14 @@ LEFT JOIN (
     GROUP BY die_id
 ) w ON md.id = w.die_id
 
+-- Issue優先度（open な issue のうち最高優先度）
+LEFT JOIN (
+    SELECT die_id, MIN(priority) AS issue_priority
+    FROM t_die_issue
+    WHERE status = 'open'
+    GROUP BY die_id
+) iss ON md.id = iss.die_id
+
 -- 測定
 LEFT JOIN t_die_inspection i
   ON i.press_id = p.id
@@ -134,6 +149,10 @@ LEFT JOIN t_die_diagnosis d
 -- 修理（計画・報告・承認すべて含む）
 LEFT JOIN t_die_fix f
   ON f.diagnosis_id = d.id
+
+-- 金型コンディション
+LEFT JOIN m_die_conditions mc
+  ON md.die_condition_id = mc.id
 
 $where
 ORDER BY p.press_date_at DESC, p.id DESC

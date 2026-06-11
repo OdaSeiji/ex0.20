@@ -241,6 +241,32 @@
       .watch-middle { background: #e65100; }
       .watch-low    { background: #1565c0; }
 
+      .issue-badge {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .issue-p1 { background: #c62828; }
+      .issue-p2 { background: #e65100; }
+      .issue-p3 { background: #1565c0; }
+
+      .condition-badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .condition-1 { background: #f57c00; } /* Trial */
+      .condition-2 { background: #1565c0; } /* Mass Production Trial */
+      .condition-3 { background: #2e7d32; } /* Mass Production */
+
       .preview-wide {
         width: 900px;
         max-height: 90vh;
@@ -484,13 +510,14 @@
             </th>
 
             <th data-key="col_watch">重点管理</th>
+            <th data-key="col_issue_priority">優先度</th>
 
             <th data-key="col_type">
               押出種別
               <select
                 id="filterPressingType"
                 class="die-search"
-                style="margin-left: 6px"
+                style="margin-left: 6px; width: 40px"
               >
                 <option value="">すべて</option>
                 <option value="◎">◎</option>
@@ -498,6 +525,8 @@
                 <option value="●">●</option>
               </select>
             </th>
+
+            <th data-key="col_condition">コンディション</th>
 
             <!-- ★ ここから 6 ステップ -->
             <th data-key="col_ins">測定</th>
@@ -731,8 +760,10 @@
           col_date: "押出日",
           col_die: "金型番号",
           col_watch: "重点管理",
+          col_issue_priority: "優先度",
           col_type: "押出種別",
 
+          col_condition: "コンディション",
           col_ins: "測定",
           col_diag: "診断",
           col_needfix: "修理要否",
@@ -788,8 +819,10 @@
           col_date: "Ngày ép",
           col_die: "Mã khuôn",
           col_watch: "Theo dõi",
+          col_issue_priority: "Ưu tiên",
           col_type: "Loại ép",
 
+          col_condition: "Tình trạng",
           col_ins: "Đo",
           col_diag: "Chẩn đoán",
           col_needfix: "Cần sửa",
@@ -1089,11 +1122,26 @@
             ? `<td><span class="watch-badge watch-${row.watch_priority}">${row.watch_priority}</span></td>`
             : `<td></td>`;
 
+          const issuePriorityLabel = {
+            1: { ja: "高", vi: "Cao" },
+            2: { ja: "中", vi: "TB" },
+            3: { ja: "低", vi: "Thấp" },
+          };
+          const issueCell = row.issue_priority != null
+            ? `<td><span class="issue-badge issue-p${row.issue_priority}">${issuePriorityLabel[row.issue_priority]?.[currentLang] ?? row.issue_priority}</span></td>`
+            : `<td></td>`;
+
+          const conditionCell = row.die_condition_id
+            ? `<td><span class="condition-badge condition-${row.die_condition_id}">${row.die_condition_name}</span></td>`
+            : `<td></td>`;
+
           tr.innerHTML = `
             <td>${row.press_date}</td>
             <td class="die-number">${row.die_number}</td>
             ${watchCell}
+            ${issueCell}
             <td class="pressing-type">${row.pressing_symbol}</td>
+            ${conditionCell}
 
             <!-- ★ 測定（プレビュー対応） -->
             <td>${inspectionBadge(row.inspected, row.press_id)}</td>

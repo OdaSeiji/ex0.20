@@ -44,18 +44,25 @@ if (!$diagnosis) {
 }
 
 $diagnosis_id = $diagnosis["id"];
-$need_fix     = $diagnosis["need_fix"];        // ★ need_fix を取得
+$need_fix     = $diagnosis["need_fix"];
+$ng_action    = $diagnosis["ng_action"];
 $die_issue_id = $diagnosis["die_issue_id"];
+
+// ng_action 2=修理, 3=修理+条件変更 → need_fix を上書き補正（保存時に未セットの古いデータ対応）
+if ($ng_action == 2 || $ng_action == 3) {
+    $need_fix = 1;
+}
 
 /* ----------------------------------------
    4. die_lifecycle_status_id を取得
 ---------------------------------------- */
-$sql = "SELECT die_lifecycle_status_id FROM m_dies WHERE id = ?";
+$sql = "SELECT die_lifecycle_status_id, die_condition_id FROM m_dies WHERE id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$die_id]);
 $die_info = $stmt->fetch(PDO::FETCH_ASSOC);
 
 $die_lifecycle_status_id = $die_info["die_lifecycle_status_id"];
+$die_condition_id        = $die_info["die_condition_id"];
 
 /* ----------------------------------------
    5. 承認処理
@@ -72,7 +79,41 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute([$diagnosis_id]);
 
 /* ----------------------------------------
-   6. Issue 自動登録の条件判定（新仕様）
+   6. 修理が必要な場合、金型のコンディションを Trial (1) にセット
+---------------------------------------- */
+if ($need_fix == 1) {
+    $pdo->prepare("UPDATE m_dies SET die_condition_id = 1 WHERE id = ?")
+        ->execute([$die_id]);
+
+    $pdo->prepare("
+        INSERT INTO t_die_condition_history (die_id, condition_id, changed_at, staff_id, memo)
+        VALUES (?, 1, NOW(), 9999, '診断承認により Trial に設定')
+    ")->execute([$die_id]);
+}
+
+/* ----------------------------------------
+   7. 修理不要の場合、フェーズを1段階昇格
+   Trial(1) → Mass Production Trial(2)
+   Mass Production Trial(2) → Mass Production(3)
+   それ以外（NULL, 3）は変更しない
+---------------------------------------- */
+if ($need_fix == 0 && in_array($die_condition_id, [1, 2])) {
+    $next_condition_id = $die_condition_id + 1;
+
+    $pdo->prepare("UPDATE m_dies SET die_condition_id = ? WHERE id = ?")
+        ->execute([$next_condition_id, $die_id]);
+
+    $condition_names = [1 => 'Trial', 2 => 'Mass Production Trial', 3 => 'Mass Production'];
+    $memo = "診断承認により {$condition_names[$die_condition_id]} → {$condition_names[$next_condition_id]} に昇格";
+
+    $pdo->prepare("
+        INSERT INTO t_die_condition_history (die_id, condition_id, changed_at, staff_id, memo)
+        VALUES (?, ?, NOW(), 9999, ?)
+    ")->execute([$die_id, $next_condition_id, $memo]);
+}
+
+/* ----------------------------------------
+   9. Issue 自動登録の条件判定（新仕様）
    ----------------------------------------
    ▼ t_die_issue に追加する条件（誠司さん仕様）
 
@@ -94,7 +135,7 @@ $should_create_issue =
     ($need_fix == 0 && $die_lifecycle_status_id != 7);
 
 /* ----------------------------------------
-   7. Issue 自動登録
+   10. Issue 自動登録
    ・die_id に紐づく open な issue があればリンク
    ・なければ新規作成してリンク
    ・1つの issue に複数 diagnosis がリンクされる（issue が close するまで）
@@ -130,7 +171,7 @@ if ($should_create_issue && empty($die_issue_id)) {
 }
 
 /* ----------------------------------------
-   8. 完了レスポンス
+   11. 完了レスポンス
 ---------------------------------------- */
 echo json_encode([
     "status" => "success",
