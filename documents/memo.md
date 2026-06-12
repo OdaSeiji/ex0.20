@@ -5034,3 +5034,20 @@ ORDER BY p.press_date_at DESC, p.press_start_at;
   <img src="./img/20260609-06.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/06/12
+
+金型到着日を入れるのは、ここでは出来ない様にすべき。
+ここは、`t_die_handover`しか更新されないため。
+
+<figure style="text-align:center;">
+  <img src="./img/20260612-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型検索機能の追加
+
+<figure style="text-align:center;">
+  <img src="./img/20260612-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
