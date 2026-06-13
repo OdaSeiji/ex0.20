@@ -406,6 +406,22 @@
         <textarea id="condition_change"></textarea>
       </div>
 
+      <!-- ★ フェーズ移行選択（ng_action=1 かつ condition が 1 or 2 のときのみ表示） -->
+      <div id="advance_condition_block" style="display: none">
+        <h3 data-key="sec_advance_condition">■ フェーズ移行</h3>
+        <div class="row">
+          <label></label>
+          <label>
+            <input type="radio" name="advance_condition" value="0" />
+            <span data-key="advance_stay">このまま継続する</span>（<span id="current_condition_label"></span>）
+          </label>
+          <label>
+            <input type="radio" name="advance_condition" value="1" />
+            <span data-key="advance_next">次フェーズへ移行する</span>（<span id="next_condition_label"></span>）
+          </label>
+        </div>
+      </div>
+
       <h3 data-key="sec_diag_memo">■ メモ</h3>
       <textarea id="diag_memo"></textarea>
 
@@ -539,6 +555,9 @@
           ng_4: "条件変更のみ",
 
           sec_condition_change: "■ 条件変更内容",
+          sec_advance_condition: "■ フェーズ移行",
+          advance_stay: "このまま継続する",
+          advance_next: "次フェーズへ移行する",
           // sec_repair_required: "■ 修理の要否",
           // label_repair_required: "修理が必要",
 
@@ -592,6 +611,9 @@
           ng_4: "Chỉ thay đổi điều kiện",
 
           sec_condition_change: "■ Nội dung thay đổi điều kiện",
+          sec_advance_condition: "■ Chuyển giai đoạn",
+          advance_stay: "Tiếp tục giai đoạn hiện tại",
+          advance_next: "Chuyển sang giai đoạn tiếp theo",
           sec_repair_required: "■ Cần sửa chữa",
           label_repair_required: "Cần sửa chữa",
 
@@ -620,6 +642,17 @@
       // ★ pressId と mode はここで1回だけ宣言
       const pressId = getParam("press_id");
       const mode = getParam("mode");
+
+      // 金型コンディション・押出種別（データロード後にセット）
+      let _dieConditionId   = null;
+      let _dieConditionName = null;
+      let _pressingTypeId   = null;
+
+      const conditionNames = {
+        1: "Trial",
+        2: "Mass Production Trial",
+        3: "Mass Production"
+      };
 
       // hidden にセット（必要なら）
       document.getElementById("press_id").value = pressId;
@@ -673,6 +706,11 @@
               "SCAN FILE:",
               data.press.press_directive_scan_file_name,
             );
+
+            /* 金型コンディション・押出種別を保持 */
+            _dieConditionId   = data.die_condition_id   ? Number(data.die_condition_id) : null;
+            _dieConditionName = data.die_condition_name ?? null;
+            _pressingTypeId   = data.press.pressing_type_id ? Number(data.press.pressing_type_id) : null;
 
             /* 測定・指示・プレス情報 */
             fillInspection(data.inspection, data.inspection_files);
@@ -985,12 +1023,14 @@
         // NGアクション
         setChecked(`input[name="ng_action"][value="${d.ng_action}"]`);
 
-        // 条件変更
-        if (d.ng_action == 3 || d.ng_action == 4) {
-          const block = document.getElementById("condition_change_block");
-          if (block) block.style.display = "block";
+        // 条件変更・フェーズ移行ブロックの表示制御
+        onNgActionChange(d.ng_action);
+        setValue("condition_change", d.condition_change);
 
-          setValue("condition_change", d.condition_change);
+        // advance_condition の復元
+        if (d.ng_action == 1 && d.advance_condition !== null && d.advance_condition !== undefined) {
+          const el = document.querySelector(`input[name="advance_condition"][value="${d.advance_condition}"]`);
+          if (el) el.checked = true;
         }
 
         // 承認ステータス
@@ -1008,6 +1048,51 @@
         // メモ
         setValue("diag_memo", d.memo);
       }
+
+      /* ------------------------------
+         ng_action 変更時の表示制御
+      ------------------------------ */
+      function onNgActionChange(value) {
+        // 条件変更テキストエリア
+        const condBlock = document.getElementById("condition_change_block");
+        condBlock.style.display = (value == 3 || value == 4) ? "block" : "none";
+
+        // フェーズ移行ブロック
+        const advBlock = document.getElementById("advance_condition_block");
+
+        if (value == 1) {
+          if (_dieConditionId === 1 || _dieConditionId === 2) {
+            // Case 1: conditionに値あり → 1段階昇格
+            const nextId = _dieConditionId + 1;
+            document.getElementById("current_condition_label").textContent = conditionNames[_dieConditionId] ?? "";
+            document.getElementById("next_condition_label").textContent    = conditionNames[nextId] ?? "";
+            advBlock.style.display = "block";
+
+          } else if (_dieConditionId === null) {
+            // Case 2: condition = NULL → pressing_type_id で昇格先を決定
+            // pressing_type_id=1(◎) → 2, pressing_type_id=2(〇)/3(●) → 3
+            const nextId = _pressingTypeId === 1 ? 2 : 3;
+            document.getElementById("current_condition_label").textContent = "";
+            document.getElementById("next_condition_label").textContent    = conditionNames[nextId] ?? "";
+            advBlock.style.display = "block";
+
+          } else {
+            // condition = 3(Mass Production) → 表示しない
+            advBlock.style.display = "none";
+            document.querySelectorAll('input[name="advance_condition"]').forEach(r => r.checked = false);
+          }
+        } else {
+          advBlock.style.display = "none";
+          document.querySelectorAll('input[name="advance_condition"]').forEach(r => r.checked = false);
+        }
+      }
+
+      // ng_action ラジオボタンにイベントを登録
+      document.querySelectorAll('input[name="ng_action"]').forEach(radio => {
+        radio.addEventListener("change", function() {
+          onNgActionChange(this.value);
+        });
+      });
 
       /* ------------------------------
          診断保存
@@ -1067,6 +1152,13 @@
         formData.append("overall_judgement", overall_judge);
         formData.append("ng_action", ng_action);
         formData.append("condition_change", condition_change);
+
+        // advance_condition（ng_action=1 のときのみ送信）
+        if (ng_action == 1) {
+          const adv = document.querySelector('input[name="advance_condition"]:checked')?.value ?? "";
+          formData.append("advance_condition", adv);
+        }
+
         formData.append("memo", document.getElementById("diag_memo").value);
 
         // 添付ファイル（任意）

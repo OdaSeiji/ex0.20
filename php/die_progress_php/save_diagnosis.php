@@ -32,6 +32,15 @@ $memo               = $_POST["memo"] ?? null;
 // ng_action 2=修理, 3=修理+条件変更 のとき need_fix = 1
 $need_fix = ($ng_action == 2 || $ng_action == 3) ? 1 : 0;
 
+// ng_action=1(Watch) のときだけ advance_condition を受け取る、それ以外は NULL
+$advance_condition = null;
+if ($ng_action == 1) {
+    $raw = $_POST["advance_condition"] ?? null;
+    if ($raw === "1" || $raw === "0") {
+        $advance_condition = (int)$raw;
+    }
+}
+
 // --------------------------------------------------
 // 2. press_id → inspection_id を取得（最新を使用）
 // --------------------------------------------------
@@ -70,6 +79,7 @@ if ($exist) {
             overall_judgement = ?,
             ng_action = ?,
             need_fix = ?,
+            advance_condition = ?,
             condition_change = ?,
             memo = ?,
             approval_status = 'pending',   -- ★ 未承認に戻す
@@ -87,6 +97,7 @@ if ($exist) {
         $overall_judge,
         $ng_action,
         $need_fix,
+        $advance_condition,
         $condition_change,
         $memo,
         $inspection_id
@@ -108,11 +119,12 @@ if ($exist) {
             overall_judgement,
             ng_action,
             need_fix,
+            advance_condition,
             condition_change,
             memo,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
     ";
 
     $stmt = $pdo->prepare($sql);
@@ -125,6 +137,7 @@ if ($exist) {
         $overall_judge,
         $ng_action,
         $need_fix,
+        $advance_condition,
         $condition_change,
         $memo
     ]);

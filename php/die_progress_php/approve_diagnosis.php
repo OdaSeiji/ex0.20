@@ -15,7 +15,12 @@ if (!$press_id) {
 /* ----------------------------------------
    2. press_id → inspection を取得（die_id も取得）
 ---------------------------------------- */
-$sql = "SELECT id, die_id FROM t_die_inspection WHERE press_id = ?";
+$sql = "
+    SELECT i.id, i.die_id, p.pressing_type_id
+    FROM t_die_inspection i
+    LEFT JOIN t_press p ON p.id = i.press_id
+    WHERE i.press_id = ?
+";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$press_id]);
 $inspection = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -25,8 +30,9 @@ if (!$inspection) {
     exit;
 }
 
-$inspection_id = $inspection["id"];
-$die_id        = $inspection["die_id"];
+$inspection_id    = $inspection["id"];
+$die_id           = $inspection["die_id"];
+$pressing_type_id = $inspection["pressing_type_id"];
 
 /* ----------------------------------------
    3. 最新の diagnosis を取得
@@ -43,10 +49,11 @@ if (!$diagnosis) {
     exit;
 }
 
-$diagnosis_id = $diagnosis["id"];
-$need_fix     = $diagnosis["need_fix"];
-$ng_action    = $diagnosis["ng_action"];
-$die_issue_id = $diagnosis["die_issue_id"];
+$diagnosis_id      = $diagnosis["id"];
+$need_fix          = $diagnosis["need_fix"];
+$ng_action         = $diagnosis["ng_action"];
+$advance_condition = $diagnosis["advance_condition"];
+$die_issue_id      = $diagnosis["die_issue_id"];
 
 // ng_action 2=修理, 3=修理+条件変更 → need_fix を上書き補正（保存時に未セットの古いデータ対応）
 if ($ng_action == 2 || $ng_action == 3) {
@@ -92,24 +99,33 @@ if ($need_fix == 1) {
 }
 
 /* ----------------------------------------
-   7. 修理不要の場合、フェーズを1段階昇格
-   Trial(1) → Mass Production Trial(2)
-   Mass Production Trial(2) → Mass Production(3)
-   それ以外（NULL, 3）は変更しない
+   7. 診断者がフェーズ移行を選択した場合のみ昇格
 ---------------------------------------- */
-if ($need_fix == 0 && in_array($die_condition_id, [1, 2])) {
-    $next_condition_id = $die_condition_id + 1;
-
-    $pdo->prepare("UPDATE m_dies SET die_condition_id = ? WHERE id = ?")
-        ->execute([$next_condition_id, $die_id]);
-
+if ($advance_condition == 1) {
     $condition_names = [1 => 'Trial', 2 => 'Mass Production Trial', 3 => 'Mass Production'];
-    $memo = "診断承認により {$condition_names[$die_condition_id]} → {$condition_names[$next_condition_id]} に昇格";
+    $next_condition_id = null;
 
-    $pdo->prepare("
-        INSERT INTO t_die_condition_history (die_id, condition_id, changed_at, staff_id, memo)
-        VALUES (?, ?, NOW(), 9999, ?)
-    ")->execute([$die_id, $next_condition_id, $memo]);
+    if (in_array($die_condition_id, [1, 2])) {
+        // Case 1: condition あり → 1段階昇格
+        $next_condition_id = $die_condition_id + 1;
+        $memo = "Approved: {$condition_names[$die_condition_id]} -> {$condition_names[$next_condition_id]}";
+
+    } elseif ($die_condition_id === null) {
+        // Case 2: condition なし → pressing_type_id で昇格先を決定
+        // pressing_type_id=1(◎) → 2, pressing_type_id=2(〇)/3(●) → 3
+        $next_condition_id = ($pressing_type_id == 1) ? 2 : 3;
+        $memo = "Approved: (none) -> {$condition_names[$next_condition_id]}";
+    }
+
+    if ($next_condition_id !== null) {
+        $pdo->prepare("UPDATE m_dies SET die_condition_id = ? WHERE id = ?")
+            ->execute([$next_condition_id, $die_id]);
+
+        $pdo->prepare("
+            INSERT INTO t_die_condition_history (die_id, condition_id, changed_at, staff_id, memo)
+            VALUES (?, ?, NOW(), 9999, ?)
+        ")->execute([$die_id, $next_condition_id, $memo]);
+    }
 }
 
 /* ----------------------------------------

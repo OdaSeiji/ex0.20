@@ -12,7 +12,7 @@ $allowed_cols = [
     "instruction_created_at",
     "inspection_passed_at",
     "submitted_to_japan_at",
-    "submitted_to_vietnam_at",
+    "asset_registration_applied_at",
 ];
 
 if (!in_array($date_col, $allowed_cols, true)) {
@@ -49,7 +49,7 @@ $sql = "
         h.inspection_number,
         h.inspection_passed_at,
         h.submitted_to_japan_at,
-        h.submitted_to_vietnam_at,
+        h.asset_registration_applied_at,
         h.is_accessory_item_flag,
         h.note2,
         h.invoice_number,

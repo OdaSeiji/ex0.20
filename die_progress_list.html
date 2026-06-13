@@ -215,17 +215,35 @@
       #progressTable td:nth-child(4) { width: 100px; }
       #progressTable th:nth-child(4) select.die-search { width: 48px; margin-left: 4px; }
 
-      /* 5,6,8,9,10列目：均等幅 */
+      /* 5列目：優先度 */
       #progressTable th:nth-child(5),
-      #progressTable td:nth-child(5),
+      #progressTable td:nth-child(5) { width: 68px; text-align: center; }
+
+      /* 6列目：コンディション */
       #progressTable th:nth-child(6),
-      #progressTable td:nth-child(6),
+      #progressTable td:nth-child(6) { width: 90px; text-align: center; }
+
+      /* 7列目：測定 / 8列目：診断 / 9列目：移行 */
+      #progressTable th:nth-child(7),
+      #progressTable td:nth-child(7),
       #progressTable th:nth-child(8),
       #progressTable td:nth-child(8),
       #progressTable th:nth-child(9),
-      #progressTable td:nth-child(9),
-      #progressTable th:nth-child(10),
-      #progressTable td:nth-child(10) { width: 68px; text-align: center; }
+      #progressTable td:nth-child(9) { width: 70px; text-align: center; }
+
+      /* 11列目：診断承認 / 12列目：修理計画 / 13列目：修理報告 */
+      #progressTable th:nth-child(11),
+      #progressTable td:nth-child(11),
+      #progressTable th:nth-child(12),
+      #progressTable td:nth-child(12),
+      #progressTable th:nth-child(13),
+      #progressTable td:nth-child(13) { width: 70px; text-align: center; }
+
+      /* 14列目：操作 */
+      #progressTable th:nth-child(14),
+      #progressTable td:nth-child(14) { width: 150px; text-align: center; }
+      #progressTable td:nth-child(14) .btn,
+      #progressTable td:nth-child(14) .btn-disabled { width: 140px; }
 
       /* 重点管理バッジ */
       .watch-badge {
@@ -266,6 +284,18 @@
       .condition-1 { background: #f57c00; } /* Trial */
       .condition-2 { background: #1565c0; } /* Mass Production Trial */
       .condition-3 { background: #2e7d32; } /* Mass Production */
+
+      .advance-badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .advance-yes  { background: #2e7d32; } /* 移行する */
+      .advance-no   { background: #757575; } /* 継続 */
 
       .preview-wide {
         width: 900px;
@@ -531,6 +561,7 @@
             <!-- ★ ここから 6 ステップ -->
             <th data-key="col_ins">測定</th>
             <th data-key="col_diag">診断</th>
+            <th data-key="col_advance">移行</th>
             <th data-key="col_needfix">修理要否</th>
             <th data-key="col_diag_app">診断承認</th>
             <th data-key="col_fix_plan">修理計画</th>
@@ -766,6 +797,7 @@
           col_condition: "コンディション",
           col_ins: "測定",
           col_diag: "診断",
+          col_advance: "移行",
           col_needfix: "修理要否",
           col_diag_app: "診断承認",
           col_fix_plan: "修理計画",
@@ -825,6 +857,7 @@
           col_condition: "Tình trạng",
           col_ins: "Đo",
           col_diag: "Chẩn đoán",
+          col_advance: "Chuyển GĐ",
           col_needfix: "Cần sửa",
           col_diag_app: "Duyệt chẩn đoán",
           col_fix_plan: "Kế hoạch sửa",
@@ -1065,6 +1098,17 @@
               : `<span class="badge none">—</span>`;
 
         /* ------------------------------
+          フェーズ移行バッジ
+          1=移行する, 0=継続, null=—
+        ------------------------------ */
+        const advanceBadge = (val) => {
+          const v = val === null || val === undefined ? null : Number(val);
+          if (v === 1) return `<span class="advance-badge advance-yes">Advance</span>`;
+          if (v === 0) return `<span class="advance-badge advance-no">Stay</span>`;
+          return `<span class="badge none">—</span>`;
+        };
+
+        /* ------------------------------
     ★ 測定バッジ（クリックでプレビュー）
   ------------------------------ */
         const inspectionBadge = (flag, pressId) =>
@@ -1149,6 +1193,9 @@
             <!-- ★ 診断（プレビュー対応） -->
             <td>${diagnosisBadge(row.diagnosed, row.press_id)}</td>
 
+            <!-- フェーズ移行 -->
+            <td>${advanceBadge(row.advance_condition)}</td>
+
             <!-- 修理要否（文章表示） -->
             <td>${actionMap[row.ng_action]?.[currentLang] ?? "—"}</td>
 
@@ -1213,7 +1260,7 @@
         // ★★★ ⑥ 修理計画承認は廃止 → すぐ修理実施報告へ ★★★
         // 修理報告がまだなら「修理実施報告」へ
         if (!row.fix_report) {
-          return `<button class="btn" onclick="goFixReport(${row.press_id})">修理実施報告</button>`;
+          return `<button class="btn" onclick="goFixReport(${row.press_id})">${dict[lang].col_action_fix_report}</button>`;
         }
 
         // ⑦ 修理報告済 → 詳細　一次的に詳細ではなく、完了としている。

@@ -307,7 +307,7 @@
             <th data-col="inspection_number" data-key="col_insp_num">検査書番号 <span class="sort-icon"></span></th>
             <th data-col="inspection_passed_at" data-key="col_insp_passed">検査合格日 <span class="sort-icon"></span></th>
             <th data-col="submitted_to_japan_at" data-key="col_sub_jp">日本送付日 <span class="sort-icon"></span></th>
-            <th data-col="submitted_to_vietnam_at" data-key="col_sub_vn">VN送付日 <span class="sort-icon"></span></th>
+            <th data-col="asset_registration_applied_at" data-key="col_sub_vn">VN送付日 <span class="sort-icon"></span></th>
             <th data-col="is_accessory_item_flag" data-key="col_accessory" class="no-sort">付属品</th>
             <th data-col="note2" data-key="col_note2">備考 <span class="sort-icon"></span></th>
             <th data-col="unusable_flag" data-key="col_unusable" class="no-sort">使用不可</th>
@@ -364,7 +364,7 @@
           col_insp_num:    "検査書番号",
           col_insp_passed: "検査合格日",
           col_sub_jp:      "日本送付日",
-          col_sub_vn:      "VN送付日",
+          col_sub_vn:      "固定資産登録日",
           col_accessory:   "付属品",
           col_note2:       "備考",
           col_invoice:     "インボイス番号",
@@ -388,7 +388,7 @@
           col_insp_num:    "Số kataken",
           col_insp_passed: "Ngày xác nhận kataken",
           col_sub_jp:      "Ngày gửi mail qua Nhật yêu cầu ikan",
-          col_sub_vn:      "Ngày đăng ký tài sản VN",
+          col_sub_vn:      "Ngày đăng ký tài sản cố định",
           col_accessory:   "Nửa khuôn",
           col_note2:       "Ghi chú",
           col_invoice:     "Số invoice",
@@ -518,7 +518,7 @@
             inspection_number:       tr.querySelector('[name="insp_num"]').value      || null,
             inspection_passed_at:    tr.querySelector('[name="insp_passed"]').value   || null,
             submitted_to_japan_at:   tr.querySelector('[name="sub_jp"]').value        || null,
-            submitted_to_vietnam_at: tr.querySelector('[name="sub_vn"]').value        || null,
+            asset_registration_applied_at: tr.querySelector('[name="sub_vn"]').value        || null,
             is_accessory_item_flag:  tr.querySelector('[name="accessory"]').checked   ? 1 : null,
             note2:                   tr.querySelector('[name="note2"]').value         || null,
             invoice_number:          tr.querySelector('[name="invoice"]').value       || null,
@@ -592,7 +592,7 @@
               <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
               <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>
               <td><input type="date" name="sub_jp"       value="${rawDate(row.submitted_to_japan_at)}" /></td>
-              <td><input type="date" name="sub_vn"       value="${rawDate(row.submitted_to_vietnam_at)}" /></td>
+              <td><input type="date" name="sub_vn"       value="${rawDate(row.asset_registration_applied_at)}" /></td>
               <td><input type="checkbox" name="accessory" ${row.is_accessory_item_flag ? "checked" : ""} /></td>
               <td><input type="text" name="note2"        value="${row.note2 ?? ""}" /></td>
               <td><input type="checkbox" name="unusable" ${row.unusable_flag ? "checked" : ""} /></td>
@@ -618,7 +618,7 @@
               <td>${row.inspection_number ?? ""}</td>
               <td>${formatDate(row.inspection_passed_at)}</td>
               <td>${formatDate(row.submitted_to_japan_at)}</td>
-              <td>${formatDate(row.submitted_to_vietnam_at)}</td>
+              <td>${formatDate(row.asset_registration_applied_at)}</td>
               <td>${accFlag}</td>
               <td>${row.note2 ?? ""}</td>
               <td>${unusableFlag}</td>

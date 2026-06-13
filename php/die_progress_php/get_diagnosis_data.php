@@ -22,6 +22,27 @@ $press = $stmt->fetch(PDO::FETCH_ASSOC);
 $die_id = $press["dies_id"];
 
 // --------------------------------------------------
+// 1-b. 金型コンディション（m_dies → m_die_conditions）
+// --------------------------------------------------
+$die_condition_id   = null;
+$die_condition_name = null;
+if ($die_id) {
+    $sql = "
+    SELECT md.die_condition_id, mc.name AS die_condition_name
+    FROM m_dies md
+    LEFT JOIN m_die_conditions mc ON md.die_condition_id = mc.id
+    WHERE md.id = ?
+    ";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$die_id]);
+    $cond = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($cond) {
+        $die_condition_id   = $cond["die_condition_id"];
+        $die_condition_name = $cond["die_condition_name"];
+    }
+}
+
+// --------------------------------------------------
 // 2. 押出指示（t_press_directive）
 // --------------------------------------------------
 $sql = "
@@ -197,6 +218,8 @@ if ($fix_id) {
 // --------------------------------------------------
 echo json_encode([
     "press" => $press,
+    "die_condition_id"   => $die_condition_id,
+    "die_condition_name" => $die_condition_name,
     "directive" => $directive,
     "inspection" => $inspection,
     "inspection_files" => $inspection_files,
