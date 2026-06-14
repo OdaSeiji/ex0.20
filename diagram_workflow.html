@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>金型管理 業務範囲図</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Segoe UI", "Meiryo", sans-serif;
+  background: #f0f4f8;
+  padding: 32px;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #1a237e;
+  text-align: center;
+  margin-bottom: 4px;
+}
+.page-sub {
+  text-align: center;
+  color: #777;
+  font-size: 12px;
+  margin-bottom: 24px;
+}
+
+.diagram {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* 課題意識 note */
+.issue-note {
+  background: #fff8e1;
+  border-left: 5px solid #ff8f00;
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 12px;
+  color: #5d4037;
+  line-height: 1.8;
+}
+.issue-note .note-title {
+  font-weight: bold;
+  color: #e65100;
+  font-size: 13px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Main zones row */
+.zones-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.zone-box {
+  flex: 1;
+  border-radius: 10px;
+  padding: 16px;
+}
+.zone-mfg {
+  background: #e3f2fd;
+  border: 2px solid #1565c0;
+}
+.zone-qlt {
+  background: #e8f5e9;
+  border: 2px solid #2e7d32;
+}
+
+.zone-header { margin-bottom: 14px; }
+
+.zone-name {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 5px;
+  margin-bottom: 6px;
+}
+.zone-mfg .zone-name { background: #1565c0; color: #fff; }
+.zone-qlt .zone-name { background: #2e7d32; color: #fff; }
+
+.zone-page {
+  display: inline-block;
+  font-size: 10px;
+  color: #444;
+  background: #ffffffcc;
+  border: 1px solid #b0bec5;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-family: "Roboto Mono", "Consolas", monospace;
+}
+
+/* Steps */
+.steps { display: flex; flex-direction: column; align-items: flex-start; }
+
+.step {
+  padding: 6px 14px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.step-sm { font-size: 11px; padding: 5px 11px; }
+
+.mfg-n  { background: #bbdefb; border: 1.5px solid #1976d2; color: #0d47a1; }
+.mfg-k  { background: #1565c0; color: #fff; }
+.qlt-n  { background: #c8e6c9; border: 1.5px solid #388e3c; color: #1b5e20; }
+.qlt-k  { background: #2e7d32; color: #fff; }
+
+.arr-v {
+  height: 18px;
+  display: flex;
+  align-items: center;
+  padding-left: 22px;
+  color: #90a4ae;
+  font-size: 13px;
+}
+
+/* Branch */
+.branch-split {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  margin-top: 0;
+}
+.branch { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.branch-label {
+  font-size: 9px;
+  color: #fff;
+  border-radius: 3px;
+  padding: 2px 7px;
+  margin-bottom: 5px;
+  white-space: nowrap;
+}
+.bl-stage { background: #0288d1; }
+.bl-repair { background: #546e7a; }
+
+/* Center connector column */
+.connector {
+  width: 90px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dashboard zone */
+.zone-dash {
+  background: #f3e5f5;
+  border: 2px solid #6a1b9a;
+  border-radius: 10px;
+  padding: 16px;
+}
+.zone-dash .zone-name { background: #6a1b9a; color: #fff; }
+
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+.dash-item {
+  background: #fff;
+  border: 1.5px solid #ce93d8;
+  border-radius: 7px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #4a148c;
+  line-height: 1.5;
+}
+.dash-item .di-icon { font-size: 16px; margin-right: 4px; }
+.dash-item .di-title { font-weight: bold; font-size: 12px; display: block; margin-bottom: 2px; }
+.dash-item .di-sub { font-size: 11px; color: #7b1fa2; }
+
+/* Down arrow section */
+.down-section {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.down-label {
+  font-size: 11px;
+  color: #6a1b9a;
+  font-weight: bold;
+  background: #e1bee7;
+  border-radius: 4px;
+  padding: 2px 10px;
+}
+</style>
+</head>
+<body>
+
+<p class="page-title">金型管理システム 業務範囲図</p>
+<p class="page-sub">die_issue_progress.html 新設の背景と各ページの役割</p>
+
+<div class="diagram">
+
+  <!-- 課題意識 -->
+  <div class="issue-note">
+    <span class="note-title">⚠ 新設の背景</span>
+    製造管理（Issue・診断・修理）のプロセス記録はできていたが、「プロセスの<strong>結果</strong>が出ているか」を横断的に確認する手段がなかった。<br>
+    特に、コンディション ステージUP が承認された後、次の押出・型検が<strong>実際に進んでいるか</strong>見えていなかった。
+  </div>
+
+  <!-- 2ゾーン + 中央コネクター -->
+  <div class="zones-row">
+
+    <!-- LEFT: 製造管理 -->
+    <div class="zone-box zone-mfg">
+      <div class="zone-header">
+        <div class="zone-name">■ 製造管理</div><br>
+        <span class="zone-page">die_progress_list.html</span>
+      </div>
+
+      <div class="steps">
+        <div class="step mfg-n">① Issue 発生（課題登録）</div>
+        <div class="arr-v">↓</div>
+        <div class="step mfg-n">② 診断 実施</div>
+        <div class="arr-v">↓</div>
+        <div class="step mfg-k">③ 診断 承認</div>
+        <div class="arr-v" style="padding-left:16px; color:#546e7a; font-size:11px;">↓ ルート分岐</div>
+
+        <div class="branch-split">
+
+          <!-- Branch A: ステージUP -->
+          <div class="branch">
+            <div class="branch-label bl-stage">修理不要・ステージUP</div>
+            <div class="step step-sm mfg-k">④ 次押出（即時）</div>
+          </div>
+
+          <!-- Branch B: 修理あり -->
+          <div class="branch">
+            <div class="branch-label bl-repair">修理あり</div>
+            <div class="step step-sm mfg-n">⑤ 修理計画 承認</div>
+            <div class="arr-v">↓</div>
+            <div class="step step-sm mfg-n">⑦ 修理 実施</div>
+            <div class="arr-v">↓</div>
+            <div class="step step-sm mfg-k">⑨ 次押出</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: コネクター (SVG) -->
+    <div class="connector">
+      <svg width="90" height="200" viewBox="0 0 90 200">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#ff8f00"/>
+          </marker>
+        </defs>
+        <!-- 矢印 -->
+        <line x1="8" y1="100" x2="75" y2="100"
+              stroke="#ff8f00" stroke-width="2.5"
+              stroke-dasharray="6,3"
+              marker-end="url(#arr)"/>
+        <!-- ラベル -->
+        <text x="45" y="82" text-anchor="middle"
+              font-family="Meiryo,Segoe UI,sans-serif" font-size="10" fill="#bf360c" font-weight="bold">
+          コンディション
+        </text>
+        <text x="45" y="95" text-anchor="middle"
+              font-family="Meiryo,Segoe UI,sans-serif" font-size="10" fill="#bf360c" font-weight="bold">
+          ステージUP
+        </text>
+        <text x="45" y="116" text-anchor="middle"
+              font-family="Meiryo,Segoe UI,sans-serif" font-size="10" fill="#bf360c">
+          → 型検 開始
+        </text>
+      </svg>
+    </div>
+
+    <!-- RIGHT: 品質評価 -->
+    <div class="zone-box zone-qlt">
+      <div class="zone-header">
+        <div class="zone-name">■ 品質評価</div><br>
+        <span class="zone-page">die_handover_progress.html</span>
+      </div>
+
+      <div class="steps">
+        <div class="step qlt-n">VN 製造型検</div>
+        <div class="arr-v">↓</div>
+        <div class="step qlt-n">VN QA 型検</div>
+        <div class="arr-v">↓</div>
+        <div class="step qlt-n">型検書類 日本提出</div>
+        <div class="arr-v">↓</div>
+        <div class="step qlt-n">日本型検</div>
+        <div class="arr-v">↓</div>
+        <div class="step qlt-k">✔ 金型移管</div>
+        <div class="arr-v">↓</div>
+        <div class="step qlt-k">✔ 量産開始（MP）</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 下矢印 -->
+  <div class="down-section">
+    <svg width="24" height="22" viewBox="0 0 24 22">
+      <line x1="12" y1="0" x2="12" y2="14" stroke="#6a1b9a" stroke-width="2.5"/>
+      <polygon points="4,12 20,12 12,22" fill="#6a1b9a"/>
+    </svg>
+    <div class="down-label">両領域を横断して「今どこが詰まっているか」を可視化</div>
+    <svg width="24" height="22" viewBox="0 0 24 22">
+      <line x1="12" y1="0" x2="12" y2="14" stroke="#6a1b9a" stroke-width="2.5"/>
+      <polygon points="4,12 20,12 12,22" fill="#6a1b9a"/>
+    </svg>
+  </div>
+
+  <!-- BOTTOM: 横断ダッシュボード -->
+  <div class="zone-dash">
+    <div class="zone-header">
+      <div class="zone-name">■ 横断進捗モニター（新設）</div><br>
+      <span class="zone-page">die_issue_progress.html</span>
+    </div>
+
+    <div class="dash-grid">
+      <div class="dash-item">
+        <span class="di-title"><span class="di-icon">🔍</span>現在フェーズの一覧表示</span>
+        <span class="di-sub">Issue ごとに①〜⑨のどのフェーズにいるかを表示</span>
+      </div>
+      <div class="dash-item">
+        <span class="di-title"><span class="di-icon">⏱</span>停滞日数のハイライト</span>
+        <span class="di-sub">最終アクションからの経過日数を色で警告</span>
+      </div>
+      <div class="dash-item">
+        <span class="di-title"><span class="di-icon">📋</span>製造側の日程を一覧</span>
+        <span class="di-sub">診断承認日・修理計画日・次押出日を並べて確認</span>
+      </div>
+      <div class="dash-item">
+        <span class="di-title"><span class="di-icon">🔗</span>品質評価側と連携</span>
+        <span class="di-sub">金型番号クリック → 型検進捗をモーダルで確認</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

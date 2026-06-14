@@ -5035,19 +5035,22 @@ ORDER BY p.press_date_at DESC, p.press_start_at;
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
-# 2026/06/12
+# 2026/06/11
 
-金型到着日を入れるのは、ここでは出来ない様にすべき。
-ここは、`t_die_handover`しか更新されないため。
+金型修理のループは良いが、次のステップに進む方法が無い。どの様な時に、どんな次のステップに進むのか決めないから。
+
+```SQL
+INSERT INTO m_die_conditions (id, name) VALUES
+(1, 'Trial'),
+(2, 'Mass Production Trial'),
+(3, 'Mass Production');
+```
+
+# 2026/06/14
+
+赤色の枠を追加。診断で、問題なしと判断されたものは、確実に品質評価に回らないとならない。
 
 <figure style="text-align:center;">
-  <img src="./img/20260612-01.png" width="300">
-  <!-- <figcaption>測定進捗追加</figcaption> -->
-</figure>
-
-金型検索機能の追加
-
-<figure style="text-align:center;">
-  <img src="./img/20260612-02.png" width="300">
+  <img src="./img/20260614_Web全体.drawio.svg" width="400">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
