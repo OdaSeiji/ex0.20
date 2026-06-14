@@ -365,6 +365,11 @@
           <div class="menu-title" data-key="watch_title">重点管理金型リスト</div>
           <div class="menu-desc" data-key="watch_desc">押出前を含む、重点管理が必要な金型の登録・管理</div>
         </div>
+        <div class="menu-card" onclick="location.href = 'die_issue_progress.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="issue_progress_title">（暫定）金型進捗確認表</div>
+          <div class="menu-desc" data-key="issue_progress_desc">Issue別の現在フェーズと停滞状況の一覧</div>
+        </div>
       </div>
     </div>
 
@@ -490,6 +495,8 @@
           handover_progress_desc: "到着・型検・量産トライ・移管の進捗管理",
           watch_title: "重点管理金型リスト",
           watch_desc: "押出前を含む、重点管理が必要な金型の登録・管理",
+          issue_progress_title: "（暫定）金型進捗確認表",
+          issue_progress_desc: "Issue別の現在フェーズと停滞状況の一覧",
           staff_title: "スタッフ設定",
           staff_desc: "スタッフのロール・パスワードの管理",
           import_title: "新規金型登録",
@@ -552,10 +559,16 @@
           handover_progress_desc: "Quản lý tiến độ: đến nơi, kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
           watch_desc: "Đăng ký và quản lý khuôn cần theo dõi, kể cả trước khi ép",
+          issue_progress_title: "（暫定）Bảng xác nhận tiến độ khuôn",
+          issue_progress_desc: "Danh sách giai đoạn hiện tại và tình trạng trì hoãn theo Issue",
           staff_title: "Cài đặt nhân viên",
           staff_desc: "Quản lý vai trò và mật khẩu của nhân viên",
           import_title: "Nhập khuôn",
           import_desc: "Nhập hàng loạt khuôn từ file CSV",
+          order_title: "Nhập ngày đặt hàng & xuất hàng",
+          order_desc: "Đăng ký ngày đặt hàng và ngày xuất hàng của khuôn",
+          arrival_title: "Nhập ngày đến của khuôn",
+          arrival_desc: "Đăng ký ngày đến của khuôn tại hiện trường",
           pn_title: "Quản lý mã SP",
           pn_desc: "Đăng ký, chỉnh sửa mã sản phẩm và danh mục",
 
@@ -604,6 +617,7 @@
       window.onload = function () {
         const saved = localStorage.getItem("lang") || "ja";
         setLang(saved);
+        restoreAccordion();
 
         // ★ 言語切り替え時にダッシュボードを再描画
         if (window.dashboardData) {
@@ -693,7 +707,20 @@
         if (!isOpen) {
           el.classList.add("open");
           el.nextElementSibling.style.display = "block";
+          localStorage.setItem("accordion_open", el.querySelector("[data-key]").dataset.key);
+        } else {
+          localStorage.removeItem("accordion_open");
         }
+      }
+
+      function restoreAccordion() {
+        const key = localStorage.getItem("accordion_open");
+        if (!key) return;
+        const span = document.querySelector(`.accordion [data-key="${key}"]`);
+        if (!span) return;
+        const el = span.closest(".accordion");
+        el.classList.add("open");
+        el.nextElementSibling.style.display = "block";
       }
 
       // 上位10件の最新測定を取得してカード表示

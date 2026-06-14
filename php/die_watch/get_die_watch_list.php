@@ -23,11 +23,14 @@ $sql = "
         w.memo,
         w.created_at,
         w.closed_at,
-        s.staff_name AS registered_by_name
+        s.staff_name AS registered_by_name,
+        d.die_condition_id,
+        dc.name AS die_condition_name
     FROM t_die_watch w
     JOIN m_dies d ON w.die_id = d.id
     LEFT JOIN m_production_numbers p ON d.production_number_id = p.id
     LEFT JOIN m_staff s ON w.registered_by = s.id
+    LEFT JOIN m_die_conditions dc ON d.die_condition_id = dc.id
     {$where}
     ORDER BY
         FIELD(w.priority, 'high', 'middle', 'low'),

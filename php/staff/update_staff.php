@@ -13,7 +13,7 @@ if (!$id) {
 
 if ($action === "update_role") {
     $role    = $input["role"] ?? null;
-    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup"];
+    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer"];
 
     if ($role !== null && !in_array($role, $allowed)) {
         echo json_encode(["status" => "error", "message" => "invalid role"]);

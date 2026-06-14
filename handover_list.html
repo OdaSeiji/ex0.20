@@ -522,7 +522,7 @@
             is_accessory_item_flag:  tr.querySelector('[name="accessory"]').checked   ? 1 : null,
             note2:                   tr.querySelector('[name="note2"]').value         || null,
             invoice_number:          tr.querySelector('[name="invoice"]').value       || null,
-            die_arrived_at:          tr.querySelector('[name="arrived"]').value       || null,
+            die_arrived_at:          undefined,
             unusable_flag:           tr.querySelector('[name="unusable"]').checked    ? 1 : null,
           });
         });
@@ -587,7 +587,7 @@
               <td><input type="date" name="ordered"      value="${rawDate(row.ordered_at)}" /></td>
               <td><input type="date" name="shipped"      value="${rawDate(row.shipped_at)}" /></td>
               <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
-              <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
+              <td>${formatDate(row.die_arrived_at)}</td>
               <td><input type="date" name="ins_created"  value="${rawDate(row.instruction_created_at)}" /></td>
               <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
               <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>

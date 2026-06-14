@@ -667,6 +667,12 @@
               <span id="pv_diesmark"></span>
             </p>
 
+            <!-- フェーズ移行（診断専用） -->
+            <p id="pv_advance_row" style="display:none;">
+              <strong data-key="label_advance">フェーズ移行</strong>：
+              <span id="pv_advance"></span>
+            </p>
+
             <!-- 対策（診断・修理で使用） -->
             <p id="pv_action_row">
               <strong data-key="label_action">対策</strong>：
@@ -830,6 +836,7 @@
           label_ng: "対策内容",
           label_condition: "条件変更",
           label_memo: "メモ",
+          label_advance: "フェーズ移行",
           label_action: "対策内容",
 
           // ▼▼▼ 編集ボタン ▼▼▼
@@ -890,6 +897,7 @@
           label_ng: "Biện pháp",
           label_condition: "Thay đổi điều kiện",
           label_memo: "Ghi chú",
+          label_advance: "Chuyển giai đoạn",
           label_action: "Biện pháp",
 
           // ▼▼▼ 編集ボタン ▼▼▼
@@ -1599,7 +1607,17 @@
         document.getElementById("pv_overall").textContent =
           data.diagnosis.overall_judgement || "-";
 
-        // 6. 対策（ng_action）
+        // 6. フェーズ移行
+        const advRow = document.getElementById("pv_advance_row");
+        const advSpan = document.getElementById("pv_advance");
+        advRow.style.display = "block";
+        if (data.diagnosis.advance_condition == 1) {
+          advSpan.innerHTML = '<span style="background:#2e7d32;color:#fff;padding:2px 10px;border-radius:4px;font-size:12px;">あり</span>';
+        } else {
+          advSpan.innerHTML = '<span style="color:#9e9e9e;">なし</span>';
+        }
+
+        // 7. 対策（ng_action）
         document.getElementById("pv_action").textContent =
           actionMap[data.diagnosis.ng_action]?.[currentLang] ?? "—";
 
@@ -1795,6 +1813,7 @@
         document.getElementById("pv_surface_roughness_row").style.display = "block";
         document.getElementById("pv_diesmark_row").style.display          = "block";
         document.getElementById("pv_action_row").style.display            = "block";
+        document.getElementById("pv_advance_row").style.display           = "none";
         document.getElementById("pv_fp_die_row").style.display            = "none";
         document.getElementById("pv_fp_press_date_row").style.display     = "none";
 

@@ -129,6 +129,13 @@
         font-size: 14px;
         padding: 3px 5px;
       }
+      .pri-clickable { cursor: pointer; }
+      .pri-clickable:hover { opacity: 0.75; }
+      .pri-select {
+        font-size: 12px; padding: 2px 4px;
+        border: 1px solid #90c0f0; border-radius: 4px;
+      }
+
       .save-btn {
         margin-top: 5px;
         padding: 4px 10px;
@@ -138,6 +145,19 @@
         border-radius: 4px;
         cursor: pointer;
       }
+
+      .condition-badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .condition-1 { background: #f57c00; }
+      .condition-2 { background: #1565c0; }
+      .condition-3 { background: #2e7d32; }
     </style>
   </head>
 
@@ -162,7 +182,7 @@
       <table id="issueTable">
         <thead>
           <tr>
-            <th style="cursor:pointer; user-select:none;" onclick="sortByDieNo()">
+            <th style="cursor:pointer; user-select:none; width:200px;" onclick="sortByDieNo()">
               <span data-key="col_die">金型番号</span>
               <span id="sortIndicator"></span>
               <input id="searchDieNo" type="text" placeholder="検索..."
@@ -171,6 +191,7 @@
                 onclick="event.stopPropagation()" />
             </th>
             <th data-key="col_title">テーマ</th>
+            <th data-key="col_die_status">金型ステータス</th>
             <th data-key="col_priority">優先度</th>
             <th data-key="col_latest">最終押出日</th>
             <th data-key="col_status">完了状態</th>
@@ -188,6 +209,7 @@
           title: "🛠 テーマ一覧",
           col_die: "金型番号",
           col_title: "テーマ",
+          col_die_status: "金型ステータス",
           col_priority: "優先度",
           col_latest: "最終押出日",
           col_status: "完了状態",
@@ -197,6 +219,7 @@
           title: "🛠 Danh sách chủ đề",
           col_die: "Mã khuôn",
           col_title: "Chủ đề",
+          col_die_status: "Trạng thái khuôn",
           col_priority: "Ưu tiên",
           col_latest: "Ngày ép cuối",
           col_status: "Trạng thái",
@@ -293,7 +316,25 @@
               <input class="detail-edit-input" style="display:none;" type="text" value="${titleValue}" />
               <button class="save-btn" style="display:none;">${saveBtnLabel}</button>
             </td>
-            <td><span class="badge ${priorityClass}">${row.priority_label}</span></td>
+            <td>${row.die_condition_id
+              ? `<span class="condition-badge condition-${row.die_condition_id}">${row.die_status}</span>`
+              : "—"}</td>
+            <td>
+              <span class="badge ${priorityClass} pri-clickable"
+                    data-issue-id="${row.id}"
+                    data-priority="${row.priority}"
+                    onclick="startEditPriority(this)">
+                ${row.priority_label}
+              </span>
+              <select class="pri-select" style="display:none;"
+                      data-issue-id="${row.id}"
+                      onchange="savePriority(this)"
+                      onblur="cancelEditPriority(this)">
+                <option value="1" ${row.priority==1?'selected':''}>1 - ${lang==='vi'?'Cao':'高'}</option>
+                <option value="2" ${row.priority==2?'selected':''}>2 - ${lang==='vi'?'Trung bình':'中'}</option>
+                <option value="3" ${row.priority==3?'selected':''}>3 - ${lang==='vi'?'Thấp':'低'}</option>
+              </select>
+            </td>
             <td>${row.latest_press_date?.split(" ")[0] ?? "—"}</td>
             <td><span class="badge ${compClass}">${row.completion_status}</span></td>
             <td><button class="btn" onclick="location.href='die_timeline.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}'">タイムライン</button></td>
@@ -301,6 +342,49 @@
 
           tbody.appendChild(tr);
         });
+      }
+
+      /* 優先度インライン編集 */
+      const PRI_CLASS  = { 1: "high",   2: "medium", 3: "low" };
+      const PRI_LABELS_MAP = {
+        ja: { 1: "高", 2: "中", 3: "低" },
+        vi: { 1: "Cao", 2: "Trung bình", 3: "Thấp" },
+      };
+
+      function startEditPriority(badge) {
+        const sel = badge.nextElementSibling;
+        badge.style.display = "none";
+        sel.style.display   = "inline-block";
+        sel.focus();
+      }
+
+      function cancelEditPriority(sel) {
+        const badge = sel.previousElementSibling;
+        sel.style.display   = "none";
+        badge.style.display = "inline-block";
+      }
+
+      async function savePriority(sel) {
+        const id    = sel.dataset.issueId;
+        const value = sel.value;
+        const lang  = localStorage.getItem("lang") || "ja";
+
+        const form = new FormData();
+        form.append("id",    id);
+        form.append("field", "priority");
+        form.append("value", value);
+
+        const res    = await fetch("./php/die_progress_php/update_issue_detail.php",
+                                   { method: "POST", body: form });
+        const result = await res.json();
+
+        const badge = sel.previousElementSibling;
+        if (result.status === "success") {
+          badge.className   = `badge ${PRI_CLASS[value]} pri-clickable`;
+          badge.textContent = PRI_LABELS_MAP[lang][value];
+          badge.dataset.priority = value;
+        }
+        cancelEditPriority(sel);
       }
 
       /* クリックで編集モードへ */

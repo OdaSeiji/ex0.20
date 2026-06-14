@@ -184,6 +184,19 @@
 
       .overdue { color: #c62828; font-weight: bold; }
 
+      .condition-badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: bold;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .condition-1 { background: #f57c00; }
+      .condition-2 { background: #1565c0; }
+      .condition-3 { background: #2e7d32; }
+
       .edit-btn {
         padding: 4px 12px; background: #1565c0; color: #fff;
         border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
@@ -314,6 +327,7 @@
                 <th data-key="col_die">金型番号</th>
                 <th data-key="col_arrival">到着日</th>
                 <th data-key="col_reason">理由</th>
+                <th data-key="col_condition">コンディション</th>
                 <th data-key="col_priority">優先度</th>
                 <th data-key="col_target">目標納期</th>
                 <th data-key="col_status">状態</th>
@@ -340,6 +354,7 @@
           col_pn:        "品番",
           col_arrival:   "到着日",
           col_reason:    "理由",
+          col_condition: "コンディション",
           col_priority:  "優先度",
           col_target:    "目標納期",
           col_status:    "状態",
@@ -373,6 +388,7 @@
           col_pn:        "Mã SP",
           col_arrival:   "Ngày đến",
           col_reason:    "Lý do",
+          col_condition: "Điều kiện khuôn",
           col_priority:  "Ưu tiên",
           col_target:    "Ngày mục tiêu",
           col_status:    "Trạng thái",
@@ -617,7 +633,7 @@
         tbody.innerHTML = "";
 
         if (data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#aaa;padding:30px">${dict[currentLang].empty}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#aaa;padding:30px">${dict[currentLang].empty}</td></tr>`;
           return;
         }
 
@@ -643,6 +659,9 @@
             <td class="die-num">${row.die_number}</td>
             <td>${fmtDate(row.arrival_at)}</td>
             <td>${reasonHtml}</td>
+            <td>${row.die_condition_id
+              ? `<span class="condition-badge condition-${row.die_condition_id}">${row.die_condition_name}</span>`
+              : "—"}</td>
             <td><span class="badge ${pClass}">${row.priority}</span></td>
             <td class="${od ? "overdue" : ""}">${fmtDate(row.target_date)}</td>
             <td><span class="badge ${sClass}">${row.status}</span></td>

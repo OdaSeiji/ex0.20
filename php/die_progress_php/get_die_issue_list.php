@@ -10,6 +10,8 @@ $sql = "
         i.id,
         i.die_id,
         d.die_number,
+        d.die_condition_id,
+        dc.name AS die_status,
         i.issue_title,
         i.issue_title_jp,
         i.issue_title_vn,
@@ -34,6 +36,7 @@ $sql = "
         END AS priority_label
     FROM t_die_issue i
     JOIN m_dies d ON i.die_id = d.id
+    LEFT JOIN m_die_conditions dc ON d.die_condition_id = dc.id
     {$where}
     ORDER BY i.created_at DESC
 ";

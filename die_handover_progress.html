@@ -56,6 +56,20 @@
     .badge-registered   { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
     .flag-on { color: #1565c0; font-weight: bold; }
 
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
+    .filter-btn {
+      padding: 5px 12px; border-radius: 20px; border: 1.5px solid #90a4ae;
+      background: #fff; color: #546e7a; cursor: pointer; font-size: 12px; font-weight: bold;
+      transition: all 0.15s; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .filter-btn:hover { border-color: #0078d4; color: #0078d4; background: #e8f4ff; }
+    .filter-btn.active { background: #0078d4; color: #fff; border-color: #0078d4; }
+    .filter-btn .cnt {
+      font-size: 11px; font-weight: normal; background: rgba(0,0,0,0.15);
+      border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center;
+    }
+    .filter-btn.active .cnt { background: rgba(255,255,255,0.3); }
+
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(0,0,0,0.55);
       z-index: 200; display: flex; justify-content: center; align-items: flex-start;
@@ -124,6 +138,27 @@
     <button class="btn btn-edit" id="editBtn" onclick="openEditModal()" disabled data-key="btn_edit">✏️ 選択を編集</button>
     <button class="btn" style="background:#217346;color:#fff;" onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
     <span class="checked-count" id="checkedCount"></span>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-filter="" onclick="setStatusFilter('')">
+      <span data-key="filter_all">すべて表示</span><span class="cnt" id="cnt_all"></span>
+    </button>
+    <button class="filter-btn" data-filter="vn_prod_wait" onclick="setStatusFilter('vn_prod_wait')">
+      <span data-key="filter_vn_prod_wait">VN製造型検待ち</span><span class="cnt" id="cnt_vn_prod_wait"></span>
+    </button>
+    <button class="filter-btn" data-filter="vn_qa_wait" onclick="setStatusFilter('vn_qa_wait')">
+      <span data-key="filter_vn_qa_wait">VNQA型検待ち</span><span class="cnt" id="cnt_vn_qa_wait"></span>
+    </button>
+    <button class="filter-btn" data-filter="submit_jp_wait" onclick="setStatusFilter('submit_jp_wait')">
+      <span data-key="filter_submit_jp_wait">型検日本提出待ち</span><span class="cnt" id="cnt_submit_jp_wait"></span>
+    </button>
+    <button class="filter-btn" data-filter="jp_wait" onclick="setStatusFilter('jp_wait')">
+      <span data-key="filter_jp_wait">日本型検待ち</span><span class="cnt" id="cnt_jp_wait"></span>
+    </button>
+    <button class="filter-btn" data-filter="handover_wait" onclick="setStatusFilter('handover_wait')">
+      <span data-key="filter_handover_wait">金型移管待ち</span><span class="cnt" id="cnt_handover_wait"></span>
+    </button>
   </div>
 
   <div class="table-wrap">
@@ -245,6 +280,12 @@
         f_ready:       "移管準備完了",
         f_memo:        "メモ",
         tip_wildcard:  "ワイルドカード使用可\n* ：任意の文字列\n? ：任意の1文字\n例）A12*　*123　A??B",
+        filter_all:           "すべて表示",
+        filter_vn_prod_wait:  "VN製造型検待ち",
+        filter_vn_qa_wait:    "VNQA型検待ち",
+        filter_submit_jp_wait:"型検日本提出待ち",
+        filter_jp_wait:       "日本型検待ち",
+        filter_handover_wait: "金型移管待ち",
       },
       vi: {
         title:        "🔄 Quản lý tiến độ kiểm tra khuôn",
@@ -303,6 +344,12 @@
         f_ready:       "Hoàn tất CB BG",
         f_memo:        "Ghi chú",
         tip_wildcard:  "Hỗ trợ ký tự đại diện\n* ：chuỗi ký tự bất kỳ\n? ：1 ký tự bất kỳ\nVD）A12*　*123　A??B",
+        filter_all:           "Tất cả",
+        filter_vn_prod_wait:  "Chờ KT khuôn SX VN",
+        filter_vn_qa_wait:    "Chờ KT khuôn QA VN",
+        filter_submit_jp_wait:"Chờ gửi KT JP",
+        filter_jp_wait:       "Chờ KT JP",
+        filter_handover_wait: "Chờ bàn giao khuôn",
       },
     };
 
@@ -348,7 +395,16 @@
     let sortCol      = "";
     let sortDir      = "asc";
     let showZZZ      = false;
+    let activeFilter = "";
     const checkedIds = new Set();
+
+    const FILTER_FUNS = {
+      vn_prod_wait:   r => !!r.arrival_at && !r.vn_production_dimensional_inspection_at,
+      vn_qa_wait:     r => !!r.vn_production_dimensional_inspection_at && !r.vn_qa_dimensional_inspection_at,
+      submit_jp_wait: r => !!r.vn_qa_dimensional_inspection_at && !r.submit_dimensional_inspection_to_japan_at,
+      jp_wait:        r => !!r.submit_dimensional_inspection_to_japan_at && !r.jp_dimensional_inspection_at,
+      handover_wait:  r => !!r.jp_dimensional_inspection_at && !r.die_handover_at,
+    };
 
     const FIELDS = [
       { key: "original_table_no",                         labelKey: "f_original",    type: "number"   },
@@ -389,6 +445,7 @@
     async function loadData() {
       const res = await fetch("./php/die_handover_progress_php/get_list.php");
       allData = await res.json();
+      updateFilterCounts();
       applyFilters();
     }
 
@@ -484,6 +541,23 @@
     /* =====================================================
        フィルタ
     ===================================================== */
+    function setStatusFilter(type) {
+      activeFilter = type;
+      document.querySelectorAll(".filter-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.filter === type);
+      });
+      applyFilters();
+    }
+
+    function updateFilterCounts() {
+      const base = allData.filter(r => showZZZ || !(r.die_number ?? "").toUpperCase().endsWith("-ZZZ"));
+      document.getElementById("cnt_all").textContent = base.length;
+      Object.keys(FILTER_FUNS).forEach(key => {
+        const el = document.getElementById("cnt_" + key);
+        if (el) el.textContent = base.filter(FILTER_FUNS[key]).length;
+      });
+    }
+
     function applyFilters() {
       const q = document.getElementById("searchDie").value.trim().toUpperCase();
       let matchDie;
@@ -499,10 +573,12 @@
       } else {
         matchDie = dn => dn.includes(q);
       }
+      const statusFn = activeFilter ? FILTER_FUNS[activeFilter] : null;
       filteredData = allData.filter(r => {
         const dn = (r.die_number ?? "").toUpperCase();
         if (!showZZZ && dn.endsWith("-ZZZ")) return false;
         if (!matchDie(dn)) return false;
+        if (statusFn && !statusFn(r)) return false;
         return true;
       });
       renderTable(filteredData);
@@ -517,6 +593,7 @@
       btn.textContent      = showZZZ ? t.zzz_show : t.zzz_hide;
       btn.style.background = showZZZ ? "#fff3e0" : "#eceff1";
       btn.style.color      = showZZZ ? "#e65100" : "#555";
+      updateFilterCounts();
       applyFilters();
     }
 

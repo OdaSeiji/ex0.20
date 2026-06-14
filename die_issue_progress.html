@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Issue 進捗管理</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .lang-buttons {
+        position: fixed; top: 10px; right: 10px; z-index: 100;
+        display: flex; gap: 6px;
+      }
+      .lang-buttons button {
+        min-width: 88px; height: 32px; padding: 0 16px;
+        border: 2px solid #2b6ca3; border-radius: 16px;
+        background: transparent; color: #2b6ca3;
+        font-size: 13px; font-weight: bold; cursor: pointer;
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        letter-spacing: 0.3px;
+      }
+      .lang-buttons button:hover {
+        background: #e8f1ff;
+        box-shadow: 0 2px 6px rgba(43,108,163,0.15);
+      }
+      .lang-buttons button.active {
+        background: #2b6ca3; color: #fff;
+        box-shadow: 0 2px 8px rgba(43,108,163,0.3);
+      }
+
+      h1 {
+        font-size: 22px; margin-bottom: 12px;
+        border-left: 6px solid #0078d4; padding-left: 10px;
+      }
+
+      .toolbar {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 14px; flex-wrap: wrap;
+      }
+
+      .btn-back {
+        padding: 7px 16px; background: #2b6ca3; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
+      }
+
+      .filter-label { font-size: 13px; color: #555; }
+      select.phase-filter {
+        padding: 6px 10px; border: 1px solid #ccc;
+        border-radius: 5px; font-size: 13px;
+      }
+
+      .summary-bar {
+        display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px;
+      }
+      .summary-chip {
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: bold; cursor: pointer;
+        border: 2px solid transparent; transition: 0.15s;
+      }
+      .summary-chip:hover { opacity: 0.8; }
+      .summary-chip.active { border-color: #333; }
+
+      .table-wrap {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        overflow-x: auto;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+      }
+
+      table {
+        width: 100%; border-collapse: collapse;
+        min-width: 1100px;
+      }
+
+      th, td {
+        padding: 8px 10px; border-bottom: 1px solid #eee;
+        text-align: center; white-space: nowrap;
+        font-size: 13px;
+      }
+
+      th {
+        background: #e8f1ff; position: sticky; top: 0; z-index: 10;
+        font-size: 12px;
+      }
+
+      tr:hover { background: #f0f8ff; }
+
+      .die-number {
+        font-family: "Roboto Mono", monospace;
+        text-align: left; font-size: 13px;
+      }
+
+      .theme-cell { text-align: left; max-width: 220px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+      /* コンディションバッジ */
+      .condition-badge {
+        display: inline-block; padding: 2px 7px; border-radius: 4px;
+        font-size: 10px; font-weight: bold; color: #fff; white-space: nowrap;
+      }
+      .condition-1 { background: #f57c00; }
+      .condition-2 { background: #1565c0; }
+      .condition-3 { background: #2e7d32; }
+
+      /* フェーズバッジ */
+      .phase-badge {
+        display: inline-block; padding: 3px 8px; border-radius: 4px;
+        font-size: 11px; font-weight: bold; color: #fff; white-space: nowrap;
+      }
+      .phase-1 { background: #9e9e9e; }
+      .phase-2 { background: #f57c00; }
+      .phase-3 { background: #c62828; }
+      .phase-4 { background: #1565c0; }
+      .phase-5 { background: #c62828; }
+      .phase-6 { background: #e65100; }
+      .phase-7 { background: #e65100; }
+      .phase-8 { background: #f57c00; }
+      .phase-9 { background: #2e7d32; }
+
+      /* 優先度バッジ */
+      .pri-badge {
+        display: inline-block; padding: 2px 8px; border-radius: 4px;
+        font-size: 11px; font-weight: bold; color: #fff;
+      }
+      .pri-1 { background: #c62828; }
+      .pri-2 { background: #f57c00; }
+      .pri-3 { background: #1565c0; }
+
+      /* 停滞日数の色分け */
+      .stale-low    { color: #333; }
+      .stale-mid    { color: #e65100; font-weight: bold; }
+      .stale-high   { color: #c62828; font-weight: bold; font-size: 14px; }
+
+      .count-label { font-size: 13px; color: #666; margin-left: auto; }
+
+      /* 型番クリック */
+      .die-link {
+        color: #1565c0; text-decoration: none; cursor: pointer;
+        font-family: "Roboto Mono", monospace;
+      }
+      .die-link:hover { text-decoration: underline; }
+      .timeline-btn {
+        margin-left: 6px; padding: 1px 6px;
+        font-size: 10px; background: #e8f1ff; color: #1565c0;
+        border: 1px solid #90c0f0; border-radius: 3px;
+        cursor: pointer; text-decoration: none;
+      }
+
+      /* モーダル */
+      .modal-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,0.45); z-index: 500;
+        justify-content: center; align-items: flex-start;
+        padding-top: 60px;
+      }
+      .modal-overlay.open { display: flex; }
+      .modal-box {
+        background: #fff; border-radius: 10px;
+        width: 680px; max-width: 95vw;
+        max-height: 80vh; overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        padding: 24px 28px;
+      }
+      .modal-header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 18px;
+        border-bottom: 2px solid #e8f1ff; padding-bottom: 12px;
+      }
+      .modal-die-num {
+        font-family: "Roboto Mono", monospace;
+        font-size: 18px; font-weight: bold; color: #1565c0;
+      }
+      .modal-badge-unreg {
+        padding: 3px 10px; border-radius: 4px;
+        background: #e0e0e0; color: #666;
+        font-size: 11px; font-weight: bold;
+      }
+      .modal-grid {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 10px 24px; margin-bottom: 20px;
+      }
+      .modal-field { display: flex; flex-direction: column; gap: 3px; }
+      .modal-field label {
+        font-size: 11px; font-weight: bold; color: #888;
+      }
+      .modal-field span {
+        font-size: 13px; color: #222;
+        font-family: "Roboto Mono", monospace;
+      }
+      .modal-field span.empty { color: #bbb; }
+      .modal-memo {
+        background: #f9f9f9; border-radius: 6px;
+        padding: 10px 12px; font-size: 13px; color: #444;
+        margin-bottom: 20px; min-height: 36px;
+        white-space: pre-wrap;
+      }
+      .modal-footer {
+        display: flex; gap: 10px; justify-content: flex-end;
+        border-top: 1px solid #eee; padding-top: 14px;
+      }
+      .btn-handover {
+        padding: 8px 16px; background: #1565c0; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer; font-size: 13px;
+      }
+      .btn-timeline {
+        padding: 8px 16px; background: #2e7d32; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer; font-size: 13px;
+      }
+      .btn-close {
+        padding: 8px 16px; background: #9e9e9e; color: #fff;
+        border: none; border-radius: 5px; cursor: pointer; font-size: 13px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="lang-buttons">
+      <button data-lang="ja" onclick="setLang('ja')">日本語</button>
+      <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <h1 data-key="title">🔍 Issue 進捗管理</h1>
+
+    <div class="toolbar">
+      <button class="btn-back" onclick="location.href='index.html'">← メニューへ戻る</button>
+      <span class="filter-label" data-key="filter_label">フェーズ絞り込み：</span>
+      <select class="phase-filter" onchange="applyFilter()">
+        <option value="">すべて</option>
+        <option value="①">① 診断未完了</option>
+        <option value="②">② 診断承認待ち</option>
+        <option value="③">③ 診断却下</option>
+        <option value="④">④ ステージUP承認済・次押出待ち</option>
+        <option value="⑤">⑤ 修理計画未作成</option>
+        <option value="⑥">⑥ 修理計画承認待ち</option>
+        <option value="⑦">⑦ 修理実施待ち</option>
+        <option value="⑧">⑧ 修理報告承認待ち</option>
+        <option value="⑨">⑨ 完了待ち</option>
+      </select>
+      <span class="count-label" id="countLabel"></span>
+    </div>
+
+    <!-- フェーズ別サマリーチップ -->
+    <div class="summary-bar" id="summaryBar"></div>
+
+    <div class="table-wrap">
+      <table id="progressTable">
+        <thead>
+          <tr>
+            <th data-key="col_die" style="width:200px">金型番号</th>
+            <th data-key="col_pn" style="width:200px">品番</th>
+            <th data-key="col_condition">コンディション</th>
+            <th data-key="col_priority">優先度</th>
+            <th data-key="col_phase">現在のフェーズ</th>
+            <th data-key="col_stale">停滞日数</th>
+            <th data-key="col_last_action">最終アクション日</th>
+            <th data-key="col_diag_approved">診断承認日</th>
+            <th data-key="col_ng_action">NG対応</th>
+            <th data-key="col_next_press">次押出日</th>
+            <th data-key="col_plan">修理計画日</th>
+            <th data-key="col_fix">修理完了日</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- 型検進捗モーダル -->
+    <div class="modal-overlay" id="handoverModal" onclick="closeModal(event)">
+      <div class="modal-box">
+        <div class="modal-header">
+          <span class="modal-die-num" id="modalDieNum"></span>
+          <span id="modalUnregBadge" class="modal-badge-unreg" style="display:none">未登録</span>
+        </div>
+        <div class="modal-grid" id="modalGrid"></div>
+        <div style="font-size:11px;font-weight:bold;color:#888;margin-bottom:4px;">メモ</div>
+        <div class="modal-memo" id="modalMemo"></div>
+        <div class="modal-footer">
+          <button class="btn-handover" id="modalHandoverBtn">🔄 型検進捗ページへ</button>
+          <button class="btn-timeline"  id="modalTimelineBtn">📋 タイムライン</button>
+          <button class="btn-close" onclick="closeModal()">✕ 閉じる</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const dict = {
+        ja: {
+          title:           "🔍 Issue 進捗管理",
+          filter_label:    "フェーズ絞り込み：",
+          col_die:         "金型番号",
+          col_pn:          "品番",
+          col_condition:   "コンディション",
+          col_theme:       "テーマ",
+          col_priority:    "優先度",
+          col_phase:       "現在のフェーズ",
+          col_stale:       "停滞日数",
+          col_last_action: "最終アクション日",
+          col_diag_approved: "診断承認日",
+          col_ng_action:   "NG対応",
+          col_next_press:  "次押出日",
+          col_plan:        "修理計画日",
+          col_fix:         "修理完了日",
+          days:            "日",
+          no_data:         "該当データなし",
+        },
+        vi: {
+          title:           "🔍 Quản lý tiến độ Issue",
+          filter_label:    "Lọc theo giai đoạn：",
+          col_die:         "Mã khuôn",
+          col_pn:          "Mã SP",
+          col_condition:   "Điều kiện",
+          col_theme:       "Chủ đề",
+          col_priority:    "Ưu tiên",
+          col_phase:       "Giai đoạn hiện tại",
+          col_stale:       "Số ngày trì hoãn",
+          col_last_action: "Ngày hành động cuối",
+          col_diag_approved: "Ngày duyệt CĐ",
+          col_ng_action:   "Xử lý NG",
+          col_next_press:  "Ngày ép tiếp theo",
+          col_plan:        "Ngày lên KHSC",
+          col_fix:         "Ngày SC xong",
+          days:            " ngày",
+          no_data:         "Không có dữ liệu",
+        },
+      };
+
+      const PHASE_COLORS = {
+        "①": { bg: "#9e9e9e", cls: "phase-1" },
+        "②": { bg: "#f57c00", cls: "phase-2" },
+        "③": { bg: "#c62828", cls: "phase-3" },
+        "④": { bg: "#1565c0", cls: "phase-4" },
+        "⑤": { bg: "#c62828", cls: "phase-5" },
+        "⑥": { bg: "#e65100", cls: "phase-6" },
+        "⑦": { bg: "#e65100", cls: "phase-7" },
+        "⑧": { bg: "#f57c00", cls: "phase-8" },
+        "⑨": { bg: "#2e7d32", cls: "phase-9" },
+      };
+
+      const PRI_LABELS = { 1: "高", 2: "中", 3: "低" };
+      const NG_LABELS = {
+        ja: { 1: "様子を見る", 2: "修理", 3: "修理+条件変更", 4: "条件変更のみ" },
+        vi: { 1: "Theo dõi",   2: "SC",   3: "SC+Đổi ĐK",     4: "Chỉ đổi ĐK" },
+      };
+
+      let currentLang = localStorage.getItem("lang") || "ja";
+      let allData = [];
+
+      function setLang(lang) {
+        currentLang = lang;
+        localStorage.setItem("lang", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        document.querySelectorAll(".lang-buttons button").forEach((btn) => {
+          btn.classList.toggle("active", btn.dataset.lang === lang);
+        });
+        applyFilter();
+      }
+
+      function phaseKey(phase) {
+        return phase ? phase.slice(0, 1) : "";
+      }
+
+      function staleClass(days) {
+        if (days >= 30) return "stale-high";
+        if (days >= 7)  return "stale-mid";
+        return "stale-low";
+      }
+
+      function fmt(dateStr) {
+        if (!dateStr) return "—";
+        return String(dateStr).slice(2, 10); // yy-mm-dd
+      }
+
+      function renderSummary(data) {
+        const counts = {};
+        data.forEach((r) => {
+          const k = phaseKey(r.current_phase);
+          counts[k] = (counts[k] || 0) + 1;
+        });
+
+        const bar = document.getElementById("summaryBar");
+        bar.innerHTML = "";
+        Object.entries(counts).sort().forEach(([k, n]) => {
+          const color = PHASE_COLORS[k]?.bg ?? "#999";
+          const chip = document.createElement("span");
+          chip.className = "summary-chip";
+          chip.style.background = color;
+          chip.style.color = "#fff";
+          chip.textContent = `${k} ${n}件`;
+          chip.onclick = () => {
+            document.querySelector(".phase-filter").value = k;
+            applyFilter();
+          };
+          bar.appendChild(chip);
+        });
+      }
+
+      function applyFilter() {
+        const sel = document.querySelector(".phase-filter").value;
+        const filtered = sel
+          ? allData.filter((r) => r.current_phase.startsWith(sel))
+          : allData;
+        renderTable(filtered);
+      }
+
+      function renderTable(data) {
+        document.getElementById("countLabel").textContent = `${data.length} 件`;
+        const tbody = document.querySelector("#progressTable tbody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:#aaa;padding:30px">${dict[currentLang].no_data}</td></tr>`;
+          return;
+        }
+
+        data.forEach((row) => {
+          const pk    = phaseKey(row.current_phase);
+          const pcls  = PHASE_COLORS[pk]?.cls ?? "";
+          const days  = Number(row.days_since_last_action ?? 0);
+          const priLbl = PRI_LABELS[row.priority] ?? row.priority;
+
+          const condBadge = row.die_condition_id
+            ? `<span class="condition-badge condition-${row.die_condition_id}">${row.die_condition_name}</span>`
+            : "—";
+
+          const phaseBadge = `<span class="phase-badge ${pcls}">${row.current_phase}</span>`;
+
+          const priCls = row.priority == 1 ? "pri-1" : row.priority == 2 ? "pri-2" : "pri-3";
+
+          const tr = document.createElement("tr");
+          const ngLabel = NG_LABELS[currentLang][row.ng_action] ?? "—";
+
+          tr.innerHTML = `
+            <td class="die-number">
+              <span class="die-link" onclick="openHandoverModal(${row.die_id}, '${row.die_number}')">${row.die_number}</span>
+              <a class="timeline-btn" href="die_timeline.html?die_id=${row.die_id}&die_number=${encodeURIComponent(row.die_number)}">TL</a>
+            </td>
+            <td style="text-align:left; font-family:'Roboto Mono',monospace;">${row.production_number}</td>
+            <td>${condBadge}</td>
+            <td><span class="pri-badge ${priCls}">${priLbl}</span></td>
+            <td>${phaseBadge}</td>
+            <td class="${staleClass(days)}">${days}${dict[currentLang].days}</td>
+            <td>${fmt(row.last_action_date)}</td>
+            <td>${fmt(row.diag_approved_at)}</td>
+            <td style="font-size:11px;">${ngLabel}</td>
+            <td>${fmt(row.first_press_after_approval)}</td>
+            <td>${fmt(row.plan_fix_date)}</td>
+            <td>${fmt(row.actual_fix_date)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* ── 型検進捗モーダル ── */
+      let _modalDieId = null;
+      let _modalDieNumber = null;
+
+      const HANDOVER_FIELDS = [
+        { key: "die_planning_phase_steps",                  label: "Step" },
+        { key: "arrival_at",                                label: "到着日" },
+        { key: "vn_production_dimensional_inspection_at",   label: "VN製造型検日" },
+        { key: "vn_qa_dimensional_inspection_at",           label: "VN QA型検日" },
+        { key: "submit_dimensional_inspection_to_japan_at", label: "型検日本提出日" },
+        { key: "jp_dimensional_inspection_at",              label: "日本型検日" },
+        { key: "jp_dimensional_inspection_document_number", label: "日本型検文書番号" },
+        { key: "mass_production_trial_at",                  label: "量産トライ日" },
+        { key: "die_handover_at",                           label: "金型移管日" },
+        { key: "mass_production_start_at",                  label: "量産開始日" },
+      ];
+
+      async function openHandoverModal(die_id, die_number) {
+        _modalDieId     = die_id;
+        _modalDieNumber = die_number;
+
+        document.getElementById("modalDieNum").textContent = die_number;
+        document.getElementById("modalGrid").innerHTML     = "<span style='color:#aaa;font-size:13px'>読み込み中…</span>";
+        document.getElementById("modalMemo").textContent   = "";
+        document.getElementById("modalUnregBadge").style.display = "none";
+        document.getElementById("handoverModal").classList.add("open");
+
+        const res  = await fetch(`./php/die_handover_progress_php/get_by_die.php?die_id=${die_id}`);
+        const data = await res.json();
+
+        const grid = document.getElementById("modalGrid");
+        grid.innerHTML = "";
+
+        if (!data.handover_id) {
+          document.getElementById("modalUnregBadge").style.display = "inline";
+          grid.innerHTML = "<span style='color:#aaa;font-size:13px;grid-column:1/-1'>型検進捗データ未登録</span>";
+        } else {
+          HANDOVER_FIELDS.forEach(({ key, label }) => {
+            const val = data[key];
+            const disp = val ? fmt(val) : null;
+            grid.innerHTML += `
+              <div class="modal-field">
+                <label>${label}</label>
+                <span class="${disp ? '' : 'empty'}">${disp ?? "—"}</span>
+              </div>`;
+          });
+        }
+
+        document.getElementById("modalMemo").textContent = data.memo ?? "";
+        document.getElementById("modalHandoverBtn").onclick =
+          () => location.href = "die_handover_progress.html";
+        document.getElementById("modalTimelineBtn").onclick =
+          () => location.href = `die_timeline.html?die_id=${die_id}&die_number=${encodeURIComponent(die_number)}`;
+      }
+
+      function closeModal(e) {
+        if (e && e.target !== document.getElementById("handoverModal")) return;
+        document.getElementById("handoverModal").classList.remove("open");
+      }
+
+      async function loadData() {
+        const res = await fetch("./php/die_progress_php/get_die_issue_progress.php");
+        allData = await res.json();
+        renderSummary(allData);
+        applyFilter();
+      }
+
+      window.onload = () => {
+        setLang(currentLang);
+        loadData();
+      };
+    </script>
+  </body>
+</html>
