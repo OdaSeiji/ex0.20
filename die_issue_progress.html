@@ -242,6 +242,11 @@
         <option value="⑧">⑧ 修理報告承認待ち</option>
         <option value="⑨">⑨ 完了待ち</option>
       </select>
+      <button id="ngWatchBtn" onclick="toggleNgWatch()"
+        style="padding:5px 12px; border-radius:20px; border:1.5px solid #90a4ae;
+               background:#fff; color:#546e7a; cursor:pointer; font-size:12px; font-weight:bold;">
+        <span data-key="filter_ng_watch">様子を見る</span>
+      </button>
       <span class="count-label" id="countLabel"></span>
     </div>
 
@@ -293,6 +298,7 @@
         ja: {
           title:           "🔍 Issue 進捗管理",
           filter_label:    "フェーズ絞り込み：",
+          filter_ng_watch: "様子を見る",
           col_die:         "金型番号",
           col_pn:          "品番",
           col_condition:   "コンディション",
@@ -312,6 +318,7 @@
         vi: {
           title:           "🔍 Quản lý tiến độ Issue",
           filter_label:    "Lọc theo giai đoạn：",
+          filter_ng_watch: "Theo dõi",
           col_die:         "Mã khuôn",
           col_pn:          "Mã SP",
           col_condition:   "Điều kiện",
@@ -403,11 +410,25 @@
         });
       }
 
+      let ngWatchActive = false;
+
+      function toggleNgWatch() {
+        ngWatchActive = !ngWatchActive;
+        const btn = document.getElementById("ngWatchBtn");
+        btn.style.background     = ngWatchActive ? "#0078d4" : "#fff";
+        btn.style.color          = ngWatchActive ? "#fff"    : "#546e7a";
+        btn.style.borderColor    = ngWatchActive ? "#0078d4" : "#90a4ae";
+        applyFilter();
+      }
+
       function applyFilter() {
         const sel = document.querySelector(".phase-filter").value;
-        const filtered = sel
+        let filtered = sel
           ? allData.filter((r) => r.current_phase.startsWith(sel))
           : allData;
+        if (ngWatchActive) {
+          filtered = filtered.filter((r) => String(r.ng_action) === "1");
+        }
         renderTable(filtered);
       }
 

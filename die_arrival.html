@@ -95,6 +95,14 @@
         font-size: 14px;
       }
 
+      th input[type="text"] {
+        margin-left: 6px; padding: 3px 7px;
+        font-size: 12px; font-weight: normal;
+        border: 1px solid #aac4e8; border-radius: 4px;
+        font-family: "Roboto Mono", monospace;
+        width: 110px; vertical-align: middle;
+      }
+
       /* ── 保存バー ── */
       .save-bar {
         background: #fff; border-radius: 10px;
@@ -152,7 +160,10 @@
             <thead>
               <tr>
                 <th style="width:36px;"><input type="checkbox" id="checkAll" onchange="toggleAll(this.checked)" /></th>
-                <th>型番</th>
+                <th>型番
+                  <input type="text" id="searchDieNo" placeholder="検索…"
+                    oninput="filterAndRender()" onclick="event.stopPropagation()" />
+                </th>
                 <th>品番</th>
                 <th>登録日</th>
                 <th>出荷日</th>
@@ -193,21 +204,28 @@
 
         document.getElementById("countLabel").textContent = `${tableData.length} 件`;
         document.getElementById("checkAll").checked = false;
-        renderTable();
+        filterAndRender();
         updateStatus();
       }
 
+      /* ── フィルター → 描画 ── */
+      function filterAndRender() {
+        const q = document.getElementById("searchDieNo").value.trim().toLowerCase();
+        const data = q ? tableData.filter(r => (r.die_number ?? "").toLowerCase().includes(q)) : tableData;
+        renderTable(data);
+      }
+
       /* ── テーブル描画 ── */
-      function renderTable() {
+      function renderTable(data = tableData) {
         const tbody = document.querySelector("#dieTable tbody");
         tbody.innerHTML = "";
 
-        if (!tableData.length) {
+        if (!data.length) {
           tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">未到着の金型はありません</td></tr>`;
           return;
         }
 
-        tableData.forEach((row) => {
+        data.forEach((row) => {
           const tr = document.createElement("tr");
           tr.dataset.id = row.id;
           tr.innerHTML = `
