@@ -13,7 +13,7 @@ $sql = "
     FROM m_dies d
     LEFT JOIN m_production_numbers p ON d.production_number_id = p.id
     LEFT JOIN t_die_handover h ON h.die_id = d.id
-    WHERE d.arrival_at IS NULL
+    WHERE (d.arrival_at IS NULL OR h.is_accessory_item_flag = 1)
       AND d.is_disable IS NULL
     ORDER BY d.id DESC
 ";

@@ -212,6 +212,7 @@
       .import-footer { margin-top: 16px; display: flex; gap: 10px; justify-content: flex-end; }
       .btn-import { background: #0078d4; color: white; }
       .btn-import:hover { background: #005fa3; }
+      .btn-import:disabled { background: #ccc; color: #888; cursor: not-allowed; }
       .btn-back { background: #546e7a; color: white; }
       .btn-back:hover { background: #37474f; }
 
@@ -258,7 +259,7 @@
 
     <div class="toolbar">
       <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
-      <button class="btn btn-import" onclick="openImportModal()" data-key="btn_import">📂 CSV インポート</button>
+      <button class="btn btn-import" onclick="openImportModal()" data-key="btn_import" disabled>📂 CSV インポート</button>
       <button class="btn btn-edit" id="editBtn" onclick="enterEditMode()" disabled
         data-key="btn_edit">✏️ チェックのみ編集</button>
       <button class="btn btn-save" id="saveBtn" onclick="saveAll()"
@@ -326,7 +327,7 @@
         <div id="dropZone" class="drop-zone">
           <div>ここに CSV をドロップ</div>
           <div style="margin-top:6px;font-size:13px">またはクリックしてファイルを選択</div>
-          <small>形式: UTF-8 CSV &nbsp;|&nbsp; ヘッダー: die_name</small>
+          <small>形式: UTF-8 CSV &nbsp;|&nbsp; ヘッダー: die_name, is_accessory_item &nbsp;|&nbsp; <span style="color:#c62828;">is_accessory_item = 1 の行のみ登録対象</span></small>
         </div>
 
         <div id="importPreview" style="display:none">
@@ -334,6 +335,7 @@
             <thead>
               <tr>
                 <th>型番 (CSV)</th>
+                <th>is_accessory_item</th>
                 <th>型番の候補</th>
                 <th>状態</th>
               </tr>
@@ -522,7 +524,7 @@
             is_accessory_item_flag:  tr.querySelector('[name="accessory"]').checked   ? 1 : null,
             note2:                   tr.querySelector('[name="note2"]').value         || null,
             invoice_number:          tr.querySelector('[name="invoice"]').value       || null,
-            die_arrived_at:          undefined,
+            die_arrived_at:          tr.querySelector('[name="arrived"]').value       || null,
             unusable_flag:           tr.querySelector('[name="unusable"]').checked    ? 1 : null,
           });
         });
@@ -587,7 +589,7 @@
               <td><input type="date" name="ordered"      value="${rawDate(row.ordered_at)}" /></td>
               <td><input type="date" name="shipped"      value="${rawDate(row.shipped_at)}" /></td>
               <td><input type="text" name="invoice"      value="${row.invoice_number ?? ""}" /></td>
-              <td>${formatDate(row.die_arrived_at)}</td>
+              <td><input type="date" name="arrived"      value="${rawDate(row.die_arrived_at)}" /></td>
               <td><input type="date" name="ins_created"  value="${rawDate(row.instruction_created_at)}" /></td>
               <td><input type="text" name="insp_num"     value="${row.inspection_number ?? ""}" /></td>
               <td><input type="date" name="insp_passed"  value="${rawDate(row.inspection_passed_at)}" /></td>
@@ -744,8 +746,9 @@
       }
 
       async function processCSV(text) {
-        const rows = parseCSV(text);
-        if (rows.length === 0) { alert("有効なデータがありません"); return; }
+        const allRows = parseCSV(text);
+        const rows = allRows.filter(r => String(r.is_accessory_item).trim() === "1");
+        if (rows.length === 0) { alert("is_accessory_item = 1 の行がありません"); return; }
         importRows = rows;
 
         const dieNames = [...new Set(rows.map(r => r.die_name).filter(Boolean))];
@@ -798,6 +801,7 @@
           tr.dataset.dieId = initialDieId;
           tr.innerHTML = `
             <td>${row.die_name ?? ""}</td>
+            <td style="text-align:center;"><span style="background:#2e7d32;color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;">1</span></td>
             <td>${selectHtml}</td>
             <td id="imp_status_${idx}">${statusHtml}</td>
           `;
@@ -834,6 +838,7 @@
           const idx = Number(tr.dataset.idx);
           payload.push({
             die_id: Number(tr.dataset.dieId),
+            is_accessory_item_flag: 1,
           });
         });
         if (payload.length === 0) return;

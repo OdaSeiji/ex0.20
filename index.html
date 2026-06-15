@@ -391,6 +391,22 @@
     </div>
 
     <!-- ⚙️ 各種設定 -->
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_register">📋 新規、金型、品番登録</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card" onclick="location.href = 'die_import.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="import_title">新規金型登録</div>
+          <div class="menu-desc" data-key="import_desc">CSVから金型を一括登録</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'die_part_import.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title" data-key="part_import_title">部品登録</div>
+          <div class="menu-desc" data-key="part_import_desc">CSVから部品を一括登録</div>
+        </div>
+      </div>
+    </div>
+
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_settings">⚙️ 各種設定</span></div>
     <div class="accordion-content">
       <div class="menu-row">
@@ -408,11 +424,6 @@
           <img class="menu-icon" src="./img/wrench.svg" alt="" />
           <div class="menu-title" data-key="staff_title">スタッフ設定</div>
           <div class="menu-desc" data-key="staff_desc">スタッフのロール・パスワードの管理</div>
-        </div>
-        <div class="menu-card" onclick="location.href = 'die_import.html'">
-          <img class="menu-icon" src="./img/factory.svg" alt="" />
-          <div class="menu-title" data-key="import_title">新規金型登録</div>
-          <div class="menu-desc" data-key="import_desc">CSVから金型を一括登録</div>
         </div>
         <div class="menu-card" onclick="location.href = 'die_order.html'">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
@@ -469,6 +480,7 @@
           section_press: "🏭 押出工程",
           section_maintenance: "🧰 金型メンテナンス",
           section_progress: "📊 金型進捗管理",
+          section_register: "📋 新規、金型、品番登録",
           section_settings: "⚙️ 各種設定",
           dashboard_title: "📊 測定ダッシュボード（押出〇）",
 
@@ -501,6 +513,8 @@
           staff_desc: "スタッフのロール・パスワードの管理",
           import_title: "新規金型登録",
           import_desc: "CSVから金型を一括登録",
+          part_import_title: "部品登録",
+          part_import_desc: "CSVから部品を一括登録",
           order_title: "発注・出荷日入力",
           order_desc: "金型の発注日・出荷日を登録",
           arrival_title: "金型 到着日入力",
@@ -532,6 +546,7 @@
           section_press: "🏭 Quy trình ép đùn",
           section_maintenance: "🧰 Bảo trì khuôn",
           section_progress: "📊 Tiến độ khuôn",
+          section_register: "📋 Đăng ký khuôn & linh kiện mới",
           section_settings: "⚙️ Cài đặt chung",
           dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
 
@@ -565,6 +580,8 @@
           staff_desc: "Quản lý vai trò và mật khẩu của nhân viên",
           import_title: "Nhập khuôn",
           import_desc: "Nhập hàng loạt khuôn từ file CSV",
+          part_import_title: "Đăng ký linh kiện",
+          part_import_desc: "Nhập hàng loạt linh kiện từ file CSV",
           order_title: "Nhập ngày đặt hàng & xuất hàng",
           order_desc: "Đăng ký ngày đặt hàng và ngày xuất hàng của khuôn",
           arrival_title: "Nhập ngày đến của khuôn",

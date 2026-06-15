@@ -20,8 +20,9 @@ foreach ($rows as $row) {
         continue;
     }
 
-    $insStmt = $pdo->prepare("INSERT INTO t_die_handover (die_id) VALUES (?)");
-    $insStmt->execute([$die_id]);
+    $is_accessory = isset($row["is_accessory_item_flag"]) ? intval($row["is_accessory_item_flag"]) : 0;
+    $insStmt = $pdo->prepare("INSERT INTO t_die_handover (die_id, is_accessory_item_flag) VALUES (?, ?)");
+    $insStmt->execute([$die_id, $is_accessory]);
     $inserted++;
 }
 
