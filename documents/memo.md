@@ -5054,3 +5054,48 @@ INSERT INTO m_die_conditions (id, name) VALUES
   <img src="./img/20260614_Web全体.drawio.svg" width="400">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/06/15
+
+CY1S20PA-V01D　雌型
+は、handover_list.htmlには、到着日が入っていない状態だが、
+die_arrival.htmlにはリストに表示されない。（プログラム上のバグか？）
+
+登録されているが、、、、
+6/9着。
+
+`handover_list.html`に新規に輸出金型を登録しようとすると、エラーが出る。
+
+```
+handover_list.html:1 Uncaught (in promise) SyntaxError: Unexpected token '<', "<br />
+<b>"... is not valid JSON
+handover_list.html:1 Uncaught (in promise) SyntaxError: Unexpected token '<', "<br />
+<b>"... is not valid JSON
+```
+
+`CP9632T-V04B`が、雌型、雄型、リングともに登録なし。エラーが出るため、SQLで対応。
+
+```
+INSERT INTO t_die_handover (die_id, note2, is_accessory_item_flag)
+VALUES
+(1145, 'female die', 1),
+(1145, 'male die', 1),
+(1145, 'ring', 1);
+```
+
+そして問題は、この金型と、`CP9632T-V04B`が以下の画面で表示されない点。その他にも表示されない金型有。`CP9632T4-V02D`も`CXS06S3-V01D`も、表示されない。
+
+<figure style="text-align:center;">
+  <img src="./img/20260615-01.png" width="400">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+今は、到着日を入力すると、
+`m_dies, t_die_handover, t_die_handover_progress`の3つに到着日を入れることにしているが、以下のような、部品の場合、必要なのは`t_die_handover`だけ。
+
+<figure style="text-align:center;">
+  <img src="./img/20260615-02.png" width="400">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型管理画面が欲しいな。
