@@ -5099,3 +5099,5 @@ VALUES
 </figure>
 
 金型管理画面が欲しいな。
+
+`die_inspection.html?press_id=11234&mode=edit`で開くと、サムネイルが拡大しない。
