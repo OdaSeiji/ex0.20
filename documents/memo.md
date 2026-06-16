@@ -5101,3 +5101,44 @@ VALUES
 金型管理画面が欲しいな。
 
 `die_inspection.html?press_id=11234&mode=edit`で開くと、サムネイルが拡大しない。
+
+# 2026/06/16
+
+部品の登録は、重複が有ってもいい。但し、必要以上に登録する可能性が有るので、既に登録されているものを表示する必要がある。また登録する時、どんな部品高入力させる。
+
+<figure style="text-align:center;">
+  <img src="./img/20260616-01.png" width="400">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+それから、部品ではわからない。金型部品。
+
+<figure style="text-align:center;">
+  <img src="./img/20260616-02.png" width="400">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+品番整理の為には、図面がそろっている必要がありますね。図面、プレビューの取り込みを実施しましょうか。どの品番がそろっていて、どの品番がそろっていないのか。
+
+型修理報告待ちは8型しかないけど、25と言う表示
+
+<figure style="text-align:center;">
+  <img src="./img/20260616-03.png" width="200">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型修理完了日を入れて、そこを過ぎているかどうか。を表示する。
+
+<figure style="text-align:center;">
+  <img src="./img/20260616-04.png" width="500">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型修理ページ。ベトナム語にならない。もう一つは、修理開始日を入力する。
+
+<figure style="text-align:center;">
+  <img src="./img/20260616-05.png" width="500">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+それと、添付ファイル、既にある場合、上書きしてしまう問題。
