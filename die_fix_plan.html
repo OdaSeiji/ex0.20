@@ -255,8 +255,9 @@
         </div>
 
         <h3 data-key="sec_attach">■ 添付ファイル（任意）</h3>
-        <input type="file" id="plan_files" multiple />
         <div id="plan_file_preview" class="file-list"></div>
+        <input type="file" id="plan_files" multiple />
+        <div id="plan_file_new_preview" class="file-list" style="margin-top:8px;"></div>
 
         <div class="button-area">
           <button class="btn" id="submitBtn" data-key="btn_submit">申請する</button>
@@ -611,7 +612,7 @@
         });
 
       function renderSelectedPlanFiles() {
-        const area = document.getElementById("plan_file_preview");
+        const area = document.getElementById("plan_file_new_preview");
         area.innerHTML = "";
 
         selectedPlanFiles.forEach((file, index) => {

@@ -312,10 +312,13 @@
         <textarea id="memo" rows="4"></textarea>
 
         <label data-key="lbl_files">添付ファイル（必須）</label>
+
+        <!-- 保存済みファイル表示エリア -->
+        <div id="preview_area" class="preview-area"></div>
         <input type="file" id="inspection_files" multiple />
 
-        <!-- ★ ここに追加：サムネイル表示エリア -->
-        <div id="preview_area" class="preview-area"></div>
+        <!-- 新規選択ファイルプレビューエリア -->
+        <div id="preview_area_new" class="preview-area" style="margin-top:8px;"></div>
       </div>
 
       <button class="btn" id="saveBtn" data-key="btn_save" type="button">
@@ -375,7 +378,7 @@
       function renderPreview(files) {
         console.log("renderPreview:", files);
 
-        const preview = document.getElementById("preview_area");
+        const preview = document.getElementById("preview_area_new");
         preview.innerHTML = "";
 
         files.forEach((file, index) => {
@@ -666,7 +669,7 @@
         }
 
         const hasExistingFiles =
-          document.querySelectorAll("#preview_area .preview-item").length > 0;
+          document.querySelectorAll("#preview_area .preview-item, #preview_area_new .preview-item").length > 0;
 
         if (files.length === 0 && !hasExistingFiles) {
           alert("Attachment is required.");

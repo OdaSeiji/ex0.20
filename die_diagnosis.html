@@ -426,10 +426,13 @@
       <textarea id="diag_memo"></textarea>
 
       <h3 data-key="sec_diag_files">■ 添付ファイル（任意）</h3>
+
+      <!-- ▼ 保存済みファイル表示エリア -->
+      <div id="diag_file_preview" class="file-list"></div>
       <input type="file" id="diag_files" name="diag_files[]" multiple />
 
-      <!-- ▼ サムネイル表示エリア -->
-      <div id="diag_file_preview" class="file-list"></div>
+      <!-- ▼ 新規選択ファイルプレビューエリア -->
+      <div id="diag_file_new_preview" class="file-list" style="margin-top:8px;"></div>
     </div>
 
     <!-- ============================= -->
@@ -1293,7 +1296,7 @@
       document
         .getElementById("diag_files")
         .addEventListener("change", function (e) {
-          const area = document.getElementById("diag_file_preview");
+          const area = document.getElementById("diag_file_new_preview");
           area.innerHTML = "";
 
           Array.from(e.target.files).forEach((file) => {
