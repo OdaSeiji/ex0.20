@@ -12,11 +12,12 @@ require_once "../db.php";
   - plan_files[]（添付ファイル）
 */
 
-$diagnosis_id       = $_POST["diagnosis_id"];
-$plan_fix_date      = $_POST["plan_fix_date"];
-$plan_fix_staff_id  = $_POST["plan_fix_staff_id"];
-$plan_fix_content   = $_POST["plan_fix_content"];
-$fix_id             = $_POST["fix_id"] ?? null;
+$diagnosis_id          = $_POST["diagnosis_id"];
+$plan_fix_date         = $_POST["plan_fix_date"];
+$plan_completion_date  = $_POST["plan_completion_date"] ?: null;
+$plan_fix_staff_id     = $_POST["plan_fix_staff_id"];
+$plan_fix_content      = $_POST["plan_fix_content"];
+$fix_id                = $_POST["fix_id"] ?? null;
 
 /* --------------------------------------------------
    1. 新規 or 更新
@@ -27,6 +28,7 @@ if ($fix_id) {
         UPDATE t_die_fix
         SET
             plan_fix_date = ?,
+            plan_completion_date = ?,
             plan_fix_staff_id = ?,
             plan_fix_content = ?,
             plan_approval_status = 'pending',
@@ -38,6 +40,7 @@ if ($fix_id) {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $plan_fix_date,
+        $plan_completion_date,
         $plan_fix_staff_id,
         $plan_fix_content,
         $fix_id
@@ -52,17 +55,19 @@ if ($fix_id) {
         (
             diagnosis_id,
             plan_fix_date,
+            plan_completion_date,
             plan_fix_staff_id,
             plan_fix_content,
             plan_approval_status,
             created_at
         )
-        VALUES (?, ?, ?, ?, 'pending', NOW())
+        VALUES (?, ?, ?, ?, ?, 'pending', NOW())
     ";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([
         $diagnosis_id,
         $plan_fix_date,
+        $plan_completion_date,
         $plan_fix_staff_id,
         $plan_fix_content
     ]);

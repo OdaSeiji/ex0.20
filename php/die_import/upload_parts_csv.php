@@ -20,20 +20,20 @@ if ($header && isset($header[0])) {
 }
 $header = array_map('trim', $header);
 
-$dnIdx = array_search("die_number",           $header);
-$flIdx = array_search("is_accessory_item_flag", $header);
+$dnIdx    = array_search("die_number", $header);
+$note2Idx = array_search("note2",      $header);
 
-if ($dnIdx === false || $flIdx === false) {
+if ($dnIdx === false) {
     fclose($handle);
-    echo json_encode(["status" => "error", "message" => "ヘッダーに die_number と is_accessory_item_flag が必要です"]);
+    echo json_encode(["status" => "error", "message" => "ヘッダーに die_number が必要です"]);
     exit;
 }
 
-$stmtCheckDies = $pdo->prepare("SELECT id FROM m_dies WHERE die_number = ?");
-$stmtCheckTmp  = $pdo->prepare("SELECT id FROM t_dies_import_tmp WHERE die_number = ? AND import_flag = 0");
-$stmtInsert    = $pdo->prepare("
-    INSERT INTO t_dies_import_tmp (die_number, import_flag, created_at)
-    VALUES (?, 0, CURDATE())
+$stmtFindDie = $pdo->prepare("SELECT id FROM m_dies WHERE die_number = ?");
+$stmtCheckTmp = $pdo->prepare("SELECT id FROM t_parts_import_tmp WHERE die_number = ? AND import_flag = 0");
+$stmtInsert  = $pdo->prepare("
+    INSERT INTO t_parts_import_tmp (die_number, die_id, note2, import_flag, created_at)
+    VALUES (?, ?, ?, 0, CURDATE())
 ");
 
 $inserted = 0;
@@ -42,27 +42,30 @@ $errors   = [];
 
 while (($row = fgetcsv($handle)) !== false) {
     $dieNumber = strtoupper(trim($row[$dnIdx] ?? ""));
-    $flag      = trim($row[$flIdx] ?? "");
+    $note2     = ($note2Idx !== false) ? trim($row[$note2Idx] ?? "") : "";
+    if ($note2 === "") $note2 = null;
 
     if ($dieNumber === "") continue;
-    if ($flag !== "1") { $skipped++; continue; }
 
-    $stmtCheckDies->execute([$dieNumber]);
-    if ($stmtCheckDies->fetchColumn()) {
+    // m_dies に存在しない → 拒否
+    $stmtFindDie->execute([$dieNumber]);
+    $dieId = $stmtFindDie->fetchColumn();
+    if (!$dieId) {
         $skipped++;
-        $errors[] = "{$dieNumber}: m_dies に既に登録済み";
+        $errors[] = "{$dieNumber}: m_dies に存在しない金型番号です";
         continue;
     }
 
+    // インポート待ちリストに既に存在 → スキップ
     $stmtCheckTmp->execute([$dieNumber]);
     if ($stmtCheckTmp->fetchColumn()) {
         $skipped++;
-        $errors[] = "{$dieNumber}: インポート待ちリストに既に存在";
+        $errors[] = "{$dieNumber}: インポート待ちリストに既に存在します";
         continue;
     }
 
     try {
-        $stmtInsert->execute([$dieNumber]);
+        $stmtInsert->execute([$dieNumber, $dieId, $note2]);
         $inserted++;
     } catch (PDOException $e) {
         $errors[] = "{$dieNumber}: " . $e->getMessage();

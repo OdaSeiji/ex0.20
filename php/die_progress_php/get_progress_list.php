@@ -80,6 +80,8 @@ SELECT
         ELSE NULL
     END AS fix_plan,
 
+    f.plan_completion_date,
+
     /* ============================
        ⑥ 修理計画承認（plan_approval_status）
     ============================ */

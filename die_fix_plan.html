@@ -176,55 +176,55 @@
       </div>
 
       <!-- タイトル -->
-      <h1>🛠 修理計画（Fix Plan）</h1>
+      <h1 id="pageTitle">🛠 修理計画（Fix Plan）</h1>
 
       <!-- 承認モード専用ボタン -->
       <div
         id="approvalButtons"
         style="text-align: right; margin-bottom: 10px; display: none"
       >
-        <button class="btn btn-success" id="approveBtn">承認</button>
-        <button class="btn btn-danger" id="rejectBtn">却下</button>
+        <button class="btn btn-success" id="approveBtn" data-key="btn_approve">承認</button>
+        <button class="btn btn-danger"  id="rejectBtn"  data-key="btn_reject">却下</button>
       </div>
 
       <!-- ============================= -->
       <!-- 診断情報（読み取り専用） -->
       <!-- ============================= -->
       <div class="card">
-        <h2>■ 診断情報（読み取り専用）</h2>
+        <h2 data-key="sec_diag">■ 診断情報（読み取り専用）</h2>
 
         <div class="row">
-          <label>型番：</label><span id="fp_die_number"></span>
+          <label data-key="lbl_die_number">型番：</label><span id="fp_die_number"></span>
         </div>
         <div class="row">
-          <label>押出日：</label><span id="fp_press_date"></span>
+          <label data-key="lbl_press_date">押出日：</label><span id="fp_press_date"></span>
         </div>
         <div class="row">
-          <label>診断日：</label><span id="diag_date"></span>
+          <label data-key="lbl_diag_date">診断日：</label><span id="diag_date"></span>
         </div>
         <div class="row">
-          <label>診断者：</label><span id="diag_staff"></span>
+          <label data-key="lbl_diag_staff">診断者：</label><span id="diag_staff"></span>
         </div>
         <div class="row">
-          <label>寸法判定：</label><span id="dim_judge"></span>
+          <label data-key="lbl_dim">寸法判定：</label><span id="dim_judge"></span>
         </div>
         <div class="row">
-          <label>形状判定：</label><span id="shape_judge"></span>
+          <label data-key="lbl_shape">形状判定：</label><span id="shape_judge"></span>
         </div>
         <div class="row">
-          <label>総合判定：</label><span id="overall_judge"></span>
+          <label data-key="lbl_overall">総合判定：</label><span id="overall_judge"></span>
         </div>
         <div class="row">
-          <label>NG 対応：</label><span id="ng_action"></span>
+          <label data-key="lbl_ng_action">NG 対応：</label><span id="ng_action"></span>
         </div>
         <div class="row">
-          <label>条件変更：</label><span id="condition_change"></span>
+          <label data-key="lbl_condition">条件変更：</label><span id="condition_change"></span>
         </div>
         <div class="row">
-          <label>修理要否：</label><span id="need_fix"></span>
+          <label data-key="lbl_need_fix">修理要否：</label><span id="need_fix"></span>
         </div>
 
-        <h3>■ 診断時の添付ファイル</h3>
+        <h3 data-key="sec_diag_files">■ 診断時の添付ファイル</h3>
         <div id="diag_files" class="file-list"></div>
       </div>
 
@@ -232,29 +232,34 @@
       <!-- 修理計画（入力） -->
       <!-- ============================= -->
       <div class="card">
-        <h2>■ 修理計画（入力）</h2>
+        <h2 id="secPlanTitle" data-key="sec_plan">■ 修理計画（入力）</h2>
 
         <div class="row">
-          <label>修理予定日：</label>
+          <label data-key="lbl_plan_fix_date">修理予定日：</label>
           <input type="date" id="plan_fix_date" required />
         </div>
 
         <div class="row">
-          <label>修理担当者：</label>
+          <label data-key="lbl_completion_date">修理完了予定日：</label>
+          <input type="date" id="plan_completion_date" />
+        </div>
+
+        <div class="row">
+          <label data-key="lbl_staff">修理担当者：</label>
           <select id="plan_fix_staff_id"></select>
         </div>
 
         <div class="row">
-          <label>修理予定内容：</label>
+          <label data-key="lbl_content">修理予定内容：</label>
           <textarea id="plan_fix_content" required></textarea>
         </div>
 
-        <h3>■ 添付ファイル（任意）</h3>
+        <h3 data-key="sec_attach">■ 添付ファイル（任意）</h3>
         <input type="file" id="plan_files" multiple />
         <div id="plan_file_preview" class="file-list"></div>
 
         <div class="button-area">
-          <button class="btn" id="submitBtn">申請する</button>
+          <button class="btn" id="submitBtn" data-key="btn_submit">申請する</button>
         </div>
       </div>
     </div>
@@ -278,16 +283,16 @@
           border-radius: 8px;
         "
       >
-        <h3>却下理由</h3>
+        <h3 data-key="lbl_reject_reason">却下理由</h3>
         <textarea
           id="reject_reason"
           style="width: 100%; height: 80px"
         ></textarea>
         <div style="text-align: right; margin-top: 10px">
-          <button class="btn btn-secondary" onclick="closeRejectModal()">
+          <button class="btn btn-secondary" onclick="closeRejectModal()" data-key="btn_cancel">
             キャンセル
           </button>
-          <button class="btn btn-danger" onclick="submitReject()">
+          <button class="btn btn-danger" onclick="submitReject()" data-key="btn_do_reject">
             却下する
           </button>
         </div>
@@ -295,11 +300,109 @@
     </div>
 
     <script>
-      /* ------------------------------
-     多言語（必要なら後で追加）
-  ------------------------------ */
+      /* ------------------------------ */
+      /* 多言語辞書                      */
+      /* ------------------------------ */
+      const dict = {
+        ja: {
+          page_title:       "🛠 修理計画（Fix Plan）",
+          page_title_appr:  "🛠 修理計画（承認モード）",
+          sec_diag:         "■ 診断情報（読み取り専用）",
+          lbl_die_number:   "型番：",
+          lbl_press_date:   "押出日：",
+          lbl_diag_date:    "診断日：",
+          lbl_diag_staff:   "診断者：",
+          lbl_dim:          "寸法判定：",
+          lbl_shape:        "形状判定：",
+          lbl_overall:      "総合判定：",
+          lbl_ng_action:    "NG 対応：",
+          lbl_condition:    "条件変更：",
+          lbl_need_fix:     "修理要否：",
+          sec_diag_files:   "■ 診断時の添付ファイル",
+          sec_plan:         "■ 修理計画（入力）",
+          lbl_plan_fix_date:"修理予定日：",
+          lbl_completion_date:"修理完了予定日：",
+          lbl_staff:        "修理担当者：",
+          lbl_content:      "修理予定内容：",
+          sec_attach:       "■ 添付ファイル（任意）",
+          btn_submit:       "申請する",
+          btn_approve:      "承認",
+          btn_reject:       "却下",
+          btn_cancel:       "キャンセル",
+          btn_do_reject:    "却下する",
+          lbl_reject_reason:"却下理由",
+          need_fix_yes:     "必要",
+          need_fix_no:      "不要",
+          msg_submitted:    "修理計画を申請しました。",
+          msg_approved:     "修理計画を承認しました。",
+          msg_rejected:     "修理計画を却下しました。",
+          msg_no_plan:      "修理計画が読み込まれていません。",
+          msg_need_reason:  "却下理由を入力してください。",
+          btn_back:         "← 戻る",
+        },
+        vi: {
+          page_title:       "🛠 Kế hoạch sửa chữa",
+          page_title_appr:  "🛠 Kế hoạch sửa chữa（Chế độ duyệt）",
+          sec_diag:         "■ Thông tin chẩn đoán（Chỉ đọc）",
+          lbl_die_number:   "Số khuôn：",
+          lbl_press_date:   "Ngày ép：",
+          lbl_diag_date:    "Ngày chẩn đoán：",
+          lbl_diag_staff:   "Người chẩn đoán：",
+          lbl_dim:          "Đánh giá kích thước：",
+          lbl_shape:        "Đánh giá hình dạng：",
+          lbl_overall:      "Đánh giá tổng hợp：",
+          lbl_ng_action:    "Xử lý NG：",
+          lbl_condition:    "Thay đổi điều kiện：",
+          lbl_need_fix:     "Cần sửa chữa：",
+          sec_diag_files:   "■ File đính kèm chẩn đoán",
+          sec_plan:         "■ Kế hoạch sửa chữa（Nhập liệu）",
+          lbl_plan_fix_date:"Ngày dự kiến sửa：",
+          lbl_completion_date:"Ngày dự kiến hoàn thành：",
+          lbl_staff:        "Người phụ trách：",
+          lbl_content:      "Nội dung sửa chữa dự kiến：",
+          sec_attach:       "■ File đính kèm（Tùy chọn）",
+          btn_submit:       "Gửi yêu cầu",
+          btn_approve:      "Duyệt",
+          btn_reject:       "Từ chối",
+          btn_cancel:       "Hủy",
+          btn_do_reject:    "Xác nhận từ chối",
+          lbl_reject_reason:"Lý do từ chối",
+          need_fix_yes:     "Cần",
+          need_fix_no:      "Không cần",
+          msg_submitted:    "Đã gửi kế hoạch sửa chữa.",
+          msg_approved:     "Đã duyệt kế hoạch sửa chữa.",
+          msg_rejected:     "Đã từ chối kế hoạch sửa chữa.",
+          msg_no_plan:      "Chưa tải được kế hoạch sửa chữa.",
+          msg_need_reason:  "Vui lòng nhập lý do từ chối.",
+          btn_back:         "← Quay lại",
+        },
+      };
+
+      let currentLang = localStorage.getItem("lang") || "ja";
+
       function setLang(lang) {
+        currentLang = lang;
         localStorage.setItem("lang", lang);
+        applyLang();
+      }
+
+      function applyLang() {
+        const d = dict[currentLang] || dict.ja;
+
+        // data-key 要素を一括更新
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.dataset.key;
+          if (d[key]) el.textContent = d[key];
+        });
+
+        // タイトル（承認モードかどうかで分岐）
+        const isApproval = mode === "approval";
+        document.getElementById("pageTitle").textContent =
+          isApproval ? d.page_title_appr : d.page_title;
+
+        // 戻るボタン
+        const backBtn = document.querySelector(".btn.btn-secondary[onclick='history.back()']");
+        if (backBtn) backBtn.textContent = d.btn_back;
       }
 
       const urlParams = new URLSearchParams(window.location.search);
@@ -312,6 +415,9 @@
       let selectedPlanFiles = [];
 
       window.onload = function () {
+        applyLang();
+        const today = new Date().toISOString().slice(0, 10);
+        document.getElementById("plan_fix_date").value = today;
         loadDiagnosis();
         loadStaffList();
       };
@@ -438,6 +544,10 @@
               data.plan_fix_date,
             );
 
+            document.getElementById("plan_completion_date").value = formatDateForInput(
+              data.plan_completion_date,
+            );
+
             document.getElementById("plan_fix_staff_id").value =
               data.plan_fix_staff_id || "";
 
@@ -555,6 +665,10 @@
             document.getElementById("plan_fix_date").value,
           );
           formData.append(
+            "plan_completion_date",
+            document.getElementById("plan_completion_date").value,
+          );
+          formData.append(
             "plan_fix_staff_id",
             document.getElementById("plan_fix_staff_id").value,
           );
@@ -576,7 +690,7 @@
           })
             .then((res) => res.json())
             .then((data) => {
-              alert("修理計画を申請しました。");
+              alert(dict[currentLang].msg_submitted);
               location.href = "die_progress_list.html";
             });
         });
@@ -586,10 +700,11 @@
   ------------------------------ */
       function setApprovalMode() {
         // タイトル変更
-        document.querySelector("h1").textContent = "🛠 修理計画（承認モード）";
+        document.getElementById("pageTitle").textContent = dict[currentLang].page_title_appr;
 
         // 入力不可にする
         document.getElementById("plan_fix_date").disabled = true;
+        document.getElementById("plan_completion_date").disabled = true;
         document.getElementById("plan_fix_staff_id").disabled = true;
         document.getElementById("plan_fix_content").readOnly = true;
 
@@ -621,7 +736,7 @@
       document
         .getElementById("approveBtn")
         .addEventListener("click", function () {
-          if (!fix_id) return alert("修理計画が読み込まれていません。");
+          if (!fix_id) return alert(dict[currentLang].msg_no_plan);
 
           fetch("./php/die_progress_php/approve_fix_plan.php", {
             method: "POST",
@@ -632,7 +747,7 @@
           })
             .then((res) => res.json())
             .then((data) => {
-              alert("修理計画を承認しました。");
+              alert(dict[currentLang].msg_approved);
               location.href = "die_progress_list.html";
             });
         });
@@ -653,7 +768,7 @@
 
       function submitReject() {
         const reason = document.getElementById("reject_reason").value.trim();
-        if (!reason) return alert("却下理由を入力してください。");
+        if (!reason) return alert(dict[currentLang].msg_need_reason);
 
         fetch("./php/die_progress_php/approve_fix_plan.php", {
           method: "POST",
@@ -665,7 +780,7 @@
         })
           .then((res) => res.json())
           .then((data) => {
-            alert("修理計画を却下しました。");
+            alert(dict[currentLang].msg_rejected);
             location.href = "die_progress_list.html";
           });
       }

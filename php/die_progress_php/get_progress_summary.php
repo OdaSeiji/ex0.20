@@ -38,16 +38,7 @@ try {
                             AND d.approval_date IS NOT NULL
                             AND d.approval_date < CURDATE()
                             AND (f.created_at IS NULL OR f.created_at >= CURDATE())
-                       THEN 1 END) AS plan_yst,
-
-            COUNT(CASE WHEN f.id IS NOT NULL
-                            AND f.plan_fix_date IS NOT NULL
-                            AND f.actual_fix_reported_at IS NULL
-                       THEN 1 END) AS rep_cur,
-            COUNT(CASE WHEN f.id IS NOT NULL
-                            AND f.created_at < CURDATE()
-                            AND (f.actual_fix_reported_at IS NULL OR f.actual_fix_reported_at >= CURDATE())
-                       THEN 1 END) AS rep_yst
+                       THEN 1 END) AS plan_yst
 
         FROM t_press p
         LEFT JOIN t_die_inspection i  ON i.press_id      = p.id
@@ -56,16 +47,42 @@ try {
         WHERE p.press_date_at >= DATE_SUB(CURDATE(), INTERVAL 90 DAY)
     ")->fetch(PDO::FETCH_ASSOC);
 
+    // fix_report は get_progress_list.php と同じ LIMIT 200 内で集計
+    $repRow = $pdo->query("
+        SELECT
+            COUNT(CASE WHEN sub.plan_fix_date IS NOT NULL
+                            AND sub.actual_fix_date IS NULL
+                       THEN 1 END) AS rep_cur,
+            COUNT(CASE WHEN sub.plan_fix_date IS NOT NULL
+                            AND sub.fix_created_at < CURDATE()
+                            AND (sub.actual_fix_date IS NULL OR sub.actual_fix_date >= CURDATE())
+                       THEN 1 END) AS rep_yst
+        FROM (
+            SELECT
+                f.plan_fix_date,
+                f.actual_fix_date,
+                f.created_at AS fix_created_at,
+                d.ng_action
+            FROM t_press p
+            LEFT JOIN t_die_inspection i ON i.press_id      = p.id
+            LEFT JOIN t_die_diagnosis  d ON d.inspection_id = i.id
+            LEFT JOIN t_die_fix        f ON f.diagnosis_id  = d.id
+            ORDER BY p.press_date_at DESC, p.id DESC
+            LIMIT 200
+        ) sub
+        WHERE sub.ng_action IN (2, 3)
+    ")->fetch(PDO::FETCH_ASSOC);
+
     function step($cur, $yst) {
         return ["current" => (int)$cur, "yesterday" => (int)$yst, "delta" => (int)$cur - (int)$yst];
     }
 
     $result = [
-        "inspection" => step($row["insp_cur"], $row["insp_yst"]),
-        "diagnosis"  => step($row["diag_cur"], $row["diag_yst"]),
-        "approval"   => step($row["appr_cur"], $row["appr_yst"]),
-        "fix_plan"   => step($row["plan_cur"], $row["plan_yst"]),
-        "fix_report" => step($row["rep_cur"],  $row["rep_yst"]),
+        "inspection" => step($row["insp_cur"],       $row["insp_yst"]),
+        "diagnosis"  => step($row["diag_cur"],       $row["diag_yst"]),
+        "approval"   => step($row["appr_cur"],       $row["appr_yst"]),
+        "fix_plan"   => step($row["plan_cur"],       $row["plan_yst"]),
+        "fix_report" => step($repRow["rep_cur"],     $repRow["rep_yst"]),
     ];
 
 } catch (Throwable $e) {

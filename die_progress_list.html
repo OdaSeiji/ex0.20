@@ -208,7 +208,7 @@
 
       /* 3列目：重点管理バッジ */
       #progressTable th:nth-child(3),
-      #progressTable td:nth-child(3) { width: 68px; text-align: center; }
+      #progressTable td:nth-child(3) { width: 54px; text-align: center; }
 
       /* 4列目：押出種別 */
       #progressTable th:nth-child(4),
@@ -217,7 +217,7 @@
 
       /* 5列目：優先度 */
       #progressTable th:nth-child(5),
-      #progressTable td:nth-child(5) { width: 68px; text-align: center; }
+      #progressTable td:nth-child(5) { width: 54px; text-align: center; }
 
       /* 6列目：コンディション */
       #progressTable th:nth-child(6),
@@ -231,19 +231,23 @@
       #progressTable th:nth-child(9),
       #progressTable td:nth-child(9) { width: 70px; text-align: center; }
 
-      /* 11列目：診断承認 / 12列目：修理計画 / 13列目：修理報告 */
+      /* 11列目：診断承認 / 12列目：修理計画 / 14列目：修理報告 */
       #progressTable th:nth-child(11),
       #progressTable td:nth-child(11),
       #progressTable th:nth-child(12),
       #progressTable td:nth-child(12),
-      #progressTable th:nth-child(13),
-      #progressTable td:nth-child(13) { width: 70px; text-align: center; }
-
-      /* 14列目：操作 */
       #progressTable th:nth-child(14),
-      #progressTable td:nth-child(14) { width: 150px; text-align: center; }
-      #progressTable td:nth-child(14) .btn,
-      #progressTable td:nth-child(14) .btn-disabled { width: 140px; }
+      #progressTable td:nth-child(14) { width: 70px; text-align: center; }
+
+      /* 13列目：完了予定日 */
+      #progressTable th:nth-child(13),
+      #progressTable td:nth-child(13) { width: 46px; text-align: center; font-size: 11px; }
+
+      /* 15列目：操作 */
+      #progressTable th:nth-child(15),
+      #progressTable td:nth-child(15) { width: 150px; text-align: center; }
+      #progressTable td:nth-child(15) .btn,
+      #progressTable td:nth-child(15) .btn-disabled { width: 140px; }
 
       /* 重点管理バッジ */
       .watch-badge {
@@ -565,6 +569,7 @@
             <th data-key="col_needfix">修理要否</th>
             <th data-key="col_diag_app">診断承認</th>
             <th data-key="col_fix_plan">修理計画</th>
+            <th data-key="col_completion_date">完了予定</th>
             <th data-key="col_fix_report">修理報告</th>
 
             <th data-key="col_action">操作</th>
@@ -808,6 +813,7 @@
           col_diag_app: "診断承認",
           col_fix_plan: "修理計画",
           col_fix_plan_app: "修理計画承認",
+          col_completion_date: "完了予定",
           col_fix_report: "修理報告",
           col_fix_report_app: "修理報告承認",
 
@@ -869,6 +875,7 @@
           col_diag_app: "Duyệt chẩn đoán",
           col_fix_plan: "Kế hoạch sửa",
           col_fix_plan_app: "Duyệt kế hoạch",
+          col_completion_date: "Dự kiến HT",
           col_fix_report: "Báo cáo sửa",
           col_fix_report_app: "Duyệt báo cáo",
 
@@ -1212,7 +1219,10 @@
 
             <!-- 修理計画（プレビュー対応） -->
             <td>${fixPlanBadge(row.fix_plan, row.press_id)}</td>
-            
+
+            <!-- 完了予定日 -->
+            <td>${formatCompletionDate(row.plan_completion_date)}</td>
+
             <!-- 修理報告（プレビュー対応） -->
             <td>${fixReportBadge(row.fix_report, row.press_id)}</td>
 
@@ -1409,6 +1419,15 @@
           ja: yy-mm-dd（例: 26-05-22）
           vi: dd-mm-yy（例: 22-05-26）
       ============================================================ */
+      function formatCompletionDate(dateStr) {
+        if (!dateStr) return `<span style="color:#ccc;">—</span>`;
+        const parts = dateStr.slice(0, 10).split("-");
+        if (parts.length !== 3) return dateStr;
+        const mm = parts[1];
+        const dd = parts[2];
+        return currentLang === "vi" ? `${dd}-${mm}` : `${mm}-${dd}`;
+      }
+
       function formatDate(dateStr) {
         if (!dateStr) return "-";
         const base = dateStr.split(" ")[0]; // 時刻部分を除去
