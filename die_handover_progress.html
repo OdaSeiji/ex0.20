@@ -55,6 +55,7 @@
     .badge-unregistered { background: #eceff1; color: #90a4ae; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
     .badge-registered   { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
     .flag-on { color: #1565c0; font-weight: bold; }
+    .notice-field[readonly] { background: #e8e8e8 !important; cursor: pointer; color: #555; }
 
     .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
     .filter-btn {
@@ -175,7 +176,6 @@
                      border-radius:3px; background:#eceff1; color:#555; cursor:pointer;">
             </button>
           </th>
-          <th data-col="original_table_no"                        data-key="col_original">元表番号 <span class="sort-icon"></span></th>
           <th data-col="die_planning_phase_steps"                 data-key="col_step">Step <span class="sort-icon"></span></th>
           <th data-col="arrival_at"                               data-key="col_arrival">到着日 <span class="sort-icon"></span></th>
           <th data-col="vn_production_dimensional_inspection_at"  data-key="col_vn_prod">VN製造型検日 <span class="sort-icon"></span></th>
@@ -193,7 +193,6 @@
           <th class="no-sort"                                     data-key="col_bcp">BCP</th>
           <th class="no-sort"                                     data-key="col_ready">移管準備完了</th>
           <th data-col="memo"                                     data-key="col_memo">メモ <span class="sort-icon"></span></th>
-          <th class="no-sort"                                     data-key="col_status">状態</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -232,7 +231,6 @@
         zzz_show:     "-ZZZ 表示中",
         checked_count: n => `${n}件選択中`,
         col_die:       "型番",
-        col_original:  "元表番号",
         col_step:      "Step",
         col_arrival:   "到着日",
         col_vn_prod:   "VN製造型検日",
@@ -250,13 +248,10 @@
         col_bcp:       "BCP",
         col_ready:     "移管準備完了",
         col_memo:      "メモ",
-        col_status:    "状態",
         modal_title:   "✏️ 移管進捗 編集・比較",
         modal_item:    "項目",
         btn_save:      "💾 一括保存",
         btn_cancel:    "✕ キャンセル",
-        registered:    "登録済",
-        unregistered:  "未登録",
         save_err:      "保存に失敗しました",
         del_confirm:   name => `「${name}」の移管進捗データを削除しますか？`,
         del_err:       "削除に失敗しました",
@@ -297,7 +292,6 @@
         zzz_show:     "-ZZZ Đang hiện",
         checked_count: n => `Đã chọn ${n} mục`,
         col_die:       "Số khuôn",
-        col_original:  "Số bảng gốc",
         col_step:      "Step",
         col_arrival:   "Ngày đến",
         col_vn_prod:   "KT khuôn SX VN",
@@ -315,13 +309,10 @@
         col_bcp:       "BCP",
         col_ready:     "Hoàn tất CB BG",
         col_memo:      "Ghi chú",
-        col_status:    "Trạng thái",
         modal_title:   "✏️ Chỉnh sửa & so sánh tiến độ",
         modal_item:    "Hạng mục",
         btn_save:      "💾 Lưu tất cả",
         btn_cancel:    "✕ Hủy",
-        registered:    "Đã đăng ký",
-        unregistered:  "Chưa đăng ký",
         save_err:      "Lưu thất bại",
         del_confirm:   name => `Xóa dữ liệu tiến độ của「${name}」?`,
         del_err:       "Xóa thất bại",
@@ -397,6 +388,7 @@
     let showZZZ      = false;
     let activeFilter = "";
     const checkedIds = new Set();
+    let noticeUnlocked = false;
 
     const FILTER_FUNS = {
       vn_prod_wait:   r => !!r.arrival_at && !r.vn_production_dimensional_inspection_at,
@@ -470,22 +462,19 @@
         const tr    = document.createElement("tr");
         const dieId = String(row.die_id);
         tr.dataset.dieId = dieId;
+        const noticeSet = !!(row.production_site_change_notice);
+        if (noticeSet) checkedIds.delete(dieId);
         const checked = checkedIds.has(dieId);
         if (checked) tr.classList.add("checked-row");
 
-        const registered  = row.id != null;
-        const statusBadge = registered
-          ? `<span class="badge-registered">${t.registered}</span>`
-          : `<span class="badge-unregistered">${t.unregistered}</span>`;
         const flag = v => v ? `<span class="flag-on">●</span>` : "";
 
         tr.innerHTML = `
-          <td class="sticky-check">
-            <input type="checkbox" ${checked ? "checked" : ""}
+          <td class="sticky-check"${noticeSet ? ` onclick="unlockCheckbox(event,'${dieId}')" style="cursor:pointer"` : ""}>
+            <input type="checkbox" ${checked ? "checked" : ""} ${noticeSet ? "disabled" : ""}
               onchange="toggleCheck('${dieId}', this.checked)" />
           </td>
           <td class="die-num sticky-die">${row.die_number ?? ""}</td>
-          <td class="mono">${row.original_table_no ?? ""}</td>
           <td class="mono">${row.die_planning_phase_steps ?? ""}</td>
           <td class="mono">${fmtDate(row.arrival_at)}</td>
           <td class="mono">${fmtDate(row.vn_production_dimensional_inspection_at)}</td>
@@ -503,7 +492,6 @@
           <td>${flag(row.bcp_flag)}</td>
           <td>${flag(row.die_transfer_ready_flag)}</td>
           <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;">${row.memo ?? ""}</td>
-          <td>${statusBadge}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -523,7 +511,8 @@
       document.querySelectorAll("#mainTable tbody tr").forEach(tr => {
         const dieId = tr.dataset.dieId;
         const inp   = tr.querySelector("input[type=checkbox]");
-        if (inp) inp.checked = cb.checked;
+        if (!inp || inp.disabled) return;
+        inp.checked = cb.checked;
         if (cb.checked) checkedIds.add(dieId);
         else            checkedIds.delete(dieId);
         tr.classList.toggle("checked-row", cb.checked);
@@ -617,6 +606,7 @@
     ===================================================== */
     function openEditModal() {
       if (checkedIds.size === 0) return;
+      noticeUnlocked = false;
       const selected = allData.filter(r => checkedIds.has(String(r.die_id)));
       buildCompareTable(selected);
       document.getElementById("editModal").style.display = "flex";
@@ -624,6 +614,36 @@
 
     function closeEditModal() {
       document.getElementById("editModal").style.display = "none";
+    }
+
+    function handleNoticeFocus(input) {
+      if (noticeUnlocked) return;
+      input.blur();
+      const pw = prompt("切替業連発行日を編集するにはパスワードを入力してください");
+      if (pw === "1031") {
+        noticeUnlocked = true;
+        document.querySelectorAll(".notice-field").forEach(el => el.removeAttribute("readonly"));
+        input.focus();
+      } else if (pw !== null) {
+        alert("パスワードが違います");
+      }
+    }
+
+    function unlockCheckbox(event, dieId) {
+      const inp = event.currentTarget.querySelector("input[type=checkbox]");
+      if (!inp || !inp.disabled) return;
+      const pw = prompt("チェックボックスを有効にするにはパスワードを入力してください");
+      if (pw === "1031") {
+        inp.disabled = false;
+        inp.checked  = true;
+        event.currentTarget.removeAttribute("onclick");
+        event.currentTarget.style.cursor = "";
+        toggleCheck(dieId, true);
+        const tr = event.currentTarget.closest("tr");
+        if (tr) tr.classList.add("checked-row");
+      } else if (pw !== null) {
+        alert("パスワードが違います");
+      }
     }
 
     function onOverlayClick(e) {
@@ -658,8 +678,10 @@
                        data-hp-id="${hpId}">${val}</textarea></td>`;
           } else {
             const v = f.type === "date" ? rawDate(val) : val;
+            const isNotice = f.key === "production_site_change_notice";
             html += `<td><input type="${f.type}" name="${f.key}"
-                       data-die-id="${dieId}" data-hp-id="${hpId}" value="${v}" /></td>`;
+                       data-die-id="${dieId}" data-hp-id="${hpId}" value="${v}"
+                       ${isNotice ? 'class="notice-field" readonly onfocus="handleNoticeFocus(this)"' : ''} /></td>`;
           }
         });
 
@@ -729,20 +751,19 @@
     ===================================================== */
     function exportCSV() {
       const headersJa = [
-        "型番","元表番号","Step","到着日","VN製造型検日","VN QA型検日",
+        "型番","Step","到着日","VN製造型検日","VN QA型検日",
         "型検日本提出日","日本型検日","日本型検文書番号","アルマイト確認要否",
         "アルマイト確認日","量産トライ日","金型移管日","量産開始日",
-        "切替業連発行日","寸法検査担当者","BCP","移管準備完了","メモ","状態"
+        "切替業連発行日","寸法検査担当者","BCP","移管準備完了","メモ"
       ];
       const headersVi = [
-        "Số khuôn","Số bảng gốc","Step","Ngày đến","KT khuôn SX VN","KT khuôn QA VN",
+        "Số khuôn","Step","Ngày đến","KT khuôn SX VN","KT khuôn QA VN",
         "Ngày gửi KT JP","Ngày KT JP","Số VB KT JP","Cần XN anodize",
         "Ngày XN anodize","Ngày thử SX","Ngày bàn giao","Ngày bắt đầu SX",
-        "Ngày phát hành BC","Người KT KT","BCP","Hoàn tất CB BG","Ghi chú","Trạng thái"
+        "Ngày phát hành BC","Người KT KT","BCP","Hoàn tất CB BG","Ghi chú"
       ];
-      const t = dict[currentLang];
       const rows = filteredData.map(r => [
-        r.die_number ?? "", r.original_table_no ?? "", r.die_planning_phase_steps ?? "",
+        r.die_number ?? "", r.die_planning_phase_steps ?? "",
         fmtDate(r.arrival_at), fmtDate(r.vn_production_dimensional_inspection_at),
         fmtDate(r.vn_qa_dimensional_inspection_at), fmtDate(r.submit_dimensional_inspection_to_japan_at),
         fmtDate(r.jp_dimensional_inspection_at), r.jp_dimensional_inspection_document_number ?? "",
@@ -750,8 +771,7 @@
         fmtDate(r.mass_production_trial_at), fmtDate(r.die_handover_at),
         fmtDate(r.mass_production_start_at), r.production_site_change_notice ?? "",
         r.dimensional_inspection_by ?? "", r.bcp_flag ? "●" : "",
-        r.die_transfer_ready_flag ? "●" : "", r.memo ?? "",
-        r.id != null ? t.registered : t.unregistered
+        r.die_transfer_ready_flag ? "●" : "", r.memo ?? ""
       ]);
 
       const escape = v => `"${String(v).replace(/"/g, '""')}"`;
