@@ -11,7 +11,7 @@ if (!$id) {
     exit;
 }
 
-$stmt = $pdo->prepare("DELETE FROM t_parts_import_tmp WHERE id = ?");
+$stmt = $pdo->prepare("DELETE FROM t_parts_import_tmp WHERE id = ? AND import_flag = 0");
 $stmt->execute([$id]);
 
 if ($stmt->rowCount() > 0) {

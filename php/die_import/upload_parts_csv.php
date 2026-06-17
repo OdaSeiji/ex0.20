@@ -30,10 +30,10 @@ if ($dnIdx === false) {
 }
 
 $stmtFindDie = $pdo->prepare("SELECT id FROM m_dies WHERE die_number = ?");
-$stmtCheckTmp = $pdo->prepare("SELECT id FROM t_parts_import_tmp WHERE die_number = ?");
+$stmtCheckTmp = $pdo->prepare("SELECT id FROM t_parts_import_tmp WHERE die_number = ? AND import_flag = 0");
 $stmtInsert  = $pdo->prepare("
-    INSERT INTO t_parts_import_tmp (die_number, die_id, note2, created_at)
-    VALUES (?, ?, ?, CURDATE())
+    INSERT INTO t_parts_import_tmp (die_number, die_id, note2, import_flag, created_at)
+    VALUES (?, ?, ?, 0, CURDATE())
 ");
 
 $inserted = 0;
