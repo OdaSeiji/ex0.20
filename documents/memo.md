@@ -5142,3 +5142,46 @@ VALUES
 </figure>
 
 それと、添付ファイル、既にある場合、上書きしてしまう問題。
+
+# 2026/06/17
+
+<figure style="text-align:center;">
+  <img src="./img/20260617-01.png" width="500">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+①　編集画面に移らず、直接、check boxを編集できるようにする
+②　ここは、Hieuさんだけ、編集できるようにする、入力後、記述は変更できないようにする
+③　日本型検送付日
+④　必要なし
+⑤　必要なし
+
+die_part_import.htmlでCSVを取り込むとき、下記のエラーが出る。
+
+```
+die_part_import.html:229  POST http://10.163.50.17/ex0.20/php/die_import/upload_parts_csv.php 500 (Internal Server Error)
+uploadCsv @ die_part_import.html:229
+onclick @ die_part_import.html:158
+VM184:1 Uncaught (in promise) SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at uploadCsv (die_part_import.html:230:34)
+uploadCsv @ die_part_import.html:230
+await in uploadCsv
+onclick @ die_part_import.html:158
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
+```
+
+```
+die_part_import.html:229  POST http://10.163.50.17/ex0.20/php/die_import/upload_parts_csv.php 500 (Internal Server Error)
+uploadCsv @ die_part_import.html:229
+onclick @ die_part_import.html:158
+VM184:1 Uncaught (in promise) SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+    at uploadCsv (die_part_import.html:230:34)
+uploadCsv @ die_part_import.html:230
+await in uploadCsv
+onclick @ die_part_import.html:158
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
+```
+
+# 2026/06/18
+
+測定の漏れがないか、過去にさかのぼって表示が出来ないか？
