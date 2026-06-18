@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Die Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 300; }
+    .lang-buttons button { padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 14px; border-left: 6px solid #0078d4; padding-left: 10px; }
+
+    .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-back   { background: #546e7a; color: #fff; }
+    .btn-save   { background: #4caf50; color: #fff; }
+    .btn-update { background: #ff9800; color: #fff; }
+    .btn-delete { background: #e53935; color: #fff; }
+    .btn-csv    { background: #217346; color: #fff; }
+    .btn-clear  { background: #9e9e9e; color: #fff; }
+    .btn-cancel { background: #9e9e9e; color: #fff; }
+
+    .mode-badge { font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 4px; background: #e8f1ff; color: #0078d4; }
+    .mode-badge.update { background: #fff3e0; color: #e65100; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; }
+
+    /* ── Left panel ── */
+    .left-panel { width: 560px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 12px; font-weight: bold; color: #0055a5; border-bottom: 1px solid #ccd8ee; }
+    .card-body { padding: 12px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .form-group { display: flex; flex-direction: column; gap: 3px; }
+    .form-group.full { grid-column: span 2; }
+    label { font-size: 11px; color: #555; font-weight: bold; }
+
+    input[type=text], input[type=date], input[type=number], select {
+      padding: 5px 8px; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 13px; font-family: inherit; width: 100%;
+    }
+    input:focus, select:focus { outline: none; border-color: #0078d4; }
+
+    #barcodeArea { margin-top: 8px; text-align: center; }
+    #barcodeArea svg { max-width: 100%; }
+
+    /* ── PN table ── */
+    #pnSearch { width: 100%; padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 12px; margin-bottom: 8px; }
+    #pnSearch:focus { outline: none; border-color: #0078d4; }
+    .pn-table-wrap { max-height: 190px; overflow-y: auto; }
+    .pn-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    .pn-table th { background: #e8f1ff; padding: 4px 6px; font-size: 10px; position: sticky; top: 0; z-index: 2; border-bottom: 1px solid #e0e0e0; text-align: left; }
+    .pn-table td { padding: 4px 6px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    .pn-table tbody tr { cursor: pointer; }
+    .pn-table tbody tr:hover { background: #f0f8ff; }
+    .pn-table tbody tr.selected { background: #e3f2fd; }
+
+    /* ── Right panel ── */
+    .right-panel { flex: 1; min-width: 0; }
+    .right-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    #dieSearch { padding: 6px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-family: "Roboto Mono", monospace; font-size: 13px; width: 200px; }
+    #dieSearch:focus { outline: none; border-color: #0078d4; }
+    .count-label { font-size: 13px; color: #555; }
+
+    .table-wrap { background: #fff; border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-height: calc(100vh - 170px); }
+    table { border-collapse: collapse; width: max-content; min-width: 100%; }
+    th { background: #e8f1ff; padding: 6px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px; white-space: nowrap; text-align: center; position: sticky; top: 0; z-index: 5; cursor: pointer; }
+    th.no-sort { cursor: default; }
+    .sort-icon { font-size: 9px; margin-left: 2px; opacity: 0.6; }
+    td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; white-space: nowrap; text-align: center; }
+    td.die-num { font-family: "Roboto Mono", monospace; font-weight: bold; text-align: left; max-width: 60px; overflow: hidden; text-overflow: ellipsis; }
+    td.mono    { font-family: "Roboto Mono", monospace; max-width: 100px; overflow: hidden; text-overflow: ellipsis; }
+    td.narrow  { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+    td.xs      { max-width: 52px; overflow: hidden; text-overflow: ellipsis; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #f0f8ff; }
+    tbody tr.selected { background: #fff8e1; }
+    tbody tr.selected:hover { background: #fff3cd; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 200; display: flex; justify-content: center; align-items: center;
+    }
+    .modal-box { background: #fff; border-radius: 10px; padding: 24px; width: 340px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); }
+    .modal-box h2 { font-size: 16px; margin-bottom: 12px; border-left: 5px solid #e53935; padding-left: 10px; }
+    .del-target { font-family: "Roboto Mono", monospace; font-weight: bold; font-size: 14px; margin-bottom: 14px; color: #333; }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">金型登録・管理</h1>
+
+  <div class="toolbar">
+    <button class="btn btn-back"   onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <span   id="modeBadge" class="mode-badge" data-key="mode_new">新規追加モード</span>
+    <button class="btn btn-save"   id="saveBtn"   onclick="saveDie()"        disabled data-key="btn_save">💾 新規追加</button>
+    <button class="btn btn-update" id="updateBtn" onclick="updateDie()"      disabled data-key="btn_update">✏️ 更新</button>
+    <button class="btn btn-delete" id="deleteBtn" onclick="openDeleteModal()" disabled data-key="btn_delete">🗑️ 削除</button>
+    <button class="btn btn-clear"  onclick="clearForm()"                              data-key="btn_clear">✕ クリア</button>
+    <button class="btn btn-csv"    onclick="exportCSV()"                              data-key="btn_csv">📥 CSV</button>
+    <span class="count-label" id="countLabel"></span>
+  </div>
+
+  <div class="layout">
+    <!-- ── Left ── -->
+    <div class="left-panel">
+
+      <div class="card">
+        <div class="card-header" data-key="card_form">入力フォーム</div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group full">
+              <label data-key="lbl_die">Die Number *</label>
+              <input type="text" id="dieNumber"
+                style="font-family:'Roboto Mono',monospace; font-weight:bold; text-transform:uppercase;"
+                oninput="this.value=this.value.toUpperCase(); validate()" />
+            </div>
+            <div class="form-group">
+              <label data-key="lbl_diameter">Diameter *</label>
+              <select id="diameter" onchange="validate()">
+                <option value="">—</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label data-key="lbl_bolster">Bolster *</label>
+              <select id="bolster" onchange="validate()">
+                <option value="">—</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label data-key="lbl_arrival">到着日 *</label>
+              <input type="date" id="arrivalDate" onchange="validate()" />
+            </div>
+            <div class="form-group">
+              <label data-key="lbl_hole">穴数 * (1–6)</label>
+              <input type="number" id="hole" min="1" max="6" step="1" oninput="validate()" />
+            </div>
+            <div class="form-group full">
+              <label data-key="lbl_position">棚番</label>
+              <input type="text" id="position" oninput="updateBarcode()" />
+            </div>
+          </div>
+          <div id="barcodeArea"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" data-key="card_pn">品番選択 *</div>
+        <div class="card-body" style="padding-bottom:4px;">
+          <input type="text" id="pnSearch" placeholder="品番で絞り込み…" oninput="filterPNs()" />
+          <div class="pn-table-wrap">
+            <table class="pn-table">
+              <thead>
+                <tr>
+                  <th data-key="col_cat1">Category 1</th>
+                  <th data-key="col_cat2">Category 2</th>
+                  <th data-key="col_pn">品番</th>
+                  <th data-key="col_lnk">Lnk</th>
+                </tr>
+              </thead>
+              <tbody id="pnBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right ── -->
+    <div class="right-panel">
+      <div class="right-toolbar">
+        <input type="text" id="dieSearch" placeholder="型番で絞り込み…" oninput="filterDies()" />
+        <span class="count-label" id="countLabel"></span>
+      </div>
+      <div class="table-wrap">
+        <table id="dieTable">
+          <thead>
+            <tr>
+              <th data-key="col_die"      style="min-width:60px;">型番 <span class="sort-icon"></span></th>
+              <th data-key="col_dim">直径 <span class="sort-icon"></span></th>
+              <th data-key="col_bolster"  style="min-width:70px;">Bolster <span class="sort-icon"></span></th>
+              <th data-key="col_pn_h"     style="min-width:80px;">PN <span class="sort-icon"></span></th>
+              <th data-key="col_arrival_h" style="min-width:52px;">到着 <span class="sort-icon"></span></th>
+              <th data-key="col_updated"   style="min-width:52px;">更新 <span class="sort-icon"></span></th>
+              <th data-key="col_hole_h"    style="min-width:36px;">穴数 <span class="sort-icon"></span></th>
+              <th data-key="col_pos"       style="min-width:52px;">棚番 <span class="sort-icon"></span></th>
+            </tr>
+          </thead>
+          <tbody id="dieBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete modal -->
+  <div class="modal-overlay" id="deleteModal" style="display:none" onclick="onOverlayClick(event)">
+    <div class="modal-box">
+      <h2 data-key="del_title">🗑️ 削除確認</h2>
+      <div class="del-target" id="deleteTarget"></div>
+      <div class="form-group">
+        <label data-key="del_emp">従業員番号（7桁）</label>
+        <input type="text" id="empNumber" maxlength="7" oninput="checkEmpNumber()" placeholder="0000000" style="font-family:'Roboto Mono',monospace;" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-delete"  id="confirmDeleteBtn" onclick="executeDel()" disabled data-key="del_confirm">削除実行</button>
+        <button class="btn btn-cancel"  onclick="closeDeleteModal()"                          data-key="del_cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+  <script>
+    const PHP_DIE = '../diereport/ext0.11/exd11/php/Die/';
+    const PHP_PN  = '../diereport/ext0.11/exd11/php/ProductionNumber/';
+
+    /* ── 多言語辞書 ── */
+    const dict = {
+      ja: {
+        title: '金型登録・管理', btn_back: '← 戻る',
+        btn_save: '💾 新規追加', btn_update: '✏️ 更新',
+        btn_delete: '🗑️ 削除', btn_clear: '✕ クリア', btn_csv: '📥 CSV',
+        mode_new: '新規追加モード', mode_update: '更新モード',
+        card_form: '入力フォーム', card_pn: '品番選択 *',
+        lbl_die: 'Die Number *', lbl_diameter: 'Diameter *', lbl_bolster: 'Bolster *',
+        lbl_arrival: '到着日 *', lbl_hole: '穴数 * (1–6)', lbl_position: '棚番',
+        col_cat1: 'Category 1', col_cat2: 'Category 2', col_pn: '品番', col_lnk: 'Lnk',
+        col_die: '型番', col_dim: '直径', col_bolster: 'Bolster', col_pn_h: 'PN',
+        col_arrival_h: '到着', col_updated: '更新', col_hole_h: '穴数', col_pos: '棚番',
+        del_title: '🗑️ 削除確認', del_emp: '従業員番号（7桁）',
+        del_confirm: '削除実行', del_cancel: 'キャンセル',
+        count: n => `${n} 件`,
+        dup_error: 'この型番は既に登録されています',
+        pn_ph: '品番で絞り込み…', die_ph: '型番で絞り込み…',
+      },
+      vi: {
+        title: 'Đăng ký & Quản lý khuôn', btn_back: '← Quay lại',
+        btn_save: '💾 Thêm mới', btn_update: '✏️ Cập nhật',
+        btn_delete: '🗑️ Xóa', btn_clear: '✕ Xóa trắng', btn_csv: '📥 CSV',
+        mode_new: 'Chế độ thêm mới', mode_update: 'Chế độ cập nhật',
+        card_form: 'Nhập liệu', card_pn: 'Chọn mã SP *',
+        lbl_die: 'Số khuôn *', lbl_diameter: 'Đường kính *', lbl_bolster: 'Bolster *',
+        lbl_arrival: 'Ngày đến *', lbl_hole: 'Số lỗ * (1–6)', lbl_position: 'Vị trí',
+        col_cat1: 'Category 1', col_cat2: 'Category 2', col_pn: 'Mã SP', col_lnk: 'Lnk',
+        col_die: 'Số khuôn', col_dim: 'Đường kính', col_bolster: 'Bolster', col_pn_h: 'Mã SP',
+        col_arrival_h: 'Ngày đến', col_updated: 'Cập nhật', col_hole_h: 'Số lỗ', col_pos: 'Vị trí',
+        del_title: '🗑️ Xác nhận xóa', del_emp: 'Mã nhân viên (7 chữ số)',
+        del_confirm: 'Xóa', del_cancel: 'Hủy',
+        count: n => `${n} mục`,
+        dup_error: 'Số khuôn này đã được đăng ký',
+        pn_ph: 'Lọc theo mã SP…', die_ph: 'Lọc theo số khuôn…',
+      },
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'ja';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      document.getElementById('btnJa').classList.toggle('active', lang === 'ja');
+      document.getElementById('btnVi').classList.toggle('active', lang === 'vi');
+      const t = dict[lang];
+      document.querySelectorAll('[data-key]').forEach(el => {
+        const v = t[el.dataset.key];
+        if (v && typeof v !== 'function') el.textContent = v;
+      });
+      document.getElementById('pnSearch').placeholder  = t.pn_ph;
+      document.getElementById('dieSearch').placeholder = t.die_ph;
+      updateCountLabel();
+      updateModeBadge();
+    }
+
+    /* ── State ── */
+    let allDies      = [];
+    let allPNs       = [];
+    let empNumbers   = [];
+    let selectedDieId = null;
+    let selectedPNId  = null;
+    let isUpdateMode  = false;
+    let sortKey = 'die_number';
+    let sortDir = 'asc';
+
+    const SORT_KEYS = {
+      0: 'die_number', 1: 'die_diamater', 2: 'bolster_name',
+      3: 'production_number', 4: 'arrival_at', 5: 'updated_at',
+      6: 'hole', 7: 'die_postition',
+    };
+    // ※ th[data-key] の index は id 列削除後 0-based で一致
+
+    /* ── HTTP helper ── */
+    async function post(url, params = {}) {
+      const body = Object.entries(params)
+        .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v ?? ''))
+        .join('&');
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+      });
+      return res.json();
+    }
+
+    /* ── 初期化 ── */
+    async function init() {
+      document.getElementById('arrivalDate').value = new Date().toISOString().slice(0, 10);
+      setLang(currentLang);
+      await Promise.all([loadDiameters(), loadBolsters(), loadPNs(), loadDies(), loadEmpNumbers()]);
+    }
+
+    async function loadDiameters() {
+      const data = await post(PHP_DIE + 'SelDiamater.php', { dieName: '%' });
+      const sel  = document.getElementById('diameter');
+      data.forEach(d => {
+        const o = document.createElement('option');
+        o.value = d.id;
+        o.textContent = 'ø' + d.die_diamater;
+        sel.appendChild(o);
+      });
+    }
+
+    async function loadBolsters() {
+      const data = await post(PHP_DIE + 'SelBolster.php', { dieName: '%' });
+      const sel  = document.getElementById('bolster');
+      data.forEach(d => {
+        const o = document.createElement('option');
+        o.value = d.id;
+        o.textContent = d.bolster_name;
+        sel.appendChild(o);
+      });
+    }
+
+    async function loadPNs() {
+      allPNs = await post(PHP_DIE + 'SelProductionNumber.php', { production_number: '%' });
+      renderPNTable(allPNs);
+    }
+
+    async function loadDies() {
+      allDies = await post(PHP_DIE + 'SelSummaryV2.php', { dieName: '%' });
+      renderDieTable(allDies);
+    }
+
+    async function loadEmpNumbers() {
+      empNumbers = await post(PHP_PN + 'SelEmploeeNumber.php', { dummy: 'dummy' });
+    }
+
+    /* ── PN テーブル ── */
+    function renderPNTable(data) {
+      const tbody = document.getElementById('pnBody');
+      tbody.innerHTML = '';
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.id;
+        if (String(row.id) === String(selectedPNId)) tr.classList.add('selected');
+        tr.innerHTML = `
+          <td>${row.category1 ?? ''}</td>
+          <td>${row.category2 ?? ''}</td>
+          <td style="font-family:'Roboto Mono',monospace;">${row.production_number ?? ''}</td>
+          <td>${row.linked_dies ?? 0}</td>
+        `;
+        tr.addEventListener('click', () => {
+          selectedPNId = row.id;
+          document.querySelectorAll('#pnBody tr').forEach(r =>
+            r.classList.toggle('selected', String(r.dataset.id) === String(row.id))
+          );
+          validate();
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function filterPNs() {
+      const q = document.getElementById('pnSearch').value.trim().toUpperCase();
+      renderPNTable(q ? allPNs.filter(r => (r.production_number ?? '').toUpperCase().includes(q)) : allPNs);
+    }
+
+    /* ── Die テーブル ── */
+    function renderDieTable(data) {
+      const sorted = [...data].sort((a, b) => {
+        const v1 = a[sortKey] ?? '', v2 = b[sortKey] ?? '';
+        return sortDir === 'asc' ? (v1 > v2 ? 1 : -1) : (v1 < v2 ? 1 : -1);
+      });
+
+      const tbody = document.getElementById('dieBody');
+      tbody.innerHTML = '';
+      sorted.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.dataset.id = row.id;
+        if (String(row.id) === String(selectedDieId)) tr.classList.add('selected');
+        tr.innerHTML = `
+          <td class="die-num">${row.die_number ?? ''}</td>
+          <td>${row.die_diamater ? 'ø' + row.die_diamater : ''}</td>
+          <td class="narrow">${row.bolster_name ?? ''}</td>
+          <td class="mono">${row.production_number ?? ''}</td>
+          <td class="xs">${row.arrival_at ?? ''}</td>
+          <td class="xs">${row.updated_at ?? ''}</td>
+          <td>${row.hole ?? ''}</td>
+          <td class="xs">${row.die_postition ?? ''}</td>
+        `;
+        tr.addEventListener('click', () => selectDie(row));
+        tbody.appendChild(tr);
+      });
+      updateCountLabel();
+    }
+
+    function filterDies() {
+      const q = document.getElementById('dieSearch').value.trim().toUpperCase();
+      renderDieTable(q ? allDies.filter(r => (r.die_number ?? '').toUpperCase().includes(q)) : allDies);
+    }
+
+    function updateCountLabel() {
+      const n = document.querySelectorAll('#dieBody tr').length;
+      document.getElementById('countLabel').textContent = dict[currentLang].count(n);
+    }
+
+    /* ── ソート ── */
+    document.querySelectorAll('#dieTable th[data-key]').forEach((th, idx) => {
+      th.style.cursor = 'pointer';
+      th.addEventListener('click', () => {
+        const key = SORT_KEYS[idx];
+        if (!key) return;
+        sortDir = (sortKey === key && sortDir === 'asc') ? 'desc' : 'asc';
+        sortKey = key;
+        document.querySelectorAll('#dieTable .sort-icon').forEach(i => i.textContent = '');
+        const icon = th.querySelector('.sort-icon');
+        if (icon) icon.textContent = sortDir === 'asc' ? '▲' : '▼';
+        filterDies();
+      });
+    });
+
+    /* ── 行選択（フォームへ反映） ── */
+    function selectDie(row) {
+      if (String(row.id) === String(selectedDieId)) { clearForm(); return; }
+
+      selectedDieId = row.id;
+      isUpdateMode  = true;
+      document.querySelectorAll('#dieBody tr').forEach(tr =>
+        tr.classList.toggle('selected', String(tr.dataset.id) === String(row.id))
+      );
+
+      document.getElementById('dieNumber').value   = row.die_number ?? '';
+      document.getElementById('arrivalDate').value  = row.arrival_at ? '20' + row.arrival_at : '';
+      document.getElementById('hole').value         = row.hole ?? '';
+      document.getElementById('position').value     = row.die_postition ?? '';
+
+      const dsel = document.getElementById('diameter');
+      [...dsel.options].forEach(o => { if (o.textContent === 'ø' + row.die_diamater) dsel.value = o.value; });
+
+      const bsel = document.getElementById('bolster');
+      [...bsel.options].forEach(o => { if (o.textContent === row.bolster_name) bsel.value = o.value; });
+
+      const pnRow = allPNs.find(p => p.production_number === row.production_number);
+      if (pnRow) { selectedPNId = pnRow.id; renderPNTable(allPNs); }
+
+      updateBarcode();
+      updateModeBadge();
+      document.getElementById('saveBtn').disabled   = true;
+      document.getElementById('updateBtn').disabled = false;
+      document.getElementById('deleteBtn').disabled = false;
+    }
+
+    /* ── クリア ── */
+    function clearForm() {
+      selectedDieId = null;
+      selectedPNId  = null;
+      isUpdateMode  = false;
+      document.getElementById('dieNumber').value   = '';
+      document.getElementById('diameter').value    = '';
+      document.getElementById('bolster').value     = '';
+      document.getElementById('arrivalDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('hole').value        = '';
+      document.getElementById('position').value    = '';
+      document.getElementById('barcodeArea').innerHTML = '';
+      document.querySelectorAll('#dieBody tr').forEach(tr => tr.classList.remove('selected'));
+      renderPNTable(allPNs);
+      updateModeBadge();
+      document.getElementById('saveBtn').disabled   = true;
+      document.getElementById('updateBtn').disabled = true;
+      document.getElementById('deleteBtn').disabled = true;
+    }
+
+    function updateModeBadge() {
+      const badge = document.getElementById('modeBadge');
+      const t = dict[currentLang];
+      badge.textContent = isUpdateMode ? t.mode_update : t.mode_new;
+      badge.className   = 'mode-badge' + (isUpdateMode ? ' update' : '');
+    }
+
+    /* ── バリデーション ── */
+    function validate() {
+      const dieOk     = document.getElementById('dieNumber').value.trim().length >= 3;
+      const diamOk    = !!document.getElementById('diameter').value;
+      const boltOk    = !!document.getElementById('bolster').value;
+      const arrivalOk = !!document.getElementById('arrivalDate').value;
+      const holeVal   = parseInt(document.getElementById('hole').value);
+      const holeOk    = Number.isInteger(holeVal) && holeVal >= 1 && holeVal <= 6;
+      const ok        = dieOk && diamOk && boltOk && arrivalOk && holeOk && !!selectedPNId;
+
+      if (isUpdateMode) {
+        document.getElementById('updateBtn').disabled = !ok;
+      } else {
+        document.getElementById('saveBtn').disabled = !ok;
+      }
+    }
+
+    /* ── バーコード ── */
+    function updateBarcode() {
+      const val  = document.getElementById('position').value.trim();
+      const area = document.getElementById('barcodeArea');
+      if (!val) { area.innerHTML = ''; return; }
+      area.innerHTML = '<svg id="barcodeSvg"></svg>';
+      try {
+        JsBarcode('#barcodeSvg', val, { width: 2, height: 50, displayValue: true, fontSize: 12 });
+      } catch (e) { area.innerHTML = ''; }
+    }
+
+    /* ── 新規保存 ── */
+    async function saveDie() {
+      const dieNum = document.getElementById('dieNumber').value.trim();
+      if (allDies.some(d => d.die_number === dieNum)) {
+        alert(dict[currentLang].dup_error); return;
+      }
+      await post(PHP_DIE + 'InsDieV2.php', {
+        die_number:           dieNum,
+        die_diamater__select: document.getElementById('diameter').value,
+        bolster__select:      document.getElementById('bolster').value,
+        arrival_date:         document.getElementById('arrivalDate').value,
+        whole__input:         document.getElementById('hole').value,
+        die_postition:        document.getElementById('position').value,
+        production_number_id: selectedPNId,
+        today:                new Date().toISOString().slice(0, 10),
+      });
+      await loadDies();
+      clearForm();
+    }
+
+    /* ── 更新 ── */
+    async function updateDie() {
+      await post(PHP_DIE + 'UpdateDataV2.php', {
+        die_number:           document.getElementById('dieNumber').value.trim(),
+        die_diamater__select: document.getElementById('diameter').value,
+        bolster__select:      document.getElementById('bolster').value,
+        arrival_date:         document.getElementById('arrivalDate').value,
+        whole__input:         document.getElementById('hole').value,
+        die_postition:        document.getElementById('position').value,
+        production_number_id: selectedPNId,
+        targetId:             selectedDieId,
+        today:                new Date().toISOString().slice(0, 10),
+      });
+      await loadDies();
+      clearForm();
+    }
+
+    /* ── 削除モーダル ── */
+    function openDeleteModal() {
+      if (!selectedDieId) return;
+      const row = allDies.find(d => String(d.id) === String(selectedDieId));
+      document.getElementById('deleteTarget').textContent = row?.die_number ?? '';
+      document.getElementById('empNumber').value = '';
+      document.getElementById('confirmDeleteBtn').disabled = true;
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; }
+    function onOverlayClick(e) { if (e.target === document.getElementById('deleteModal')) closeDeleteModal(); }
+
+    function checkEmpNumber() {
+      const val   = document.getElementById('empNumber').value;
+      const valid = val.length === 7 && empNumbers.some(e => e.emploee_number == val && e.position_id == 1);
+      document.getElementById('confirmDeleteBtn').disabled = !valid;
+    }
+
+    async function executeDel() {
+      await post(PHP_DIE + 'DelDie.php', { id: selectedDieId });
+      closeDeleteModal();
+      await loadDies();
+      clearForm();
+    }
+
+    /* ── CSV出力 ── */
+    function exportCSV() {
+      const headers = ['型番','直径','Bolster','品番','到着','更新','穴数','棚番'];
+      const rows    = allDies.map(r => [
+        r.die_number, r.die_diamater ? 'ø'+r.die_diamater : '',
+        r.bolster_name, r.production_number,
+        r.arrival_at, r.updated_at, r.hole, r.die_postition ?? '',
+      ]);
+      const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+      const csv = [headers, ...rows].map(row => row.map(esc).join(',')).join('\r\n');
+      const a   = Object.assign(document.createElement('a'), {
+        href: URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })),
+        download: `dies_${new Date().toISOString().slice(0, 10)}.csv`,
+      });
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    init();
+  </script>
+</body>
+</html>

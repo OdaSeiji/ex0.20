@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>型検進捗管理</title>
+  <title>Die Handover Progress</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -181,7 +181,7 @@
           <th data-col="vn_production_dimensional_inspection_at"  data-key="col_vn_prod">VN製造型検日 <span class="sort-icon"></span></th>
           <th data-col="vn_qa_dimensional_inspection_at"          data-key="col_vn_qa">VN QA型検日 <span class="sort-icon"></span></th>
           <th data-col="submit_dimensional_inspection_to_japan_at" data-key="col_submit_jp">型検日本提出日 <span class="sort-icon"></span></th>
-          <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検日 <span class="sort-icon"></span></th>
+          <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検送付 <span class="sort-icon"></span></th>
           <th data-col="jp_dimensional_inspection_document_number" data-key="col_jp_doc">日本型検文書番号 <span class="sort-icon"></span></th>
           <th class="no-sort"                                     data-key="col_anodize_req">アルマイト確認要否</th>
           <th data-col="anodizing_quality_check_at"               data-key="col_anodize_at">アルマイト確認日 <span class="sort-icon"></span></th>
@@ -236,7 +236,7 @@
         col_vn_prod:   "VN製造型検日",
         col_vn_qa:     "VN QA型検日",
         col_submit_jp: "型検日本提出日",
-        col_jp_insp:   "日本型検日",
+        col_jp_insp:   "日本型検送付",
         col_jp_doc:    "日本型検文書番号",
         col_anodize_req: "アルマイト確認要否",
         col_anodize_at:  "アルマイト確認日",
@@ -262,7 +262,7 @@
         f_vn_prod:     "VN製造型検日",
         f_vn_qa:       "VN QA型検日",
         f_submit_jp:   "型検日本提出日",
-        f_jp_insp:     "日本型検日",
+        f_jp_insp:     "日本型検送付",
         f_jp_doc:      "日本型検文書番号",
         f_anodize_req: "アルマイト確認要否",
         f_anodize_at:  "アルマイト確認日",
@@ -752,7 +752,7 @@
     function exportCSV() {
       const headersJa = [
         "型番","Step","到着日","VN製造型検日","VN QA型検日",
-        "型検日本提出日","日本型検日","日本型検文書番号","アルマイト確認要否",
+        "型検日本提出日","日本型検送付","日本型検文書番号","アルマイト確認要否",
         "アルマイト確認日","量産トライ日","金型移管日","量産開始日",
         "切替業連発行日","寸法検査担当者","BCP","移管準備完了","メモ"
       ];
