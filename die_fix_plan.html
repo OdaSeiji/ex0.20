@@ -512,7 +512,7 @@
      スタッフ一覧
   ------------------------------ */
       function loadStaffList() {
-        fetch("./php/die_progress_php/get_staff_list.php?roles=die_setup,admin,null")
+        fetch("./php/die_progress_php/get_staff_list.php?roles=maintenance,admin")
           .then((res) => res.json())
           .then((list) => {
             const sel = document.getElementById("plan_fix_staff_id");
