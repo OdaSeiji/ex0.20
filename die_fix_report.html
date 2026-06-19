@@ -341,7 +341,7 @@
         スタッフ一覧
       ============================================================ */
       async function loadStaff() {
-        const res = await fetch("./php/die_progress_php/get_staff_list.php?roles=die_setup,admin,null");
+        const res = await fetch("./php/die_progress_php/get_staff_list.php?roles=maintenance,admin");
         const staff = await res.json();
 
         const sel = document.getElementById("actual_fix_staff_id");
