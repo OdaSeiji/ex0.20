@@ -5189,3 +5189,14 @@ onclick @ die_part_import.html:158
 # 2026/06/19
 
 Nguyễn Phước Thịnhさんが、金型修理画面でひょじされない。
+
+# 2026/06/22
+
+金型図面の表示,phpの位置がテスト機と異なるため、うまく表示できない。phpも、ex0.20で完結するべき
+
+<figure style="text-align:center;">
+  <img src="./img/20260622-01.png" width="500">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+金型登録画面も、phpの位置がおかしい。
