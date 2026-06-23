@@ -865,6 +865,8 @@
           const img = document.createElement("img");
           img.src = "../uploads/" + f.file_path; // ← DB のパス
           img.className = "preview-img";
+          img.style.cursor = "pointer";
+          img.onclick = () => openModal(img.src);
 
           // DOM 組み立て
           div.appendChild(del);
