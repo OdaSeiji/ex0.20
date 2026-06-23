@@ -101,7 +101,7 @@
 
       th,
       td {
-        padding: 10px;
+        padding: 8px 6px;
         border-bottom: 1px solid #ddd;
         text-align: center;
       }
@@ -208,16 +208,16 @@
 
       /* 3列目：重点管理バッジ */
       #progressTable th:nth-child(3),
-      #progressTable td:nth-child(3) { width: 54px; text-align: center; }
+      #progressTable td:nth-child(3) { width: 44px; text-align: center; padding-left: 2px; padding-right: 2px; }
 
-      /* 4列目：押出種別 */
+      /* 4列目：優先度 */
       #progressTable th:nth-child(4),
-      #progressTable td:nth-child(4) { width: 100px; }
-      #progressTable th:nth-child(4) select.die-search { width: 48px; margin-left: 4px; }
+      #progressTable td:nth-child(4) { width: 50px; text-align: center; padding-left: 2px; padding-right: 2px; }
 
-      /* 5列目：優先度 */
+      /* 5列目：押出種別 */
       #progressTable th:nth-child(5),
-      #progressTable td:nth-child(5) { width: 54px; text-align: center; }
+      #progressTable td:nth-child(5) { width: 60px; text-align: center; padding-left: 2px; padding-right: 2px; }
+      #progressTable th:nth-child(5) select.die-search { width: 40px; margin-left: 2px; }
 
       /* 6列目：コンディション */
       #progressTable th:nth-child(6),
@@ -1195,7 +1195,7 @@
             : `<td></td>`;
 
           tr.innerHTML = `
-            <td>${row.press_date}</td>
+            <td>${formatDate(row.press_date)}</td>
             <td class="die-number">${row.die_number}</td>
             ${watchCell}
             ${issueCell}
@@ -1690,7 +1690,7 @@
 
         // 3. 基本情報
         document.getElementById("pv_fp_die").textContent        = data.die_number  || "-";
-        document.getElementById("pv_fp_press_date").textContent = data.press_date  || "-";
+        document.getElementById("pv_fp_press_date").textContent = formatDate(data.press_date) || "-";
         document.getElementById("pv_fp_die_row").style.display        = "block";
         document.getElementById("pv_fp_press_date_row").style.display = "block";
 

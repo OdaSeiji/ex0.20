@@ -450,7 +450,7 @@
       );
 
       document.getElementById('dieNumber').value   = row.die_number ?? '';
-      document.getElementById('arrivalDate').value  = row.arrival_at ? '20' + row.arrival_at : '';
+      document.getElementById('arrivalDate').value  = (row.arrival_at && row.arrival_at !== '00-00-00') ? '20' + row.arrival_at : '';
       document.getElementById('hole').value         = row.hole ?? '';
       document.getElementById('position').value     = row.die_postition ?? '';
 

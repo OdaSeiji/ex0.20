@@ -163,7 +163,7 @@ LEFT JOIN m_die_conditions mc
 
 $where
 ORDER BY p.press_date_at DESC, p.id DESC
-LIMIT 200
+LIMIT 400
 ";
 
 $stmt = $pdo->prepare($sql);

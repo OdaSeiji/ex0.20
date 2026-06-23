@@ -11,8 +11,8 @@ $stmt = $pdo->prepare("
         m_dies_diamater.die_diamater,
         IFNULL(m_bolster.bolster_name, '') AS bolster_name,
         m_production_numbers.production_number,
-        IFNULL(DATE_FORMAT(m_dies.arrival_at, '%y-%m-%d'), '') AS arrival_at,
-        IFNULL(DATE_FORMAT(m_dies.updated_at, '%y-%m-%d'), '') AS updated_at,
+        IF(m_dies.arrival_at IS NULL OR m_dies.arrival_at = '0000-00-00', '', DATE_FORMAT(m_dies.arrival_at, '%y-%m-%d')) AS arrival_at,
+        IF(m_dies.updated_at IS NULL OR m_dies.updated_at = '0000-00-00', '', DATE_FORMAT(m_dies.updated_at, '%y-%m-%d')) AS updated_at,
         m_dies.hole,
         die_postition
     FROM m_dies
