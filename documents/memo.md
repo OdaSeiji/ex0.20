@@ -5236,3 +5236,84 @@ Stack trace:
 #1 {main}
   thrown in <b>C:\xampp\htdocs\ex0.20\php\die_register\UpdateDataV2.php</b> on line <b>18</b><br />
 ```
+
+# 2026/06/29
+
+http://10.163.50.17/ex0.20/die_handover_progress.html
+更新順でソートしたい。
+
+なぜか、以下のデータが、測定完了にならない。
+
+```
+advance_condition
+:
+null
+approved
+:
+null
+diagnosed
+:
+null
+die_condition_id
+:
+3
+die_condition_name
+:
+"Mass Production"
+die_number
+:
+"MXS16B-V03D"
+fix_plan
+:
+null
+fix_plan_approval
+:
+null
+fix_report
+:
+null
+fix_report_approval
+:
+null
+inspected
+:
+1
+issue_priority
+:
+null
+need_fix
+:
+null
+ng_action
+:
+null
+plan_completion_date
+:
+null
+press_date
+:
+"2026-06-25"
+press_id
+:
+11695
+pressing_symbol
+:
+"〇"
+watch_priority
+:
+null
+```
+
+測定データは有るのだが、、、
+
+```
+mysql> select * from t_die_inspection di where di.press_id = 11695;
++-----+----------+--------+---------------------+---------------------+------------------+--------------+----------------+---------------+------------------------+-----------------------------------+------+-------------------+----------+---------------------+
+| id  | press_id | die_id | inspection_date     | inspection_staff_id | dimension_result | shape_result | overall_result | memo          | cmm                    | lm_im                             | gage | surface_roughness | diesmark | created_at          |
++-----+----------+--------+---------------------+---------------------+------------------+--------------+----------------+---------------+------------------------+-----------------------------------+------+-------------------+----------+---------------------+
+| 145 |    11695 |   1036 | 2026-06-25 00:00:00 |                  41 | NG               | OK           | NG             | NGO?I QUAN:OK | TR??C K?O C?Y 1:NG MAX |  TR??C K?O :NG K?CH TH??C ;11,21, |      | RM:OK             | OK       | 2026-06-25 16:05:25 |
++-----+----------+--------+---------------------+---------------------+------------------+--------------+----------------+---------------+------------------------+-----------------------------------+------+-------------------+----------+---------------------+
+1 row in set (0.10 sec)
+
+mysql>
+```
