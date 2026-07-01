@@ -5328,3 +5328,10 @@ mysql>
 # 2026/07/01
 
 t_die_handover_progress.jp_dimensional_inspection_atがhttp://10.163.50.17/ex0.20/die_handover_progress.htmlに表示されていない？
+
+いや、問題ないが、日本語の表記がおかしい。これ日本型検合格日。
+
+<figure style="text-align:center;">
+  <img src="./img/20260701-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
