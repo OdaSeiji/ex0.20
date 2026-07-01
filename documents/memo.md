@@ -5317,3 +5317,14 @@ mysql> select * from t_die_inspection di where di.press_id = 11695;
 
 mysql>
 ```
+
+同じpress_idに二つの測定が出来ちゃうのね。。。
+
+<figure style="text-align:center;">
+  <img src="./img/20260629-01.png" width="500">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+# 2026/07/01
+
+t_die_handover_progress.jp_dimensional_inspection_atがhttp://10.163.50.17/ex0.20/die_handover_progress.htmlに表示されていない？
