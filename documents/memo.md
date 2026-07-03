@@ -5335,3 +5335,6 @@ t_die_handover_progress.jp_dimensional_inspection_atがhttp://10.163.50.17/ex0.2
   <img src="./img/20260701-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+型検画面、日付を直接入力できるように。
+それと更新日時を表示した方がいいかな。。。
