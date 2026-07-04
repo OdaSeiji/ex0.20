@@ -56,6 +56,13 @@
     .badge-registered   { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
     .flag-on { color: #1565c0; font-weight: bold; }
     .notice-field[readonly] { background: #e8e8e8 !important; cursor: pointer; color: #555; }
+    td.date-cell { cursor: pointer; }
+    td.date-cell.cell-selected { background: #fff3cd !important; outline: 2px solid #f9a825; outline-offset: -2px; }
+    td.date-cell .date-input {
+      width: 98px; padding: 1px 2px; border: 1px solid #90c0f0; border-radius: 3px;
+      font-size: 11px; font-family: "Roboto Mono", monospace; background: #f0f8ff;
+      box-sizing: border-box; line-height: normal;
+    }
 
     .filter-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; align-items: center; }
     .filter-btn {
@@ -181,7 +188,7 @@
           <th data-col="vn_production_dimensional_inspection_at"  data-key="col_vn_prod">VN製造型検日 <span class="sort-icon"></span></th>
           <th data-col="vn_qa_dimensional_inspection_at"          data-key="col_vn_qa">VN QA型検日 <span class="sort-icon"></span></th>
           <th data-col="submit_dimensional_inspection_to_japan_at" data-key="col_submit_jp">型検日本提出日 <span class="sort-icon"></span></th>
-          <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検送付 <span class="sort-icon"></span></th>
+          <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検合格日 <span class="sort-icon"></span></th>
           <th data-col="jp_dimensional_inspection_document_number" data-key="col_jp_doc">日本型検文書番号 <span class="sort-icon"></span></th>
           <th class="no-sort"                                     data-key="col_anodize_req">アルマイト確認要否</th>
           <th data-col="anodizing_quality_check_at"               data-key="col_anodize_at">アルマイト確認日 <span class="sort-icon"></span></th>
@@ -236,7 +243,7 @@
         col_vn_prod:   "VN製造型検日",
         col_vn_qa:     "VN QA型検日",
         col_submit_jp: "型検日本提出日",
-        col_jp_insp:   "日本型検送付",
+        col_jp_insp:   "日本型検合格日",
         col_jp_doc:    "日本型検文書番号",
         col_anodize_req: "アルマイト確認要否",
         col_anodize_at:  "アルマイト確認日",
@@ -262,7 +269,7 @@
         f_vn_prod:     "VN製造型検日",
         f_vn_qa:       "VN QA型検日",
         f_submit_jp:   "型検日本提出日",
-        f_jp_insp:     "日本型検送付",
+        f_jp_insp:     "日本型検合格日",
         f_jp_doc:      "日本型検文書番号",
         f_anodize_req: "アルマイト確認要否",
         f_anodize_at:  "アルマイト確認日",
@@ -444,6 +451,13 @@
     /* =====================================================
        テーブル描画
     ===================================================== */
+    function makeDateCell(field, dieId, hpId, val) {
+      return `<td class="mono date-cell" data-field="${field}" data-die-id="${dieId}" data-hp-id="${hpId ?? ''}" title="クリックして編集">`
+           + `<span class="date-text">${fmtDate(val)}</span>`
+           + `<input type="date" class="date-input" value="${rawDate(val)}" style="display:none">`
+           + `</td>`;
+    }
+
     function renderTable(data) {
       const sorted = [...data];
       if (sortCol) {
@@ -476,17 +490,17 @@
           </td>
           <td class="die-num sticky-die">${row.die_number ?? ""}</td>
           <td class="mono">${row.die_planning_phase_steps ?? ""}</td>
-          <td class="mono">${fmtDate(row.arrival_at)}</td>
-          <td class="mono">${fmtDate(row.vn_production_dimensional_inspection_at)}</td>
-          <td class="mono">${fmtDate(row.vn_qa_dimensional_inspection_at)}</td>
-          <td class="mono">${fmtDate(row.submit_dimensional_inspection_to_japan_at)}</td>
-          <td class="mono">${fmtDate(row.jp_dimensional_inspection_at)}</td>
+          ${makeDateCell("arrival_at", dieId, row.id, row.arrival_at)}
+          ${makeDateCell("vn_production_dimensional_inspection_at", dieId, row.id, row.vn_production_dimensional_inspection_at)}
+          ${makeDateCell("vn_qa_dimensional_inspection_at", dieId, row.id, row.vn_qa_dimensional_inspection_at)}
+          ${makeDateCell("submit_dimensional_inspection_to_japan_at", dieId, row.id, row.submit_dimensional_inspection_to_japan_at)}
+          ${makeDateCell("jp_dimensional_inspection_at", dieId, row.id, row.jp_dimensional_inspection_at)}
           <td class="mono">${row.jp_dimensional_inspection_document_number ?? ""}</td>
           <td>${flag(row.anodizing_quality_check_required_flag)}</td>
-          <td class="mono">${fmtDate(row.anodizing_quality_check_at)}</td>
-          <td class="mono">${fmtDate(row.mass_production_trial_at)}</td>
-          <td class="mono">${fmtDate(row.die_handover_at)}</td>
-          <td class="mono">${fmtDate(row.mass_production_start_at)}</td>
+          ${makeDateCell("anodizing_quality_check_at", dieId, row.id, row.anodizing_quality_check_at)}
+          ${makeDateCell("mass_production_trial_at", dieId, row.id, row.mass_production_trial_at)}
+          ${makeDateCell("die_handover_at", dieId, row.id, row.die_handover_at)}
+          ${makeDateCell("mass_production_start_at", dieId, row.id, row.mass_production_start_at)}
           <td class="mono">${row.production_site_change_notice ?? ""}</td>
           <td class="mono">${row.dimensional_inspection_by ?? ""}</td>
           <td>${flag(row.bcp_flag)}</td>
@@ -796,6 +810,83 @@
     window.onload = async () => {
       setLang(currentLang);
       await loadData();
+
+      // インライン日付編集
+      const mainTable = document.getElementById("mainTable");
+      mainTable.addEventListener("click", function(e) {
+        const cell = e.target.closest("td.date-cell");
+        if (!cell) {
+          // テーブル内の別セルをクリック → 選択解除
+          document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
+          return;
+        }
+        const inp = cell.querySelector(".date-input");
+        if (!inp || inp.style.display !== "none") return;
+        if (cell.classList.contains("cell-selected")) {
+          // 2回目クリック：編集モード
+          document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
+          inp.dataset.original = inp.value;
+          cell.querySelector(".date-text").style.display = "none";
+          inp.style.display = "";
+          inp.focus();
+          try { inp.showPicker(); } catch(_) {}
+        } else {
+          // 1回目クリック：選択（変色）
+          document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
+          cell.classList.add("cell-selected");
+        }
+      });
+      document.addEventListener("click", function(e) {
+        if (!e.target.closest("#mainTable")) {
+          document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
+        }
+      });
+      let escaping = false;
+      mainTable.addEventListener("keydown", function(e) {
+        if (e.key !== "Escape") return;
+        const inp = document.activeElement;
+        if (!inp || !inp.classList.contains("date-input")) return;
+        const cell = inp.closest("td.date-cell");
+        if (!cell) return;
+        escaping = true;
+        inp.value = inp.dataset.original ?? "";
+        inp.style.display = "none";
+        cell.querySelector(".date-text").style.display = "";
+      });
+      mainTable.addEventListener("focusout", async function(e) {
+        if (!e.target.classList.contains("date-input")) return;
+        if (escaping) { escaping = false; return; }
+        const inp   = e.target;
+        const cell  = inp.closest("td.date-cell");
+        if (!cell) return;
+        const span  = cell.querySelector(".date-text");
+        const field = cell.dataset.field;
+        const dieId = cell.dataset.dieId;
+        const hpId  = cell.dataset.hpId;
+        const newVal = inp.value || null;
+        inp.style.display  = "none";
+        span.style.display = "";
+        span.textContent   = fmtDate(newVal);
+        const needsInsert = !hpId;
+        const payload = [{ die_id: Number(dieId), id: hpId ? Number(hpId) : null, [field]: newVal }];
+        const res = await fetch("./php/die_handover_progress_php/save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.status === "ok") {
+          const row = allData.find(r => String(r.die_id) === String(dieId));
+          if (row) row[field] = newVal;
+          const frow = filteredData.find(r => String(r.die_id) === String(dieId));
+          if (frow) frow[field] = newVal;
+          if (needsInsert) await loadData();
+        } else {
+          alert(dict[currentLang].save_err + ": " + (result.message ?? ""));
+          const row = allData.find(r => String(r.die_id) === String(dieId));
+          span.textContent = fmtDate(row ? row[field] : null);
+        }
+      });
 
       const input = document.getElementById("searchDie");
       const tip   = document.getElementById("wildcardTip");
