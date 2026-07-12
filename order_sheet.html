@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Order Sheet</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1300px; margin: 0 auto; }
+
+      .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 300; }
+      .lang-buttons button {
+        padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+      }
+      .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+      /* ── ヘッダー ── */
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        font-size: 13px; white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+
+      /* ── カード共通 ── */
+      .card {
+        background: #fff; border-radius: 10px;
+        padding: 18px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 13px; font-weight: bold; color: #1565c0;
+        margin-bottom: 14px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+        display: flex; align-items: center; justify-content: space-between;
+      }
+
+      .btn {
+        padding: 7px 14px; border: none; border-radius: 5px;
+        cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap;
+      }
+      .btn:disabled { background: #ccc !important; cursor: default; }
+      .btn-blue   { background: #0078d4; color: #fff; }
+      .btn-blue:hover   { background: #005fa3; }
+      .btn-green  { background: #2e7d32; color: #fff; }
+      .btn-green:hover  { background: #1b5e20; }
+      .btn-gray   { background: #9e9e9e; color: #fff; }
+      .btn-red    { background: #c62828; color: #fff; }
+      .btn-red:hover    { background: #8e0000; }
+
+      input[type="file"] { display: none; }
+      .file-label {
+        display: inline-block; border: 1px solid #0078d4; color: #0078d4;
+        padding: 7px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;
+      }
+      .file-label:hover { background: #e8f4ff; }
+
+      .import-toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+      /* ── テーブル ── */
+      .table-wrap {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 480px;
+      }
+      table { width: 100%; border-collapse: collapse; min-width: 900px; }
+      th, td { padding: 8px 10px; border-bottom: 1px solid #eee; font-size: 12.5px; text-align: center; white-space: nowrap; }
+      th { background: #e8f1ff; font-weight: bold; color: #333; position: sticky; top: 0; z-index: 5; }
+      tr:hover { background: #f7f9ff; }
+
+      .mono { font-family: "Roboto Mono", monospace; }
+      .left { text-align: left; }
+
+      td.editable { cursor: pointer; }
+      td.editable:hover { background: #fff8e1; }
+      td.editable input {
+        width: 100%; padding: 3px 5px; border: 1px solid #90c0f0; border-radius: 4px;
+        font-size: 12px; font-family: "Roboto Mono", monospace; background: #f0f8ff;
+      }
+
+      .badge {
+        display: inline-block; padding: 2px 8px; border-radius: 4px;
+        font-size: 11px; font-weight: bold;
+      }
+      .badge-ok   { background: #e8f5e9; color: #2e7d32; }
+      .badge-warn { background: #ffebee; color: #c62828; }
+
+      .diff-plus  { background-color: #dbdbff; }
+      .diff-minus { background-color: #ffd1bf; color: red; font-weight: bold; }
+
+      .empty-msg { text-align: center; color: #aaa; padding: 32px; font-size: 14px; }
+
+      .remove-btn {
+        width: 22px; height: 22px; border: none; border-radius: 4px;
+        background: #c62828; color: #fff; cursor: pointer; font-size: 12px; line-height: 1;
+      }
+      .del-btn {
+        border: none; border-radius: 4px; background: #ffebee; color: #c62828;
+        padding: 4px 8px; cursor: pointer; font-size: 12px;
+      }
+      .del-btn:hover { background: #ffcdd2; }
+      .del-btn:disabled { background: #eee; color: #aaa; cursor: not-allowed; }
+      .del-btn:disabled:hover { background: #eee; }
+
+      #searchBox {
+        padding: 7px 10px; border: 1px solid #aac4e8; border-radius: 4px;
+        font-family: "Roboto Mono", monospace; font-size: 13px; width: 220px;
+      }
+
+      /* ── Toast ── */
+      #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+
+      /* ── 削除確認モーダル ── */
+      .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+        z-index: 200; display: flex; justify-content: center; align-items: center;
+      }
+      .modal-box {
+        background: #fff; border-radius: 10px; padding: 24px;
+        width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+      }
+      .modal-box h2 { font-size: 16px; margin-bottom: 14px; border-left: 5px solid #c62828; padding-left: 10px; }
+      .del-target { font-family: "Roboto Mono", monospace; font-size: 14px; margin-bottom: 16px; color: #333; }
+      .form-group { margin-bottom: 16px; }
+      .form-group label { display: block; font-size: 12px; color: #555; margin-bottom: 6px; }
+      .form-group input {
+        width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-family: "Roboto Mono", monospace; font-size: 14px;
+      }
+      .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+    </style>
+  </head>
+
+  <body>
+    <div class="lang-buttons">
+      <button id="btnJa" onclick="setLang('ja')">日本語</button>
+      <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+    </div>
+
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'" data-key="back">← メニューへ戻る</button>
+        <h1 data-key="title">📦 発注書管理</h1>
+      </div>
+
+      <!-- Excelインポート -->
+      <div class="card">
+        <div class="card-title"><span data-key="import_title">Excelインポート</span></div>
+        <div class="import-toolbar">
+          <label class="file-label" for="fileUpload" data-key="btn_upload">📤 Excelファイルを選択</label>
+          <input type="file" id="fileUpload" accept=".xlsx,.xls" />
+          <button class="btn btn-blue" onclick="downloadTemplate()" data-key="btn_template">📥 テンプレートをダウンロード</button>
+        </div>
+      </div>
+
+      <!-- ステージング確認 -->
+      <div class="card">
+        <div class="card-title">
+          <span data-key="staging_title">インポート内容の確認</span>
+          <button class="btn btn-green" id="saveBtn" onclick="saveStaging()" disabled data-key="btn_save">保存</button>
+        </div>
+        <div class="table-wrap">
+          <table id="stagingTable">
+            <thead>
+              <tr>
+                <th data-key="th_number">発注書番号</th>
+                <th data-key="th_pn">品番</th>
+                <th data-key="th_issue">発行日</th>
+                <th data-key="th_delivery">納期</th>
+                <th data-key="th_qty">数量</th>
+                <th data-key="th_note">備考</th>
+                <th data-key="th_status">状態</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 発注書一覧 -->
+      <div class="card">
+        <div class="card-title">
+          <span data-key="list_title">発注書一覧</span>&nbsp;<span id="countLabel" style="font-weight:normal;color:#888;font-size:12px;"></span>
+        </div>
+        <div style="margin-bottom:12px;">
+          <input type="text" id="searchBox" data-key-ph="search_ph" placeholder="発注書番号・品番で検索…" oninput="renderList()" />
+        </div>
+        <div class="table-wrap">
+          <table id="listTable">
+            <thead>
+              <tr>
+                <th data-key="th_number">発注書番号</th>
+                <th data-key="th_pn">品番</th>
+                <th data-key="th_issue">発行日</th>
+                <th data-key="th_delivery">納期</th>
+                <th data-key="th_qty">数量</th>
+                <th data-key="th_cut">Cut</th>
+                <th data-key="th_ng">NG</th>
+                <th data-key="th_ok">OK</th>
+                <th data-key="th_diff">差分</th>
+                <th data-key="th_packed">梱包済</th>
+                <th data-key="th_remaining">未梱包</th>
+                <th data-key="th_note">備考</th>
+                <th data-key="th_updated">更新日</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 削除確認モーダル -->
+    <div class="modal-overlay" id="deleteModal" style="display:none;" onclick="if(event.target===this) closeDeleteModal()">
+      <div class="modal-box">
+        <h2 data-key="del_title">🗑️ 削除確認</h2>
+        <div class="del-target" id="deleteTarget"></div>
+        <div class="form-group">
+          <label data-key="del_emp">従業員番号（7桁・管理者のみ）</label>
+          <input type="text" id="empNumber" maxlength="7" oninput="checkEmpNumber()" placeholder="0000000" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-gray" onclick="closeDeleteModal()" data-key="del_cancel">キャンセル</button>
+          <button class="btn btn-red" id="confirmDeleteBtn" onclick="executeDelete()" disabled data-key="del_confirm">削除実行</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="./lib/xlsx.js"></script>
+    <script>
+      /* -------------------------
+         多言語辞書
+      ------------------------- */
+      const dict = {
+        ja: {
+          back: "← メニューへ戻る",
+          title: "📦 発注書管理",
+          import_title: "Excelインポート",
+          btn_upload: "📤 Excelファイルを選択",
+          btn_template: "📥 テンプレートをダウンロード",
+          staging_title: "インポート内容の確認",
+          btn_save: "保存",
+          list_title: "発注書一覧",
+          search_ph: "発注書番号・品番で検索…",
+          th_number: "発注書番号", th_pn: "品番", th_issue: "発行日", th_delivery: "納期",
+          th_qty: "数量", th_cut: "Cut", th_ng: "NG", th_ok: "OK", th_diff: "差分",
+          th_packed: "梱包済", th_remaining: "未梱包", th_note: "備考", th_updated: "更新日", th_status: "状態",
+          del_title: "🗑️ 削除確認", del_emp: "従業員番号（7桁・管理者のみ）",
+          del_cancel: "キャンセル", del_confirm: "削除実行",
+          del_locked: "押出実績（t_press）が紐づいているため削除できません",
+          status_ok: "✔ 品番一致", status_ng: "✖ 品番不明",
+          empty_staging: "インポートされたデータはありません",
+          empty_list: "発注書がありません",
+          toast_saved: (n) => `${n} 件を登録しました`,
+          toast_skipped: (n) => `（${n} 件はスキップされました）`,
+          toast_updated: "更新しました",
+          toast_deleted: "削除しました",
+          toast_delete_failed: "削除に失敗しました（権限を確認してください）",
+          toast_no_valid_rows: "登録できる行がありません",
+        },
+        vi: {
+          back: "← Về menu chính",
+          title: "📦 Quản lý phiếu đặt hàng",
+          import_title: "Nhập từ Excel",
+          btn_upload: "📤 Chọn file Excel",
+          btn_template: "📥 Tải mẫu Excel",
+          staging_title: "Xác nhận dữ liệu nhập",
+          btn_save: "Lưu",
+          list_title: "Danh sách phiếu đặt hàng",
+          search_ph: "Tìm theo số phiếu / mã SP…",
+          th_number: "Số phiếu", th_pn: "Mã SP", th_issue: "Ngày phát hành", th_delivery: "Ngày giao",
+          th_qty: "SL", th_cut: "Đã ép", th_ng: "NG", th_ok: "OK", th_diff: "Chênh lệch",
+          th_packed: "Đã đóng gói", th_remaining: "Chưa đóng gói", th_note: "Ghi chú", th_updated: "Cập nhật", th_status: "Trạng thái",
+          del_title: "🗑️ Xác nhận xóa", del_emp: "Mã nhân viên (7 số, chỉ quản trị)",
+          del_cancel: "Hủy bỏ", del_confirm: "Xóa",
+          del_locked: "Không thể xóa vì đã có dữ liệu ép (t_press) liên kết",
+          status_ok: "✔ Khớp mã SP", status_ng: "✖ Không rõ mã SP",
+          empty_staging: "Chưa có dữ liệu nhập",
+          empty_list: "Không có phiếu đặt hàng",
+          toast_saved: (n) => `Đã lưu ${n} dòng`,
+          toast_skipped: (n) => `(Bỏ qua ${n} dòng)`,
+          toast_updated: "Đã cập nhật",
+          toast_deleted: "Đã xóa",
+          toast_delete_failed: "Xóa thất bại (kiểm tra quyền)",
+          toast_no_valid_rows: "Không có dòng hợp lệ để lưu",
+        },
+      };
+      let lang = localStorage.getItem("lang") || "ja";
+
+      function setLang(l) {
+        lang = l;
+        localStorage.setItem("lang", l);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const key = el.getAttribute("data-key");
+          if (dict[l][key]) el.textContent = dict[l][key];
+        });
+        document.querySelectorAll("[data-key-ph]").forEach((el) => {
+          const key = el.getAttribute("data-key-ph");
+          if (dict[l][key]) el.placeholder = dict[l][key];
+        });
+        document.getElementById("btnJa").classList.toggle("active", l === "ja");
+        document.getElementById("btnVi").classList.toggle("active", l === "vi");
+        renderStaging();
+        renderList();
+      }
+
+      /* -------------------------
+         Toast
+      ------------------------- */
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2800);
+      }
+
+      /* -------------------------
+         品番マスタ
+      ------------------------- */
+      let productionNumbers = [];
+      async function loadProductionNumbers() {
+        const res = await fetch("./php/order_sheet/production_numbers.php");
+        productionNumbers = await res.json();
+      }
+      function resolveProductionNumberId(text) {
+        const norm = (text || "").trim().toUpperCase();
+        const hit = productionNumbers.find((p) => p.production_number.toUpperCase() === norm);
+        return hit ? hit.id : null;
+      }
+
+      /* -------------------------
+         Excelテンプレート生成
+      ------------------------- */
+      function downloadTemplate() {
+        const header = [["発注書番号", "品番", "発行日(YYYY-MM-DD)", "納期(YYYY-MM-DD)", "数量", "備考"]];
+        const ws = XLSX.utils.aoa_to_sheet(header);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "OrderSheet");
+        XLSX.writeFile(wb, "OrderSheetTemplate.xlsx");
+      }
+
+      /* -------------------------
+         Excelインポート → ステージング
+      ------------------------- */
+      let stagingRows = [];
+
+      document.getElementById("fileUpload").addEventListener("change", function (evt) {
+        const file = evt.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const workbook = XLSX.read(e.target.result, { type: "binary", cellDates: true });
+          const sheetName = workbook.SheetNames[0];
+          const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {
+            raw: false,
+            dateNF: "yyyy-mm-dd",
+          });
+
+          rows.forEach((r) => {
+            const values = Object.values(r);
+            const ordersheetNumber = String(values[0] ?? "").trim();
+            const productionNumberText = String(values[1] ?? "").trim();
+            if (!ordersheetNumber) return;
+
+            const productionNumbersId = resolveProductionNumberId(productionNumberText);
+            stagingRows.push({
+              ordersheet_number: ordersheetNumber,
+              production_number: productionNumberText,
+              production_numbers_id: productionNumbersId,
+              issue_date_at: String(values[2] ?? "").trim(),
+              delivery_date_at: String(values[3] ?? "").trim(),
+              production_quantity: parseInt(values[4], 10) || 0,
+              note: String(values[5] ?? "").trim(),
+            });
+          });
+
+          renderStaging();
+          evt.target.value = "";
+        };
+        reader.readAsBinaryString(file);
+      });
+
+      function renderStaging() {
+        const tbody = document.querySelector("#stagingTable tbody");
+        tbody.innerHTML = "";
+
+        if (!stagingRows.length) {
+          tbody.innerHTML = `<tr><td colspan="8" class="empty-msg">${dict[lang].empty_staging}</td></tr>`;
+          document.getElementById("saveBtn").disabled = true;
+          return;
+        }
+
+        stagingRows.forEach((row, index) => {
+          const resolved = !!row.production_numbers_id;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="mono">${row.ordersheet_number}</td>
+            <td class="left">${row.production_number || "—"}</td>
+            <td class="mono">${row.issue_date_at || "—"}</td>
+            <td class="mono">${row.delivery_date_at || "—"}</td>
+            <td>${row.production_quantity}</td>
+            <td class="left">${row.note || ""}</td>
+            <td>${resolved
+              ? `<span class="badge badge-ok">${dict[lang].status_ok}</span>`
+              : `<span class="badge badge-warn">${dict[lang].status_ng}</span>`}</td>
+            <td><button class="remove-btn" onclick="removeStagingRow(${index})">✕</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        document.getElementById("saveBtn").disabled = !stagingRows.some((r) => r.production_numbers_id);
+      }
+
+      function removeStagingRow(index) {
+        stagingRows.splice(index, 1);
+        renderStaging();
+      }
+
+      async function saveStaging() {
+        const validRows = stagingRows.filter((r) => r.production_numbers_id);
+        if (!validRows.length) {
+          showToast(dict[lang].toast_no_valid_rows, false);
+          return;
+        }
+
+        const res = await fetch("./php/order_sheet/insert.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(validRows),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          let msg = dict[lang].toast_saved(result.inserted);
+          if (result.skipped && result.skipped.length) msg += dict[lang].toast_skipped(result.skipped.length);
+          showToast(msg);
+          stagingRows = [];
+          renderStaging();
+          loadList();
+        } else {
+          showToast(result.message || "エラー", false);
+        }
+      }
+
+      /* -------------------------
+         発注書一覧
+      ------------------------- */
+      let listData = [];
+
+      async function loadList() {
+        const res = await fetch("./php/order_sheet/list.php");
+        listData = await res.json();
+        document.getElementById("countLabel").textContent = `${listData.length} 件`;
+        renderList();
+      }
+
+      function renderList() {
+        const keyword = document.getElementById("searchBox").value.trim().toUpperCase();
+        const filtered = keyword
+          ? listData.filter((r) =>
+              (r.ordersheet_number ?? "").toUpperCase().includes(keyword) ||
+              (r.production_number ?? "").toUpperCase().includes(keyword))
+          : listData;
+
+        const tbody = document.querySelector("#listTable tbody");
+        tbody.innerHTML = "";
+
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="14" class="empty-msg">${dict[lang].empty_list}</td></tr>`;
+          return;
+        }
+
+        filtered.forEach((row) => {
+          const diffClass = row.diff_quantity > 0 ? "diff-plus" : (row.diff_quantity < 0 ? "diff-minus" : "");
+          const tr = document.createElement("tr");
+          tr.dataset.id = row.id;
+          tr.innerHTML = `
+            <td class="mono left">${row.ordersheet_number}</td>
+            <td class="left">${row.production_number ?? "—"}</td>
+            <td class="mono editable" data-field="issue_date_at" onclick="editCell(this, ${row.id}, 'date')">${row.issue_date_at ?? ""}</td>
+            <td class="mono editable" data-field="delivery_date_at" onclick="editCell(this, ${row.id}, 'date')">${row.delivery_date_at ?? ""}</td>
+            <td class="editable" data-field="production_quantity" onclick="editCell(this, ${row.id}, 'number')">${row.production_quantity}</td>
+            <td>${row.cut_quantity}</td>
+            <td>${row.ng_quantity}</td>
+            <td>${row.ok_quantity}</td>
+            <td class="${diffClass}">${row.diff_quantity}</td>
+            <td>${row.packed_quantity}</td>
+            <td>${row.remaining_quantity}</td>
+            <td class="left editable" data-field="note" onclick="editCell(this, ${row.id}, 'text')">${row.note ?? ""}</td>
+            <td class="mono">${row.updated_at ?? ""}</td>
+            <td>${row.press_count > 0
+              ? `<button class="del-btn" disabled title="${dict[lang].del_locked}">🔒</button>`
+              : `<button class="del-btn" onclick="openDeleteModal(${row.id}, '${row.ordersheet_number}')">🗑️</button>`}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+
+      /* -------------------------
+         インライン編集
+      ------------------------- */
+      function editCell(td, id, type) {
+        if (td.querySelector("input")) return;
+        const original = td.textContent.trim();
+        const inputType = type === "date" ? "date" : (type === "number" ? "number" : "text");
+        td.innerHTML = `<input type="${inputType}" value="${original}" />`;
+        const input = td.querySelector("input");
+        input.focus();
+
+        const commit = async () => {
+          const value = input.value;
+          const field = td.dataset.field;
+          if (value === original) {
+            renderList();
+            return;
+          }
+          const res = await fetch("./php/order_sheet/update.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, [field]: value }),
+          });
+          const result = await res.json();
+          if (result.status === "ok") {
+            showToast(dict[lang].toast_updated);
+            loadList();
+          } else {
+            showToast(result.message || "エラー", false);
+            renderList();
+          }
+        };
+
+        input.addEventListener("blur", commit);
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") input.blur();
+          if (e.key === "Escape") { input.removeEventListener("blur", commit); renderList(); }
+        });
+      }
+
+      /* -------------------------
+         削除確認モーダル
+      ------------------------- */
+      let staffList = [];
+      let deleteTargetId = null;
+
+      async function loadStaffList() {
+        const res = await fetch("./php/staff/get_staff_list.php");
+        staffList = await res.json();
+      }
+
+      function openDeleteModal(id, ordersheetNumber) {
+        deleteTargetId = id;
+        document.getElementById("deleteTarget").textContent = ordersheetNumber;
+        document.getElementById("empNumber").value = "";
+        document.getElementById("confirmDeleteBtn").disabled = true;
+        document.getElementById("deleteModal").style.display = "flex";
+      }
+
+      function closeDeleteModal() {
+        deleteTargetId = null;
+        document.getElementById("deleteModal").style.display = "none";
+      }
+
+      function checkEmpNumber() {
+        const val = document.getElementById("empNumber").value.trim();
+        const valid = val.length === 7 && staffList.some((s) =>
+          String(s.emploee_number) === val && s.role === "admin" && !s.leave_at);
+        document.getElementById("confirmDeleteBtn").disabled = !valid;
+      }
+
+      async function executeDelete() {
+        const emploeeNumber = document.getElementById("empNumber").value.trim();
+        const res = await fetch("./php/order_sheet/delete.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: deleteTargetId, emploee_number: emploeeNumber }),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast(dict[lang].toast_deleted);
+          closeDeleteModal();
+          loadList();
+        } else {
+          showToast(dict[lang].toast_delete_failed, false);
+        }
+      }
+
+      /* -------------------------
+         初期化
+      ------------------------- */
+      setLang(lang);
+      loadProductionNumbers();
+      loadStaffList();
+      loadList();
+      renderStaging();
+    </script>
+  </body>
+</html>
