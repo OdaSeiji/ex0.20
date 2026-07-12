@@ -5347,3 +5347,15 @@ t_die_handover_progress.jp_dimensional_inspection_atがhttp://10.163.50.17/ex0.2
 - `ordersheet`に使えない状態であるフラグを作る
 
 が必要になってしまう。特に生産指示を取り込むところがめんどくさい。
+データベースの修正は以下
+
+```sql
+ALTER TABLE m_ordersheet
+  ADD COLUMN is_available TINYINT(1) NOT NULL DEFAULT 1 AFTER note;
+```
+
+確認用
+
+```sql
+SELECT is_available, COUNT(*) FROM m_ordersheet GROUP BY is_available;
+```
