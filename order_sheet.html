@@ -247,8 +247,8 @@
         <h2 data-key="del_title">🗑️ 削除確認</h2>
         <div class="del-target" id="deleteTarget"></div>
         <div class="form-group">
-          <label data-key="del_emp">従業員番号（7桁・管理者のみ）</label>
-          <input type="text" id="empNumber" maxlength="7" oninput="checkEmpNumber()" placeholder="0000000" />
+          <label data-key="del_emp">パスワード</label>
+          <input type="password" id="deletePassword" oninput="checkDeletePassword()" placeholder="••••" />
         </div>
         <div class="modal-footer">
           <button class="btn btn-gray" onclick="closeDeleteModal()" data-key="del_cancel">キャンセル</button>
@@ -278,7 +278,7 @@
           th_number: "発注書番号", th_pn: "品番", th_issue: "発行日", th_delivery: "納期",
           th_qty: "数量", th_cut: "Cut", th_ng: "NG", th_ok: "OK", th_diff: "差分",
           th_packed: "梱包済", th_remaining: "未梱包", th_note: "備考", th_updated: "更新日", th_status: "状態",
-          del_title: "🗑️ 削除確認", del_emp: "従業員番号（7桁・管理者のみ）",
+          del_title: "🗑️ 削除確認", del_emp: "パスワード",
           del_cancel: "キャンセル", del_confirm: "削除実行",
           del_locked: "押出実績（t_press）が紐づいているため削除できません",
           status_ok: "✔ 品番一致", status_ng: "✖ 品番不明",
@@ -304,7 +304,7 @@
           th_number: "Số phiếu", th_pn: "Mã SP", th_issue: "Ngày phát hành", th_delivery: "Ngày giao",
           th_qty: "SL", th_cut: "Đã ép", th_ng: "NG", th_ok: "OK", th_diff: "Chênh lệch",
           th_packed: "Đã đóng gói", th_remaining: "Chưa đóng gói", th_note: "Ghi chú", th_updated: "Cập nhật", th_status: "Trạng thái",
-          del_title: "🗑️ Xác nhận xóa", del_emp: "Mã nhân viên (7 số, chỉ quản trị)",
+          del_title: "🗑️ Xác nhận xóa", del_emp: "Mật khẩu",
           del_cancel: "Hủy bỏ", del_confirm: "Xóa",
           del_locked: "Không thể xóa vì đã có dữ liệu ép (t_press) liên kết",
           status_ok: "✔ Khớp mã SP", status_ng: "✖ Không rõ mã SP",
@@ -573,18 +573,12 @@
       /* -------------------------
          削除確認モーダル
       ------------------------- */
-      let staffList = [];
       let deleteTargetId = null;
-
-      async function loadStaffList() {
-        const res = await fetch("./php/staff/get_staff_list.php");
-        staffList = await res.json();
-      }
 
       function openDeleteModal(id, ordersheetNumber) {
         deleteTargetId = id;
         document.getElementById("deleteTarget").textContent = ordersheetNumber;
-        document.getElementById("empNumber").value = "";
+        document.getElementById("deletePassword").value = "";
         document.getElementById("confirmDeleteBtn").disabled = true;
         document.getElementById("deleteModal").style.display = "flex";
       }
@@ -594,19 +588,17 @@
         document.getElementById("deleteModal").style.display = "none";
       }
 
-      function checkEmpNumber() {
-        const val = document.getElementById("empNumber").value.trim();
-        const valid = val.length === 7 && staffList.some((s) =>
-          String(s.emploee_number) === val && s.role === "admin" && !s.leave_at);
-        document.getElementById("confirmDeleteBtn").disabled = !valid;
+      function checkDeletePassword() {
+        const val = document.getElementById("deletePassword").value.trim();
+        document.getElementById("confirmDeleteBtn").disabled = val !== "1031";
       }
 
       async function executeDelete() {
-        const emploeeNumber = document.getElementById("empNumber").value.trim();
+        const password = document.getElementById("deletePassword").value.trim();
         const res = await fetch("./php/order_sheet/delete.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: deleteTargetId, emploee_number: emploeeNumber }),
+          body: JSON.stringify({ id: deleteTargetId, password }),
         });
         const result = await res.json();
 
@@ -624,7 +616,6 @@
       ------------------------- */
       setLang(lang);
       loadProductionNumbers();
-      loadStaffList();
       loadList();
       renderStaging();
     </script>

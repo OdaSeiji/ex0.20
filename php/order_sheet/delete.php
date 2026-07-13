@@ -4,20 +4,14 @@ require_once "./../db.php";
 
 $data = json_decode(file_get_contents("php://input"), true);
 $id = intval($data["id"] ?? 0);
-$emploeeNumber = trim($data["emploee_number"] ?? "");
+$password = trim($data["password"] ?? "");
 
-if (!$id || $emploeeNumber === "") {
+if (!$id || $password === "") {
     echo json_encode(["status" => "error", "message" => "invalid input"]);
     exit;
 }
 
-$authStmt = $pdo->prepare("
-    SELECT COUNT(*) FROM m_staff
-    WHERE emploee_number = ? AND role = 'admin' AND leave_at IS NULL
-");
-$authStmt->execute([$emploeeNumber]);
-
-if ($authStmt->fetchColumn() == 0) {
+if ($password !== "1031") {
     echo json_encode(["status" => "error", "message" => "permission denied"]);
     exit;
 }
