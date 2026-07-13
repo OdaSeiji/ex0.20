@@ -5359,3 +5359,14 @@ ALTER TABLE m_ordersheet
 ```sql
 SELECT is_available, COUNT(*) FROM m_ordersheet GROUP BY is_available;
 ```
+
+ちょっと上の改造、延期かな。
+動きとしては、以下のようにしてほしいらしい。
+
+```
+１：7月生産指示が出る 1,000
+２：生産する、、、良品でる 400
+３：生産指示を「完了」にする
+４：8月同じ品番の新しい生産指示600が出る
+５：のこり600を生産する
+```
