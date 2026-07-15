@@ -89,6 +89,17 @@
       th { background: #e8f1ff; font-weight: bold; color: #333; position: sticky; top: 0; z-index: 5; }
       tr:hover { background: #f7f9ff; }
 
+      tr.row-stopped { background: #fdecea; }
+      tr.row-stopped:hover { background: #fbdcd7; }
+
+      .avail-btn {
+        border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 11px; font-weight: bold;
+      }
+      .avail-btn.active { background: #e8f5e9; color: #2e7d32; }
+      .avail-btn.active:hover { background: #c8e6c9; }
+      .avail-btn.resume { background: #ffebee; color: #c62828; }
+      .avail-btn.resume:hover { background: #ffcdd2; }
+
       .mono { font-family: "Roboto Mono", monospace; }
       .left { text-align: left; }
 
@@ -231,6 +242,7 @@
                 <th data-key="th_remaining">未梱包</th>
                 <th data-key="th_note">備考</th>
                 <th data-key="th_updated">更新日</th>
+                <th data-key="th_available">状態</th>
                 <th></th>
               </tr>
             </thead>
@@ -278,10 +290,14 @@
           th_number: "発注書番号", th_pn: "品番", th_issue: "発行日", th_delivery: "納期",
           th_qty: "数量", th_cut: "Cut", th_ng: "NG", th_ok: "OK", th_diff: "差分",
           th_packed: "梱包済", th_remaining: "未梱包", th_note: "備考", th_updated: "更新日", th_status: "状態",
+          th_available: "状態",
           del_title: "🗑️ 削除確認", del_emp: "パスワード",
           del_cancel: "キャンセル", del_confirm: "削除実行",
           del_locked: "押出実績（t_press）が紐づいているため削除できません",
           status_ok: "✔ 品番一致", status_ng: "✖ 品番不明",
+          status_active: "運用中", status_stopped: "停止中",
+          btn_resume: "▶ 再開",
+          stop_password_prompt: "生産を停止します。パスワードを入力してください",
           empty_staging: "インポートされたデータはありません",
           empty_list: "発注書がありません",
           toast_saved: (n) => `${n} 件を登録しました`,
@@ -290,6 +306,9 @@
           toast_deleted: "削除しました",
           toast_delete_failed: "削除に失敗しました（権限を確認してください）",
           toast_no_valid_rows: "登録できる行がありません",
+          toast_stopped: "生産を停止しました",
+          toast_resumed: "生産を再開しました",
+          toast_wrong_password: "パスワードが違います",
         },
         vi: {
           back: "← Về menu chính",
@@ -304,10 +323,14 @@
           th_number: "Số phiếu", th_pn: "Mã SP", th_issue: "Ngày phát hành", th_delivery: "Ngày giao",
           th_qty: "SL", th_cut: "Đã ép", th_ng: "NG", th_ok: "OK", th_diff: "Chênh lệch",
           th_packed: "Đã đóng gói", th_remaining: "Chưa đóng gói", th_note: "Ghi chú", th_updated: "Cập nhật", th_status: "Trạng thái",
+          th_available: "Trạng thái",
           del_title: "🗑️ Xác nhận xóa", del_emp: "Mật khẩu",
           del_cancel: "Hủy bỏ", del_confirm: "Xóa",
           del_locked: "Không thể xóa vì đã có dữ liệu ép (t_press) liên kết",
           status_ok: "✔ Khớp mã SP", status_ng: "✖ Không rõ mã SP",
+          status_active: "Đang hoạt động", status_stopped: "Đã dừng",
+          btn_resume: "▶ Tiếp tục",
+          stop_password_prompt: "Sẽ dừng sản xuất. Vui lòng nhập mật khẩu",
           empty_staging: "Chưa có dữ liệu nhập",
           empty_list: "Không có phiếu đặt hàng",
           toast_saved: (n) => `Đã lưu ${n} dòng`,
@@ -316,6 +339,9 @@
           toast_deleted: "Đã xóa",
           toast_delete_failed: "Xóa thất bại (kiểm tra quyền)",
           toast_no_valid_rows: "Không có dòng hợp lệ để lưu",
+          toast_stopped: "Đã dừng sản xuất",
+          toast_resumed: "Đã tiếp tục sản xuất",
+          toast_wrong_password: "Sai mật khẩu",
         },
       };
       let lang = localStorage.getItem("lang") || "ja";
@@ -500,14 +526,16 @@
         tbody.innerHTML = "";
 
         if (!filtered.length) {
-          tbody.innerHTML = `<tr><td colspan="14" class="empty-msg">${dict[lang].empty_list}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="15" class="empty-msg">${dict[lang].empty_list}</td></tr>`;
           return;
         }
 
         filtered.forEach((row) => {
           const diffClass = row.diff_quantity > 0 ? "diff-plus" : (row.diff_quantity < 0 ? "diff-minus" : "");
+          const isAvailable = Number(row.is_available) !== 0;
           const tr = document.createElement("tr");
           tr.dataset.id = row.id;
+          if (!isAvailable) tr.classList.add("row-stopped");
           tr.innerHTML = `
             <td class="mono left">${row.ordersheet_number}</td>
             <td class="left">${row.production_number ?? "—"}</td>
@@ -522,12 +550,42 @@
             <td>${row.remaining_quantity}</td>
             <td class="left editable" data-field="note" onclick="editCell(this, ${row.id}, 'text')">${row.note ?? ""}</td>
             <td class="mono">${row.updated_at ?? ""}</td>
+            <td>${isAvailable
+              ? `<button class="avail-btn active" onclick="requestStop(${row.id})">${dict[lang].status_active}</button>`
+              : `<button class="avail-btn resume" onclick="toggleAvailable(${row.id}, true)">${dict[lang].btn_resume}</button>`}</td>
             <td>${row.press_count > 0
               ? `<button class="del-btn" disabled title="${dict[lang].del_locked}">🔒</button>`
               : `<button class="del-btn" onclick="openDeleteModal(${row.id}, '${row.ordersheet_number}')">🗑️</button>`}</td>
           `;
           tbody.appendChild(tr);
         });
+      }
+
+      function requestStop(id) {
+        const password = prompt(dict[lang].stop_password_prompt);
+        if (password === null) return;
+        if (password.trim() !== "1031") {
+          showToast(dict[lang].toast_wrong_password, false);
+          return;
+        }
+        toggleAvailable(id, false, password.trim());
+      }
+
+      async function toggleAvailable(id, makeAvailable, password = null) {
+        const body = { id, is_available: makeAvailable ? 1 : 0 };
+        if (password !== null) body.password = password;
+        const res = await fetch("./php/order_sheet/update.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const result = await res.json();
+        if (result.status === "ok") {
+          showToast(makeAvailable ? dict[lang].toast_resumed : dict[lang].toast_stopped);
+          loadList();
+        } else {
+          showToast(result.message || "エラー", false);
+        }
       }
 
       /* -------------------------

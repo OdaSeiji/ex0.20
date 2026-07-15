@@ -18,6 +18,7 @@ $sql = "
         IFNULL(t20.packed_quantity, 0) AS packed_quantity,
         (m_ordersheet.production_quantity - IFNULL(t20.packed_quantity, 0)) AS remaining_quantity,
         m_ordersheet.note,
+        m_ordersheet.is_available,
         m_ordersheet.updated_at,
         COUNT(DISTINCT t_press.id) AS press_count
     FROM m_ordersheet

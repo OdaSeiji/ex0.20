@@ -10,11 +10,20 @@ if (!$id) {
     exit;
 }
 
+if (array_key_exists("is_available", $data) && intval($data["is_available"]) === 0) {
+    $password = trim($data["password"] ?? "");
+    if ($password !== "1031") {
+        echo json_encode(["status" => "error", "message" => "permission denied"]);
+        exit;
+    }
+}
+
 $fieldMap = [
     "issue_date_at" => "issue_date_at",
     "delivery_date_at" => "delivery_date_at",
     "production_quantity" => "production_quantity",
     "note" => "note",
+    "is_available" => "is_available",
 ];
 
 $sets = [];
