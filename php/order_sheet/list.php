@@ -27,12 +27,13 @@ $sql = "
         SELECT
             t_using_aging_rack.t_press_id,
             SUM(IFNULL(t_using_aging_rack.work_quantity, 0)) AS work_quantity,
-            SUM(IFNULL((
-                SELECT SUM(t_press_quality.ng_quantities)
-                FROM t_press_quality
-                WHERE t_press_quality.using_aging_rack_id = t_using_aging_rack.id
-            ), 0)) AS total_ng
+            SUM(IFNULL(tpq.ng_sum, 0)) AS total_ng
         FROM t_using_aging_rack
+        LEFT JOIN (
+            SELECT using_aging_rack_id, SUM(ng_quantities) AS ng_sum
+            FROM t_press_quality
+            GROUP BY using_aging_rack_id
+        ) tpq ON tpq.using_aging_rack_id = t_using_aging_rack.id
         GROUP BY t_using_aging_rack.t_press_id
     ) t10 ON t10.t_press_id = t_press.id
     LEFT JOIN (
