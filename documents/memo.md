@@ -5370,3 +5370,8 @@ SELECT is_available, COUNT(*) FROM m_ordersheet GROUP BY is_available;
 ４：8月同じ品番の新しい生産指示600が出る
 ５：のこり600を生産する
 ```
+
+# 2026/07/24
+
+メニューの分かりにくいところ
+・品番登録、金型登録、部品登録は一つにまとめる
