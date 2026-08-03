@@ -5375,3 +5375,12 @@ SELECT is_available, COUNT(*) FROM m_ordersheet GROUP BY is_available;
 
 メニューの分かりにくいところ
 ・品番登録、金型登録、部品登録は一つにまとめる
+
+# 2026/08/03
+
+下記部、マルチラインが欲しい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260803-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
