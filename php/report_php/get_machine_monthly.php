@@ -25,8 +25,31 @@ $sql = "
                 * 2.7
                 / 1000000000
             )
-        , 2) AS extrusion_t
+        , 2) AS extrusion_t,
+        ROUND(
+            SUM(
+                (IFNULL(t20.work_quantity, 0) - IFNULL(t10.total_ng, 0))
+                * IFNULL(mpn.specific_weight, 0)
+                * COALESCE(p.first_actual_length, mpn.production_length * 1000)
+                / 1000000
+            )
+        , 2) AS good_weight_t
     FROM t_press p
+    LEFT JOIN m_dies mdie ON p.dies_id = mdie.id
+    LEFT JOIN m_production_numbers mpn ON mdie.production_number_id = mpn.id
+    LEFT JOIN (
+        SELECT t_press_id, SUM(work_quantity) AS work_quantity
+        FROM t_using_aging_rack
+        GROUP BY t_press_id
+    ) t20 ON t20.t_press_id = p.id
+    LEFT JOIN (
+        SELECT
+            t_using_aging_rack.t_press_id,
+            SUM(t_press_quality.ng_quantities) AS total_ng
+        FROM t_using_aging_rack
+        LEFT JOIN t_press_quality ON t_press_quality.using_aging_rack_id = t_using_aging_rack.id
+        GROUP BY t_using_aging_rack.t_press_id
+    ) t10 ON t10.t_press_id = p.id
     WHERE p.press_machine_no IS NOT NULL
       AND p.press_machine_no != 0
       AND p.press_start_at   IS NOT NULL
@@ -37,20 +60,22 @@ $sql = "
 
 $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
-$months     = [];
-$machines   = [];
-$hours      = [];
-$counts     = [];
-$extrusions = [];
+$months      = [];
+$machines    = [];
+$hours       = [];
+$counts      = [];
+$extrusions  = [];
+$goodWeights = [];
 
 foreach ($rows as $r) {
     $m  = (int)$r['machine'];
     $mo = $r['month'];
-    $months[$mo]        = true;
-    $machines[$m]       = true;
-    $hours[$m][$mo]      = (float)$r['usage_hours'];
-    $counts[$m][$mo]     = (int)$r['press_count'];
-    $extrusions[$m][$mo] = (float)$r['extrusion_t'];
+    $months[$mo]          = true;
+    $machines[$m]         = true;
+    $hours[$m][$mo]        = (float)$r['usage_hours'];
+    $counts[$m][$mo]       = (int)$r['press_count'];
+    $extrusions[$m][$mo]   = (float)$r['extrusion_t'];
+    $goodWeights[$m][$mo]  = (float)$r['good_weight_t'];
 }
 
 $months   = array_keys($months);
@@ -59,9 +84,10 @@ sort($months);
 sort($machines);
 
 echo json_encode([
-    "months"     => $months,
-    "machines"   => $machines,
-    "hours"      => $hours,
-    "counts"     => $counts,
-    "extrusions" => $extrusions,
+    "months"      => $months,
+    "machines"    => $machines,
+    "hours"       => $hours,
+    "counts"      => $counts,
+    "extrusions"  => $extrusions,
+    "goodWeights" => $goodWeights,
 ]);

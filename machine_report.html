@@ -88,7 +88,7 @@
     </table>
   </div>
 
-  <div class="section-title" data-key="sec_extrusion">⚖️ 押出量（t）</div>
+  <div class="section-title" data-key="sec_extrusion">⚖️ ビレット投入量（t）</div>
   <div class="table-wrap">
     <table id="extrusionTable">
       <thead><tr id="extrusionHead"></tr></thead>
@@ -122,13 +122,14 @@
         label_year: "年度絞り込み：",
         opt_all:    "全期間",
         sec_hours:      "⏱ 稼働時間（時間）",
-        sec_extrusion:  "⚖️ 押出量（t）",
+        sec_extrusion:  "⚖️ ビレット投入量（t）",
         sec_counts:     "🔢 押出回数",
-        chart_title:"📈 設備別稼働時間（積み上げ）＋ 押出回数",
+        chart_title:"📈 設備別稼働時間（積み上げ）＋ ビレット投入量 / 良品量",
         col_total:  "合計",
         machine:    n => `設備${n}`,
         sum_row:    "合計",
-        count_line: "押出量 t（合計）",
+        count_line: "ビレット投入量 t（合計）",
+        good_line:  "良品量 t（合計）",
       },
       vi: {
         title:      "🏭 Báo cáo hoạt động máy",
@@ -138,13 +139,14 @@
         label_year: "Lọc theo năm：",
         opt_all:    "Tất cả",
         sec_hours:      "⏱ Giờ hoạt động",
-        sec_extrusion:  "⚖️ Sản lượng ép（t）",
+        sec_extrusion:  "⚖️ Lượng phôi nạp（t）",
         sec_counts:     "🔢 Số lần ép",
-        chart_title:"📈 Giờ HĐ theo máy（tích lũy）＋ Số lần ép",
+        chart_title:"📈 Giờ HĐ theo máy（tích lũy）＋ Lượng phôi nạp / SP tốt",
         col_total:  "Tổng",
         machine:    n => `Máy ${n}`,
         sum_row:    "Tổng",
-        count_line: "Sản lượng t（tổng）",
+        count_line: "Lượng phôi nạp t（tổng）",
+        good_line:  "SL SP tốt t（tổng）",
       },
     };
 
@@ -310,6 +312,23 @@
         yAxisID:         "y2",
       });
 
+      // 折れ線：良品量合計（右軸）
+      const goodWeightTotals = months.map(m =>
+        Math.round(data.machines.reduce((sum, mno) => sum + (data.goodWeights[mno]?.[m] ?? 0), 0) * 100) / 100
+      );
+      datasets.push({
+        type:            "line",
+        label:           t.good_line,
+        data:            goodWeightTotals,
+        borderColor:     "#43a047",
+        backgroundColor: "transparent",
+        borderWidth:     2,
+        pointRadius:     4,
+        pointBackgroundColor: "#43a047",
+        tension:         0.3,
+        yAxisID:         "y2",
+      });
+
       if (chartInstance) chartInstance.destroy();
       chartInstance = new Chart(document.getElementById("myChart"), {
         data: { labels, datasets },
@@ -329,7 +348,7 @@
               position: "right",
               beginAtZero: true,
               grid: { drawOnChartArea: false },
-              title: { display: true, text: "押出量 (t)" },
+              title: { display: true, text: "重量 (t)" },
             },
           },
         },
