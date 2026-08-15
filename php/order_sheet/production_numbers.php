@@ -18,7 +18,6 @@ if ($keyword !== "") {
         SELECT id, production_number
         FROM m_production_numbers
         ORDER BY production_number
-        LIMIT 50
     ");
 }
 

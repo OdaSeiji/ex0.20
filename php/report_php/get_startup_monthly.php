@@ -3,9 +3,15 @@ header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
 $sql = "
-    SELECT 'arrival'     AS metric, DATE_FORMAT(arrival_at,                    '%Y-%m') AS month, COUNT(*) AS cnt
-    FROM t_die_handover_progress WHERE arrival_at IS NOT NULL
-    GROUP BY DATE_FORMAT(arrival_at, '%Y-%m')
+    SELECT 'arrival'      AS metric, DATE_FORMAT(die_arrived_at, '%Y-%m') AS month, COUNT(*) AS cnt
+    FROM t_die_handover
+    WHERE die_arrived_at IS NOT NULL AND IFNULL(is_accessory_item_flag, 0) = 0
+    GROUP BY DATE_FORMAT(die_arrived_at, '%Y-%m')
+    UNION ALL
+    SELECT 'parts_arrival', DATE_FORMAT(die_arrived_at, '%Y-%m'), COUNT(*)
+    FROM t_die_handover
+    WHERE die_arrived_at IS NOT NULL AND is_accessory_item_flag = 1
+    GROUP BY DATE_FORMAT(die_arrived_at, '%Y-%m')
     UNION ALL
     SELECT 'inspection',              DATE_FORMAT(jp_dimensional_inspection_at, '%Y-%m'), COUNT(*)
     FROM t_die_handover_progress WHERE jp_dimensional_inspection_at IS NOT NULL

@@ -101,10 +101,11 @@
         chart_title: "📈 月別推移",
         col_total:   "合計",
         metrics: {
-          arrival:     "金型到着数",
-          inspection:  "型検合格数",
-          handover:    "金型移管数",
-          trial_press: "試押回数",
+          arrival:       "金型到着数",
+          parts_arrival: "金型部品到着数",
+          inspection:    "型検合格数",
+          handover:      "金型移管数",
+          trial_press:   "試押回数",
         },
         diff_label: "移管数ー到着数",
       },
@@ -118,10 +119,11 @@
         chart_title: "📈 Xu hướng theo tháng",
         col_total:   "Tổng",
         metrics: {
-          arrival:     "Số khuôn đến",
-          inspection:  "KT khuôn đạt",
-          handover:    "Số bàn giao",
-          trial_press: "Số lần thử ép",
+          arrival:       "Số khuôn đến",
+          parts_arrival: "Số phụ kiện đến",
+          inspection:    "KT khuôn đạt",
+          handover:      "Số bàn giao",
+          trial_press:   "Số lần thử ép",
         },
         diff_label: "Bàn giao - Đến",
       },
@@ -147,8 +149,8 @@
     ===================================================== */
     let rawData = null;
 
-    const METRIC_KEYS   = ["arrival", "inspection", "handover", "trial_press"];
-    const CHART_COLORS  = ["#1976d2", "#2e7d32", "#f57c00", "#7b1fa2"];
+    const METRIC_KEYS   = ["arrival", "parts_arrival", "inspection", "handover", "trial_press"];
+    const CHART_COLORS  = ["#1976d2", "#00838f", "#2e7d32", "#f57c00", "#7b1fa2"];
 
     async function loadData() {
       const res = await fetch("./php/report_php/get_startup_monthly.php");
