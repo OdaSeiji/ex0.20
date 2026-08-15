@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Press Daily Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 300; }
+    .lang-buttons button { padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px; }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-back   { background: #546e7a; color: #fff; }
+    .btn-save   { background: #4caf50; color: #fff; }
+    .btn-update { background: #ff9800; color: #fff; }
+    .btn-test   { background: #9c27b0; color: #fff; }
+    .btn-add    { background: #0078d4; color: #fff; }
+    .btn-csv    { background: #217346; color: #fff; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden; }
+    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #0055a5; border-bottom: 1px solid #ccd8ee; }
+    .card-body { padding: 14px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-group { display: flex; flex-direction: column; gap: 3px; }
+    .form-group.full { grid-column: span 2; }
+    label { font-size: 11px; color: #555; font-weight: bold; }
+
+    input[type=text], input[type=date], input[type=number], input[type=file], select {
+      padding: 5px 8px; border: 1px solid #ccc; border-radius: 4px;
+      font-size: 13px; font-family: inherit; width: 100%;
+    }
+    input:focus, select:focus { outline: none; border-color: #0078d4; }
+    #pressing-type__select, #press-type-filter { font-family: "MS Gothic", "Segoe UI", sans-serif; }
+    .inline-pair { display: flex; gap: 6px; align-items: center; }
+    .inline-pair span { font-size: 12px; color: #888; }
+    .num-input { text-align: right; }
+
+    .field-empty { background-color: #fff3cd !important; border-color: #ffca6b !important; }
+    .file-label.field-empty { background-color: #fff3cd; }
+    .field-invalid { background-color: #ffe0e0 !important; border-color: #ff6b6b !important; }
+
+    input[type="file"] { display: none; }
+    .file-label {
+      display: inline-block; border: 1px solid #0078d4; color: #0078d4;
+      padding: 7px 14px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;
+      white-space: nowrap;
+    }
+    .file-label:hover { background: #e8f4ff; }
+    #drawingFileName { font-size: 12px; color: #666; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    #previewModal .modal-box { width: 720px; text-align: center; }
+    #previewModal img { max-width: 100%; max-height: 70vh; }
+
+    .basic-card { width: 600px; flex-shrink: 0; }
+    .mid-card   { width: 420px; flex-shrink: 0; }
+    .right-card { width: 230px; flex-shrink: 0; }
+
+    .table-wrap { background: #fff; border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 8px; }
+    table { border-collapse: collapse; width: 100%; }
+    th { background: #e8f1ff; padding: 6px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px; white-space: nowrap; text-align: center; position: sticky; top: 0; }
+    td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; white-space: nowrap; text-align: center; }
+    td input { padding: 4px 6px; font-size: 12px; }
+    .mono { font-family: "Roboto Mono", monospace; }
+    .left { text-align: left; }
+    .right { text-align: right; }
+    .sub-title { font-size: 12px; font-weight: bold; color: #555; margin: 12px 0 6px; }
+
+    .add-form-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
+    .add-form-row input, .add-form-row select { width: auto; min-width: 70px; }
+
+    .empty-note { text-align: center; color: #aaa; padding: 14px; font-size: 12px; }
+
+    .summary-wrap { max-height: 420px; }
+
+    #directive__group.required label { color: #e53935; }
+    #directive__group.required input#directive__input { border-color: #e53935; background: #fff8f8; }
+
+    /* ── モーダル（指示書選択） ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 400; display: flex; justify-content: center; align-items: center;
+    }
+    .modal-box {
+      background: #fff; border-radius: 10px; padding: 20px;
+      width: 640px; max-width: 92vw; max-height: 80vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .modal-box h2 { font-size: 16px; margin-bottom: 12px; border-left: 5px solid #0078d4; padding-left: 10px; }
+    #directiveSearch { padding: 6px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; margin-bottom: 10px; width: 100%; }
+    .modal-table-wrap { flex: 1; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 6px; }
+    .modal-table-wrap table { width: 100%; }
+    .modal-table-wrap tbody tr { cursor: pointer; }
+    .modal-table-wrap tbody tr:hover { background: #f0f8ff; }
+    .modal-footer { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+    /* ── ドロップダウン候補（入力しながら選べる） ── */
+    .dropdown-anchor { position: relative; }
+    .dropdown-panel {
+      position: absolute; top: 100%; left: 0; right: 0; margin-top: 4px;
+      background: #fff; border: 1px solid #ccd8ee; border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.18); z-index: 50;
+      max-height: 260px; overflow-y: auto;
+    }
+    .dropdown-panel table { width: 100%; }
+    .dropdown-panel tbody tr { cursor: pointer; }
+    .dropdown-panel tbody tr:hover { background: #f0f8ff; }
+    .dropdown-panel th { position: sticky; top: 0; }
+    .die-dropdown-table td {
+      font-family: "Roboto Mono", monospace; font-size: 15px;
+      padding: 7px 10px; text-align: left;
+    }
+    .die-dropdown-table tr.active td { background: #d6e9ff; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🏭 プレス日報入力</h1>
+  <div class="subtitle" data-key="subtitle">設備別・日別のプレス実績を入力（画面デザインのみ・未接続）</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+  </div>
+
+  <!-- 基本情報 ＋ 温度・ラム速度測定 -->
+  <div class="layout">
+    <div class="card basic-card">
+      <div class="card-header" data-key="card_basic">基本情報</div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="width:130px; flex-shrink:0;">
+                <label data-key="lbl_date">日付</label>
+                <input type="date" id="date__input" onchange="document.getElementById('plcLogBtn').disabled = !this.value;" />
+              </div>
+              <div class="form-group dropdown-anchor" id="die__group" style="width:150px; flex-shrink:0;">
+                <label data-key="lbl_die">金型番号</label>
+                <input type="text" id="die__input" autocomplete="off" oninput="searchDies()" onfocus="searchDies()" onkeydown="onDieKeydown(event)" style="font-family:'Roboto Mono',monospace; font-size:15px;" />
+                <select id="die__select" style="display:none;"><option value="0">-</option></select>
+                <div class="dropdown-panel" id="dieDropdown" style="display:none;">
+                  <table class="die-dropdown-table">
+                    <tbody id="dieModalBody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="form-group" style="width:40px; flex-shrink:0;">
+                <label>&nbsp;</label>
+                <button type="button" id="plcLogBtn" class="btn btn-add" title="稼働ログを表示" onclick="openPlcSessionModal()" disabled style="padding:5px 8px; width:100%;">🍓</button>
+              </div>
+              <div class="form-group" id="press-directive__group" style="flex:1;">
+                <label data-key="lbl_press_directive">押出指示書</label>
+                <select id="press-directive__select" onchange="onDirectiveChange()"><option value="0">-</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="width:75px; flex-shrink:0;">
+                <label data-key="lbl_press_type">プレス種別</label>
+                <select id="pressing-type__select">
+                  <option value="0">-</option>
+                  <option value="1">〇</option>
+                  <option value="2">◎</option>
+                  <option value="3">●</option>
+                </select>
+              </div>
+              <div class="form-group" id="directive__group" style="flex:1;">
+                <label data-key="lbl_directive">生産指示書</label>
+                <div class="inline-pair">
+                  <input type="text" id="directive__input" readonly style="flex:1; cursor:pointer;" onclick="openDirectiveModal()" />
+                  <button type="button" class="btn btn-add" data-key="btn_select" onclick="openDirectiveModal()">選択</button>
+                </div>
+                <select id="directive_input__select" style="display:none;"><option value="0">-</option></select>
+              </div>
+              <div class="form-group" style="width:90px; flex-shrink:0;">
+                <label data-key="lbl_washed">洗浄済み</label>
+                <select id="is-washed__select">
+                  <option value="0">-</option>
+                  <option value="1" data-key="opt_no">No</option>
+                  <option value="2" data-key="opt_yes">Yes</option>
+                </select>
+              </div>
+              <div class="form-group" style="width:90px; flex-shrink:0;">
+                <label data-key="lbl_machine">設備番号</label>
+                <select id="machine-number__select">
+                  <option value="0">-</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                </select>
+              </div>
+              <div class="form-group" style="width:80px; flex-shrink:0;">
+                <label data-key="lbl_billet_size">ビレットサイズ</label>
+                <select id="billet-size__select">
+                  <option value="0">-</option>
+                  <option value="9">9</option>
+                  <option value="12">12</option>
+                  <option value="14">14</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="width:90px; flex-shrink:0;">
+                <label data-key="lbl_billet_length">ビレット長さ</label>
+                <input type="text" list="billet-length__selects" id="billet-length__select" class="num-input" />
+                <datalist id="billet-length__selects">
+                  <option value="600">600</option>
+                  <option value="1200">1200</option>
+                </datalist>
+              </div>
+              <div class="form-group" style="width:90px; flex-shrink:0;">
+                <label data-key="lbl_plan_qty">計画ビレット数</label>
+                <input type="text" id="plan-billet-qty__input" class="num-input" />
+              </div>
+              <div class="form-group" style="width:90px; flex-shrink:0;">
+                <label data-key="lbl_actual_qty">実績ビレット数</label>
+                <input type="text" id="actual-billet-qty__input" class="num-input" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="width:210px; flex-shrink:0;">
+                <label data-key="lbl_press_time">プレス時間（開始 - 終了）</label>
+                <div class="inline-pair">
+                  <input type="text" id="press-start__input" maxlength="5" onblur="formatTimeField(this)" />
+                  <span>-</span>
+                  <input type="text" id="press-finish__input" maxlength="5" onblur="formatTimeField(this)" />
+                </div>
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label data-key="lbl_ram_speed">ラム速度 (mm/s)</label>
+                <input type="text" id="actual-ram-speed__input" />
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label data-key="lbl_die_temp">実測金型温度 (℃)</label>
+                <input type="text" id="actual-die-temp__input" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="flex:1;">
+                <label data-key="lbl_name">担当者</label>
+                <select id="name__select"><option value="0">-</option></select>
+              </div>
+              <div class="form-group" style="width:100px; flex-shrink:0;">
+                <label data-key="lbl_actual_length">実測長さ (SP dài)</label>
+                <input type="text" id="first_actual_length" class="num-input" />
+              </div>
+              <div class="form-group" style="width:100px; flex-shrink:0;">
+                <label data-key="lbl_stretch_ratio">ストレッチ</label>
+                <input type="text" id="stretch-ratio__input" class="num-input" onblur="formatStretchRatio(this)" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="flex:1;">
+                <label data-key="lbl_special_note">特記事項</label>
+                <input type="text" id="special_note" />
+              </div>
+              <div class="form-group" style="width:300px; flex-shrink:0;">
+                <label data-key="lbl_file">ファイル</label>
+                <input type="file" id="press-direction_file" accept="image/*,.pdf" onchange="onDrawingFileChange(this)" />
+                <div class="inline-pair">
+                  <label for="press-direction_file" class="file-label" data-key="btn_choose_file">File</label>
+                  <span id="drawingFileName">未選択</span>
+                  <button class="btn btn-add" id="preview__button" disabled onclick="openDrawingPreview()" data-key="btn_preview">Preview</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sub-title" data-key="sub_container_temp">コンテナ温度</div>
+        <div class="table-wrap">
+          <table id="container-temperature__table">
+            <thead>
+              <tr><th></th><th data-key="col_stemside">StemSide</th><th data-key="col_dieside">DieSide</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th data-key="row_upside">Upside</th>
+                <td><input type="text" id="container_upside_stemside" class="num-input" /></td>
+                <td><input type="text" id="container_upside_dieside" class="num-input" /></td>
+              </tr>
+              <tr>
+                <th data-key="row_downside">Downside</th>
+                <td><input type="text" id="container_downside_stemside" class="num-input" /></td>
+                <td><input type="text" id="container_downside_dieside" class="num-input" /></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sub-title" data-key="sub_ram_values">ラム速度・圧力・温度</div>
+        <div class="table-wrap">
+          <table id="ram-values__table">
+            <thead>
+              <tr><th></th><th colspan="3">1000/400mm</th><th colspan="3">200mm</th></tr>
+              <tr>
+                <th></th>
+                <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+                <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+              </tr>
+            </thead>
+            <tbody id="ram-values__body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- mid__wrapper 相当：バンドル登録 -->
+    <div class="card mid-card">
+      <div class="card-header" data-key="card_bundle">バンドル登録</div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table id="bundle__table">
+            <thead>
+              <tr>
+                <th>ID</th><th data-key="col_bundle">Bundle</th><th data-key="col_qty">Qty</th>
+                <th data-key="col_lot">Lot</th><th data-key="col_mfg">Mfg</th>
+                <th data-key="col_insp">Insp</th><th data-key="col_note">Note</th>
+              </tr>
+            </thead>
+            <tbody><tr><td colspan="7" class="empty-note" data-key="empty_bundle">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="bundle_no" data-key-ph="ph_bundle" placeholder="Bundle No" />
+          <input type="text" id="quantity" data-key-ph="ph_qty" placeholder="Qty" />
+          <input type="text" id="lot_no" data-key-ph="ph_lot" placeholder="Lot" />
+          <select id="mfg">
+            <option value="1">Dubai</option>
+            <option value="2">VN</option>
+          </select>
+          <select id="insp">
+            <option value="1">OK</option>
+            <option value="2">NG</option>
+          </select>
+          <input type="text" id="note_billet" data-key-ph="ph_note" placeholder="Note" />
+          <button class="btn btn-add" id="add_bundle__button" disabled data-key="btn_save">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- right__wrapper 相当：ラック登録 ＋ 定尺・数量登録 -->
+    <div class="card right-card">
+      <div class="card-header" data-key="card_rack">ラック登録</div>
+      <div class="card-body">
+        <div class="table-wrap">
+          <table id="rack__table">
+            <thead><tr><th>ID</th><th data-key="col_order">Order</th><th data-key="col_rack">Rack</th><th data-key="col_qty">Qty</th></tr></thead>
+            <tbody><tr><td colspan="4" class="empty-note" data-key="empty_rack">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="racknumber__input" data-key-ph="ph_rack" placeholder="Rack" />
+          <input type="text" id="rackqty__input" data-key-ph="ph_qty" placeholder="Qty" />
+          <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">保存</button>
+        </div>
+
+        <div class="sub-title" data-key="card_worklength">定尺・数量登録</div>
+        <div class="table-wrap">
+          <table id="work-length__table">
+            <thead><tr><th>No.</th><th data-key="col_len">len</th><th data-key="col_qty">qty</th></tr></thead>
+            <tbody><tr><td colspan="3" class="empty-note" data-key="empty_worklength">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="length_exd" data-key-ph="ph_len" placeholder="len" />
+          <input type="text" id="quantity_cut" data-key-ph="ph_qty" placeholder="qty" />
+          <button class="btn btn-add" id="add_row__button" data-key="btn_add_row">行を追加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 保存・フィルタ -->
+  <div class="toolbar">
+    <button class="btn btn-save" id="save__button" disabled data-key="btn_save_record">保存</button>
+    <button class="btn btn-update" id="update__button" disabled data-key="btn_update">更新</button>
+    <button class="btn btn-test" id="test__button" data-key="btn_test">TEST</button>
+    <div class="form-group" style="width:70px;">
+      <label data-key="lbl_filter_machine">設備</label>
+      <select id="press-machine-filter">
+        <option value=""></option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+    </div>
+    <div class="form-group" style="width:70px;">
+      <label data-key="lbl_filter_type">種別</label>
+      <select id="press-type-filter">
+        <option value=""></option>
+        <option value="1">〇</option>
+        <option value="2">◎</option>
+        <option value="3">●</option>
+      </select>
+    </div>
+    <div class="form-group" style="width:120px;">
+      <label data-key="lbl_filter_die">金型番号</label>
+      <input type="text" id="die-number-fileter" />
+    </div>
+    <div class="form-group" style="width:220px;">
+      <label data-key="lbl_filter_term">期間</label>
+      <div class="inline-pair">
+        <input type="date" id="start-term" />
+        <span>-</span>
+        <input type="date" id="end-term" />
+      </div>
+    </div>
+    <button class="btn btn-csv" id="download_data" data-key="btn_download">📥 ダウンロード</button>
+  </div>
+
+  <!-- 実績一覧 -->
+  <div class="card">
+    <div class="card-header" data-key="card_summary">実績一覧</div>
+    <div class="card-body" style="padding: 10px;">
+      <div class="table-wrap summary-wrap">
+        <table id="summary__table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th data-key="sc_date">日付</th>
+              <th data-key="sc_machine">設備</th>
+              <th data-key="sc_die">金型</th>
+              <th data-key="sc_directive">指示書</th>
+              <th data-key="sc_type">種別</th>
+              <th data-key="sc_washed">洗浄</th>
+              <th data-key="sc_lot">ロット</th>
+              <th data-key="sc_billet_size">B/S</th>
+              <th data-key="sc_billet_length">B/L</th>
+              <th data-key="sc_plan_qty">計画数</th>
+              <th data-key="sc_actual_qty">実績数</th>
+              <th data-key="sc_stop_cause">停止理由</th>
+              <th data-key="sc_start">開始</th>
+              <th data-key="sc_finish">終了</th>
+              <th data-key="sc_ram_speed">ラム速度</th>
+              <th data-key="sc_die_temp">金型温度</th>
+            </tr>
+          </thead>
+          <tbody><tr><td colspan="17" class="empty-note" data-key="empty_summary">実績データなし</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- 指示書選択モーダル -->
+  <div class="modal-overlay" id="directiveModal" style="display:none;" onclick="if(event.target===this) closeDirectiveModal()">
+    <div class="modal-box">
+      <h2 data-key="modal_directive_title">📑 指示書選択</h2>
+      <div class="inline-pair" style="margin-bottom:10px;">
+        <button type="button" class="btn btn-back" onclick="shiftDirectiveMonth(-1)">◀</button>
+        <span id="directiveMonthLabel" class="mono" style="min-width:80px; text-align:center; font-weight:bold;"></span>
+        <button type="button" class="btn btn-back" onclick="shiftDirectiveMonth(1)">▶</button>
+        <span style="font-size:11px; color:#888;" data-key="lbl_delivery_month">（納期基準）</span>
+      </div>
+      <input type="text" id="directiveSearch" data-key-ph="ph_directive_search" placeholder="発注書番号・品番で検索…" oninput="renderDirectiveTable()" />
+      <div class="modal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="col_ordersheet">発注書番号</th>
+              <th data-key="col_pn">品番</th>
+              <th data-key="col_qty">数量</th>
+              <th data-key="col_ok">OK</th>
+              <th data-key="col_packed">梱包済</th>
+              <th data-key="col_delivery">納期</th>
+              <th data-key="col_note">備考</th>
+            </tr>
+          </thead>
+          <tbody id="directiveModalBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-back" onclick="closeDirectiveModal()" data-key="btn_cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 図面ファイル プレビューモーダル -->
+  <div class="modal-overlay" id="previewModal" style="display:none;" onclick="if(event.target===this) closeDrawingPreview()">
+    <div class="modal-box">
+      <h2 data-key="modal_preview_title">🖼 図面プレビュー</h2>
+      <div id="previewContent" style="margin:14px 0;"></div>
+      <div class="modal-footer">
+        <button class="btn btn-back" onclick="closeDrawingPreview()" data-key="btn_cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 稼働ログ（PLCサンプリング）モーダル -->
+  <div class="modal-overlay" id="plcSessionModal" style="display:none;" onclick="if(event.target===this) closePlcSessionModal()">
+    <div class="modal-box" style="width:820px;">
+      <h2 data-key="modal_plc_title">⏱ 稼働ログ（PLCサンプリング）</h2>
+      <div style="font-size:12px; color:#888; margin-bottom:10px;" id="plcSessionDateLabel"></div>
+      <div class="modal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="col_machine">設備</th>
+              <th data-key="col_die">金型番号</th>
+              <th data-key="col_start">開始</th>
+              <th data-key="col_end">終了</th>
+              <th data-key="col_billet_inc">Billet数</th>
+              <th style="width:65px;">DieUp</th>
+              <th style="width:65px;">DieDown</th>
+              <th style="width:65px;">StemUp</th>
+              <th style="width:65px;">StemDown</th>
+            </tr>
+          </thead>
+          <tbody id="plcSessionModalBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-back" onclick="closePlcSessionModal()" data-key="btn_cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "🏭 プレス日報入力",
+        subtitle: "設備別・日別のプレス実績を入力（画面デザインのみ・未接続）",
+        btn_back: "← 戻る",
+        card_basic: "基本情報",
+        lbl_directive: "生産指示書", lbl_date: "日付", lbl_die: "金型番号",
+        btn_select: "選択",
+        modal_directive_title: "📑 指示書選択", ph_directive_search: "発注書番号・品番で検索…",
+        col_ordersheet: "発注書番号", col_pn: "品番", col_delivery: "納期", btn_cancel: "キャンセル",
+        col_ok: "OK", col_packed: "梱包済", col_note: "備考",
+        modal_plc_title: "⏱ 稼働ログ（PLCサンプリング）",
+        col_machine: "設備", col_start: "開始", col_end: "終了",
+        col_billet_inc: "Billet数",
+        empty_plc: "この日のログはありません",
+        lbl_delivery_month: "（納期基準）",
+        lbl_washed: "洗浄済み", opt_no: "No", opt_yes: "Yes",
+        lbl_press_type: "プレス種別", lbl_machine: "設備番号",
+        lbl_billet_size: "ビレットサイズ", lbl_billet_length: "ビレット長さ",
+        lbl_plan_qty: "計画ビレット数", lbl_actual_qty: "実績ビレット数",
+        lbl_press_time: "プレス時間（開始 - 終了）",
+        lbl_ram_speed: "ラム速度 (mm/s)", lbl_die_temp: "実測金型温度 (℃)",
+        lbl_name: "担当者", lbl_press_directive: "押出指示書",
+        lbl_actual_length: "実測長さ (SP dài)", lbl_stretch_ratio: "ストレッチ",
+        lbl_special_note: "特記事項", lbl_file: "ファイル", btn_preview: "プレビュー",
+        btn_choose_file: "File", modal_preview_title: "🖼 図面プレビュー",
+        preview_unsupported: "この形式はプレビューできません。「開く」から確認してください。",
+        btn_open_file: "開く",
+        card_measure: "温度・ラム速度測定",
+        sub_container_temp: "コンテナ温度", sub_ram_values: "ラム速度・圧力・温度",
+        col_stemside: "StemSide", col_dieside: "DieSide",
+        row_upside: "Upside", row_downside: "Downside",
+        col_spd: "速度", col_press: "圧力", col_temp: "温度",
+        card_bundle: "バンドル登録", col_bundle: "バンドル", col_qty: "数量", col_lot: "ロット",
+        col_mfg: "製造", col_insp: "検査", col_note: "備考",
+        empty_bundle: "登録データなし",
+        ph_bundle: "バンドル番号", ph_qty: "数量", ph_lot: "ロット", ph_note: "備考",
+        btn_save: "保存",
+        card_rack: "ラック登録", col_order: "順序", col_rack: "ラック",
+        empty_rack: "登録データなし", ph_rack: "ラック番号",
+        card_worklength: "定尺・数量登録", col_len: "長さ",
+        empty_worklength: "登録データなし", ph_len: "長さ",
+        btn_add_row: "行を追加",
+        btn_save_record: "保存", btn_update: "更新", btn_test: "TEST",
+        lbl_filter_machine: "設備", lbl_filter_type: "種別", lbl_filter_die: "金型番号",
+        lbl_filter_term: "期間", btn_download: "📥 ダウンロード",
+        card_summary: "実績一覧",
+        sc_date: "日付", sc_machine: "設備", sc_die: "金型", sc_directive: "指示書",
+        sc_type: "種別", sc_washed: "洗浄", sc_lot: "ロット", sc_billet_size: "B/S",
+        sc_billet_length: "B/L", sc_plan_qty: "計画数", sc_actual_qty: "実績数",
+        sc_stop_cause: "停止理由", sc_start: "開始", sc_finish: "終了",
+        sc_ram_speed: "ラム速度", sc_die_temp: "金型温度",
+        empty_summary: "実績データなし",
+      },
+      vi: {
+        title: "🏭 Nhập báo cáo ngày (Press)",
+        subtitle: "Nhập kết quả ép theo máy / theo ngày（chỉ giao diện・chưa kết nối）",
+        btn_back: "← Quay lại",
+        card_basic: "Thông tin cơ bản",
+        lbl_directive: "Phiếu chỉ thị sản xuất", lbl_date: "Ngày", lbl_die: "Số khuôn",
+        btn_select: "Chọn",
+        modal_directive_title: "📑 Chọn phiếu đặt hàng", ph_directive_search: "Tìm theo số phiếu / mã SP…",
+        col_ordersheet: "Số phiếu", col_pn: "Mã SP", col_delivery: "Ngày giao", btn_cancel: "Hủy bỏ",
+        col_ok: "OK", col_packed: "Đã đóng gói", col_note: "Ghi chú",
+        modal_plc_title: "⏱ Nhật ký PLC (sampling)",
+        col_machine: "Máy", col_start: "Bắt đầu", col_end: "Kết thúc",
+        col_billet_inc: "SL Billet",
+        empty_plc: "Không có log cho ngày này",
+        lbl_delivery_month: "（theo ngày giao）",
+        lbl_washed: "Đã rửa?", opt_no: "No", opt_yes: "Yes",
+        lbl_press_type: "Loại ép", lbl_machine: "Số máy",
+        lbl_billet_size: "Cỡ Billet", lbl_billet_length: "Chiều dài Billet",
+        lbl_plan_qty: "SL Billet kế hoạch", lbl_actual_qty: "SL Billet thực tế",
+        lbl_press_time: "Thời gian ép（bắt đầu - kết thúc）",
+        lbl_ram_speed: "Tốc độ Ram (mm/s)", lbl_die_temp: "Nhiệt độ khuôn thực đo (℃)",
+        lbl_name: "Người phụ trách", lbl_press_directive: "Phiếu chỉ thị ép",
+        lbl_actual_length: "SP dài (thực đo)", lbl_stretch_ratio: "TL kéo",
+        lbl_special_note: "Ghi chú đặc biệt", lbl_file: "Tệp", btn_preview: "Xem trước",
+        btn_choose_file: "File", modal_preview_title: "🖼 Xem trước bản vẽ",
+        preview_unsupported: "Không thể xem trước định dạng này. Vui lòng nhấn “Mở” để kiểm tra.",
+        btn_open_file: "Mở",
+        card_measure: "Đo nhiệt độ / tốc độ Ram",
+        sub_container_temp: "Nhiệt độ Container", sub_ram_values: "Tốc độ / áp lực / nhiệt độ Ram",
+        col_stemside: "StemSide", col_dieside: "DieSide",
+        row_upside: "Upside", row_downside: "Downside",
+        col_spd: "Tốc độ", col_press: "Áp lực", col_temp: "Nhiệt độ",
+        card_bundle: "Đăng ký Bundle", col_bundle: "Bundle", col_qty: "SL", col_lot: "Lot",
+        col_mfg: "SX", col_insp: "KT", col_note: "Ghi chú",
+        empty_bundle: "Chưa có dữ liệu",
+        ph_bundle: "Số Bundle", ph_qty: "SL", ph_lot: "Lot", ph_note: "Ghi chú",
+        btn_save: "Lưu",
+        card_rack: "Đăng ký Rack", col_order: "Thứ tự", col_rack: "Rack",
+        empty_rack: "Chưa có dữ liệu", ph_rack: "Số Rack",
+        card_worklength: "Đăng ký chiều dài / SL", col_len: "Dài",
+        empty_worklength: "Chưa có dữ liệu", ph_len: "Dài",
+        btn_add_row: "Thêm dòng",
+        btn_save_record: "Lưu", btn_update: "Cập nhật", btn_test: "TEST",
+        lbl_filter_machine: "Máy", lbl_filter_type: "Loại", lbl_filter_die: "Số khuôn",
+        lbl_filter_term: "Khoảng thời gian", btn_download: "📥 Tải xuống",
+        card_summary: "Danh sách kết quả",
+        sc_date: "Ngày", sc_machine: "Máy", sc_die: "Khuôn", sc_directive: "Chỉ thị",
+        sc_type: "Loại", sc_washed: "Rửa", sc_lot: "Lot", sc_billet_size: "B/S",
+        sc_billet_length: "B/L", sc_plan_qty: "SL KH", sc_actual_qty: "SL TT",
+        sc_stop_cause: "Lý do dừng", sc_start: "Bắt đầu", sc_finish: "Kết thúc",
+        sc_ram_speed: "Tốc độ Ram", sc_die_temp: "Nhiệt độ khuôn",
+        empty_summary: "Chưa có dữ liệu",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      const t = dict[lang];
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const v = t[el.dataset.key];
+        if (v && typeof v === "string") el.textContent = v;
+      });
+      document.querySelectorAll("[data-key-ph]").forEach(el => {
+        const v = t[el.dataset.keyPh];
+        if (v) el.placeholder = v;
+      });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+    }
+
+    /* ラム速度・圧力・温度テーブル：No.1〜No.5 を組み立て */
+    function buildRamRows() {
+      const body = document.getElementById("ram-values__body");
+      for (let no = 1; no <= 5; no++) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <th>No.${no}</th>
+          <td><input type="text" id="no${no}_1000_ram_speed" class="num-input" /></td>
+          <td><input type="text" id="no${no}_1000_ram_pressure" class="num-input" /></td>
+          <td><input type="text" id="no${no}_1000_work_temperature" class="num-input" /></td>
+          <td><input type="text" id="no${no}_0200_ram_speed" class="num-input" /></td>
+          <td><input type="text" id="no${no}_0200_ram_pressure" class="num-input" /></td>
+          <td><input type="text" id="no${no}_0200_work_temperature" class="num-input" /></td>
+        `;
+        body.appendChild(tr);
+      }
+    }
+
+    /* 日付のデフォルト値：t_press の最新日付の翌日 */
+    /* 担当者：m_staff（leave_at IS NULL AND role='operator'）を反映 */
+    async function loadStaffList() {
+      const res  = await fetch("./php/press_daily_report/get_staff.php");
+      const rows = await res.json();
+      const sel  = document.getElementById("name__select");
+      rows.forEach(row => {
+        const opt = document.createElement("option");
+        opt.value = row.id;
+        opt.textContent = row.staff_name;
+        sel.appendChild(opt);
+      });
+    }
+
+    async function setDefaultDate() {
+      try {
+        const res  = await fetch("./php/press_daily_report/get_next_date.php");
+        const data = await res.json();
+        if (data.latest_date) {
+          document.getElementById("date__input").value = data.latest_date;
+          document.getElementById("plcLogBtn").disabled = false;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    /* -------------------------
+       指示書選択モーダル
+    ------------------------- */
+    let orderSheets = [];
+    let directiveMonth = null;   // "YYYY-MM"
+    let loadedMonth    = null;
+
+    function initialDirectiveMonth() {
+      const v = document.getElementById("date__input").value;
+      return v ? v.slice(0, 7) : new Date().toISOString().slice(0, 7);
+    }
+
+    async function loadOrderSheets(month) {
+      const res = await fetch("./php/press_daily_report/get_ordersheets.php?month=" + encodeURIComponent(month));
+      orderSheets = await res.json();
+      loadedMonth = month;
+      document.getElementById("directiveMonthLabel").textContent = month;
+    }
+
+    async function shiftDirectiveMonth(diff) {
+      const [y, m] = directiveMonth.split("-").map(Number);
+      const d = new Date(y, m - 1 + diff, 1);
+      directiveMonth = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+      await loadOrderSheets(directiveMonth);
+      renderDirectiveTable();
+    }
+
+    async function openDirectiveModal() {
+      if (!directiveMonth) directiveMonth = initialDirectiveMonth();
+      if (loadedMonth !== directiveMonth) await loadOrderSheets(directiveMonth);
+      document.getElementById("directiveSearch").value = "";
+      renderDirectiveTable();
+      document.getElementById("directiveModal").style.display = "flex";
+    }
+
+    function closeDirectiveModal() {
+      document.getElementById("directiveModal").style.display = "none";
+    }
+
+    function renderDirectiveTable() {
+      const q = document.getElementById("directiveSearch").value.trim().toUpperCase();
+      const rows = q
+        ? orderSheets.filter(r =>
+            (r.ordersheet_number ?? "").toUpperCase().includes(q) ||
+            (r.production_number ?? "").toUpperCase().includes(q))
+        : orderSheets;
+
+      const tbody = document.getElementById("directiveModalBody");
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-note">—</td></tr>`;
+        return;
+      }
+      rows.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono">${row.ordersheet_number ?? ""}</td>
+          <td class="mono left">${row.production_number ?? ""}</td>
+          <td class="mono right">${row.production_quantity ?? ""}</td>
+          <td class="mono right">${row.ok_quantity ?? 0}</td>
+          <td class="mono right">${row.packed_quantity ?? 0}</td>
+          <td>${row.delivery_date_at ?? ""}</td>
+          <td class="left">${row.note ?? ""}</td>
+        `;
+        tr.addEventListener("click", () => selectOrderSheet(row));
+        tbody.appendChild(tr);
+      });
+    }
+
+    function selectOrderSheet(row) {
+      document.getElementById("directive__input").value = row.ordersheet_number;
+      const sel = document.getElementById("directive_input__select");
+      sel.innerHTML = "";
+      const opt = document.createElement("option");
+      opt.value = row.id;
+      opt.textContent = row.ordersheet_number;
+      sel.appendChild(opt);
+      sel.value = row.id;
+      document.getElementById("directive__group").classList.remove("required");
+      closeDirectiveModal();
+      checkAllRequiredFields();
+    }
+
+    /* プレス種別「●」選択時：指示書番号をアクティブにしてモーダルを開く */
+    document.getElementById("pressing-type__select").addEventListener("change", function () {
+      const group = document.getElementById("directive__group");
+      if (this.value === "3") {
+        group.classList.add("required");
+        openDirectiveModal();
+      } else {
+        group.classList.remove("required");
+      }
+    });
+
+    /* -------------------------
+       金型番号：入力しながら候補をドロップダウン表示
+    ------------------------- */
+    let dieSearchTimer = null;
+    let dieRows        = [];
+    let dieActiveIndex = -1;
+
+    function showDieDropdown() {
+      document.getElementById("dieDropdown").style.display = "block";
+    }
+    function hideDieDropdown() {
+      document.getElementById("dieDropdown").style.display = "none";
+      dieActiveIndex = -1;
+    }
+
+    function searchDies() {
+      clearTimeout(dieSearchTimer);
+      dieSearchTimer = setTimeout(async () => {
+        const q = document.getElementById("die__input").value.trim();
+        const res = await fetch("./php/press_daily_report/get_dies.php?q=" + encodeURIComponent(q));
+        dieRows = await res.json();
+        dieActiveIndex = -1;
+        renderDieDropdown();
+        showDieDropdown();
+      }, 250);
+    }
+
+    function renderDieDropdown() {
+      const tbody = document.getElementById("dieModalBody");
+      tbody.innerHTML = "";
+      if (!dieRows.length) {
+        tbody.innerHTML = `<tr><td class="empty-note">—</td></tr>`;
+        return;
+      }
+      dieRows.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.dataset.index = i;
+        if (i === dieActiveIndex) tr.classList.add("active");
+        tr.innerHTML = `<td>${row.die_number ?? ""}</td>`;
+        // mousedown（blurより先に発火）でクリック選択を確実に拾う
+        tr.addEventListener("mousedown", (e) => { e.preventDefault(); selectDie(row); });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function setDieActiveIndex(i) {
+      if (!dieRows.length) return;
+      dieActiveIndex = (i + dieRows.length) % dieRows.length;
+      document.querySelectorAll("#dieModalBody tr").forEach(tr =>
+        tr.classList.toggle("active", Number(tr.dataset.index) === dieActiveIndex)
+      );
+      const activeTr = document.querySelector("#dieModalBody tr.active");
+      if (activeTr) activeTr.scrollIntoView({ block: "nearest" });
+    }
+
+    function onDieKeydown(e) {
+      const dropdownOpen = document.getElementById("dieDropdown").style.display !== "none";
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (!dropdownOpen) { searchDies(); return; }
+        setDieActiveIndex(dieActiveIndex + 1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (dropdownOpen) setDieActiveIndex(dieActiveIndex - 1);
+      } else if (e.key === "Enter") {
+        if (dropdownOpen && dieActiveIndex >= 0) {
+          e.preventDefault();
+          selectDie(dieRows[dieActiveIndex]);
+        }
+      } else if (e.key === "Escape") {
+        hideDieDropdown();
+      }
+    }
+
+    function selectDie(row) {
+      document.getElementById("die__input").value = row.die_number;
+      const sel = document.getElementById("die__select");
+      sel.innerHTML = "";
+      const opt = document.createElement("option");
+      opt.value = row.id;
+      opt.textContent = row.die_number;
+      sel.appendChild(opt);
+      sel.value = row.id;
+      hideDieDropdown();
+      loadDirectivesForDie(row.id);
+      checkAllRequiredFields();
+    }
+
+    /* -------------------------
+       指示書選択：金型に紐づく直近5件のt_press_directiveを取得し、
+       選択中の指示書の内容（プレス種別/ビレットサイズ/長さ/計画数/ラム速度/伸び率）を都度反映
+    ------------------------- */
+    let directiveList = [];
+
+    async function loadDirectivesForDie(dieId) {
+      const res = await fetch("./php/press_daily_report/get_directives.php?die_id=" + encodeURIComponent(dieId));
+      directiveList = await res.json();
+
+      const sel = document.getElementById("press-directive__select");
+      sel.innerHTML = "";
+      if (!directiveList.length) {
+        sel.appendChild(new Option("-", "0"));
+        return;
+      }
+      directiveList.forEach(d => sel.appendChild(new Option(d.plan_date_at, d.id)));
+      sel.value = directiveList[0].id;
+      applyDirective(directiveList[0]);
+    }
+
+    function onDirectiveChange() {
+      const id = document.getElementById("press-directive__select").value;
+      const d  = directiveList.find(x => String(x.id) === String(id));
+      if (d) applyDirective(d);
+    }
+
+    function applyDirective(d) {
+      document.getElementById("pressing-type__select").value = d.pressing_type_id ?? "0";
+      document.getElementById("billet-size__select").value   = d.billet_size ?? "0";
+      document.getElementById("billet-length__select").value = d.billet_length ?? "";
+      document.getElementById("plan-billet-qty__input").value = d.billet_input_quantity ?? "";
+      document.getElementById("actual-ram-speed__input").value = d.ram_speed ?? "";
+      document.getElementById("stretch-ratio__input").value    = d.stretch_ratio ?? "";
+      checkAllRequiredFields();
+    }
+
+    // 金型番号欄以外をクリックしたらドロップダウンを閉じる
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("die__group").contains(e.target)) hideDieDropdown();
+    });
+
+    /* プレス時間：4桁数字（例 0930）を確定時に HH:MM 形式へ整形 */
+    function formatTimeField(el) {
+      const digits = el.value.replace(/\D/g, "");
+      if (digits.length === 4) {
+        el.value = digits.slice(0, 2) + ":" + digits.slice(2);
+      }
+    }
+
+    /* ストレッチ：小数点第1位までに整形（例 .8 → 0.8） */
+    function formatStretchRatio(el) {
+      const val = el.value.trim();
+      if (val === "") return;
+      const num = parseFloat(val);
+      if (!isNaN(num)) el.value = num.toFixed(1);
+    }
+
+    /* -------------------------
+       稼働ログ（PLCサンプリング）モーダル：日付選択時に表示
+    ------------------------- */
+    async function openPlcSessionModal() {
+      const date = document.getElementById("date__input").value;
+      if (!date) return;
+
+      const res  = await fetch("./php/press_daily_report/get_plc_sessions.php?date=" + encodeURIComponent(date));
+      const rows = await res.json();
+
+      document.getElementById("plcSessionDateLabel").textContent = date;
+      const tbody = document.getElementById("plcSessionModalBody");
+      tbody.innerHTML = "";
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty-note">${dict[currentLang].empty_plc}</td></tr>`;
+      } else {
+        rows.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.machine ?? ""}</td>
+            <td class="mono left">${row.die_name ?? ""}</td>
+            <td class="mono">${row.start_time ?? ""}</td>
+            <td class="mono">${row.end_time ?? ""}</td>
+            <td class="mono right">${row.billet_increase ?? 0}</td>
+            <td class="mono right">${row.tempdieup ?? ""}</td>
+            <td class="mono right">${row.tempdiedown ?? ""}</td>
+            <td class="mono right">${row.tempstemup ?? ""}</td>
+            <td class="mono right">${row.tempstemdown ?? ""}</td>
+          `;
+          tr.style.cursor = "pointer";
+          tr.addEventListener("click", () => applyPlcSession(row));
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById("plcSessionModal").style.display = "flex";
+    }
+
+    function closePlcSessionModal() {
+      document.getElementById("plcSessionModal").style.display = "none";
+    }
+
+    // 行クリックで開始/終了時刻・コンテナ温度4か所を反映
+    function applyPlcSession(row) {
+      const startHm = (row.start_time ?? "").split(" ")[1] ?? "";
+      const endHm   = (row.end_time ?? "").split(" ")[1] ?? "";
+      document.getElementById("press-start__input").value  = startHm;
+      document.getElementById("press-finish__input").value = endHm;
+      document.getElementById("container_upside_dieside").value    = row.tempdieup ?? "";
+      document.getElementById("container_downside_dieside").value  = row.tempdiedown ?? "";
+      document.getElementById("container_upside_stemside").value   = row.tempstemup ?? "";
+      document.getElementById("container_downside_stemside").value = row.tempstemdown ?? "";
+      closePlcSessionModal();
+      checkAllRequiredFields();
+    }
+
+    /* -------------------------
+       図面ファイル：選択したファイル名の表示 ＋ プレビュー
+    ------------------------- */
+    let drawingFileURL = null;
+
+    function onDrawingFileChange(input) {
+      const file = input.files[0];
+      document.getElementById("drawingFileName").textContent = file ? file.name : "未選択";
+      document.getElementById("preview__button").disabled = !file;
+      if (drawingFileURL) URL.revokeObjectURL(drawingFileURL);
+      drawingFileURL = file ? URL.createObjectURL(file) : null;
+    }
+
+    function openDrawingPreview() {
+      const file = document.getElementById("press-direction_file").files[0];
+      if (!file || !drawingFileURL) return;
+
+      const content = document.getElementById("previewContent");
+      if (file.type.startsWith("image/")) {
+        content.innerHTML = `<img src="${drawingFileURL}" alt="${file.name}" />`;
+      } else if (file.type === "application/pdf") {
+        content.innerHTML = `<embed src="${drawingFileURL}" type="application/pdf" width="100%" height="500px" />`;
+      } else {
+        content.innerHTML = `
+          <p style="font-size:13px; color:#666; margin-bottom:10px;">${dict[currentLang].preview_unsupported}</p>
+          <a class="btn btn-add" href="${drawingFileURL}" target="_blank" rel="noopener">${dict[currentLang].btn_open_file}</a>
+        `;
+      }
+      document.getElementById("previewModal").style.display = "flex";
+    }
+
+    function closeDrawingPreview() {
+      document.getElementById("previewModal").style.display = "none";
+    }
+
+    // Escキーでモーダルを閉じる
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      if (document.getElementById("directiveModal").style.display !== "none") closeDirectiveModal();
+      if (document.getElementById("plcSessionModal").style.display !== "none") closePlcSessionModal();
+      if (document.getElementById("previewModal").style.display !== "none") closeDrawingPreview();
+    });
+
+    /* -------------------------
+       必須項目チェック（基本情報カード：special_note以外すべて）
+    ------------------------- */
+    const REQUIRED_FIELD_IDS = [
+      "date__input", "die__input", "press-directive__select",
+      "pressing-type__select", "directive__input", "is-washed__select",
+      "machine-number__select", "billet-size__select",
+      "billet-length__select", "plan-billet-qty__input", "actual-billet-qty__input",
+      "press-start__input", "press-finish__input", "actual-ram-speed__input", "actual-die-temp__input",
+      "name__select", "first_actual_length", "stretch-ratio__input",
+      "press-direction_file",
+      "container_upside_stemside", "container_upside_dieside",
+      "container_downside_stemside", "container_downside_dieside",
+    ];
+
+    // ラム速度テーブル：No.1〜5すべて対象。実際に必須になる行数は実績ビレット数で決まる（checkRequiredField内で判定）
+    [1, 2, 3, 4, 5].forEach(no => {
+      ["1000", "0200"].forEach(pos => {
+        ["ram_speed", "ram_pressure", "work_temperature"].forEach(field => {
+          REQUIRED_FIELD_IDS.push(`no${no}_${pos}_${field}`);
+        });
+      });
+    });
+
+    function isFieldEmpty(el) {
+      if (el.type === "file") return el.files.length === 0;
+      if (el.tagName === "SELECT") return !el.value || el.value === "0";
+      return !el.value || el.value.trim() === "";
+    }
+
+    function checkRequiredField(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      let empty = isFieldEmpty(el);
+      // 生産指示書はプレス種別が「●」の時のみ必須
+      if (id === "directive__input" && document.getElementById("pressing-type__select").value !== "3") {
+        empty = false;
+      }
+      // ラム速度テーブル：No.(実績ビレット数)までの行のみ必須（例：実績ビレット数4ならNo.5は不要）
+      const ramMatch = id.match(/^no(\d)_/);
+      if (ramMatch) {
+        const rowNo = Number(ramMatch[1]);
+        const qtyVal = document.getElementById("actual-billet-qty__input").value.trim();
+        const requiredRows = /^\d+$/.test(qtyVal) ? Math.min(5, Number(qtyVal)) : 5;
+        if (rowNo > requiredRows) empty = false;
+      }
+      if (el.type === "file") {
+        // input[type=file]は非表示のため、見た目のラベル側に色を付ける
+        const label = document.querySelector(`label[for="${id}"]`);
+        if (label) label.classList.toggle("field-empty", empty);
+      } else {
+        el.classList.toggle("field-empty", empty);
+      }
+    }
+
+    function checkAllRequiredFields() {
+      REQUIRED_FIELD_IDS.forEach(checkRequiredField);
+      validateAllFields();
+    }
+
+    /* -------------------------
+       数値レンジ・形式チェック
+    ------------------------- */
+    const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+    const VALIDATORS = {
+      "plan-billet-qty__input":   val => /^\d+$/.test(val) && Number(val) >= 1 && Number(val) <= 50,
+      "actual-billet-qty__input": val => /^\d+$/.test(val) && Number(val) >= 1 && Number(val) <= 50,
+      "actual-ram-speed__input":  val => isFinite(val) && Number(val) >= 0.1 && Number(val) <= 20.0,
+      "actual-die-temp__input":   val => isFinite(val) && Number(val) >= 400 && Number(val) <= 510,
+      "first_actual_length":      val => isFinite(val) && Number(val) >= 1500 && Number(val) <= 6600,
+      "stretch-ratio__input":     val => isFinite(val) && Number(val) >= 0 && Number(val) <= 2.0,
+      "container_upside_stemside":   val => /^\d+$/.test(val) && Number(val) >= 300 && Number(val) <= 550,
+      "container_upside_dieside":    val => /^\d+$/.test(val) && Number(val) >= 300 && Number(val) <= 550,
+      "container_downside_stemside": val => /^\d+$/.test(val) && Number(val) >= 300 && Number(val) <= 550,
+      "container_downside_dieside":  val => /^\d+$/.test(val) && Number(val) >= 300 && Number(val) <= 550,
+    };
+
+    // ラム速度テーブル（No.1〜5）：ex0.11と同じ範囲（速度0〜30 / 圧力0〜60 / 温度200〜600、いずれも境界値含まず）
+    const RAM_RANGES = {
+      ram_speed:        [0, 30],
+      ram_pressure:      [0, 60],
+      work_temperature: [200, 600],
+    };
+    [1, 2, 3, 4, 5].forEach(no => {
+      ["1000", "0200"].forEach(pos => {
+        Object.entries(RAM_RANGES).forEach(([field, [min, max]]) => {
+          VALIDATORS[`no${no}_${pos}_${field}`] = val => isFinite(val) && Number(val) > min && Number(val) < max;
+        });
+      });
+    });
+
+    function validateField(id) {
+      const el = document.getElementById(id);
+      const validator = VALIDATORS[id];
+      if (!el || !validator) return;
+      const val = el.value.trim();
+      el.classList.toggle("field-invalid", val !== "" && !validator(val));
+    }
+
+    // "1200" のような未変換の4桁数字も、blur時にHH:MMへ変換される前提で妥当な時刻として扱う
+    function normalizeTimeValue(val) {
+      if (TIME_RE.test(val)) return val;
+      if (/^\d{4}$/.test(val)) {
+        const hh = val.slice(0, 2);
+        const mm = val.slice(2);
+        if (Number(hh) <= 23 && Number(mm) <= 59) return hh + ":" + mm;
+      }
+      return null;
+    }
+
+    function validatePressTime() {
+      const startEl  = document.getElementById("press-start__input");
+      const finishEl = document.getElementById("press-finish__input");
+      const startVal  = startEl.value.trim();
+      const finishVal = finishEl.value.trim();
+      const startNorm  = startVal  === "" ? "" : normalizeTimeValue(startVal);
+      const finishNorm = finishVal === "" ? "" : normalizeTimeValue(finishVal);
+      let startInvalid  = startVal  !== "" && startNorm  === null;
+      let finishInvalid = finishVal !== "" && finishNorm === null;
+      if (startNorm && finishNorm && finishNorm <= startNorm) {
+        startInvalid = true;
+        finishInvalid = true;
+      }
+      startEl.classList.toggle("field-invalid", startInvalid);
+      finishEl.classList.toggle("field-invalid", finishInvalid);
+    }
+
+    function validateAllFields() {
+      Object.keys(VALIDATORS).forEach(validateField);
+      validatePressTime();
+    }
+
+    function initRequiredFieldChecks() {
+      const cardBody = document.querySelector(".basic-card .card-body");
+      ["input", "change"].forEach(evt => {
+        cardBody.addEventListener(evt, checkAllRequiredFields);
+      });
+      cardBody.addEventListener("blur", checkAllRequiredFields, true);
+      checkAllRequiredFields();
+    }
+
+    buildRamRows();
+    setLang(currentLang);
+    setDefaultDate().then(checkAllRequiredFields);
+    loadStaffList();
+    initRequiredFieldChecks();
+  </script>
+</body>
+</html>
