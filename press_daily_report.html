@@ -78,6 +78,8 @@
     .left { text-align: left; }
     .right { text-align: right; }
     .sub-title { font-size: 12px; font-weight: bold; color: #555; margin: 12px 0 6px; }
+    .sub-title-total { display: flex; justify-content: space-between; align-items: center; }
+    .sub-title-total .header-total { font-weight: normal; }
 
     #ram-values__table th, #ram-values__table td { padding-top: 1px; padding-bottom: 1px; }
     #ram-values__table td input { padding-top: 1px; padding-bottom: 1px; }
@@ -135,6 +137,10 @@
 
     .summary-wrap { max-height: 420px; }
     .worklength-wrap { max-height: 160px; }
+    #work-length__table { table-layout: fixed; }
+    #work-length__table th, #work-length__table td { padding-left: 3px; padding-right: 3px; }
+    #work-length__table .row-del-btn { padding: 2px 2px; font-size: 11px; }
+    #work-length__table td input { padding-left: 3px; padding-right: 3px; width: calc(100% - 5px); }
     .rack-wrap { max-height: 160px; }
     #summary__table { width: auto; }
     #summary__table th, #summary__table td { padding: 3px 6px; font-size: 11px; }
@@ -438,10 +444,13 @@
           <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">追加</button>
         </div>
 
-        <div class="sub-title" data-key="card_worklength">定尺・数量登録</div>
+        <div class="sub-title sub-title-total">
+          <span data-key="card_worklength">定尺・数量登録</span>
+          <span class="header-total"><span data-key="lbl_worklength_total">合計</span>: <span id="worklength-total__value" class="mono">0</span><span data-key="unit_pieces">本</span></span>
+        </div>
         <div class="table-wrap worklength-wrap">
           <table id="work-length__table">
-            <thead><tr><th>No.</th><th data-key="col_len">len</th><th><span data-key="col_qty">qty</span> <span id="worklength-total__value" class="mono">(0)</span></th><th></th></tr></thead>
+            <thead><tr><th style="width:38px;">No.</th><th data-key="col_len" style="width:63px;">len</th><th data-key="col_qty" style="width:63px;">qty</th><th style="width:18px;"></th></tr></thead>
             <tbody><tr><td colspan="4" class="empty-note" data-key="empty_worklength">登録データなし</td></tr></tbody>
           </table>
         </div>
@@ -708,6 +717,7 @@
         card_rack: "ラック登録", lbl_rack_total: "合計本数", col_order: "順序", col_rack: "ラック",
         empty_rack: "登録データなし", ph_rack: "ラック番号",
         card_worklength: "定尺・数量登録", col_len: "長さ",
+        lbl_worklength_total: "合計", unit_pieces: "本",
         empty_worklength: "登録データなし", ph_len: "長さ",
         card_worktime: "作業時間ログ", sub_time_extrusion: "押出時間",
         sub_time_pull: "ストレッチ時間", sub_time_cut: "切断時間",
@@ -764,6 +774,7 @@
         card_rack: "Đăng ký Rack", lbl_rack_total: "Tổng SL", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số Rack",
         card_worklength: "Đăng ký chiều dài / SL", col_len: "Dài",
+        lbl_worklength_total: "Tổng", unit_pieces: "thanh",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Dài",
         card_worktime: "Nhật ký thời gian làm việc", sub_time_extrusion: "Thời gian ép",
         sub_time_pull: "Thời gian kéo giãn", sub_time_cut: "Thời gian cắt",
@@ -1359,7 +1370,7 @@
         const n = Number(el.value);
         if (!isNaN(n)) total += n;
       });
-      document.getElementById("worklength-total__value").textContent = `(${total})`;
+      document.getElementById("worklength-total__value").textContent = total;
     }
     document.querySelector("#work-length__table tbody").addEventListener("input", e => {
       if (e.target.closest("td:nth-child(3)")) updateWorkLengthTotal();
