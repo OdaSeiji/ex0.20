@@ -72,6 +72,19 @@
         transform: translateY(-3px);
       }
 
+      .menu-card.beta {
+        border-color: #f0a000;
+        position: relative;
+      }
+      .menu-card.beta::after {
+        content: "BETA";
+        position: absolute; top: 8px; right: 10px;
+        background: #f0a000; color: #fff;
+        font-size: 10px; font-weight: bold;
+        padding: 2px 6px; border-radius: 4px;
+        letter-spacing: 0.5px;
+      }
+
       .menu-icon {
         width: 40px;
         height: 40px;
@@ -263,6 +276,11 @@
             ビレット投入に関するページ
           </div>
         </div>
+        <div class="menu-card beta" onclick="location.href = 'press_daily_report.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title">プレス日報入力</div>
+          <div class="menu-desc">設備別・日別のプレス実績入力（テスト公開中）</div>
+        </div>
       </div>
     </div>
 
@@ -278,6 +296,11 @@
           <div class="menu-desc" data-key="maintenance_desc">
             金型メンテナンスに関するページ
           </div>
+        </div>
+        <div class="menu-card beta" onclick="location.href = 'die_wash.html'">
+          <img class="menu-icon" src="./img/wrench.svg" alt="" />
+          <div class="menu-title">金型洗浄・棚入れ</div>
+          <div class="menu-desc">プレス後 → 洗浄 → 棚入れ の工程管理（テスト公開中）</div>
         </div>
       </div>
     </div>
@@ -327,6 +350,43 @@
           </div>
         </div>
       </div>
+
+      <div class="menu-row">
+        <div class="menu-card beta" onclick="location.href = 'die_issue_progress.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title">（暫定）金型進捗確認表</div>
+          <div class="menu-desc">Issue別の現在フェーズと停滞状況の一覧（テスト公開中）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📈 実績レポート -->
+    <div class="accordion" onclick="toggleAccordion(this)"><span>📈 実績レポート</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card beta" onclick="location.href = 'die_startup_report.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title">金型立上 実績レポート</div>
+          <div class="menu-desc">到着・型検・移管・試押の月別集計（テスト公開中）</div>
+        </div>
+        <div class="menu-card beta" onclick="location.href = 'machine_report.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title">設備稼働 実績レポート</div>
+          <div class="menu-desc">設備別・月別の稼働時間と押出回数（テスト公開中）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📦 生産管理 -->
+    <div class="accordion" onclick="toggleAccordion(this)"><span>📦 生産管理</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
+        <div class="menu-card beta" onclick="location.href = 'order_sheet.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title">発注書管理</div>
+          <div class="menu-desc">発注書の登録・実績・梱包状況の管理（テスト公開中）</div>
+        </div>
+      </div>
     </div>
 
     <!-- ⚙️ 各種情報 -->
@@ -350,6 +410,11 @@
             CSVから金型を一括登録
           </div>
         </div>
+        <div class="menu-card beta" onclick="location.href = 'die_part_import.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title">部品登録</div>
+          <div class="menu-desc">CSVから部品を一括登録（テスト公開中）</div>
+        </div>
       </div>
 
       <div class="menu-row">
@@ -359,6 +424,37 @@
           <div class="menu-desc" data-key="pn_desc">
             品番の登録・編集・カテゴリ設定
           </div>
+        </div>
+        <div class="menu-card beta" onclick="location.href = 'production_drawing.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title">型材図面</div>
+          <div class="menu-desc">品番ごとの型材図面PDFを登録・閲覧（テスト公開中）</div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card beta" onclick="location.href = 'die_handover_progress.html'">
+          <img class="menu-icon" src="./img/handover.svg" alt="" />
+          <div class="menu-title">型検進捗一覧</div>
+          <div class="menu-desc">到着・型検・量産トライ・移管の進捗管理（テスト公開中）</div>
+        </div>
+        <div class="menu-card beta" onclick="location.href = 'die_order.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title">発注・出荷日入力</div>
+          <div class="menu-desc">金型の発注日・出荷日を登録（テスト公開中）</div>
+        </div>
+      </div>
+
+      <div class="menu-row">
+        <div class="menu-card beta" onclick="location.href = 'die_arrival.html'">
+          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <div class="menu-title">金型 到着日入力</div>
+          <div class="menu-desc">現場に到着した金型の到着日を登録（テスト公開中）</div>
+        </div>
+        <div class="menu-card beta" onclick="location.href = 'die_register.html'">
+          <img class="menu-icon" src="./img/wrench.svg" alt="" />
+          <div class="menu-title">金型登録・管理</div>
+          <div class="menu-desc">金型の新規登録・編集・削除（テスト公開中）</div>
         </div>
       </div>
     </div>

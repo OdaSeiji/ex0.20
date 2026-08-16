@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Part Import</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 960px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #e65100; padding-left: 10px; }
+
+      .upload-card {
+        background: #fff; border-radius: 10px;
+        padding: 22px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-size: 14px; font-weight: bold; color: #e65100;
+        margin-bottom: 14px; border-bottom: 2px solid #fbe9e7; padding-bottom: 8px;
+      }
+      .card-title.existing-title {
+        color: #6a1b9a;
+        border-bottom-color: #e1bee7;
+      }
+      .upload-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .upload-row input[type="file"] {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; flex: 1; min-width: 200px;
+      }
+      .btn-upload {
+        background: #e65100; color: #fff;
+        padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;
+        font-weight: bold; white-space: nowrap;
+      }
+      .csv-hint { font-size: 12px; color: #888; margin-top: 8px; }
+      .upload-result {
+        margin-top: 12px; padding: 10px 14px; border-radius: 6px;
+        font-size: 13px; display: none;
+      }
+      .upload-result.ok  { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+      .upload-result.err { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+      .list-card {
+        background: #fff; border-radius: 10px;
+        padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+      }
+      .existing-card {
+        background: #fff; border-radius: 10px;
+        padding: 20px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+        border-left: 4px solid #ab47bc;
+        display: none;
+      }
+      .list-header {
+        display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+      }
+      .list-header h2 { font-size: 15px; color: #333; }
+      .count-label { font-size: 12px; color: #888; }
+
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 9px 12px; border-bottom: 1px solid #eee; font-size: 13px; text-align: left; }
+      th { background: #fbe9e7; font-weight: bold; color: #333; white-space: nowrap; }
+      tr:hover { background: #fff8f6; }
+
+      .existing-card table th { background: #f3e5f5; }
+      .existing-card table tr:hover { background: #fdf6ff; }
+
+      .mono { font-family: "Roboto Mono", monospace; }
+
+      .badge {
+        display: inline-block; padding: 3px 10px; border-radius: 4px;
+        font-size: 11px; font-weight: bold; color: #fff; white-space: nowrap;
+      }
+      .s-pending  { background: #e65100; }
+      .s-error    { background: #c62828; cursor: help; }
+      .s-warning  { background: #f57c00; }
+      .s-accessory { background: #7b1fa2; }
+
+      .note2-val  { color: #1565c0; font-size: 12px; }
+      .note2-empty { color: #bbb; font-size: 12px; }
+
+      .row-highlight { background: #fff3e0 !important; outline: 2px solid #f57c00; outline-offset: -2px; }
+
+      .del-btn {
+        padding: 4px 10px; background: #c62828; color: #fff;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+      }
+      .del-btn:disabled { background: #ccc; cursor: default; }
+
+      td input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+      td input[type="checkbox"]:disabled { cursor: default; }
+
+      .transfer-bar {
+        background: #fff; border-radius: 10px;
+        padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 16px;
+        margin-bottom: 20px;
+      }
+      .selected-count { font-size: 14px; color: #555; }
+      .btn-transfer {
+        background: #e65100; color: #fff;
+        padding: 10px 24px; border: none; border-radius: 5px;
+        cursor: pointer; font-weight: bold; font-size: 14px;
+        margin-left: auto;
+      }
+      .btn-transfer:disabled { background: #ccc; cursor: default; }
+
+      #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 24px;
+        border-radius: 6px; font-size: 13px; opacity: 0;
+        transition: opacity 0.3s; pointer-events: none; z-index: 999;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+
+<body style="visibility:hidden">
+    <script>
+      (async () => {
+        const r = await fetch("php/auth/check_session.php");
+        const d = await r.json();
+        if (!d.ok) { location.replace("login.html"); return; }
+        document.body.style.visibility = "visible";
+      })();
+    </script>
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1>部品登録</h1>
+      </div>
+
+      <!-- ① CSVアップロード -->
+      <div class="upload-card">
+        <div class="card-title">① CSVアップロード</div>
+        <div class="upload-row">
+          <input type="file" id="csvFile" accept=".csv" />
+          <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
+        </div>
+        <p class="csv-hint">ヘッダー: die_number, note2　|　die_number は m_dies に登録済みの金型番号のみ受け付けます</p>
+        <div class="upload-result" id="uploadResult"></div>
+      </div>
+
+      <!-- ② インポート一覧 -->
+      <div class="list-card">
+        <div class="list-header">
+          <h2>② インポート一覧</h2>
+          <span class="count-label" id="countLabel"></span>
+        </div>
+
+        <table id="importTable">
+          <thead>
+            <tr>
+              <th style="width:36px;"><input type="checkbox" id="checkAll" onchange="toggleAll(this.checked)" /></th>
+              <th>die_number</th>
+              <th>note2（取込）</th>
+              <th>状態</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- ③ 転送 -->
+      <div class="transfer-bar">
+        <span class="selected-count" id="selectedCount">0 件選択中</span>
+        <button class="btn-transfer" id="transferBtn" onclick="transferSelected()" disabled>
+          選択した行を t_die_handover へ転送
+        </button>
+      </div>
+
+      <!-- ④ 既存 t_die_handover レコード -->
+      <div class="existing-card" id="existingCard">
+        <div class="card-title existing-title">④ 既存の引き継ぎレコード（同 die_id）</div>
+        <table id="existingTable">
+          <thead>
+            <tr>
+              <th>die_number</th>
+              <th>is_accessory</th>
+              <th>note2</th>
+              <th>登録日</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      }
+
+      async function uploadCsv() {
+        const file = document.getElementById("csvFile").files[0];
+        if (!file) { showToast("ファイルを選択してください", false); return; }
+
+        const form = new FormData();
+        form.append("csv", file);
+
+        const res    = await fetch("./php/die_import/upload_parts_csv.php", { method: "POST", body: form });
+        const result = await res.json();
+
+        const box = document.getElementById("uploadResult");
+        box.style.display = "block";
+
+        if (result.status === "ok") {
+          let html = `${result.inserted} 件取り込み完了`;
+          if (result.skipped > 0) html += `、${result.skipped} 件スキップ`;
+          if (result.errors.length) {
+            html += "<ul style='margin-top:6px;padding-left:18px;'>";
+            result.errors.forEach((e) => { html += `<li>${e}</li>`; });
+            html += "</ul>";
+          }
+          box.className = "upload-result " + (result.errors.length ? "err" : "ok");
+          box.innerHTML = html;
+          loadList();
+        } else {
+          box.className = "upload-result err";
+          box.textContent = result.message || "取り込みに失敗しました";
+        }
+      }
+
+      async function loadList() {
+        const res  = await fetch("./php/die_import/get_parts_import_list.php");
+        const data = await res.json();
+
+        const imports  = data.imports  || [];
+        const existing = data.existing || [];
+
+        // ── インポート一覧 ──
+        document.getElementById("countLabel").textContent = `${imports.length} 件`;
+        document.getElementById("checkAll").checked = false;
+        updateSelectedCount();
+
+        const tbody = document.querySelector("#importTable tbody");
+        tbody.innerHTML = "";
+
+        if (!imports.length) {
+          tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+        } else {
+          imports.forEach((row) => {
+            let statusHtml;
+            if (row.import_error) {
+              statusHtml = `<span class="badge s-error" title="${escHtml(row.import_error)}">エラー</span>`;
+            } else if (row.dup_warning == 1) {
+              statusHtml = `<span class="badge s-warning">⚠ 重複あり</span>`;
+            } else {
+              statusHtml = `<span class="badge s-pending">未転送</span>`;
+            }
+
+            const note2Html = row.note2
+              ? `<span class="note2-val">${escHtml(row.note2)}</span>`
+              : `<span class="note2-empty">—</span>`;
+
+            const tr = document.createElement("tr");
+            tr.dataset.id    = row.id;
+            tr.dataset.dieId = row.die_id;
+            tr.innerHTML = `
+              <td><input type="checkbox" class="row-check" data-id="${row.id}" /></td>
+              <td class="mono">${escHtml(row.die_number)}</td>
+              <td>${note2Html}</td>
+              <td>${statusHtml}</td>
+              <td><button class="del-btn" onclick="deleteRow(${row.id})">削除</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // ── 既存引き継ぎレコード ──
+        const existingCard  = document.getElementById("existingCard");
+        const existingTbody = document.querySelector("#existingTable tbody");
+        existingTbody.innerHTML = "";
+
+        if (!existing.length) {
+          existingCard.style.display = "none";
+        } else {
+          existingCard.style.display = "block";
+          existing.forEach((row) => {
+            const accBadge = row.is_accessory_item_flag == 1
+              ? `<span class="badge s-accessory">部品</span>`
+              : `<span class="badge" style="background:#607d8b;">通常</span>`;
+
+            const note2Html = row.note2
+              ? `<span class="note2-val">${escHtml(row.note2)}</span>`
+              : `<span class="note2-empty">—</span>`;
+
+            const tr = document.createElement("tr");
+            tr.dataset.dieId = row.die_id;
+            tr.innerHTML = `
+              <td class="mono">${escHtml(row.die_number)}</td>
+              <td>${accBadge}</td>
+              <td>${note2Html}</td>
+              <td>${row.created_at ?? "—"}</td>
+            `;
+            existingTbody.appendChild(tr);
+          });
+        }
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function toggleAll(checked) {
+        document.querySelectorAll(".row-check:not(:disabled)").forEach((cb) => {
+          cb.checked = checked;
+        });
+        updateSelectedCount();
+      }
+
+      function updateSelectedCount() {
+        const n = document.querySelectorAll(".row-check:checked").length;
+        document.getElementById("selectedCount").textContent = `${n} 件選択中`;
+        document.getElementById("transferBtn").disabled = n === 0;
+      }
+
+      async function deleteRow(id) {
+        if (!confirm("この行を一覧から削除しますか？")) return;
+
+        const res    = await fetch("./php/die_import/delete_parts_import_row.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const result = await res.json();
+
+        if (result.status === "ok") {
+          showToast("削除しました");
+          loadList();
+        } else {
+          showToast(result.message || "削除に失敗しました", false);
+        }
+      }
+
+      async function transferSelected() {
+        const ids = [...document.querySelectorAll(".row-check:checked")].map((cb) => cb.dataset.id);
+        if (!ids.length) return;
+
+        const warnCount = [...document.querySelectorAll(".row-check:checked")]
+          .filter((cb) => cb.closest("tr").querySelector(".s-warning") !== null).length;
+
+        let confirmMsg = `${ids.length} 件を t_die_handover へ転送しますか？`;
+        if (warnCount > 0) {
+          confirmMsg = `⚠ ${warnCount} 件は既に t_die_handover に引き継ぎレコードが存在します。\n重複して INSERT されます。\n\n${confirmMsg}`;
+        }
+        if (!confirm(confirmMsg)) return;
+
+        const res    = await fetch("./php/die_import/transfer_to_parts.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids }),
+        });
+        const result = await res.json();
+
+        let msg = `${result.ok_count} 件転送完了`;
+        if (result.errors && result.errors.length) {
+          msg += `、${result.errors.length} 件エラー`;
+          showToast(msg, false);
+        } else {
+          showToast(msg);
+        }
+        loadList();
+      }
+
+      document.querySelector("#importTable tbody").addEventListener("change", function (e) {
+        if (e.target.classList.contains("row-check")) updateSelectedCount();
+      });
+
+      document.querySelector("#importTable tbody").addEventListener("click", function (e) {
+        const tr = e.target.closest("tr");
+        if (!tr) return;
+
+        const dieId = tr.dataset.dieId;
+        const isAlreadySelected = tr.classList.contains("row-highlight");
+
+        // 全ハイライト解除
+        document.querySelectorAll("#importTable tbody .row-highlight, #existingTable tbody .row-highlight")
+          .forEach((r) => r.classList.remove("row-highlight"));
+
+        // 同じ行を再クリックしたら解除だけで終了
+        if (isAlreadySelected) return;
+
+        // インポート行をハイライト
+        tr.classList.add("row-highlight");
+
+        // 下テーブルの同 die_id 行をハイライト
+        document.querySelectorAll(`#existingTable tbody tr[data-die-id="${dieId}"]`)
+          .forEach((r) => r.classList.add("row-highlight"));
+
+        // 既存テーブルが非表示の場合もスクロールは不要なので終了
+        const existingCard = document.getElementById("existingCard");
+        if (existingCard.style.display !== "none") {
+          const firstMatch = document.querySelector(`#existingTable tbody tr[data-die-id="${dieId}"]`);
+          if (firstMatch) firstMatch.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+
+      loadList();
+    </script>
+  </body>
+</html>
