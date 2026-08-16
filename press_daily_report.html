@@ -12,6 +12,7 @@
     .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 300; }
     .lang-buttons button { padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px; }
     .lang-buttons button.active { background: #0078d4; color: #fff; }
+    .lang-buttons .btn-back { background: #546e7a; color: #fff; border-color: #546e7a; padding: 7px 14px; }
 
     h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
     .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
@@ -32,7 +33,7 @@
     .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #0055a5; border-bottom: 1px solid #ccd8ee; }
     .card-body { padding: 14px; }
 
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
     .form-group { display: flex; flex-direction: column; gap: 3px; }
     .form-group.full { grid-column: span 2; }
     label { font-size: 11px; color: #555; font-weight: bold; }
@@ -42,7 +43,7 @@
       font-size: 13px; font-family: inherit; width: 100%;
     }
     input:focus, select:focus { outline: none; border-color: #0078d4; }
-    #pressing-type__select, #press-type-filter { font-family: "MS Gothic", "Segoe UI", sans-serif; }
+    #pressing-type__select, #press-type-filter, #summary__table .type-col { font-family: "MS Gothic", "Segoe UI", sans-serif; }
     .inline-pair { display: flex; gap: 6px; align-items: center; }
     .inline-pair span { font-size: 12px; color: #888; }
     .num-input { text-align: right; }
@@ -66,6 +67,7 @@
     .basic-card { width: 600px; flex-shrink: 0; }
     .mid-card   { width: 420px; flex-shrink: 0; }
     .right-card { width: 230px; flex-shrink: 0; }
+    .time-card  { width: 310px; flex-shrink: 0; }
 
     .table-wrap { background: #fff; border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 8px; }
     table { border-collapse: collapse; width: 100%; }
@@ -77,12 +79,65 @@
     .right { text-align: right; }
     .sub-title { font-size: 12px; font-weight: bold; color: #555; margin: 12px 0 6px; }
 
+    #ram-values__table th, #ram-values__table td { padding-top: 1px; padding-bottom: 1px; }
+    #ram-values__table td input { padding-top: 1px; padding-bottom: 1px; }
+    #container-temperature__table th, #container-temperature__table td { padding-top: 1px; padding-bottom: 1px; }
+    #container-temperature__table td input { padding-top: 1px; padding-bottom: 1px; }
+
     .add-form-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
     .add-form-row input, .add-form-row select { width: auto; min-width: 70px; }
+
+    .row-del-btn {
+      border: none; background: none; color: #c62828; font-size: 13px;
+      cursor: pointer; padding: 2px 6px; line-height: 1;
+    }
+    .row-del-btn:hover { color: #fff; background: #e53935; border-radius: 4px; }
+
+    .card-header-total { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
+
+    .time-add-form { margin-top: 8px; }
+    .mmdd-wrap {
+      position: relative; display: inline-flex; align-items: center;
+      width: 60px; height: 27px; box-sizing: border-box;
+      border: 1px solid #ccc; border-radius: 4px; background: #fff; padding: 0 6px;
+    }
+    .mmdd-wrap:focus-within { border-color: #0078d4; }
+    .mmdd-wrap input[type="date"] {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      margin: 0; padding: 0 4px; border: none; background: transparent; cursor: pointer;
+    }
+    .mmdd-wrap input[type="date"]::-webkit-datetime-edit-fields-wrapper { opacity: 0; }
+    .mmdd-wrap input[type="date"]::-webkit-calendar-picker-indicator { opacity: 0; transition: opacity .15s; }
+    .mmdd-wrap:hover input[type="date"]::-webkit-calendar-picker-indicator,
+    .mmdd-wrap input[type="date"]:focus::-webkit-calendar-picker-indicator { opacity: 1; }
+    .mmdd-wrap .mmdd-text {
+      pointer-events: none; font-family: "Roboto Mono", monospace; font-size: 12px; color: #333;
+    }
+    .mmdd-wrap .mmdd-text.placeholder { color: #999; }
+
+    .save-status { font-size: 13px; font-weight: bold; }
+    .save-status.ok { color: #2e7d32; }
+    .save-status.err { color: #c62828; }
+
+    .edit-mode-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff3cd; border: 1px solid #ffca6b; border-radius: 5px;
+      padding: 5px 10px; font-size: 12px; font-weight: bold; color: #7a5b00;
+    }
+    .btn-cancel-edit { background: #9e9e9e; color: #fff; padding: 3px 8px; font-size: 11px; }
+    #summary__table tbody tr { cursor: pointer; }
+    #summary__table tbody tr.selected-record { background: #d6e9ff; }
+    #summary__table tbody tr.selected-record:hover { background: #c3ddf7; }
+    .header-total { font-size: 12px; font-weight: normal; }
+    .header-total .mono { font-weight: bold; }
 
     .empty-note { text-align: center; color: #aaa; padding: 14px; font-size: 12px; }
 
     .summary-wrap { max-height: 420px; }
+    .worklength-wrap { max-height: 160px; }
+    .rack-wrap { max-height: 160px; }
+    #summary__table { width: auto; }
+    #summary__table th, #summary__table td { padding: 3px 6px; font-size: 11px; }
 
     #directive__group.required label { color: #e53935; }
     #directive__group.required input#directive__input { border-color: #e53935; background: #fff8f8; }
@@ -129,19 +184,15 @@
   <div class="lang-buttons">
     <button id="btnJa" onclick="setLang('ja')">日本語</button>
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
   </div>
 
   <h1 data-key="title">🏭 プレス日報入力</h1>
-  <div class="subtitle" data-key="subtitle">設備別・日別のプレス実績を入力（画面デザインのみ・未接続）</div>
-
-  <div class="toolbar">
-    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
-  </div>
 
   <!-- 基本情報 ＋ 温度・ラム速度測定 -->
   <div class="layout">
     <div class="card basic-card">
-      <div class="card-header" data-key="card_basic">基本情報</div>
+      <div class="card-header" data-key="card_press_report">押出日報</div>
       <div class="card-body">
         <div class="form-grid">
           <div class="form-group full">
@@ -293,8 +344,8 @@
           </div>
         </div>
 
-        <div class="sub-title" data-key="sub_container_temp">コンテナ温度</div>
-        <div class="table-wrap">
+        <div class="sub-title" data-key="sub_container_temp" style="margin: 6px 0 2px;">コンテナ温度</div>
+        <div class="table-wrap" style="margin-bottom: 0;">
           <table id="container-temperature__table">
             <thead>
               <tr><th></th><th data-key="col_stemside">StemSide</th><th data-key="col_dieside">DieSide</th></tr>
@@ -314,8 +365,8 @@
           </table>
         </div>
 
-        <div class="sub-title" data-key="sub_ram_values">ラム速度・圧力・温度</div>
-        <div class="table-wrap">
+        <div class="sub-title" data-key="sub_ram_values" style="margin: 6px 0 2px;">ラム速度・圧力・温度</div>
+        <div class="table-wrap" style="margin-bottom: 0;">
           <table id="ram-values__table">
             <thead>
               <tr><th></th><th colspan="3">1000/400mm</th><th colspan="3">200mm</th></tr>
@@ -331,17 +382,20 @@
       </div>
     </div>
 
-    <!-- mid__wrapper 相当：バンドル登録 -->
+    <!-- mid__wrapper 相当：ビレット情報 -->
     <div class="card mid-card">
-      <div class="card-header" data-key="card_bundle">バンドル登録</div>
+      <div class="card-header card-header-total">
+        <span data-key="card_bundle">ビレット情報</span>
+        <span class="header-total"><span data-key="lbl_bundle_total">合計本数</span>: <span id="bundle-total__value" class="mono">0</span></span>
+      </div>
       <div class="card-body">
         <div class="table-wrap">
           <table id="bundle__table">
             <thead>
               <tr>
-                <th>ID</th><th data-key="col_bundle">Bundle</th><th data-key="col_qty">Qty</th>
+                <th data-key="col_bundle">Bundle</th><th data-key="col_qty">Qty</th>
                 <th data-key="col_lot">Lot</th><th data-key="col_mfg">Mfg</th>
-                <th data-key="col_insp">Insp</th><th data-key="col_note">Note</th>
+                <th data-key="col_insp">Insp</th><th data-key="col_note">Note</th><th></th>
               </tr>
             </thead>
             <tbody><tr><td colspan="7" class="empty-note" data-key="empty_bundle">登録データなし</td></tr></tbody>
@@ -360,38 +414,105 @@
             <option value="2">NG</option>
           </select>
           <input type="text" id="note_billet" data-key-ph="ph_note" placeholder="Note" />
-          <button class="btn btn-add" id="add_bundle__button" disabled data-key="btn_save">保存</button>
+          <button class="btn btn-add" id="add_bundle__button" disabled data-key="btn_save">追加</button>
         </div>
       </div>
     </div>
 
     <!-- right__wrapper 相当：ラック登録 ＋ 定尺・数量登録 -->
     <div class="card right-card">
-      <div class="card-header" data-key="card_rack">ラック登録</div>
+      <div class="card-header card-header-total">
+        <span data-key="card_rack">ラック登録</span>
+        <span class="header-total"><span data-key="lbl_rack_total">合計本数</span>: <span id="rack-total__value" class="mono">0</span></span>
+      </div>
       <div class="card-body">
-        <div class="table-wrap">
+        <div class="table-wrap rack-wrap">
           <table id="rack__table">
-            <thead><tr><th>ID</th><th data-key="col_order">Order</th><th data-key="col_rack">Rack</th><th data-key="col_qty">Qty</th></tr></thead>
+            <thead><tr><th data-key="col_order">Order</th><th data-key="col_rack">Rack</th><th data-key="col_qty">Qty</th><th></th></tr></thead>
             <tbody><tr><td colspan="4" class="empty-note" data-key="empty_rack">登録データなし</td></tr></tbody>
           </table>
         </div>
         <div class="add-form-row">
           <input type="text" id="racknumber__input" data-key-ph="ph_rack" placeholder="Rack" />
           <input type="text" id="rackqty__input" data-key-ph="ph_qty" placeholder="Qty" />
-          <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">保存</button>
+          <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">追加</button>
         </div>
 
         <div class="sub-title" data-key="card_worklength">定尺・数量登録</div>
-        <div class="table-wrap">
+        <div class="table-wrap worklength-wrap">
           <table id="work-length__table">
-            <thead><tr><th>No.</th><th data-key="col_len">len</th><th data-key="col_qty">qty</th></tr></thead>
-            <tbody><tr><td colspan="3" class="empty-note" data-key="empty_worklength">登録データなし</td></tr></tbody>
+            <thead><tr><th>No.</th><th data-key="col_len">len</th><th><span data-key="col_qty">qty</span> <span id="worklength-total__value" class="mono">(0)</span></th><th></th></tr></thead>
+            <tbody><tr><td colspan="4" class="empty-note" data-key="empty_worklength">登録データなし</td></tr></tbody>
           </table>
         </div>
         <div class="add-form-row">
           <input type="text" id="length_exd" data-key-ph="ph_len" placeholder="len" />
           <input type="text" id="quantity_cut" data-key-ph="ph_qty" placeholder="qty" />
-          <button class="btn btn-add" id="add_row__button" data-key="btn_add_row">行を追加</button>
+          <button class="btn btn-add" id="add_row__button" disabled data-key="btn_save">追加</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- right__section 相当：作業時間ログ（押出時間／引張矯正時間／切断時間、すべてpress_idに紐づく） -->
+    <div class="card time-card">
+      <div class="card-header" data-key="card_worktime">作業時間ログ</div>
+      <div class="card-body">
+        <div class="sub-title" data-key="sub_time_extrusion">押出時間</div>
+        <div class="table-wrap">
+          <table id="time__table">
+            <thead><tr><th data-key="col_code">停止理由</th><th data-key="col_start">開始</th><th data-key="col_end">終了</th><th></th></tr></thead>
+            <tbody><tr><td colspan="4" class="empty-note" data-key="empty_time">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="add-form-row">
+          <select id="time_code" style="width:100%;"></select>
+        </div>
+        <div class="add-form-row">
+          <input type="text" id="time_start" maxlength="5" data-key-ph="col_start" placeholder="開始" onblur="formatTimeField(this)" style="width:60px;" />
+          <input type="text" id="time_end" maxlength="5" data-key-ph="col_end" placeholder="終了" onblur="formatTimeField(this)" style="width:60px;" />
+          <button class="btn btn-add" id="add_time__button" disabled data-key="btn_save">追加</button>
+        </div>
+
+        <div class="sub-title" data-key="sub_time_pull">ストレッチ時間</div>
+        <div class="table-wrap">
+          <table id="pull__table">
+            <thead><tr><th data-key="col_date">日付</th><th>No.1</th><th>No.2</th><th data-key="col_start">開始</th><th data-key="col_end">終了</th><th></th></tr></thead>
+            <tbody><tr><td colspan="6" class="empty-note" data-key="empty_pull">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="time-add-form">
+          <div class="mmdd-wrap">
+            <input type="date" id="pull_date" />
+            <span class="mmdd-text" id="pull_date_text">MM-DD</span>
+          </div>
+          <div class="add-form-row" style="gap:3px; margin-top:3px;">
+            <input type="text" id="pull_no1" placeholder="No.1" style="width:55px; min-width:0;" />
+            <input type="text" id="pull_no2" placeholder="No.2" style="width:55px; min-width:0;" />
+            <input type="text" id="pull_start" maxlength="5" data-key-ph="col_start" placeholder="開始" onblur="formatTimeField(this)" style="width:55px; min-width:0;" />
+            <input type="text" id="pull_end" maxlength="5" data-key-ph="col_end" placeholder="終了" onblur="formatTimeField(this)" style="width:55px; min-width:0;" />
+          </div>
+          <button class="btn btn-add" id="add_pull__button" disabled data-key="btn_save" style="margin-top:3px;">追加</button>
+        </div>
+
+        <div class="sub-title" data-key="sub_time_cut">切断時間</div>
+        <div class="table-wrap">
+          <table id="cut__table">
+            <thead><tr><th data-key="col_date">日付</th><th>No.1</th><th>No.2</th><th data-key="col_start">開始</th><th data-key="col_end">終了</th><th></th></tr></thead>
+            <tbody><tr><td colspan="6" class="empty-note" data-key="empty_cut">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+        <div class="time-add-form">
+          <div class="mmdd-wrap">
+            <input type="date" id="cut_date" />
+            <span class="mmdd-text" id="cut_date_text">MM-DD</span>
+          </div>
+          <div class="add-form-row" style="gap:3px; margin-top:3px;">
+            <input type="text" id="cut_no1" placeholder="No.1" style="width:55px; min-width:0;" />
+            <input type="text" id="cut_no2" placeholder="No.2" style="width:55px; min-width:0;" />
+            <input type="text" id="cut_start" maxlength="5" data-key-ph="col_start" placeholder="開始" onblur="formatTimeField(this)" style="width:55px; min-width:0;" />
+            <input type="text" id="cut_end" maxlength="5" data-key-ph="col_end" placeholder="終了" onblur="formatTimeField(this)" style="width:55px; min-width:0;" />
+          </div>
+          <button class="btn btn-add" id="add_cut__button" disabled data-key="btn_save" style="margin-top:3px;">追加</button>
         </div>
       </div>
     </div>
@@ -401,7 +522,12 @@
   <div class="toolbar">
     <button class="btn btn-save" id="save__button" disabled data-key="btn_save_record">保存</button>
     <button class="btn btn-update" id="update__button" disabled data-key="btn_update">更新</button>
-    <button class="btn btn-test" id="test__button" data-key="btn_test">TEST</button>
+    <span id="edit-mode__badge" class="edit-mode-badge" style="display:none;">
+      <span data-key="lbl_editing">編集中</span>: ID <span id="editing-id__label"></span>
+      <button type="button" class="btn btn-cancel-edit" id="cancel-edit__button" data-key="btn_cancel_edit">キャンセル</button>
+    </span>
+    <span id="save-status__label" class="save-status"></span>
+    <input type="hidden" id="existing_scan_filename" value="" />
     <div class="form-group" style="width:70px;">
       <label data-key="lbl_filter_machine">設備</label>
       <select id="press-machine-filter">
@@ -443,12 +569,11 @@
         <table id="summary__table">
           <thead>
             <tr>
-              <th>ID</th>
               <th data-key="sc_date">日付</th>
               <th data-key="sc_machine">設備</th>
               <th data-key="sc_die">金型</th>
               <th data-key="sc_directive">指示書</th>
-              <th data-key="sc_type">種別</th>
+              <th data-key="sc_type" class="type-col">種別</th>
               <th data-key="sc_washed">洗浄</th>
               <th data-key="sc_lot">ロット</th>
               <th data-key="sc_billet_size">B/S</th>
@@ -460,6 +585,7 @@
               <th data-key="sc_finish">終了</th>
               <th data-key="sc_ram_speed">ラム速度</th>
               <th data-key="sc_die_temp">金型温度</th>
+              <th data-key="sc_scan">添付</th>
             </tr>
           </thead>
           <tbody><tr><td colspan="17" class="empty-note" data-key="empty_summary">実績データなし</td></tr></tbody>
@@ -545,9 +671,8 @@
     const dict = {
       ja: {
         title: "🏭 プレス日報入力",
-        subtitle: "設備別・日別のプレス実績を入力（画面デザインのみ・未接続）",
+        card_press_report: "押出日報",
         btn_back: "← 戻る",
-        card_basic: "基本情報",
         lbl_directive: "生産指示書", lbl_date: "日付", lbl_die: "金型番号",
         btn_select: "選択",
         modal_directive_title: "📑 指示書選択", ph_directive_search: "発注書番号・品番で検索…",
@@ -575,17 +700,21 @@
         col_stemside: "StemSide", col_dieside: "DieSide",
         row_upside: "Upside", row_downside: "Downside",
         col_spd: "速度", col_press: "圧力", col_temp: "温度",
-        card_bundle: "バンドル登録", col_bundle: "バンドル", col_qty: "数量", col_lot: "ロット",
+        card_bundle: "ビレット情報", lbl_bundle_total: "合計本数", col_bundle: "バンドル", col_qty: "数量", col_lot: "ロット",
         col_mfg: "製造", col_insp: "検査", col_note: "備考",
         empty_bundle: "登録データなし",
         ph_bundle: "バンドル番号", ph_qty: "数量", ph_lot: "ロット", ph_note: "備考",
-        btn_save: "保存",
-        card_rack: "ラック登録", col_order: "順序", col_rack: "ラック",
+        btn_save: "追加",
+        card_rack: "ラック登録", lbl_rack_total: "合計本数", col_order: "順序", col_rack: "ラック",
         empty_rack: "登録データなし", ph_rack: "ラック番号",
         card_worklength: "定尺・数量登録", col_len: "長さ",
         empty_worklength: "登録データなし", ph_len: "長さ",
-        btn_add_row: "行を追加",
-        btn_save_record: "保存", btn_update: "更新", btn_test: "TEST",
+        card_worktime: "作業時間ログ", sub_time_extrusion: "押出時間",
+        sub_time_pull: "ストレッチ時間", sub_time_cut: "切断時間",
+        col_code: "停止理由", col_date: "日付",
+        empty_time: "登録データなし", empty_pull: "登録データなし", empty_cut: "登録データなし",
+        btn_save_record: "保存", btn_update: "更新",
+        lbl_editing: "編集中", btn_cancel_edit: "キャンセル",
         lbl_filter_machine: "設備", lbl_filter_type: "種別", lbl_filter_die: "金型番号",
         lbl_filter_term: "期間", btn_download: "📥 ダウンロード",
         card_summary: "実績一覧",
@@ -593,14 +722,13 @@
         sc_type: "種別", sc_washed: "洗浄", sc_lot: "ロット", sc_billet_size: "B/S",
         sc_billet_length: "B/L", sc_plan_qty: "計画数", sc_actual_qty: "実績数",
         sc_stop_cause: "停止理由", sc_start: "開始", sc_finish: "終了",
-        sc_ram_speed: "ラム速度", sc_die_temp: "金型温度",
+        sc_ram_speed: "ラム速度", sc_die_temp: "金型温度", sc_scan: "添付",
         empty_summary: "実績データなし",
       },
       vi: {
         title: "🏭 Nhập báo cáo ngày (Press)",
-        subtitle: "Nhập kết quả ép theo máy / theo ngày（chỉ giao diện・chưa kết nối）",
+        card_press_report: "Báo cáo ép ngày",
         btn_back: "← Quay lại",
-        card_basic: "Thông tin cơ bản",
         lbl_directive: "Phiếu chỉ thị sản xuất", lbl_date: "Ngày", lbl_die: "Số khuôn",
         btn_select: "Chọn",
         modal_directive_title: "📑 Chọn phiếu đặt hàng", ph_directive_search: "Tìm theo số phiếu / mã SP…",
@@ -614,7 +742,7 @@
         lbl_washed: "Đã rửa?", opt_no: "No", opt_yes: "Yes",
         lbl_press_type: "Loại ép", lbl_machine: "Số máy",
         lbl_billet_size: "Cỡ Billet", lbl_billet_length: "Chiều dài Billet",
-        lbl_plan_qty: "SL Billet kế hoạch", lbl_actual_qty: "SL Billet thực tế",
+        lbl_plan_qty: "SL KH", lbl_actual_qty: "SL TT",
         lbl_press_time: "Thời gian ép（bắt đầu - kết thúc）",
         lbl_ram_speed: "Tốc độ Ram (mm/s)", lbl_die_temp: "Nhiệt độ khuôn thực đo (℃)",
         lbl_name: "Người phụ trách", lbl_press_directive: "Phiếu chỉ thị ép",
@@ -628,17 +756,21 @@
         col_stemside: "StemSide", col_dieside: "DieSide",
         row_upside: "Upside", row_downside: "Downside",
         col_spd: "Tốc độ", col_press: "Áp lực", col_temp: "Nhiệt độ",
-        card_bundle: "Đăng ký Bundle", col_bundle: "Bundle", col_qty: "SL", col_lot: "Lot",
+        card_bundle: "Thông tin Billet", lbl_bundle_total: "Tổng SL", col_bundle: "Bundle", col_qty: "SL", col_lot: "Lot",
         col_mfg: "SX", col_insp: "KT", col_note: "Ghi chú",
         empty_bundle: "Chưa có dữ liệu",
         ph_bundle: "Số Bundle", ph_qty: "SL", ph_lot: "Lot", ph_note: "Ghi chú",
-        btn_save: "Lưu",
-        card_rack: "Đăng ký Rack", col_order: "Thứ tự", col_rack: "Rack",
+        btn_save: "Thêm",
+        card_rack: "Đăng ký Rack", lbl_rack_total: "Tổng SL", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số Rack",
         card_worklength: "Đăng ký chiều dài / SL", col_len: "Dài",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Dài",
-        btn_add_row: "Thêm dòng",
-        btn_save_record: "Lưu", btn_update: "Cập nhật", btn_test: "TEST",
+        card_worktime: "Nhật ký thời gian làm việc", sub_time_extrusion: "Thời gian ép",
+        sub_time_pull: "Thời gian kéo giãn", sub_time_cut: "Thời gian cắt",
+        col_code: "Lý do dừng", col_date: "Ngày",
+        empty_time: "Chưa có dữ liệu", empty_pull: "Chưa có dữ liệu", empty_cut: "Chưa có dữ liệu",
+        btn_save_record: "Lưu", btn_update: "Cập nhật",
+        lbl_editing: "Đang sửa", btn_cancel_edit: "Hủy",
         lbl_filter_machine: "Máy", lbl_filter_type: "Loại", lbl_filter_die: "Số khuôn",
         lbl_filter_term: "Khoảng thời gian", btn_download: "📥 Tải xuống",
         card_summary: "Danh sách kết quả",
@@ -646,7 +778,7 @@
         sc_type: "Loại", sc_washed: "Rửa", sc_lot: "Lot", sc_billet_size: "B/S",
         sc_billet_length: "B/L", sc_plan_qty: "SL KH", sc_actual_qty: "SL TT",
         sc_stop_cause: "Lý do dừng", sc_start: "Bắt đầu", sc_finish: "Kết thúc",
-        sc_ram_speed: "Tốc độ Ram", sc_die_temp: "Nhiệt độ khuôn",
+        sc_ram_speed: "Tốc độ Ram", sc_die_temp: "Nhiệt độ khuôn", sc_scan: "Tệp",
         empty_summary: "Chưa có dữ liệu",
       },
     };
@@ -668,6 +800,7 @@
       });
       document.getElementById("btnJa").classList.toggle("active", lang === "ja");
       document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (typeof renderSummaryTable === "function") renderSummaryTable();
     }
 
     /* ラム速度・圧力・温度テーブル：No.1〜No.5 を組み立て */
@@ -944,6 +1077,9 @@
       const digits = el.value.replace(/\D/g, "");
       if (digits.length === 4) {
         el.value = digits.slice(0, 2) + ":" + digits.slice(2);
+        // 値をJSで直接書き換えただけではinput/changeイベントが発火せず、
+        // バリデーション（追加/保存ボタンの有効化判定）が再実行されないため明示的に発火させる
+        el.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
 
@@ -954,6 +1090,603 @@
       const num = parseFloat(val);
       if (!isNaN(num)) el.value = num.toFixed(1);
     }
+
+    /* -------------------------
+       バンドル登録（bundle__table）
+       ex0.11 DailyReportV30の「新規レコード（Save）」モード（行をローカルに積んでおき、
+       本体の保存時にまとめて送る）を踏襲。press_id が存在しない現段階ではAJAX送信はまだ行わない。
+    ------------------------- */
+    function isNumericInRange(val) {
+      return val !== "" && !isNaN(val) && Number(val) >= 0 && Number(val) <= 1000;
+    }
+
+    function checkBundleInputs() {
+      const bundleOk = isNumericInRange(document.getElementById("bundle_no").value);
+      const qtyOk    = isNumericInRange(document.getElementById("quantity").value);
+      const lotOk    = document.getElementById("lot_no").value.trim() !== "";
+      document.getElementById("add_bundle__button").disabled = !(bundleOk && qtyOk && lotOk);
+    }
+
+    document.getElementById("bundle_no").addEventListener("input", checkBundleInputs);
+    document.getElementById("quantity").addEventListener("input", checkBundleInputs);
+    document.getElementById("lot_no").addEventListener("input", function () {
+      this.value = this.value.toUpperCase();
+      checkBundleInputs();
+    });
+
+    /* Enterキーでも即追加できるように（バンドルは連続入力が多いため） */
+    ["bundle_no", "quantity", "lot_no"].forEach(id => {
+      document.getElementById(id).addEventListener("keydown", e => {
+        if (e.key === "Enter" && !document.getElementById("add_bundle__button").disabled) {
+          e.preventDefault();
+          document.getElementById("add_bundle__button").click();
+        }
+      });
+    });
+
+    /* 行内でQtyを直接編集した場合も合計に反映 */
+    document.querySelector("#bundle__table tbody").addEventListener("input", e => {
+      if (e.target.closest("td:nth-child(2)")) updateBundleTotal();
+    });
+
+    function updateBundleTotal() {
+      let total = 0;
+      document.querySelectorAll("#bundle__table tbody tr td:nth-child(2) input").forEach(el => {
+        const n = Number(el.value);
+        if (!isNaN(n)) total += n;
+      });
+      document.getElementById("bundle-total__value").textContent = total;
+    }
+
+    function removeBundleRow(btn) {
+      const tbody = document.querySelector("#bundle__table tbody");
+      btn.closest("tr").remove();
+      if (!tbody.querySelector("tr")) {
+        tbody.innerHTML = `<tr><td colspan="7" class="empty-note">${dict[currentLang].empty_bundle}</td></tr>`;
+      }
+      updateBundleTotal();
+    }
+
+    function appendBundleRow(bundleNo, qty, lot, mfg, insp, note) {
+      const tbody = document.querySelector("#bundle__table tbody");
+      const emptyRow = tbody.querySelector(".empty-note");
+      if (emptyRow) emptyRow.closest("tr").remove();
+
+      function textCell(value, cls) {
+        const td = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = value;
+        if (cls) input.className = cls;
+        td.appendChild(input);
+        return td;
+      }
+      function selectCell(options, selectedVal) {
+        const td = document.createElement("td");
+        const select = document.createElement("select");
+        options.forEach(([val, label]) => {
+          const opt = document.createElement("option");
+          opt.value = val;
+          opt.textContent = label;
+          opt.selected = String(val) === String(selectedVal);
+          select.appendChild(opt);
+        });
+        td.appendChild(select);
+        return td;
+      }
+
+      const tr = document.createElement("tr");
+      tr.appendChild(textCell(bundleNo, "mono right"));
+      tr.appendChild(textCell(qty, "mono right"));
+      tr.appendChild(textCell(lot, "mono left"));
+      tr.appendChild(selectCell([["1", "Dubai"], ["2", "VN"]], mfg));
+      tr.appendChild(selectCell([["1", "OK"], ["2", "NG"]], insp));
+      tr.appendChild(textCell(note, "left"));
+
+      const delTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "row-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("click", () => removeBundleRow(delBtn));
+      delTd.appendChild(delBtn);
+      tr.appendChild(delTd);
+
+      tbody.appendChild(tr);
+      updateBundleTotal();
+    }
+
+    document.getElementById("add_bundle__button").addEventListener("click", function () {
+      appendBundleRow(
+        document.getElementById("bundle_no").value,
+        document.getElementById("quantity").value,
+        document.getElementById("lot_no").value,
+        document.getElementById("mfg").value,
+        document.getElementById("insp").value,
+        document.getElementById("note_billet").value
+      );
+      document.getElementById("bundle_no").value = "";
+      document.getElementById("quantity").value = "";
+      document.getElementById("lot_no").value = "";
+      document.getElementById("note_billet").value = "";
+      document.getElementById("bundle_no").focus();
+      checkBundleInputs();
+    });
+
+    /* -------------------------
+       ラック登録（rack__table）
+       ex0.11 DailyReportV30の「新規レコード（Save）」モードを踏襲（ローカル積み上げ、AJAX未送信）。
+    ------------------------- */
+    function isPositiveInt(val, max) {
+      return val !== "" && !isNaN(val) && Number(val) > 0 && (max == null || Number(val) <= max);
+    }
+
+    function isDuplicateRackNumber(val) {
+      let dup = false;
+      document.querySelectorAll("#rack__table tbody tr td:nth-child(2)").forEach(td => {
+        if (Number(td.textContent) === Number(val)) dup = true;
+      });
+      return dup;
+    }
+
+    function checkRackInputs() {
+      const rackVal = document.getElementById("racknumber__input").value;
+      const rackOk  = isPositiveInt(rackVal, 1000) && !isDuplicateRackNumber(rackVal);
+      const qtyOk   = isPositiveInt(document.getElementById("rackqty__input").value);
+      document.getElementById("add-rack__button").disabled = !(rackOk && qtyOk);
+      return rackOk && qtyOk;
+    }
+
+    document.getElementById("racknumber__input").addEventListener("input", checkRackInputs);
+    document.getElementById("rackqty__input").addEventListener("input", checkRackInputs);
+
+    document.getElementById("racknumber__input").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        if (checkRackInputs()) document.getElementById("rackqty__input").focus();
+      }
+    });
+    document.getElementById("rackqty__input").addEventListener("keydown", e => {
+      if (e.key === "Enter" && !document.getElementById("add-rack__button").disabled) {
+        e.preventDefault();
+        document.getElementById("add-rack__button").click();
+      }
+    });
+
+    function updateRackTotal() {
+      let total = 0;
+      document.querySelectorAll("#rack__table tbody tr td:nth-child(3)").forEach(td => {
+        const n = Number(td.textContent);
+        if (!isNaN(n)) total += n;
+      });
+      document.getElementById("rack-total__value").textContent = total;
+    }
+
+    function renumberRackOrder() {
+      document.querySelectorAll("#rack__table tbody tr td:nth-child(1)").forEach((td, i) => {
+        td.textContent = i + 1;
+      });
+    }
+
+    function removeRackRow(btn) {
+      const tbody = document.querySelector("#rack__table tbody");
+      btn.closest("tr").remove();
+      if (!tbody.querySelector("tr")) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_rack}</td></tr>`;
+      } else {
+        renumberRackOrder();
+      }
+      updateRackTotal();
+    }
+
+    function appendRackRow(rackNo, qty) {
+      const tbody = document.querySelector("#rack__table tbody");
+      const emptyRow = tbody.querySelector(".empty-note");
+      if (emptyRow) emptyRow.closest("tr").remove();
+
+      const order = tbody.querySelectorAll("tr").length + 1;
+
+      const tr = document.createElement("tr");
+      const orderTd = document.createElement("td");
+      orderTd.className = "mono right";
+      orderTd.textContent = order;
+      const rackTd = document.createElement("td");
+      rackTd.className = "mono right";
+      rackTd.textContent = rackNo;
+      const qtyTd = document.createElement("td");
+      qtyTd.className = "mono right";
+      qtyTd.textContent = qty;
+
+      const delTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "row-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("click", () => removeRackRow(delBtn));
+      delTd.appendChild(delBtn);
+
+      tr.appendChild(orderTd);
+      tr.appendChild(rackTd);
+      tr.appendChild(qtyTd);
+      tr.appendChild(delTd);
+      tbody.appendChild(tr);
+      updateRackTotal();
+    }
+
+    document.getElementById("add-rack__button").addEventListener("click", function () {
+      appendRackRow(document.getElementById("racknumber__input").value, document.getElementById("rackqty__input").value);
+      document.getElementById("racknumber__input").value = "";
+      document.getElementById("rackqty__input").value = "";
+      document.getElementById("racknumber__input").focus();
+      checkRackInputs();
+    });
+
+    /* -------------------------
+       定尺・数量登録（work-length__table）
+       ex0.11 DailyReportV30の「新規レコード（Save）」モードを踏襲（ローカル積み上げ、AJAX未送信）。
+    ------------------------- */
+    function checkWorkLengthInputs() {
+      const lenOk = isPositiveInt(document.getElementById("length_exd").value);
+      const qtyOk = isPositiveInt(document.getElementById("quantity_cut").value);
+      document.getElementById("add_row__button").disabled = !(lenOk && qtyOk);
+    }
+
+    document.getElementById("length_exd").addEventListener("input", checkWorkLengthInputs);
+    document.getElementById("quantity_cut").addEventListener("input", checkWorkLengthInputs);
+
+    document.getElementById("length_exd").addEventListener("keydown", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        document.getElementById("quantity_cut").focus();
+      }
+    });
+    document.getElementById("quantity_cut").addEventListener("keydown", e => {
+      if (e.key === "Enter" && !document.getElementById("add_row__button").disabled) {
+        e.preventDefault();
+        document.getElementById("add_row__button").click();
+      }
+    });
+
+    function renumberWorkLengthRows() {
+      document.querySelectorAll("#work-length__table tbody tr td:nth-child(1)").forEach((td, i) => {
+        td.textContent = "No." + (i + 1);
+      });
+    }
+
+    function updateWorkLengthTotal() {
+      let total = 0;
+      document.querySelectorAll("#work-length__table tbody tr td:nth-child(3) input").forEach(el => {
+        const n = Number(el.value);
+        if (!isNaN(n)) total += n;
+      });
+      document.getElementById("worklength-total__value").textContent = `(${total})`;
+    }
+    document.querySelector("#work-length__table tbody").addEventListener("input", e => {
+      if (e.target.closest("td:nth-child(3)")) updateWorkLengthTotal();
+    });
+
+    function removeWorkLengthRow(btn) {
+      const tbody = document.querySelector("#work-length__table tbody");
+      btn.closest("tr").remove();
+      if (!tbody.querySelector("tr")) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_worklength}</td></tr>`;
+      } else {
+        renumberWorkLengthRows();
+      }
+      updateWorkLengthTotal();
+    }
+
+    function appendWorkLengthRow(len, qty) {
+      const tbody = document.querySelector("#work-length__table tbody");
+      const emptyRow = tbody.querySelector(".empty-note");
+      if (emptyRow) emptyRow.closest("tr").remove();
+
+      const no = tbody.querySelectorAll("tr").length + 1;
+
+      const tr = document.createElement("tr");
+      const noTd = document.createElement("td");
+      noTd.className = "mono";
+      noTd.textContent = "No." + no;
+
+      function inputCell(value) {
+        const td = document.createElement("td");
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = value;
+        input.className = "mono right";
+        td.appendChild(input);
+        return td;
+      }
+
+      const delTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "row-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("click", () => removeWorkLengthRow(delBtn));
+      delTd.appendChild(delBtn);
+
+      tr.appendChild(noTd);
+      tr.appendChild(inputCell(len));
+      tr.appendChild(inputCell(qty));
+      tr.appendChild(delTd);
+      tbody.appendChild(tr);
+      updateWorkLengthTotal();
+    }
+
+    document.getElementById("add_row__button").addEventListener("click", function () {
+      appendWorkLengthRow(document.getElementById("length_exd").value, document.getElementById("quantity_cut").value);
+      document.getElementById("length_exd").value = "";
+      document.getElementById("quantity_cut").value = "";
+      document.getElementById("length_exd").focus();
+      checkWorkLengthInputs();
+    });
+
+    /* -------------------------
+       作業時間ログ：押出時間（time__table）／引張矯正時間（pull__table）／切断時間（cut__table）
+       すべて press_id 必須（ex0.11にあった press_id 無しの日単位ログモードは廃止）。
+    ------------------------- */
+    const TIME_RE_LOG = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+    // ex0.11 DailyReportV30.html の #Code セレクトをそのまま踏襲（無効化されていた700/300は除外）
+    const STOP_CODES = [
+      ["100", "100 - Tập thể dục + họp đầu giờ"],
+      ["101", "101 - Dọn dẹp vệ sinh"],
+      ["102", "102 - Bảo trì tất cả thiết bị"],
+      ["103", "103 - Hệ thống làm mát không hoạt động (lưu lượng và áp suất không đủ)"],
+      ["104", "104 - Hệ thống điện nhà máy xảy ra sự cố (cúp điện, cháy nổ tủ điện,…)"],
+      ["105", "105 - Nghỉ giữa ca làm việc"],
+      ["106", "106 - Không có kế hoạch đùn"],
+      ["200", "200 - Đo độ nhám, dấu khuôn + vận hành tự động"],
+      ["301", "301 - Chờ khuôn đủ nhiệt"],
+      ["399", "399 - Bảo trì"],
+      ["400", "400 - Sai loại vật liệu"],
+      ["401", "401 - Kẹt billet"],
+      ["499", "499 - Bảo trì"],
+      ["500", "500 - Thay mới, điều chỉnh bàn chải"],
+      ["501", "501 - Kẹt billet ở máy chà"],
+      ["502", "502 - Motor quá tải (không hoạt động)"],
+      ["599", "599 - Bảo trì"],
+      ["600", "600 - Pusher bị lỗi"],
+      ["601", "601 - Tiếp điểm gia nhiệt bị lỗi"],
+      ["602", "602 - Băng tải lỗi"],
+      ["603", "603 - Nhôm dính, không đẩy billet được"],
+      ["604", "604 - Gắp billet đã gia nhiệt (không đùn)"],
+      ["605", "605 - Thay nước làm mát"],
+      ["606", "606 - Mất tín hiệu nước làm mát (0 l/min)"],
+      ["607", "607 - Thay máng"],
+      ["608", "608 - Lỗi tiếp điểm đo nhiệt độ"],
+      ["699", "699 - Bảo trì"],
+      ["701", "701 - Kẹt ram ở trong container"],
+      ["702", "702 - Dính nhôm dummy, container"],
+      ["703", "703 - Thay thế dummy block"],
+      ["704", "704 - Thay thế stem, container"],
+      ["705", "705 - Thay wax"],
+      ["706", "706 - Rớt discard dưới thang máy"],
+      ["707", "707 - Discard không rơi (xử lý manual)"],
+      ["708", "708 - Billet không vào container (lệch tâm)"],
+      ["709", "709 - Lỗi vị trí cảm biến (main shear, die clamp, billet loader, billet inserter)"],
+      ["710", "710 - Main-shear cắt discard bị dính"],
+      ["711", "711 - Nhầm điều kiện cắt nB1, 1Bn"],
+      ["712", "712 - Chờ gia nhiệt dummy"],
+      ["713", "713 - Lỗi inserter không hoạt động"],
+      ["714", "714 - Billet không vào container"],
+      ["715", "715 - Chờ gia nhiệt container"],
+      ["716", "716 - Thay con lăn"],
+      ["717", "717 - Áp suất tiến container bất thường"],
+      ["799", "799 - Bảo trì"],
+      ["800", "800 - Puller không kẹp được sản phẩm"],
+      ["801", "801 - Puller không về được đúng vị trí"],
+      ["802", "802 - Sản phẩm cuốn vào lưỡi cưa"],
+      ["803", "803 - Puller va chạm nhau"],
+      ["899", "899 - Bảo trì"],
+      ["900", "900 - Không khởi động được hệ thống quạt làm mát"],
+      ["901", "901 - Bàn run out bị hư hỏng (rơi con lăn, xích tải,…)"],
+      ["902", "902 - Sản phẩm bị cuốn vào băng tải"],
+      ["903", "903 - Motor băng tải bị hư hỏng"],
+      ["904", "904 - Hàng nhiều, chờ cắt"],
+      ["905", "905 - Kẹt Spacer vào tay gắp máy gắp hàng"],
+      ["910", "910 - Thay lưỡi cưa máy cắt"],
+      ["999", "999 - Bảo trì"],
+    ];
+
+    function buildStopCodeOptions() {
+      const sel = document.getElementById("time_code");
+      sel.appendChild(new Option("-", "0"));
+      STOP_CODES.forEach(([val, label]) => sel.appendChild(new Option(label, val)));
+    }
+
+    /* ---- 押出時間（time__table） ---- */
+    function checkTimeCodeInputs() {
+      const codeOk  = document.getElementById("time_code").value !== "0";
+      const startVal = document.getElementById("time_start").value.trim();
+      const endVal   = document.getElementById("time_end").value.trim();
+      const timeOk = TIME_RE_LOG.test(startVal) && TIME_RE_LOG.test(endVal) && endVal > startVal;
+      document.getElementById("add_time__button").disabled = !(codeOk && timeOk);
+    }
+    ["time_code", "time_start", "time_end"].forEach(id => {
+      document.getElementById(id).addEventListener("input", checkTimeCodeInputs);
+      document.getElementById(id).addEventListener("change", checkTimeCodeInputs);
+    });
+
+    function removeTimeRow(btn) {
+      const tbody = document.querySelector("#time__table tbody");
+      btn.closest("tr").remove();
+      if (!tbody.querySelector("tr")) {
+        tbody.innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_time}</td></tr>`;
+      }
+    }
+
+    function stopCodeLabel(code) {
+      const found = STOP_CODES.find(([val]) => String(val) === String(code));
+      return found ? found[1] : String(code);
+    }
+
+    function appendTimeRow(code, start, end) {
+      const tbody = document.querySelector("#time__table tbody");
+      const emptyRow = tbody.querySelector(".empty-note");
+      if (emptyRow) emptyRow.closest("tr").remove();
+
+      const tr = document.createElement("tr");
+      const codeTd = document.createElement("td");
+      codeTd.className = "left";
+      codeTd.textContent = stopCodeLabel(code);
+      codeTd.dataset.code = code;
+      const startTd = document.createElement("td");
+      startTd.className = "mono";
+      startTd.textContent = start;
+      const endTd = document.createElement("td");
+      endTd.className = "mono";
+      endTd.textContent = end;
+
+      const delTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "row-del-btn";
+      delBtn.textContent = "✕";
+      delBtn.addEventListener("click", () => removeTimeRow(delBtn));
+      delTd.appendChild(delBtn);
+
+      tr.appendChild(codeTd);
+      tr.appendChild(startTd);
+      tr.appendChild(endTd);
+      tr.appendChild(delTd);
+      tbody.appendChild(tr);
+    }
+
+    document.getElementById("add_time__button").addEventListener("click", function () {
+      const codeSel = document.getElementById("time_code");
+      appendTimeRow(codeSel.value, document.getElementById("time_start").value, document.getElementById("time_end").value);
+      codeSel.value = "0";
+      document.getElementById("time_start").value = "";
+      document.getElementById("time_end").value = "";
+      checkTimeCodeInputs();
+    });
+
+    function collectTimeRows() {
+      const rows = [];
+      document.querySelectorAll("#time__table tbody tr").forEach(tr => {
+        if (tr.querySelector(".empty-note")) return;
+        const tds = tr.children;
+        rows.push({
+          code: tds[0].dataset.code,
+          time_start: tds[1].textContent,
+          time_end: tds[2].textContent,
+        });
+      });
+      return rows;
+    }
+
+    /* ---- 引張矯正時間（pull__table）／切断時間（cut__table）：構造が同じなので共通関数化 ---- */
+    function makeRangeTimeTableHandlers(prefix, tableId, emptyKey) {
+      const dateEl     = document.getElementById(`${prefix}_date`);
+      const dateTextEl = document.getElementById(`${prefix}_date_text`);
+      const no1El   = document.getElementById(`${prefix}_no1`);
+      const no2El   = document.getElementById(`${prefix}_no2`);
+      const startEl = document.getElementById(`${prefix}_start`);
+      const endEl   = document.getElementById(`${prefix}_end`);
+      const addBtn  = document.getElementById(`add_${prefix}__button`);
+      const isPosInt = val => /^[1-9]\d*$/.test(val);
+
+      function syncDateText() {
+        if (dateEl.value) {
+          dateTextEl.textContent = dateEl.value.slice(5);
+          dateTextEl.classList.remove("placeholder");
+        } else {
+          dateTextEl.textContent = "MM-DD";
+          dateTextEl.classList.add("placeholder");
+        }
+      }
+      syncDateText();
+      dateEl.addEventListener("input", syncDateText);
+      dateEl.addEventListener("change", syncDateText);
+
+      function check() {
+        const dateOk = dateEl.value !== "";
+        const no1Val = no1El.value.trim();
+        const no2Val = no2El.value.trim();
+        const noOk = isPosInt(no1Val) && isPosInt(no2Val) && Number(no2Val) >= Number(no1Val);
+        const startVal = startEl.value.trim();
+        const endVal   = endEl.value.trim();
+        const timeOk = TIME_RE_LOG.test(startVal) && TIME_RE_LOG.test(endVal) && endVal > startVal;
+        addBtn.disabled = !(dateOk && noOk && timeOk);
+      }
+      [dateEl, no1El, no2El, startEl, endEl].forEach(el => {
+        el.addEventListener("input", check);
+        el.addEventListener("change", check);
+      });
+
+      function removeRow(btn) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        btn.closest("tr").remove();
+        if (!tbody.querySelector("tr")) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-note">${dict[currentLang][emptyKey]}</td></tr>`;
+        }
+      }
+
+      function appendRow(dateVal, no1Val, no2Val, startVal, endVal) {
+        const tbody = document.querySelector(`#${tableId} tbody`);
+        const emptyRow = tbody.querySelector(".empty-note");
+        if (emptyRow) emptyRow.closest("tr").remove();
+
+        function cell(text, cls) {
+          const td = document.createElement("td");
+          td.textContent = text;
+          if (cls) td.className = cls;
+          return td;
+        }
+
+        const tr = document.createElement("tr");
+        const dateTd = cell(dateVal.slice(5), "mono");
+        dateTd.dataset.fullDate = dateVal;
+        tr.appendChild(dateTd);
+        tr.appendChild(cell(no1Val, "mono right"));
+        tr.appendChild(cell(no2Val, "mono right"));
+        tr.appendChild(cell(startVal, "mono"));
+        tr.appendChild(cell(endVal, "mono"));
+
+        const delTd = document.createElement("td");
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "row-del-btn";
+        delBtn.textContent = "✕";
+        delBtn.addEventListener("click", () => removeRow(delBtn));
+        delTd.appendChild(delBtn);
+        tr.appendChild(delTd);
+
+        tbody.appendChild(tr);
+      }
+
+      addBtn.addEventListener("click", function () {
+        appendRow(dateEl.value, no1El.value, no2El.value, startEl.value, endEl.value);
+        no1El.value = "";
+        no2El.value = "";
+        startEl.value = "";
+        endEl.value = "";
+        check();
+      });
+
+      function collect() {
+        const rows = [];
+        document.querySelectorAll(`#${tableId} tbody tr`).forEach(tr => {
+          if (tr.querySelector(".empty-note")) return;
+          const tds = tr.children;
+          rows.push({
+            date:  tds[0].dataset.fullDate,
+            no1:   tds[1].textContent,
+            no2:   tds[2].textContent,
+            start: tds[3].textContent,
+            end:   tds[4].textContent,
+          });
+        });
+        return rows;
+      }
+
+      return { collect, appendRow };
+    }
+
+    const pullHandlers = makeRangeTimeTableHandlers("pull", "pull__table", "empty_pull");
+    const cutHandlers  = makeRangeTimeTableHandlers("cut", "cut__table", "empty_cut");
 
     /* -------------------------
        稼働ログ（PLCサンプリング）モーダル：日付選択時に表示
@@ -1054,6 +1787,124 @@
     });
 
     /* -------------------------
+       実績一覧（summary__table）
+    ------------------------- */
+    let summaryRows = [];
+
+    function washedLabel(val) {
+      const t = dict[currentLang];
+      if (String(val) === "1") return t.opt_no;
+      if (String(val) === "2") return t.opt_yes;
+      return "-";
+    }
+
+    function trimSeconds(t) {
+      return t ? String(t).slice(0, 5) : "-";
+    }
+
+    function formatDateShort(d) {
+      return d ? String(d).slice(5) : "-";
+    }
+
+    function renderSummaryTable() {
+      const tbody = document.querySelector("#summary__table tbody");
+      if (!summaryRows.length) {
+        tbody.innerHTML = `<tr><td colspan="17" class="empty-note">${dict[currentLang].empty_summary}</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = summaryRows.map(r => {
+        const stopCause = r.stop_code
+          ? r.stop_code + (r.stop_cause_remarks ? " " + r.stop_cause_remarks : "")
+          : "-";
+        const hasScan = r.press_directive_scan_file_name && r.press_directive_scan_file_name.toLowerCase() !== "no file";
+        const scan = hasScan
+          ? `<a href="../diereport/upload/01_press_directive/${encodeURIComponent(r.press_directive_scan_file_name)}" target="_blank" rel="noopener">📎</a>`
+          : "-";
+        return `
+          <tr data-press-id="${r.id}">
+            <td class="mono left">${formatDateShort(r.press_date_at)}</td>
+            <td class="mono right">${r.press_machine_no ?? "-"}</td>
+            <td class="mono left">${r.die_number ?? "-"}</td>
+            <td class="mono left">${r.ordersheet_number ?? "-"}</td>
+            <td class="left type-col">${r.pressing_type ?? "-"}</td>
+            <td class="left">${washedLabel(r.is_washed_die)}</td>
+            <td class="mono left">${r.billet_lot_number ?? "-"}</td>
+            <td class="mono right">${r.billet_size ?? "-"}</td>
+            <td class="mono right">${r.billet_length ?? "-"}</td>
+            <td class="mono right">${r.plan_billet_quantities ?? "-"}</td>
+            <td class="mono right">${r.actual_billet_quantities ?? "-"}</td>
+            <td class="left">${stopCause}</td>
+            <td class="mono left">${trimSeconds(r.press_start_at)}</td>
+            <td class="mono left">${trimSeconds(r.press_finish_at)}</td>
+            <td class="mono right">${r.actual_ram_speed ?? "-"}</td>
+            <td class="mono right">${r.actual_die_temperature ?? "-"}</td>
+            <td>${scan}</td>
+          </tr>`;
+      }).join("");
+    }
+
+    function collectSummaryFilters() {
+      const params  = new URLSearchParams();
+      const machine = document.getElementById("press-machine-filter").value;
+      const type    = document.getElementById("press-type-filter").value;
+      const die     = document.getElementById("die-number-fileter").value.trim();
+      const start   = document.getElementById("start-term").value;
+      const end     = document.getElementById("end-term").value;
+      if (machine) params.set("machine", machine);
+      if (type)    params.set("type", type);
+      if (die)     params.set("die", die);
+      if (start)   params.set("start", start);
+      if (end)     params.set("end", end);
+      return params;
+    }
+
+    async function loadSummary() {
+      const params = collectSummaryFilters();
+      const res    = await fetch("./php/press_daily_report/get_summary.php?" + params.toString());
+      summaryRows  = await res.json();
+      renderSummaryTable();
+    }
+
+    let summaryFilterTimer = null;
+    function onSummaryFilterInput() {
+      clearTimeout(summaryFilterTimer);
+      summaryFilterTimer = setTimeout(loadSummary, 250);
+    }
+
+    ["press-machine-filter", "press-type-filter", "start-term", "end-term"].forEach(id => {
+      document.getElementById(id).addEventListener("change", loadSummary);
+    });
+    document.getElementById("die-number-fileter").addEventListener("input", onSummaryFilterInput);
+
+    function exportSummaryCSV() {
+      const t = dict[currentLang];
+      const header = [
+        "ID", t.sc_date, t.sc_machine, t.sc_die, t.sc_directive, t.sc_type, t.sc_washed,
+        t.sc_lot, t.sc_billet_size, t.sc_billet_length, t.sc_plan_qty, t.sc_actual_qty,
+        t.sc_stop_cause, t.sc_start, t.sc_finish, t.sc_ram_speed, t.sc_die_temp, t.sc_scan,
+      ];
+      const rows = summaryRows.map(r => [
+        r.id, r.press_date_at ?? "", r.press_machine_no ?? "", r.die_number ?? "",
+        r.ordersheet_number ?? "", r.pressing_type ?? "", washedLabel(r.is_washed_die),
+        r.billet_lot_number ?? "", r.billet_size ?? "", r.billet_length ?? "",
+        r.plan_billet_quantities ?? "", r.actual_billet_quantities ?? "",
+        r.stop_code ? r.stop_code + (r.stop_cause_remarks ? " " + r.stop_cause_remarks : "") : "",
+        trimSeconds(r.press_start_at), trimSeconds(r.press_finish_at),
+        r.actual_ram_speed ?? "", r.actual_die_temperature ?? "",
+        r.press_directive_scan_file_name ?? "",
+      ]);
+      const escape = v => `"${String(v).replace(/"/g, '""')}"`;
+      const csv = [header, ...rows].map(r => r.map(escape).join(",")).join("\r\n");
+      const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `プレス日報実績_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+    }
+
+    document.getElementById("download_data").addEventListener("click", exportSummaryCSV);
+
+    /* -------------------------
        必須項目チェック（基本情報カード：special_note以外すべて）
     ------------------------- */
     const REQUIRED_FIELD_IDS = [
@@ -1077,8 +1928,14 @@
       });
     });
 
+    let editingPressId = null;
+
     function isFieldEmpty(el) {
-      if (el.type === "file") return el.files.length === 0;
+      if (el.type === "file") {
+        // 編集モードでは、新しいファイルを選び直さなくても既存の添付ファイル名があればOKとする
+        if (editingPressId && document.getElementById("existing_scan_filename").value) return false;
+        return el.files.length === 0;
+      }
       if (el.tagName === "SELECT") return !el.value || el.value === "0";
       return !el.value || el.value.trim() === "";
     }
@@ -1111,6 +1968,15 @@
     function checkAllRequiredFields() {
       REQUIRED_FIELD_IDS.forEach(checkRequiredField);
       validateAllFields();
+      const cardBody = document.querySelector(".basic-card .card-body");
+      const valid = !cardBody.querySelector(".field-empty, .field-invalid");
+      if (editingPressId) {
+        document.getElementById("save__button").disabled = true;
+        document.getElementById("update__button").disabled = !valid;
+      } else {
+        document.getElementById("save__button").disabled = !valid;
+        document.getElementById("update__button").disabled = true;
+      }
     }
 
     /* -------------------------
@@ -1195,11 +2061,338 @@
       checkAllRequiredFields();
     }
 
+    /* -------------------------
+       保存（save__button）：t_press ＋ ビレット情報／ラック登録／定尺・数量登録を一括保存
+    ------------------------- */
+    function v(id) { return document.getElementById(id).value; }
+
+    function collectPressData(scanFileName) {
+      const press = {
+        dies_id: v("die__select"),
+        is_washed_die: v("is-washed__select"),
+        press_date_at: v("date__input"),
+        pressing_type_id: v("pressing-type__select"),
+        press_machine_no: v("machine-number__select"),
+        billet_size: v("billet-size__select"),
+        billet_length: v("billet-length__select"),
+        plan_billet_quantities: v("plan-billet-qty__input"),
+        actual_billet_quantities: v("actual-billet-qty__input"),
+        press_start_at: v("press-start__input"),
+        press_finish_at: v("press-finish__input"),
+        actual_ram_speed: v("actual-ram-speed__input"),
+        actual_die_temperature: v("actual-die-temp__input"),
+        staff_id: v("name__select"),
+        stretch_ratio: v("stretch-ratio__input"),
+        first_actual_length: v("first_actual_length"),
+        container_upside_stemside_temperature: v("container_upside_stemside"),
+        container_upside_dieside_temperature: v("container_upside_dieside"),
+        container_downside_stemside_temperature: v("container_downside_stemside"),
+        container_downside_dieside_temperature: v("container_downside_dieside"),
+        press_directive_scan_file_name: scanFileName || v("existing_scan_filename") || null,
+        press_directive_id: v("press-directive__select") === "0" ? null : v("press-directive__select"),
+        ordersheet_id: v("directive_input__select") === "0" ? null : v("directive_input__select"),
+        special_note: v("special_note"),
+      };
+      [1, 2, 3, 4, 5].forEach(no => {
+        ["0200", "1000"].forEach(pos => {
+          ["ram_speed", "ram_pressure", "work_temperature"].forEach(field => {
+            const id = `no${no}_${pos}_${field}`;
+            press[id] = v(id);
+          });
+        });
+      });
+      return press;
+    }
+
+    function collectBundleRows() {
+      const rows = [];
+      document.querySelectorAll("#bundle__table tbody tr").forEach(tr => {
+        if (tr.querySelector(".empty-note")) return;
+        const tds = tr.children;
+        rows.push({
+          bundle:   tds[0].querySelector("input").value,
+          quantity: tds[1].querySelector("input").value,
+          lot:      tds[2].querySelector("input").value,
+          mfg:      tds[3].querySelector("select").value,
+          insp:     tds[4].querySelector("select").value,
+          note:     tds[5].querySelector("input").value,
+        });
+      });
+      return rows;
+    }
+
+    function collectRackRows() {
+      const rows = [];
+      document.querySelectorAll("#rack__table tbody tr").forEach(tr => {
+        if (tr.querySelector(".empty-note")) return;
+        const tds = tr.children;
+        rows.push({
+          order_number:  tds[0].textContent,
+          rack_number:   tds[1].textContent,
+          work_quantity: tds[2].textContent,
+        });
+      });
+      return rows;
+    }
+
+    function collectWorkLengthRows() {
+      const rows = [];
+      let i = 0;
+      document.querySelectorAll("#work-length__table tbody tr").forEach(tr => {
+        if (tr.querySelector(".empty-note")) return;
+        i++;
+        const tds = tr.children;
+        rows.push({
+          billet_number: i,
+          work_number: 1,
+          work_length:   tds[1].querySelector("input").value,
+          work_quantity: tds[2].querySelector("input").value,
+        });
+      });
+      return rows;
+    }
+
+    async function uploadScanFileIfNeeded() {
+      const file = document.getElementById("press-direction_file").files[0];
+      if (!file) return null;
+      const formData = new FormData();
+      formData.append("scan_file", file);
+      const res = await fetch("./php/press_daily_report/upload_directive_scan.php", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "ファイルのアップロードに失敗しました");
+      return data.filename;
+    }
+
+    function showSaveStatus(msg, isError) {
+      const el = document.getElementById("save-status__label");
+      el.textContent = msg;
+      el.className = "save-status " + (isError ? "err" : "ok");
+    }
+
+    function clearSubTables() {
+      document.querySelector("#bundle__table tbody").innerHTML = `<tr><td colspan="7" class="empty-note">${dict[currentLang].empty_bundle}</td></tr>`;
+      document.querySelector("#rack__table tbody").innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_rack}</td></tr>`;
+      document.querySelector("#work-length__table tbody").innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_worklength}</td></tr>`;
+      document.querySelector("#time__table tbody").innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang].empty_time}</td></tr>`;
+      document.querySelector("#pull__table tbody").innerHTML = `<tr><td colspan="6" class="empty-note">${dict[currentLang].empty_pull}</td></tr>`;
+      document.querySelector("#cut__table tbody").innerHTML = `<tr><td colspan="6" class="empty-note">${dict[currentLang].empty_cut}</td></tr>`;
+      updateBundleTotal();
+      updateRackTotal();
+      updateWorkLengthTotal();
+    }
+
+    function resetPressForm() {
+      document.querySelectorAll(".basic-card .card-body input[type=text], .basic-card .card-body input[type=date]").forEach(el => {
+        el.value = "";
+      });
+      document.querySelectorAll(".basic-card .card-body select").forEach(el => {
+        const firstOpt = el.querySelector("option");
+        if (firstOpt) el.value = firstOpt.value;
+      });
+      document.getElementById("die__select").innerHTML = '<option value="0">-</option>';
+      document.getElementById("press-directive__select").innerHTML = '<option value="0">-</option>';
+      document.getElementById("directive_input__select").innerHTML = '<option value="0">-</option>';
+      document.getElementById("directive__group").classList.remove("required");
+
+      document.getElementById("press-direction_file").value = "";
+      document.getElementById("drawingFileName").textContent = "未選択";
+      document.getElementById("preview__button").disabled = true;
+      if (drawingFileURL) { URL.revokeObjectURL(drawingFileURL); drawingFileURL = null; }
+
+      clearSubTables();
+      ["pull_date", "cut_date"].forEach(id => {
+        document.getElementById(id).value = "";
+        document.getElementById(id).dispatchEvent(new Event("input"));
+      });
+
+      editingPressId = null;
+      document.getElementById("existing_scan_filename").value = "";
+      document.getElementById("edit-mode__badge").style.display = "none";
+      const selected = document.querySelector("#summary__table tbody tr.selected-record");
+      if (selected) selected.classList.remove("selected-record");
+
+      setDefaultDate().then(checkAllRequiredFields);
+      checkAllRequiredFields();
+    }
+
+    /* -------------------------
+       過去データの読み出し（実績一覧の行クリック→編集モード）
+       ex0.11のfillReadData()/fillWorkInformation()相当。
+    ------------------------- */
+    function setSelectValue(id, val) {
+      const el = document.getElementById(id);
+      if (val === null || val === undefined) { el.value = "0"; return; }
+      el.value = String(val);
+    }
+
+    async function loadPressForEdit(id) {
+      showSaveStatus("読込中...", false);
+      try {
+        const res = await fetch("./php/press_daily_report/get_press_detail.php?id=" + encodeURIComponent(id));
+        const data = await res.json();
+        if (!res.ok || data.error) throw new Error(data.error || "読み込みに失敗しました");
+
+        const p = data.press;
+
+        // 基本情報
+        document.getElementById("date__input").value = p.press_date_at;
+        document.getElementById("die__input").value = p.die_number ?? "";
+        document.getElementById("die__select").innerHTML =
+          `<option value="${p.dies_id}">${p.die_number ?? ""}</option>`;
+
+        document.getElementById("press-directive__select").innerHTML =
+          `<option value="${p.press_directive_id ?? 0}">${p.press_directive_plan_date_at ?? "-"}</option>`;
+        document.getElementById("directive__input").value = p.ordersheet_number ?? "";
+        document.getElementById("directive_input__select").innerHTML =
+          `<option value="${p.ordersheet_id ?? 0}">${p.ordersheet_number ?? "-"}</option>`;
+        document.getElementById("directive__group").classList.remove("required");
+
+        setSelectValue("pressing-type__select", p.pressing_type_id);
+        setSelectValue("is-washed__select", p.is_washed_die);
+        setSelectValue("machine-number__select", p.press_machine_no);
+        setSelectValue("billet-size__select", p.billet_size);
+        document.getElementById("billet-length__select").value = p.billet_length ?? "";
+        document.getElementById("plan-billet-qty__input").value = p.plan_billet_quantities ?? "";
+        document.getElementById("actual-billet-qty__input").value = p.actual_billet_quantities ?? "";
+        document.getElementById("press-start__input").value = p.press_start_at ?? "";
+        document.getElementById("press-finish__input").value = p.press_finish_at ?? "";
+        document.getElementById("actual-ram-speed__input").value = p.actual_ram_speed ?? "";
+        document.getElementById("actual-die-temp__input").value = p.actual_die_temperature ?? "";
+        document.getElementById("first_actual_length").value = p.first_actual_length ?? "";
+        document.getElementById("stretch-ratio__input").value = p.stretch_ratio ?? "";
+        document.getElementById("special_note").value = p.special_note ?? "";
+
+        const staffSel = document.getElementById("name__select");
+        if (p.staff_id && !staffSel.querySelector(`option[value="${p.staff_id}"]`)) {
+          staffSel.appendChild(new Option(p.staff_name ?? String(p.staff_id), p.staff_id));
+        }
+        setSelectValue("name__select", p.staff_id);
+
+        document.getElementById("container_upside_stemside").value = p.container_upside_stemside_temperature ?? "";
+        document.getElementById("container_upside_dieside").value = p.container_upside_dieside_temperature ?? "";
+        document.getElementById("container_downside_stemside").value = p.container_downside_stemside_temperature ?? "";
+        document.getElementById("container_downside_dieside").value = p.container_downside_dieide_temperature ?? "";
+
+        [1, 2, 3, 4, 5].forEach(no => {
+          ["0200", "1000"].forEach(pos => {
+            ["ram_speed", "ram_pressure", "work_temperature"].forEach(field => {
+              const key = `no${no}_${pos}_${field}`;
+              document.getElementById(key).value = p[key] ?? "";
+            });
+          });
+        });
+
+        // ファイル：新規選択がなければ既存ファイル名を保持する
+        document.getElementById("press-direction_file").value = "";
+        document.getElementById("existing_scan_filename").value = p.press_directive_scan_file_name ?? "";
+        document.getElementById("drawingFileName").textContent = p.press_directive_scan_file_name ?? "未選択";
+        document.getElementById("preview__button").disabled = true;
+
+        // サブテーブル
+        clearSubTables();
+        (data.bundle || []).forEach(row => appendBundleRow(row.bundle, row.quantity, row.lot, row.mfg, row.insp, row.note));
+        (data.rack || []).forEach(row => appendRackRow(row.rack_number, row.work_quantity));
+        (data.workLength || []).forEach(row => appendWorkLengthRow(row.work_length, row.work_quantity));
+        (data.time || []).forEach(row => appendTimeRow(row.code, row.time_start, row.time_end));
+        (data.pull || []).forEach(row => pullHandlers.appendRow(row.date, row.no1, row.no2, row.start, row.end));
+        (data.cut || []).forEach(row => cutHandlers.appendRow(row.date, row.no1, row.no2, row.start, row.end));
+
+        editingPressId = id;
+        document.getElementById("editing-id__label").textContent = id;
+        document.getElementById("edit-mode__badge").style.display = "inline-flex";
+
+        showSaveStatus("", false);
+        checkAllRequiredFields();
+      } catch (err) {
+        showSaveStatus("❌ " + err.message, true);
+      }
+    }
+
+    document.querySelector("#summary__table tbody").addEventListener("click", e => {
+      const tr = e.target.closest("tr");
+      if (!tr || tr.querySelector(".empty-note")) return;
+      document.querySelectorAll("#summary__table tbody tr.selected-record").forEach(el => el.classList.remove("selected-record"));
+      tr.classList.add("selected-record");
+      loadPressForEdit(tr.dataset.pressId);
+    });
+
+    document.getElementById("cancel-edit__button").addEventListener("click", () => {
+      resetPressForm();
+      showSaveStatus("", false);
+    });
+
+    document.getElementById("update__button").addEventListener("click", async function () {
+      const btn = this;
+      btn.disabled = true;
+      showSaveStatus("更新中...", false);
+      try {
+        const scanFileName = await uploadScanFileIfNeeded();
+        const payload = {
+          id: editingPressId,
+          press: collectPressData(scanFileName),
+          bundle: collectBundleRows(),
+          rack: collectRackRows(),
+          workLength: collectWorkLengthRows(),
+          time: collectTimeRows(),
+          pull: pullHandlers.collect(),
+          cut: cutHandlers.collect(),
+        };
+        const res = await fetch("./php/press_daily_report/update_press.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "更新に失敗しました");
+
+        showSaveStatus(`✅ 更新しました (ID: ${data.press_id})`, false);
+        resetPressForm();
+        loadSummary();
+      } catch (err) {
+        showSaveStatus("❌ " + err.message, true);
+        checkAllRequiredFields();
+      }
+    });
+
+    document.getElementById("save__button").addEventListener("click", async function () {
+      const btn = this;
+      btn.disabled = true;
+      showSaveStatus("保存中...", false);
+      try {
+        const scanFileName = await uploadScanFileIfNeeded();
+        const payload = {
+          press: collectPressData(scanFileName),
+          bundle: collectBundleRows(),
+          rack: collectRackRows(),
+          workLength: collectWorkLengthRows(),
+          time: collectTimeRows(),
+          pull: pullHandlers.collect(),
+          cut: cutHandlers.collect(),
+        };
+        const res = await fetch("./php/press_daily_report/save_press.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "保存に失敗しました");
+
+        showSaveStatus(`✅ 保存しました (ID: ${data.press_id})`, false);
+        resetPressForm();
+        loadSummary();
+      } catch (err) {
+        showSaveStatus("❌ " + err.message, true);
+        checkAllRequiredFields();
+      }
+    });
+
     buildRamRows();
+    buildStopCodeOptions();
     setLang(currentLang);
     setDefaultDate().then(checkAllRequiredFields);
     loadStaffList();
     initRequiredFieldChecks();
+    loadSummary();
   </script>
 </body>
 </html>
