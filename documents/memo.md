@@ -5406,3 +5406,24 @@ P260800416 CXS20A-BA023-20K 2026-08-01 2026-08-31 8 08/2026-BS
 
 金型修理画面で、一度承認した、例えば、修理する、承認、した、金型を、
 やっぱり修理しない、等の変更が必要。
+
+# 2026/08/18
+
+期間を、FYにしたい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260818-01.png" width="200">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+以下のまとめも欲しい
+
+<figure style="text-align:center;">
+  <img src="./img/20260818-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+<figure style="text-align:center;">
+  <img src="./img/20260818-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
