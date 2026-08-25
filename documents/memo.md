@@ -5427,3 +5427,12 @@ P260800416 CXS20A-BA023-20K 2026-08-01 2026-08-31 8 08/2026-BS
   <img src="./img/20260818-03.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/08/25
+
+過去の押出に対しても、修理を入力したい
+
+<figure style="text-align:center;">
+  <img src="./img/20260825-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
