@@ -5436,3 +5436,12 @@ P260800416 CXS20A-BA023-20K 2026-08-01 2026-08-31 8 08/2026-BS
   <img src="./img/20260825-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/08/27
+
+t_die_atttatched_filesのinspection_idが抜けるときが有る
+
+<figure style="text-align:center;">
+  <img src="./img/20260827-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
