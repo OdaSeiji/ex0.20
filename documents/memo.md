@@ -5445,3 +5445,51 @@ t_die_atttatched_filesのinspection_idが抜けるときが有る
   <img src="./img/20260827-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/08/29
+
+型番-品番 1対1→1対多化 第1弾。方針書: `documents/die_production_number/2026-08-29_intermediate_table_plan.md`
+
+中間テーブル`t_die_production_numbers`を作成し、`m_dies.production_number_id`からバックフィル(ローカル環境で実行・成功、1234件一致)。本番PCでも同じSQLを実行する必要あり。
+
+```SQL
+CREATE TABLE t_die_production_numbers (
+    id                    INT AUTO_INCREMENT PRIMARY KEY,
+    die_id                INT NOT NULL,
+    production_number_id  INT NOT NULL,
+    is_primary            TINYINT(1) NOT NULL DEFAULT 1,
+    created_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_die_pn (die_id, production_number_id),
+    KEY idx_tdpn_die (die_id),
+    KEY idx_tdpn_pn (production_number_id),
+    CONSTRAINT fk_tdpn_die FOREIGN KEY (die_id) REFERENCES m_dies(id) ON DELETE CASCADE,
+    CONSTRAINT fk_tdpn_pn  FOREIGN KEY (production_number_id) REFERENCES m_production_numbers(id)
+);
+
+INSERT INTO t_die_production_numbers (die_id, production_number_id, is_primary)
+SELECT id, production_number_id, 1 FROM m_dies WHERE production_number_id IS NOT NULL;
+```
+
+検証: `m_dies`の`production_number_id IS NOT NULL`件数と`t_die_production_numbers`件数が一致(1234件)することを確認済み。
+
+# 2026/08/30
+
+型番-品番 1対多化の業務理解を整理。方針書(`documents/die_production_number/2026-08-29_intermediate_table_plan.md`)の1章・4章・5章に反映済み。
+
+**品番を複数化する意味:** 別形状の製品が同じ金型にぶら下がるのではなく、**製品の断面形状(=金型)は同じまま、定尺の長さだけが異なる**品番を複数持てるようにする、というのが実態。
+
+`m_production_numbers`の列構成がこれを裏付ける。以下は本来「型番(金型)単位」で決まる形状・仕様の値で、同じ金型に紐づく品番間では常に一致するはず:
+
+- `circumscribed_circle`(外接円径)、`cross_section_area`(断面積)、`specific_weight`(単重)
+- `hardness` / `hardness_note`、`aging_type_id`、`billet_material_id`
+- `packing_quantity` / `packing_column` / `packing_row`
+
+品番ごとに実質変わるのは `production_length`(定尺長さ)と `production_number`(品番コード)のみ。
+
+**影響:** 第1弾で中間テーブル経由に切り替える対象ファイル(billet-charge, DieMaitenance窒化計算, machine_report等)は主に形状・仕様系の値を参照しているため、is_primary以外の品番を見ても結果は変わらない。値が変わりうるのは`production_length`を直接使う計算([[良品量(t)換算]]等)に限られ、想定より作業リスクは小さい。`die_register.html`の複数品番選択UIも「同一金型の長さ違いバリエーションから選ぶ」操作である前提で設計してよい。
+
+**同日、さらに議論を進めて結論が変わった。** 長さ違いの「品番(図面)」はそもそも正式には存在せず、`-20K`/`-30K`のような品番コードは図面を伴わないその場しのぎの登録だった(実データで確認: 例えば`C2Q12A-AD367-20K`(2m)と`C2Q12A-AD367-30K`(3m)は同じ形状で品番だけ複製、さらに`m_dies.production_number_id`が単一FKしか持てないため`die_number`に`-ZZZ`を付けた複製金型行まで作られていた。例: `CQ12T3L-V01B`(2m)と`CQ12T3L-V01B-ZZZ`(3m、die_id 746、プレス実績9件・2025-01〜2025-11)。ただし実際の運用ニーズ自体は実在し継続的に使われていることは確認済み)。
+
+**最終結論:** 型番・品番マスタのスキーマは変更しない(`m_dies.production_number_id`は単一FKのまま)。中間テーブル`t_die_production_numbers`は不要と判断し、ローカルDBから**DROP済み**(バックフィル元の`m_dies.production_number_id`は元々変更していないため、DROPのみで完全復元)。本番PCへは未実行だったため対応不要。
+
+今後は、第2弾で予定していた「プレス指示画面のex0.20移植」時に、その指示に対する**計画長さ**の列を追加することで対応する(実績側は`t_press.first_actual_length`で既に対応済み)。詳細・経緯は方針書 `documents/die_production_number/2026-08-29_intermediate_table_plan.md` を全面改訂して記録した。
