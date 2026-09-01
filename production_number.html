@@ -70,6 +70,18 @@
       }
       .form-group { display: flex; flex-direction: column; gap: 4px; }
       .form-group.span2 { grid-column: span 2; }
+      .form-group.span3 { grid-column: 1 / -1; }
+
+      /* ── 定尺候補(複数長さ) ── */
+      .length-options-wrap { max-height: 140px; overflow-y: auto; border: 1px solid #eee; border-radius: 5px; margin-bottom: 6px; }
+      .length-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      .length-table td { padding: 5px 10px; border-bottom: 1px solid #f0f0f0; }
+      .length-table .empty-note { color: #999; text-align: center; padding: 10px; }
+      .length-table .del-cell { width: 30px; text-align: right; }
+      .length-table .row-del-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
+      .length-add-row { display: flex; gap: 8px; }
+      .length-add-row input { flex: 1; }
+      .btn-add-length { padding: 7px 14px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-size: 12px; white-space: nowrap; }
 
       label.f-label { font-size: 12px; font-weight: bold; color: #555; }
 
@@ -391,6 +403,18 @@
             <label class="f-label req" data-key="lbl_length">製品長 (m)</label>
             <input type="text" id="fLength" />
           </div>
+          <div class="form-group span3">
+            <label class="f-label" data-key="lbl_length_options">その他の定尺候補 (m)</label>
+            <div class="length-options-wrap">
+              <table class="length-table" id="lengthOptionsTable">
+                <tbody><tr><td class="empty-note" data-key="empty_length_options">登録データなし</td></tr></tbody>
+              </table>
+            </div>
+            <div class="length-add-row">
+              <input type="text" id="newLengthValue" onkeydown="if(event.key==='Enter'){event.preventDefault();addLengthOption();}" />
+              <button type="button" class="btn-add-length" onclick="addLengthOption()" data-key="btn_add_length">＋ 追加</button>
+            </div>
+          </div>
           <div class="form-group">
             <label class="f-label" data-key="lbl_circle">外接円 (mm)</label>
             <input type="text" id="fCircle" />
@@ -625,6 +649,9 @@
           lbl_material: "材質",
           lbl_aging: "時効処理",
           lbl_length: "製品長 (m)",
+          lbl_length_options: "その他の定尺候補 (m)",
+          empty_length_options: "登録データなし",
+          btn_add_length: "＋ 追加",
           lbl_circle: "外接円 (mm)",
           lbl_weight: "比重 (kg/m)",
           lbl_area: "断面積 (mm²)",
@@ -662,6 +689,9 @@
           lbl_material: "Vật liệu",
           lbl_aging: "Xử lý lão hóa",
           lbl_length: "Chiều dài SP (m)",
+          lbl_length_options: "Chiều dài tiêu chuẩn khác (m)",
+          empty_length_options: "Chưa có dữ liệu",
+          btn_add_length: "＋ Thêm",
           lbl_circle: "Đường tròn ngoại tiếp (mm)",
           lbl_weight: "Trọng lượng riêng (kg/m)",
           lbl_area: "Diện tích tiết diện (mm²)",
@@ -941,6 +971,11 @@
         document.getElementById("fHardness").value     = r.hardness             ?? "";
         document.getElementById("fHardnessNote").value = r.hardness_note        ?? "";
 
+        /* 定尺候補を復元 */
+        const lengthOptions = await postForm("./php/ProductionNumber/SelLengthOptions.php", { targetId: id });
+        resetLengthOptionsTable();
+        (lengthOptions || []).forEach((row) => appendLengthRow(row.length));
+
         /* カテゴリ選択を復元 */
         await restoreCategories(id, r.production_category2_id ?? null);
 
@@ -966,6 +1001,66 @@
         }
       }
 
+      /* ════════════════════════════
+         定尺候補(複数長さ)
+      ════════════════════════════ */
+      function appendLengthRow(value) {
+        const tbody = document.querySelector("#lengthOptionsTable tbody");
+        const emptyRow = tbody.querySelector(".empty-note");
+        if (emptyRow) emptyRow.closest("tr").remove();
+
+        const tr = document.createElement("tr");
+        const tdLen = document.createElement("td");
+        tdLen.className = "len-cell";
+        tdLen.textContent = value;
+        const tdDel = document.createElement("td");
+        tdDel.className = "del-cell";
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "row-del-btn";
+        delBtn.textContent = "✕";
+        delBtn.onclick = () => removeLengthRow(delBtn);
+        tdDel.appendChild(delBtn);
+        tr.appendChild(tdLen);
+        tr.appendChild(tdDel);
+        tbody.appendChild(tr);
+      }
+
+      function removeLengthRow(btn) {
+        btn.closest("tr").remove();
+        const tbody = document.querySelector("#lengthOptionsTable tbody");
+        if (!tbody.querySelector("tr")) resetLengthOptionsTable();
+      }
+
+      function collectLengthRows() {
+        return Array.from(document.querySelectorAll("#lengthOptionsTable tbody .len-cell"))
+          .map((td) => td.textContent.trim())
+          .filter((v) => v !== "");
+      }
+
+      function resetLengthOptionsTable() {
+        const lang = localStorage.getItem("lang") || "ja";
+        document.querySelector("#lengthOptionsTable tbody").innerHTML =
+          `<tr><td class="empty-note">${dict[lang].empty_length_options}</td></tr>`;
+      }
+
+      function addLengthOption() {
+        const input = document.getElementById("newLengthValue");
+        const value = input.value.trim();
+        if (!value || isNaN(value) || Number(value) <= 0) {
+          showToast("正しい長さを入力してください", false);
+          return;
+        }
+        const fLength = document.getElementById("fLength").value.trim();
+        if (value === fLength || collectLengthRows().includes(value)) {
+          showToast("同じ長さが既に登録されています", false);
+          return;
+        }
+        appendLengthRow(value);
+        input.value = "";
+        input.focus();
+      }
+
       function closeForm() {
         document.getElementById("formCard").classList.remove("open");
         resetForm();
@@ -978,6 +1073,7 @@
         document.getElementById("fDept").value     = "0";
         document.getElementById("fMaterial").value = "0";
         document.getElementById("fAging").value    = "0";
+        resetLengthOptionsTable();
 
         document.querySelectorAll("#cat1Tbody tr.selected, #cat2Tbody tr.selected")
           .forEach((tr) => tr.classList.remove("selected"));
@@ -1021,6 +1117,7 @@
           billet_material_id:      document.getElementById("fMaterial").value,
           aging_type_id:           document.getElementById("fAging").value,
           production_length:       document.getElementById("fLength").value,
+          lengthOptions:           collectLengthRows().join(","),
           circumscribed_circle:    document.getElementById("fCircle").value,
           specific_weight:         document.getElementById("fWeight").value,
           cross_section_area:      document.getElementById("fArea").value,

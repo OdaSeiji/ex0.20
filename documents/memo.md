@@ -5493,3 +5493,38 @@ SELECT id, production_number_id, 1 FROM m_dies WHERE production_number_id IS NOT
 **最終結論:** 型番・品番マスタのスキーマは変更しない(`m_dies.production_number_id`は単一FKのまま)。中間テーブル`t_die_production_numbers`は不要と判断し、ローカルDBから**DROP済み**(バックフィル元の`m_dies.production_number_id`は元々変更していないため、DROPのみで完全復元)。本番PCへは未実行だったため対応不要。
 
 今後は、第2弾で予定していた「プレス指示画面のex0.20移植」時に、その指示に対する**計画長さ**の列を追加することで対応する(実績側は`t_press.first_actual_length`で既に対応済み)。詳細・経緯は方針書 `documents/die_production_number/2026-08-29_intermediate_table_plan.md` を全面改訂して記録した。
+
+# 2026/09/01
+
+業務フローの詳細確認により、実際に必要な改造を3ステップに整理(1→2→3の順で着手)。詳細は `documents/die_production_number/2026-09-01_press_directive_length_step0.md` 参照。
+
+1. プレス指示画面(ex0.11 `MakingPressDirectiveV11.html`相当)をex0.20へ新規移植。長さ入力は「あらかじめ登録された定尺候補から選ぶ」方式にする
+2. daily report(実績)に「指示値通りだったか」の入力欄を追加、`t_press`に列追加
+3. QualityReportV7画面(品質評価)の移植
+
+1の前段階として、**Step 0(品番ごとに複数の定尺候補を登録・管理できるようにする)を実装・動作確認済み**。
+
+```SQL
+CREATE TABLE m_production_number_lengths (
+  id                    INT AUTO_INCREMENT PRIMARY KEY,
+  production_number_id  INT NOT NULL,
+  length                DECIMAL(10,3) NOT NULL,
+  is_default            TINYINT(1) NOT NULL DEFAULT 0,
+  created_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_mpnl_pn_length (production_number_id, length),
+  KEY idx_mpnl_pn (production_number_id),
+  CONSTRAINT fk_mpnl_pn FOREIGN KEY (production_number_id)
+    REFERENCES m_production_numbers(id) ON DELETE CASCADE
+);
+
+INSERT INTO m_production_number_lengths (production_number_id, length, is_default)
+SELECT id, production_length, 1
+FROM m_production_numbers
+WHERE production_length IS NOT NULL;
+```
+
+検証: `m_production_numbers`の`production_length IS NOT NULL`件数と`m_production_number_lengths`件数が751件で一致することを確認済み(ローカル環境で実行・成功)。**本番PCでも同じSQLを実行する必要あり。**
+
+`m_production_numbers.production_length`列は既定値として変更せず維持、`get_machine_monthly.php`等の既存参照箇所への影響なし。`production_number.html`に「その他の定尺候補」UIを追加し、Chrome操作で追加・削除・保存・復元の一連の動作を確認済み。
+
+副次的に、`production_number.html`の既存カテゴリ選択検証に、今回の変更と無関係の不具合(編集直後にカテゴリを触らず更新すると誤って弾かれることがある)を発見。原因未特定、今回は対応せず記録のみ。

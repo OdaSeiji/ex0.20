@@ -1,25 +1,13 @@
 <?php
-  /* 21/09/05 */
-  $userid = "webuser";
-  $passwd = "";
-//  $data_json = json_decode($data); 
-//  $data_json = array_values($data_json); //配列の並び替え
-  // print_r($_POST);
-  // print_r("<br>");
-  try{
-    $dbh = new PDO(
-      'mysql:host=localhost; dbname=extrusion; charset=utf8',
-      $userid,
-      $passwd,
-      array(
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::ATTR_EMULATE_PREPARES => false
-      )
-    );
+  require_once __DIR__ . "/../db.php";
+  require_once __DIR__ . "/production_number_common.php";
 
-    $prepare = $dbh->prepare("
+  try {
+    $pdo->beginTransaction();
+
+    $prepare = $pdo->prepare("
       update m_production_numbers
-        set 
+        set
           aging_type_id = :aging_type_id,
           billet_material_id = :billet_material_id,
           circumscribed_circle = :circumscribed_circle,
@@ -55,25 +43,20 @@
     $prepare->bindValue(':updated_at', $_POST['updated_at'], PDO::PARAM_STR);
     $prepare->bindValue(':id', (INT)$_POST['targetId'], PDO::PARAM_INT);
 
-    // if($_POST['circumscribed_circle'] == '')
-    //   $prepare->bindValue(':circumscribed_circle', Null, PDO::PARAM_STR);
-    // else
-    //   $prepare->bindValue(':circumscribed_circle', $_POST['circumscribed_circle'], PDO::PARAM_STR);
-
-    //   if((INT)$_POST['drawn_department'] == 0)
-    //   $prepare->bindValue(':drawn_department', Null, PDO::PARAM_STR);
-    // else
-    //   $prepare->bindValue(':drawn_department', $_POST['drawn_department'], PDO::PARAM_STR);
-
-
-
-    // print_r($sql);
     $prepare->execute();
 
+    $pnId = (int)$_POST['targetId'];
+    $delStmt = $pdo->prepare("DELETE FROM m_production_number_lengths WHERE production_number_id = :pn_id");
+    $delStmt->execute([":pn_id" => $pnId]);
+
+    $extraLengths = parseLengthOptions($_POST['lengthOptions'] ?? '');
+    saveLengthOptions($pdo, $pnId, $_POST['production_length'], $extraLengths);
+
+    $pdo->commit();
     echo json_encode("Updated");
-  } catch (PDOException $e){
+  } catch (Exception $e) {
+    $pdo->rollBack();
     $error = $e->getMessage();
     print_r($error);
   }
-  $dbh = null;
 ?>

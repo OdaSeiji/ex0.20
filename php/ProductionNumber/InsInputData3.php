@@ -1,24 +1,13 @@
 <?php
   /* 21/09/05 */
-  $userid = "webuser";
-  $passwd = "";
-//  $data_json = json_decode($data); 
-//  $data_json = array_values($data_json); //配列の並び替え
-  // print_r($_POST);
-  // print_r("<br>");
-  try{
-    $dbh = new PDO(
-      'mysql:host=localhost; dbname=extrusion; charset=utf8',
-      $userid,
-      $passwd,
-      array(
-          PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-          PDO::ATTR_EMULATE_PREPARES => false
-      )
-    );
+  require_once __DIR__ . "/../db.php";
+  require_once __DIR__ . "/production_number_common.php";
 
-  $prepare = $dbh->prepare(
-    "INSERT INTO m_production_numbers (
+  try {
+    $pdo->beginTransaction();
+
+    $prepare = $pdo->prepare(
+      "INSERT INTO m_production_numbers (
 
 aging_type_id,
 billet_material_id,
@@ -53,7 +42,7 @@ created_at
 :packing_column,
 :packing_row,
 :updated_at
- 
+
         )"
     );
 
@@ -77,15 +66,17 @@ $prepare->bindValue(':production_category2_id', Null, PDO::PARAM_STR);
 else
 $prepare->bindValue(':production_category2_id', $_POST['production_category2_id'], PDO::PARAM_STR);
 
-
-// $prepare->bindValue(':production_category2_id', (INT)$_POST['production_category2_id'], PDO::PARAM_INT);
-    // print_r($sql);
     $prepare->execute();
+    $pnId = $pdo->lastInsertId();
 
+    $extraLengths = parseLengthOptions($_POST['lengthOptions'] ?? '');
+    saveLengthOptions($pdo, $pnId, $_POST['production_length'], $extraLengths);
+
+    $pdo->commit();
     echo json_encode("INSERTED");
-  } catch (PDOException $e){
+  } catch (Exception $e) {
+    $pdo->rollBack();
     $error = $e->getMessage();
     print_r($error);
   }
-  $dbh = null;
 ?>
