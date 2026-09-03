@@ -5528,3 +5528,12 @@ WHERE production_length IS NOT NULL;
 `m_production_numbers.production_length`列は既定値として変更せず維持、`get_machine_monthly.php`等の既存参照箇所への影響なし。`production_number.html`に「その他の定尺候補」UIを追加し、Chrome操作で追加・削除・保存・復元の一連の動作を確認済み。
 
 副次的に、`production_number.html`の既存カテゴリ選択検証に、今回の変更と無関係の不具合(編集直後にカテゴリを触らず更新すると誤って弾かれることがある)を発見。原因未特定、今回は対応せず記録のみ。
+
+# 2026/09/04
+
+ここの移管数はどこの数字を積算している？
+
+<figure style="text-align:center;">
+  <img src="./img/20260904-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
