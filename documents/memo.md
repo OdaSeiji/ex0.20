@@ -5537,3 +5537,10 @@ WHERE production_length IS NOT NULL;
   <img src="./img/20260904-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+複数の長さを持たせる方案
+
+<figure style="text-align:center;">
+  <img src="./img/20260904-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
