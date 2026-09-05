@@ -46,11 +46,11 @@
     $prepare->execute();
 
     $pnId = (int)$_POST['targetId'];
-    $delStmt = $pdo->prepare("DELETE FROM m_production_number_lengths WHERE production_number_id = :pn_id");
+    $delStmt = $pdo->prepare("DELETE FROM m_production_number_variants WHERE production_number_id = :pn_id");
     $delStmt->execute([":pn_id" => $pnId]);
 
-    $extraLengths = parseLengthOptions($_POST['lengthOptions'] ?? '');
-    saveLengthOptions($pdo, $pnId, $_POST['production_length'], $extraLengths);
+    $extraVariants = parseVariantOptions($_POST['variantOptions'] ?? '');
+    saveVariantOptions($pdo, $pnId, $_POST['production_number'], $_POST['production_length'], $extraVariants);
 
     $pdo->commit();
     echo json_encode("Updated");

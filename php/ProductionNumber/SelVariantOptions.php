@@ -10,8 +10,8 @@
     }
 
     $stmt = $pdo->prepare("
-      SELECT id, length
-      FROM m_production_number_lengths
+      SELECT id, production_number, length
+      FROM m_production_number_variants
       WHERE production_number_id = :targetId AND is_default = 0
       ORDER BY length
     ");

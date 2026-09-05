@@ -28,7 +28,7 @@ foreach ($rows as $row) {
     if ($stmt->rowCount() > 0) {
         $inserted++;
         if ($len !== null) {
-            saveLengthOptions($pdo, $pdo->lastInsertId(), $len, []);
+            saveVariantOptions($pdo, $pdo->lastInsertId(), $pn, $len, []);
         }
     }
 }

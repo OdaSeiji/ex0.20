@@ -69,8 +69,8 @@ $prepare->bindValue(':production_category2_id', $_POST['production_category2_id'
     $prepare->execute();
     $pnId = $pdo->lastInsertId();
 
-    $extraLengths = parseLengthOptions($_POST['lengthOptions'] ?? '');
-    saveLengthOptions($pdo, $pnId, $_POST['production_length'], $extraLengths);
+    $extraVariants = parseVariantOptions($_POST['variantOptions'] ?? '');
+    saveVariantOptions($pdo, $pnId, $_POST['production_number'], $_POST['production_length'], $extraVariants);
 
     $pdo->commit();
     echo json_encode("INSERTED");
