@@ -5529,6 +5529,22 @@ WHERE production_length IS NOT NULL;
 
 副次的に、`production_number.html`の既存カテゴリ選択検証に、今回の変更と無関係の不具合(編集直後にカテゴリを触らず更新すると誤って弾かれることがある)を発見。原因未特定、今回は対応せず記録のみ。
 
+# 2026/09/04
+
+ここの移管数はどこの数字を積算している？
+
+<figure style="text-align:center;">
+  <img src="./img/20260904-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+複数の長さを持たせる方案
+
+<figure style="text-align:center;">
+  <img src="./img/20260904-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
 # 2026/09/06
 
 Step 0の設計を見直し。生産指示は「長さ違いを含む品番コード」(例: `C2Q12A-AD367-30K`)を直接指定して来る実態が判明。この品番コードから実際に使う金型を逆引きする必要があるが、現行スキーマは`m_dies.production_number_id`が単一FKのため、`die_number`に`-ZZZ`を付けた複製金型(45件確認)で無理やり対応していた。
@@ -5573,3 +5589,5 @@ ALTER TABLE m_production_number_variants
 `production_number.html`のUIも「長さ」だけでなく「品番コード」も一緒に登録する形に変更(`php/ProductionNumber/production_number_common.php`の`saveVariantOptions()`/`parseVariantOptions()`、`SelLengthOptions.php`→`SelVariantOptions.php`にリネーム)。Chrome操作で品番コード+長さの追加・削除・保存・復元を確認済み。
 
 **今後の運用:** `m_dies`⇔`m_production_numbers`は1:1のまま変更しない。新しく長さ違いの品番が必要になった場合は、`-ZZZ`複製金型を作るのではなく、`m_production_number_variants`に品番コード+長さの行を追加する形で対応する。生産指示からの品番コード→金型の逆引きは、将来のプレス指示画面(Step 1)で`m_production_number_variants`を参照して実装する想定。
+
+**注記:** 09/04の手描き図(上記`20260904-02.png`)は、今回実装した`m_production_number_variants`とほぼ同じ設計(`m_dies` 1:1 `m_production_numbers` 1:多 サブテーブル)を先に構想していたもの。図中では仮に`m_production_number_sub`という名前だったが、DBには既に全く別目的(寸法データ、412件)の`m_production_numbers_sub`テーブルが存在するため、命名衝突を避けて`m_production_number_variants`とした(名前が紛らわしいだけで実体は無関係と確認済み)。
