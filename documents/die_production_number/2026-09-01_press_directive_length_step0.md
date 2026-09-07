@@ -2,7 +2,7 @@
 
 - 作成日: 2026-09-01(2026-09-06 Step 0.5として拡張)
 - 対象システム: ex0.20 (`C:\xampp\htdocs\ex0.20`)
-- ステータス: **Step 0 / Step 0.5 実装完了・動作確認済み**
+- ステータス: **Step 0 / Step 0.5 実装完了・動作確認済み。本番PC適用も2026-09-07完了**
 
 > **注意:** 本ドキュメントのテーブル名`m_production_number_lengths`は、2026-09-06に`m_production_number_variants`へ改名・拡張された(2章の当初設計を参照する際はStep 0.5の内容を優先すること)。詳細は末尾「4. Step 0.5」参照。
 
@@ -131,9 +131,11 @@ ALTER TABLE m_production_number_variants
 
 Chrome操作で、品番コード(`INI-398-1-112-D-30K`)+長さ(4.500)の追加・保存・DB確認・編集画面での復元・削除・クリーンアップまで一通り確認済み。
 
-### 4.6 本番PC適用手順(未実行・要対応)
+### 4.6 本番PC適用手順(2026-09-07 実行完了)
 
-本番PCはStep 0(`m_production_number_lengths`作成)自体を未実行のため、ローカルで辿った「作成→リネーム→ALTER」の履歴を再現する必要はない。**最終形を直接作る以下のSQLを1回実行すれば良い**(ローカルの現行スキーマと完全一致、`SHOW CREATE TABLE`で確認済み)。
+本番PCはStep 0(`m_production_number_lengths`作成)自体を未実行だったため、ローカルで辿った「作成→リネーム→ALTER」の履歴は再現せず、**最終形を直接作る以下のSQLを1回実行**した(ローカルの現行スキーマと完全一致、`SHOW CREATE TABLE`で確認済み)。
+
+**2026-09-07、本番PCで実行・検証完了。** `m_production_numbers.production_length IS NOT NULL`件数と`m_production_number_variants`件数の一致を確認済み。
 
 ```sql
 CREATE TABLE m_production_number_variants (

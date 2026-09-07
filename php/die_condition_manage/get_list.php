@@ -40,13 +40,16 @@ $sql = "
       ) ranked
       WHERE rn = 1
     ) lp ON lp.dies_id = d.id
-    WHERE d.die_number LIKE 'CQ%'
-       OR d.die_number LIKE 'CP96%'
-       OR d.die_number LIKE 'MXS%'
+    WHERE d.die_number LIKE 'CA%'
+       OR d.die_number REGEXP '^CQ[A-Z0-9]{2}T3-'
+       OR d.die_number REGEXP '^CP96[A-Z0-9]{2}T-'
+       OR d.die_number REGEXP '^MSQ[A-Z0-9]{2}B2-'
+       OR d.die_number REGEXP '^MXS[A-Z0-9]{2}B-'
        OR d.die_number LIKE 'MXQ%'
-       OR d.die_number LIKE 'CXS%'
+       OR d.die_number REGEXP '^CXS[A-Z0-9]{2}S[23]-'
        OR d.die_number LIKE 'MGP%'
        OR d.die_number LIKE 'PS%'
+       OR d.die_number REGEXP '^XLA[A-Z0-9]{2}B2-'
     ORDER BY d.die_number
 ";
 

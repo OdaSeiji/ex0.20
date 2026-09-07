@@ -111,7 +111,7 @@
       </div>
 
       <div class="list-card">
-        <div class="list-title">対象: CQ / CP96 / MXS / MXQ / CXS / MGP / PS で始まる金型(<span id="totalCount">0</span>件)</div>
+        <div class="list-title">対象: CA / CQ / CP96 / MSQ / MXS / MXQ / CXS / MGP / PS / XLA で始まる金型(<span id="totalCount">0</span>件)</div>
         <div id="groupsWrap">読み込み中...</div>
       </div>
     </div>
@@ -120,12 +120,12 @@
 
     <script>
       const CONDITION_NAMES = { 1: "Trial", 2: "Mass Production Trial", 3: "Mass Production" };
-      const PREFIXES = ["CQ", "CP96", "MXS", "MXQ", "CXS", "MGP", "PS"];
+      const PREFIXES = ["CA", "CQ", "CP96", "MSQ", "MXS", "MXQ", "CXS", "MGP", "PS", "XLA"];
       let allDies = [];
       const openGroups = new Set();
 
       // プレフィックスごとのサブ分類文字(数字の直後にこの文字があり、その後が数字またはハイフンなら「あり」)
-      const SUB_GROUP_LETTER = { CQ: "T", CP96: "T", CXS: "S" };
+      const SUB_GROUP_LETTER = { CQ: "T", CP96: "T" };
 
       function prefixOf(dieNumber) {
         return PREFIXES.find((p) => dieNumber.toUpperCase().startsWith(p)) ?? "OTHER";
@@ -163,25 +163,29 @@
               <tr>
                 <th style="width:220px;">型番</th>
                 <th style="width:160px;">現在のコンディション</th>
-                <th style="width:130px;">総押出長さ (km)</th>
+                <th style="width:130px; text-align:right;">総押出長さ (km)</th>
                 <th style="width:110px;">最終プレス日</th>
-                <th style="width:110px;">最終プレス<br>ビレット本数</th>
-                <th style="width:110px;">累計ビレット本数</th>
+                <th style="width:110px; text-align:right;">最終プレス<br>ビレット本数</th>
+                <th style="width:110px; text-align:right;">累計ビレット本数</th>
                 <th>変更</th>
               </tr>
             </thead>
             <tbody>
-              ${dies.map((d) => `
+              ${dies.map((d) => {
+                const length = Number(d.total_profile_length);
+                const lengthStyle = "text-align:right;" + (length >= 5.0 ? " color:#c62828; font-weight:bold;" : "");
+                return `
                 <tr id="row-${d.id}">
                   <td>${d.die_number}</td>
                   <td>${conditionBadge(d.die_condition_id)}</td>
-                  <td>${Number(d.total_profile_length).toFixed(1)}</td>
+                  <td style="${lengthStyle}">${length.toFixed(1)}</td>
                   <td>${d.last_press_date_at ?? "-"}</td>
-                  <td>${d.last_billet_quantities ?? "-"}</td>
-                  <td>${d.total_billet_quantities}</td>
+                  <td style="text-align:right;">${d.last_billet_quantities ?? "-"}</td>
+                  <td style="text-align:right;">${d.total_billet_quantities}</td>
                   <td>${conditionSelect(d)}</td>
                 </tr>
-              `).join("")}
+              `;
+              }).join("")}
             </tbody>
           </table>
         `;
@@ -220,7 +224,36 @@
         }).join("");
       }
 
+      // プレフィックスごとの明示的なサブ分類(該当しないものは表示されない)
+      const EXPLICIT_SPLITS = {
+        CXS: [
+          { key: "S2", label: "S2", test: (n) => /\dS2-/.test(n.toUpperCase()) },
+          { key: "S3", label: "S3", test: (n) => /\dS3-/.test(n.toUpperCase()) },
+        ],
+        MGP: [
+          { key: "M", label: "MGPM", test: (n) => n.toUpperCase().startsWith("MGPM") },
+          { key: "L", label: "MGPL", test: (n) => n.toUpperCase().startsWith("MGPL") },
+        ],
+        PS: [
+          { key: "plain", label: "PS", test: (n) => /^PS[A-Z0-9]{2}-/.test(n.toUpperCase()) },
+          { key: "A", label: "PS??A", test: (n) => /^PS[A-Z0-9]{2}A-/.test(n.toUpperCase()) },
+          { key: "B", label: "PS??B", test: (n) => /^PS[A-Z0-9]{2}B-/.test(n.toUpperCase()) },
+        ],
+      };
+
       function renderGroupContent(prefix, dies, forceOpen) {
+        const splits = EXPLICIT_SPLITS[prefix];
+        if (splits) {
+          let html = "";
+          splits.forEach((s) => {
+            const group = dies.filter((d) => s.test(d.die_number));
+            if (group.length) {
+              html += renderGroupBlock(`${prefix}:${s.key}`, s.label, group.length, renderBaseCodeGroups(group, `${prefix}:${s.key}`, forceOpen), forceOpen, true);
+            }
+          });
+          return html;
+        }
+
         const letter = SUB_GROUP_LETTER[prefix];
         if (!letter) return renderBaseCodeGroups(dies, prefix, forceOpen);
 

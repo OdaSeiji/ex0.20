@@ -5591,3 +5591,9 @@ ALTER TABLE m_production_number_variants
 **今後の運用:** `m_dies`⇔`m_production_numbers`は1:1のまま変更しない。新しく長さ違いの品番が必要になった場合は、`-ZZZ`複製金型を作るのではなく、`m_production_number_variants`に品番コード+長さの行を追加する形で対応する。生産指示からの品番コード→金型の逆引きは、将来のプレス指示画面(Step 1)で`m_production_number_variants`を参照して実装する想定。
 
 **注記:** 09/04の手描き図(上記`20260904-02.png`)は、今回実装した`m_production_number_variants`とほぼ同じ設計(`m_dies` 1:1 `m_production_numbers` 1:多 サブテーブル)を先に構想していたもの。図中では仮に`m_production_number_sub`という名前だったが、DBには既に全く別目的(寸法データ、412件)の`m_production_numbers_sub`テーブルが存在するため、命名衝突を避けて`m_production_number_variants`とした(名前が紛らわしいだけで実体は無関係と確認済み)。
+
+# 2026/09/07
+
+`m_production_number_variants`作成SQL(9/6にmemo.md記載の統合版)を本番PCで実行完了。`m_production_numbers.production_length IS NOT NULL`件数と`m_production_number_variants`件数の一致を確認済み。これでStep 0/0.5は本番反映まで完了。
+
+金型コンディション管理画面(`die_condition_manage.html`、9/6追加)は既存テーブルのみ使用のため、本番PCへのスキーマ変更は不要(コードのpull/デプロイのみで動作)。
