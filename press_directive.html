@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Press Directive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Roboto Mono", "Segoe UI", monospace;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1200px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 14px; font-weight: bold; color: #1565c0;
+        margin-bottom: 12px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .card.collapsed .card-body { display: none; }
+      .card-title .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 20px; height: 20px; border-radius: 50%; background: #1565c0; color: #fff;
+        font-size: 11px; flex-shrink: 0;
+      }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 7px 10px; border-bottom: 1px solid #eee; text-align: left; }
+      th { color: #777; font-size: 11px; }
+      tr.selectable { cursor: pointer; }
+      tr.selectable:hover td { background: #f7f9ff; }
+      tr.selected td { background: #e8f1ff; font-weight: bold; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .neg { color: #c62828; }
+
+      input[type="text"], input[type="date"], input[type="number"], select, textarea {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; font-family: inherit; width: 100%;
+      }
+      textarea { resize: vertical; min-height: 50px; }
+
+      .selected-summary {
+        background: #f7f9ff; border: 1px solid #d5e3f7; border-radius: 6px;
+        padding: 10px 14px; margin-bottom: 12px; font-size: 13px; display: none;
+      }
+      .selected-summary.show { display: block; }
+      .selected-summary .pn-code { font-weight: bold; color: #1565c0; }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px 16px;
+      }
+      .form-group { display: flex; flex-direction: column; gap: 4px; }
+      .form-group.span2 { grid-column: span 2; }
+      .form-group.span4 { grid-column: span 4; }
+      label.f-label { font-size: 11px; font-weight: bold; color: #555; }
+      label.f-label .req { color: #c62828; }
+
+      .btn-row { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
+      .btn-save { background: #1565c0; color: #fff; padding: 9px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-save:disabled { background: #90a4ae; cursor: default; }
+      .btn-cancel { background: #9e9e9e; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; }
+      .edit-badge { background: #e65100; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+
+      .empty-note { color: #999; text-align: center; padding: 16px; }
+      .die-search-wrap { position: relative; }
+      .die-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+        border: 1px solid #ccc; border-radius: 5px; max-height: 200px; overflow-y: auto;
+        z-index: 20; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+      .die-dropdown.show { display: block; }
+      .die-dropdown div { padding: 6px 10px; cursor: pointer; font-size: 13px; }
+      .die-dropdown div:hover { background: #f0f4fa; }
+
+      #toast {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1 data-key="title">プレス指示作成</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <!-- Step 1: オーダーシート選択 -->
+      <div class="card">
+        <div class="card-title"><span class="step-num">1</span><span data-key="step1_title">オーダーシート選択(残数量あり)</span></div>
+        <div class="card-body">
+          <input type="text" id="ordersheetSearch" data-key-placeholder="ph_ordersheet_search" placeholder="受注番号・品番で検索" oninput="renderOrdersheets()" style="margin-bottom:10px;" />
+          <div style="max-height:260px; overflow-y:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="col_ordersheet_no">受注番号</th>
+                  <th data-key="col_pn">品番</th>
+                  <th data-key="col_delivery">納期</th>
+                  <th class="num" data-key="col_qty">数量</th>
+                  <th class="num" data-key="col_remaining">残数量</th>
+                </tr>
+              </thead>
+              <tbody id="ordersheetTbody">
+                <tr><td colspan="5" class="empty-note" data-key="loading">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: 長さ(品番)・金型選択 -->
+      <div class="card" id="step2Card" style="display:none;">
+        <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">長さ(品番)・金型選択</span></div>
+        <div class="card-body">
+          <div class="selected-summary show" id="selectedOrdersheetSummary"></div>
+
+          <div class="form-grid" style="margin-bottom:14px;">
+            <div class="form-group span2">
+              <label class="f-label" data-key="lbl_variant">定尺(長さ)</label>
+              <select id="variantSelect" onchange="onVariantChange()"></select>
+            </div>
+            <div class="form-group span2">
+              <label class="f-label req" data-key="lbl_die">金型</label>
+              <div class="die-search-wrap">
+                <input type="text" id="dieSearchInput" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
+                <div class="die-dropdown" id="dieDropdown"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: 過去の指示履歴 -->
+      <div class="card" id="historyCard" style="display:none;">
+        <div class="card-title"><span class="step-num">3</span><span data-key="step3_title">この金型の過去の指示(クリックで読込・複製)</span></div>
+        <div class="card-body">
+          <div style="max-height:220px; overflow-y:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="col_plan_date">計画日</th>
+                  <th data-key="col_ordersheet_no">受注番号</th>
+                  <th data-key="col_variant">品番(長さ)</th>
+                  <th class="num" data-key="col_billet_qty">投入本数</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="historyTbody">
+                <tr><td colspan="5" class="empty-note" data-key="empty_history">履歴なし</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: 押出条件 -->
+      <div class="card" id="formCard" style="display:none;">
+        <div class="card-title">
+          <span class="step-num">4</span><span data-key="step4_title">押出条件</span>
+          <span class="edit-badge" id="editBadge" style="display:none;"></span>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="f-label req" data-key="lbl_plan_date">計画日</label>
+              <input type="date" id="fPlanDate" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_pressing_type">プレス種別</label>
+              <select id="fPressingType"></select>
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_machine">設備</label>
+              <select id="fMachine">
+                <option value="1">No.1</option>
+                <option value="2">No.2</option>
+                <option value="3">No.3</option>
+                <option value="4">No.4</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_incharge">担当者</label>
+              <select id="fIncharge"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_discard_thickness">放電しろ (mm)</label>
+              <input type="number" id="fDiscardThickness" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_ram_speed">ラム速度</label>
+              <input type="text" id="fRamSpeed" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_stretch_ratio">ストレッチ率</label>
+              <input type="text" id="fStretchRatio" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_cooling">冷却方式</label>
+              <select id="fCooling">
+                <option value="1">空冷</option>
+                <option value="2">水冷</option>
+                <option value="3">ミスト</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_billet_size">ビレットサイズ (inch)</label>
+              <select id="fBilletSize">
+                <option value="9">9</option>
+                <option value="12">12</option>
+                <option value="14">14</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_billet_length">ビレット長さ (mm)</label>
+              <input type="number" id="fBilletLength" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_billet_qty">ビレット投入本数</label>
+              <input type="number" id="fBilletQty" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_billet_temp">ビレット温度 (℃)</label>
+              <input type="number" id="fBilletTemp" />
+            </div>
+
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_billet_taper">ビレットテーパー加熱</label>
+              <select id="fBilletTaper">
+                <option value="-1">-</option>
+                <option value="0">0</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_die_temp">型温度 (℃)</label>
+              <input type="number" id="fDieTemp" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_die_heat_time">型加熱時間</label>
+              <input type="text" id="fDieHeatTime" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_nbn">nBn</label>
+              <select id="fNbn"></select>
+            </div>
+
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_sub_initial">サブ初期高さ</label>
+              <input type="number" id="fSubInitial" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_initial">初期高さ</label>
+              <input type="number" id="fInitial" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_value_l">サンプル位置 l</label>
+              <input type="text" id="fValueL" />
+            </div>
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_value_m">サンプル位置 m</label>
+              <input type="number" id="fValueM" />
+            </div>
+
+            <div class="form-group">
+              <label class="f-label" data-key="lbl_value_n">サンプル位置 n</label>
+              <input type="number" id="fValueN" />
+            </div>
+            <div class="form-group span4">
+              <label class="f-label" data-key="lbl_note">備考</label>
+              <textarea id="fNote"></textarea>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn-cancel" onclick="resetForm()" data-key="btn_cancel">クリア</button>
+            <button class="btn-save" id="saveBtn" onclick="saveDirective()" data-key="btn_save">指示を保存</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          title: "プレス指示作成",
+          step1_title: "オーダーシート選択(残数量あり)",
+          step2_title: "長さ(品番)・金型選択",
+          step3_title: "この金型の過去の指示(クリックで読込・複製)",
+          step4_title: "押出条件",
+          ph_ordersheet_search: "受注番号・品番で検索",
+          ph_die_search: "型番で検索/選択",
+          col_ordersheet_no: "受注番号", col_pn: "品番", col_delivery: "納期",
+          col_qty: "数量", col_remaining: "残数量", col_plan_date: "計画日",
+          col_variant: "品番(長さ)", col_billet_qty: "投入本数",
+          loading: "読み込み中...", empty_history: "履歴なし",
+          lbl_variant: "定尺(長さ)", lbl_die: "金型",
+          lbl_plan_date: "計画日", lbl_pressing_type: "プレス種別", lbl_machine: "設備",
+          lbl_incharge: "担当者", lbl_discard_thickness: "放電しろ (mm)",
+          lbl_ram_speed: "ラム速度", lbl_stretch_ratio: "ストレッチ率", lbl_cooling: "冷却方式",
+          lbl_billet_size: "ビレットサイズ (inch)", lbl_billet_length: "ビレット長さ (mm)",
+          lbl_billet_qty: "ビレット投入本数", lbl_billet_temp: "ビレット温度 (℃)",
+          lbl_billet_taper: "ビレットテーパー加熱", lbl_die_temp: "型温度 (℃)",
+          lbl_die_heat_time: "型加熱時間", lbl_nbn: "nBn",
+          lbl_sub_initial: "サブ初期高さ", lbl_initial: "初期高さ",
+          lbl_value_l: "サンプル位置 l", lbl_value_m: "サンプル位置 m", lbl_value_n: "サンプル位置 n",
+          lbl_note: "備考", btn_cancel: "クリア", btn_save: "指示を保存",
+        },
+        vi: {
+          title: "Tạo chỉ thị ép",
+          step1_title: "Chọn phiếu đặt hàng (còn số lượng)",
+          step2_title: "Chọn chiều dài (mã SP) / khuôn",
+          step3_title: "Lịch sử chỉ thị của khuôn này (bấm để tải/nhân bản)",
+          step4_title: "Điều kiện ép",
+          ph_ordersheet_search: "Tìm theo số đơn / mã SP",
+          ph_die_search: "Tìm/chọn theo mã khuôn",
+          col_ordersheet_no: "Số đơn", col_pn: "Mã SP", col_delivery: "Ngày giao",
+          col_qty: "SL", col_remaining: "SL còn lại", col_plan_date: "Ngày KH",
+          col_variant: "Mã SP (dài)", col_billet_qty: "SL billet",
+          loading: "Đang tải...", empty_history: "Chưa có lịch sử",
+          lbl_variant: "Chiều dài tiêu chuẩn", lbl_die: "Khuôn",
+          lbl_plan_date: "Ngày kế hoạch", lbl_pressing_type: "Loại ép", lbl_machine: "Máy",
+          lbl_incharge: "Người phụ trách", lbl_discard_thickness: "Độ dày xả (mm)",
+          lbl_ram_speed: "Tốc độ ram", lbl_stretch_ratio: "Tỷ lệ kéo", lbl_cooling: "Kiểu làm mát",
+          lbl_billet_size: "Cỡ billet (inch)", lbl_billet_length: "Dài billet (mm)",
+          lbl_billet_qty: "SL billet nạp", lbl_billet_temp: "Nhiệt độ billet (℃)",
+          lbl_billet_taper: "Gia nhiệt taper billet", lbl_die_temp: "Nhiệt độ khuôn (℃)",
+          lbl_die_heat_time: "TG gia nhiệt khuôn", lbl_nbn: "nBn",
+          lbl_sub_initial: "Chiều cao sub ban đầu", lbl_initial: "Chiều cao ban đầu",
+          lbl_value_l: "Vị trí mẫu l", lbl_value_m: "Vị trí mẫu m", lbl_value_n: "Vị trí mẫu n",
+          lbl_note: "Ghi chú", btn_cancel: "Xóa", btn_save: "Lưu chỉ thị",
+        },
+      };
+
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        document.querySelectorAll("[data-key-placeholder]").forEach((el) => {
+          const k = el.getAttribute("data-key-placeholder");
+          if (dict[lang][k] !== undefined) el.placeholder = dict[lang][k];
+        });
+      }
+
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2200);
+      }
+
+      /* ── 状態 ── */
+      let allOrdersheets = [];
+      let selectedOrdersheet = null;
+      let selectedDie = null;
+      let editingId = null;
+      let masters = { pressingTypes: [], nbn: [], staff: [] };
+
+      /* ── Step 1: オーダーシート ── */
+      async function loadOrdersheets() {
+        const res = await fetch("./php/press_directive/get_ordersheets.php");
+        allOrdersheets = await res.json();
+        renderOrdersheets();
+      }
+
+      function renderOrdersheets() {
+        const q = document.getElementById("ordersheetSearch").value.trim().toUpperCase();
+        const filtered = q
+          ? allOrdersheets.filter((o) =>
+              (o.ordersheet_number ?? "").toUpperCase().includes(q) ||
+              (o.production_number ?? "").toUpperCase().includes(q))
+          : allOrdersheets;
+
+        const tbody = document.getElementById("ordersheetTbody");
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_history}</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((o) => `
+          <tr class="selectable ${selectedOrdersheet?.id === o.id ? "selected" : ""}" onclick="selectOrdersheet(${o.id})">
+            <td>${o.ordersheet_number ?? ""}</td>
+            <td>${o.production_number ?? ""}</td>
+            <td>${o.delivery_date_at ?? "-"}</td>
+            <td class="num">${o.production_quantity}</td>
+            <td class="num">${o.remaining_quantity}</td>
+          </tr>
+        `).join("");
+      }
+
+      function currentLang() {
+        return localStorage.getItem("lang") || "ja";
+      }
+
+      async function selectOrdersheet(id) {
+        selectedOrdersheet = allOrdersheets.find((o) => o.id === id) ?? null;
+        renderOrdersheets();
+        if (!selectedOrdersheet) return;
+
+        const summary = document.getElementById("selectedOrdersheetSummary");
+        summary.innerHTML = `
+          <span class="pn-code">${selectedOrdersheet.production_number ?? ""}</span>
+          　受注番号: ${selectedOrdersheet.ordersheet_number ?? ""}
+          　納期: ${selectedOrdersheet.delivery_date_at ?? "-"}
+          　残数量: ${selectedOrdersheet.remaining_quantity}
+        `;
+
+        document.getElementById("step2Card").style.display = "";
+        selectedDie = null;
+        document.getElementById("dieSearchInput").value = "";
+        document.getElementById("historyCard").style.display = "none";
+        document.getElementById("formCard").style.display = "none";
+
+        await loadVariants(selectedOrdersheet.production_numbers_id);
+      }
+
+      /* ── Step 2: 長さ(品番バリアント) ── */
+      async function loadVariants(productionNumberId) {
+        const res = await fetch(`./php/press_directive/get_variants.php?production_number_id=${productionNumberId}`);
+        const variants = await res.json();
+        const sel = document.getElementById("variantSelect");
+
+        if (!variants.length) {
+          sel.innerHTML = `<option value="">-</option>`;
+          return;
+        }
+
+        sel.innerHTML = variants.map((v) =>
+          `<option value="${v.id}">${v.production_number} (${Number(v.length).toFixed(1)}m)${v.is_default ? " [既定]" : ""}</option>`
+        ).join("");
+      }
+
+      function onVariantChange() {
+        /* 長さ選択は保存時に production_number_variant_id として使うのみ、他画面への影響なし */
+      }
+
+      /* ── Step 2: 金型検索 ── */
+      let dieSearchTimer = null;
+      async function searchDies(q) {
+        clearTimeout(dieSearchTimer);
+        dieSearchTimer = setTimeout(async () => {
+          const url = selectedOrdersheet
+            ? `./php/press_directive/get_dies.php?production_number_id=${selectedOrdersheet.production_numbers_id}`
+            : `./php/press_directive/get_dies.php?q=${encodeURIComponent(q)}`;
+          const res = await fetch(url);
+          const dies = await res.json();
+          renderDieDropdown(dies);
+        }, 200);
+      }
+
+      function renderDieDropdown(dies) {
+        const dd = document.getElementById("dieDropdown");
+        if (!dies.length) {
+          dd.innerHTML = `<div style="color:#999;">該当する金型がありません</div>`;
+          dd.classList.add("show");
+          return;
+        }
+        dd.innerHTML = dies.map((d) =>
+          `<div onclick="selectDie(${d.id}, '${d.die_number}')">${d.die_number}　<span style="color:#999;">${d.production_number ?? ""}</span></div>`
+        ).join("");
+        dd.classList.add("show");
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".die-search-wrap")) {
+          document.getElementById("dieDropdown").classList.remove("show");
+        }
+      });
+
+      async function selectDie(id, dieNumber) {
+        selectedDie = { id, die_number: dieNumber };
+        document.getElementById("dieSearchInput").value = dieNumber;
+        document.getElementById("dieDropdown").classList.remove("show");
+        document.getElementById("historyCard").style.display = "";
+        document.getElementById("formCard").style.display = "";
+        resetForm();
+        await loadHistory(id);
+      }
+
+      /* ── Step 3: 過去の指示履歴 ── */
+      async function loadHistory(diesId) {
+        const res = await fetch(`./php/press_directive/get_directive_history.php?dies_id=${diesId}`);
+        const rows = await res.json();
+        const tbody = document.getElementById("historyTbody");
+
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_history}</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = rows.map((r) => `
+          <tr>
+            <td>${r.plan_date_at ?? "-"}</td>
+            <td>${r.ordersheet_number ?? "-"}</td>
+            <td>${r.variant_production_number ? `${r.variant_production_number} (${Number(r.variant_length).toFixed(1)}m)` : "-"}</td>
+            <td class="num">${r.billet_input_quantity ?? "-"}</td>
+            <td>
+              <button class="btn-cancel" style="padding:3px 8px; font-size:11px;" onclick='loadIntoForm(${JSON.stringify(r).replace(/'/g, "&apos;")}, true)'>編集</button>
+              <button class="btn-cancel" style="padding:3px 8px; font-size:11px;" onclick='loadIntoForm(${JSON.stringify(r).replace(/'/g, "&apos;")}, false)'>複製</button>
+            </td>
+          </tr>
+        `).join("");
+      }
+
+      function loadIntoForm(r, keepId) {
+        editingId = keepId ? r.id : null;
+        document.getElementById("editBadge").style.display = editingId ? "" : "none";
+        document.getElementById("editBadge").textContent = editingId ? `編集中: ID ${editingId}` : "";
+
+        document.getElementById("fPlanDate").value = r.plan_date_at ?? "";
+        document.getElementById("fPressingType").value = r.pressing_type_id ?? "";
+        document.getElementById("fMachine").value = r.press_machine ?? "1";
+        document.getElementById("fIncharge").value = r.incharge_person_id ?? "";
+        document.getElementById("fDiscardThickness").value = r.discard_thickness ?? "";
+        document.getElementById("fRamSpeed").value = r.ram_speed ?? "";
+        document.getElementById("fStretchRatio").value = r.stretch_ratio ?? "";
+        document.getElementById("fCooling").value = r.cooling_type ?? "1";
+        document.getElementById("fBilletSize").value = r.billet_size ?? "9";
+        document.getElementById("fBilletLength").value = r.billet_length ?? "";
+        document.getElementById("fBilletQty").value = r.billet_input_quantity ?? "";
+        document.getElementById("fBilletTemp").value = r.billet_temperature ?? "";
+        document.getElementById("fBilletTaper").value = r.billet_taper_heating ?? "-1";
+        document.getElementById("fDieTemp").value = r.die_temperature ?? "";
+        document.getElementById("fDieHeatTime").value = r.die_heating_time ?? "";
+        document.getElementById("fNbn").value = r.nbn_id ?? "";
+        document.getElementById("fSubInitial").value = r.sub_initial ?? "";
+        document.getElementById("fInitial").value = r.initial ?? "";
+        document.getElementById("fValueL").value = r.value_l ?? "";
+        document.getElementById("fValueM").value = r.value_m ?? "";
+        document.getElementById("fValueN").value = r.value_n ?? "";
+        document.getElementById("fNote").value = r.previous_press_note ?? "";
+
+        if (r.production_number_variant_id) {
+          document.getElementById("variantSelect").value = r.production_number_variant_id;
+        }
+
+        document.getElementById("saveBtn").textContent = editingId ? "更新する" : dict[currentLang()].btn_save;
+        showToast(editingId ? "編集用に読み込みました" : "内容を複製しました(新規として保存されます)");
+      }
+
+      /* ── Step 4: フォーム ── */
+      async function loadMasters() {
+        const res = await fetch("./php/press_directive/get_masters.php");
+        masters = await res.json();
+
+        document.getElementById("fPressingType").innerHTML =
+          masters.pressingTypes.map((t) => `<option value="${t.id}">${t.remarks_jp ?? t.pressing_type}</option>`).join("");
+        document.getElementById("fNbn").innerHTML =
+          `<option value="">-</option>` + masters.nbn.map((n) => `<option value="${n.id}">${n.nbn}</option>`).join("");
+        document.getElementById("fIncharge").innerHTML =
+          `<option value="">-</option>` + masters.staff.map((s) => `<option value="${s.id}">${s.staff_name}</option>`).join("");
+      }
+
+      function resetForm() {
+        editingId = null;
+        document.getElementById("editBadge").style.display = "none";
+        document.querySelectorAll("#formCard input[type=text], #formCard input[type=number], #formCard input[type=date], #formCard textarea")
+          .forEach((el) => { el.value = ""; });
+        document.getElementById("fMachine").value = "1";
+        document.getElementById("fCooling").value = "1";
+        document.getElementById("fBilletSize").value = "9";
+        document.getElementById("fBilletTaper").value = "-1";
+        document.getElementById("fPlanDate").value = new Date().toISOString().slice(0, 10);
+        document.getElementById("saveBtn").textContent = dict[currentLang()].btn_save;
+      }
+
+      async function saveDirective() {
+        if (!selectedDie) { showToast("金型を選択してください", false); return; }
+        if (!document.getElementById("fPlanDate").value) { showToast("計画日を入力してください", false); return; }
+
+        const payload = {
+          id: editingId,
+          dies_id: selectedDie.id,
+          ordersheet_id: selectedOrdersheet?.id ?? null,
+          production_number_variant_id: document.getElementById("variantSelect").value || null,
+          plan_date_at: document.getElementById("fPlanDate").value,
+          pressing_type_id: document.getElementById("fPressingType").value,
+          discard_thickness: document.getElementById("fDiscardThickness").value,
+          ram_speed: document.getElementById("fRamSpeed").value,
+          billet_size: document.getElementById("fBilletSize").value,
+          billet_length: document.getElementById("fBilletLength").value,
+          billet_input_quantity: document.getElementById("fBilletQty").value,
+          billet_temperature: document.getElementById("fBilletTemp").value,
+          billet_taper_heating: document.getElementById("fBilletTaper").value,
+          die_temperature: document.getElementById("fDieTemp").value,
+          die_heating_time: document.getElementById("fDieHeatTime").value,
+          stretch_ratio: document.getElementById("fStretchRatio").value,
+          incharge_person_id: document.getElementById("fIncharge").value,
+          value_l: document.getElementById("fValueL").value,
+          value_m: document.getElementById("fValueM").value,
+          value_n: document.getElementById("fValueN").value,
+          nbn_id: document.getElementById("fNbn").value,
+          press_machine: document.getElementById("fMachine").value,
+          cooling_type: document.getElementById("fCooling").value,
+          sub_initial: document.getElementById("fSubInitial").value,
+          initial: document.getElementById("fInitial").value,
+          previous_press_note: document.getElementById("fNote").value,
+        };
+
+        const url = editingId
+          ? "./php/press_directive/update_directive.php"
+          : "./php/press_directive/save_directive.php";
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const result = await res.json();
+
+        if (result.status !== "ok") {
+          showToast(result.message || "保存に失敗しました", false);
+          return;
+        }
+
+        showToast(editingId ? "更新しました" : "保存しました");
+        resetForm();
+        await loadHistory(selectedDie.id);
+        await loadOrdersheets();
+      }
+
+      /* ── 初期化 ── */
+      setLang(currentLang());
+      loadOrdersheets();
+      loadMasters();
+    </script>
+  </body>
+</html>
