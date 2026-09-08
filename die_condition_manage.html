@@ -15,7 +15,7 @@
         padding: 20px;
       }
 
-      .container { max-width: 1300px; margin: 0 auto; }
+      .container { max-width: 1600px; margin: 0 auto; }
 
       .page-header {
         background: #fff;
@@ -162,11 +162,16 @@
             <thead>
               <tr>
                 <th style="width:220px;">型番</th>
+                <th style="width:110px;">金型移管日</th>
                 <th style="width:160px;">現在のコンディション</th>
                 <th style="width:130px; text-align:right;">総押出長さ (km)</th>
                 <th style="width:110px;">最終プレス日</th>
+                <th style="width:60px; text-align:center;">プレス種別</th>
                 <th style="width:110px; text-align:right;">最終プレス<br>ビレット本数</th>
                 <th style="width:110px; text-align:right;">累計ビレット本数</th>
+                <th style="width:100px; text-align:right;">切り出し量<br>(〇以外)</th>
+                <th style="width:100px; text-align:right;">良品量<br>(〇以外)</th>
+                <th style="width:90px; text-align:right;">良品率</th>
                 <th>変更</th>
               </tr>
             </thead>
@@ -174,14 +179,22 @@
               ${dies.map((d) => {
                 const length = Number(d.total_profile_length);
                 const lengthStyle = "text-align:right;" + (length >= 5.0 ? " color:#c62828; font-weight:bold;" : "");
+                const cut = Number(d.cut_quantity);
+                const good = Number(d.good_quantity);
+                const goodRate = cut > 0 ? `${(good / cut * 100).toFixed(1)}%` : "-";
                 return `
                 <tr id="row-${d.id}">
                   <td>${d.die_number}</td>
+                  <td>${d.die_handover_at ?? "-"}</td>
                   <td>${conditionBadge(d.die_condition_id)}</td>
                   <td style="${lengthStyle}">${length.toFixed(1)}</td>
                   <td>${d.last_press_date_at ?? "-"}</td>
+                  <td style="text-align:center;">${d.last_pressing_type ?? "-"}</td>
                   <td style="text-align:right;">${d.last_billet_quantities ?? "-"}</td>
                   <td style="text-align:right;">${d.total_billet_quantities}</td>
+                  <td style="text-align:right;">${d.cut_quantity}</td>
+                  <td style="text-align:right;">${d.good_quantity}</td>
+                  <td style="text-align:right;">${goodRate}</td>
                   <td>${conditionSelect(d)}</td>
                 </tr>
               `;
