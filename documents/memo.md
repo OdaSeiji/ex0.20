@@ -5592,32 +5592,24 @@ ALTER TABLE m_production_number_variants
 
 **注記:** 09/04の手描き図(上記`20260904-02.png`)は、今回実装した`m_production_number_variants`とほぼ同じ設計(`m_dies` 1:1 `m_production_numbers` 1:多 サブテーブル)を先に構想していたもの。図中では仮に`m_production_number_sub`という名前だったが、DBには既に全く別目的(寸法データ、412件)の`m_production_numbers_sub`テーブルが存在するため、命名衝突を避けて`m_production_number_variants`とした(名前が紛らわしいだけで実体は無関係と確認済み)。
 
-# 2026/09/07
+# 2026/09/08
 
-`m_production_number_variants`作成SQL(9/6にmemo.md記載の統合版)を本番PCで実行完了。`m_production_numbers.production_length IS NOT NULL`件数と`m_production_number_variants`件数の一致を確認済み。これでStep 0/0.5は本番反映まで完了。
+追加したページ
 
-金型コンディション管理画面(`die_condition_manage.html`、9/6追加)は既存テーブルのみ使用のため、本番PCへのスキーマ変更は不要(コードのpull/デプロイのみで動作)。
+<figure style="text-align:center;">
+  <img src="./img/20260908-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
 
-**Step 1: プレス指示画面(`press_directive.html`)新規作成。** オーダーシート受注(既存)→プレス指示作成(今回新規)→生産実績入力(既存)という生産の流れのうち、ex0.11にしか無かった「プレス指示作成」をex0.20に移植。今回はオーダーシートの残数量を見ながら、長さ(品番バリアント)・金型を選んで指示を作る形にした。
+に以下のものを追加する。
 
-```SQL
-ALTER TABLE t_press_directive
-  ADD COLUMN ordersheet_id INT NULL AFTER dies_id,
-  ADD COLUMN production_number_variant_id INT NULL AFTER ordersheet_id;
+- 最終押出の「押出形態〇／◎／●」
+- 品質評価をしているなら歩留まり
+- 移管の有／無
+-
 
-ALTER TABLE t_press_directive
-  ADD CONSTRAINT fk_pd_ordersheet FOREIGN KEY (ordersheet_id) REFERENCES m_ordersheet(id),
-  ADD CONSTRAINT fk_pd_variant FOREIGN KEY (production_number_variant_id) REFERENCES m_production_number_variants(id);
-```
+# 2026/09/10
 
-ローカル環境で実行・成功。両列ともNULL許容(既存のex0.11由来レコードに影響しないため)。**本番PCでも同じSQLを実行する必要あり。**
-
-**長さの保存経路(重要):** `t_press`には既に`press_directive_id`列があり(11,847件中11,786件=99.5%に入力済み)、今回追加した列と合わせて `t_press → t_press_directive → m_production_number_variants.length` の経路で「実績がどの長さ品番の指示に基づいていたか」を逆引きできる。`t_press`側への列追加は不要だった(当初の想定より対応範囲が小さく済んだ)。
-
-**別テーブルは作らず、既存の`t_press_directive`をそのまま拡張した**(`press_daily_report`の指示書ドロップダウン、`billet-charge`、`die_progress`診断が読んでいる既存テーブルへの影響をゼロにするため)。動作確認: `press_daily_report.html`の指示書ドロップダウン・`billet-charge`の指示一覧とも、明示列指定のクエリのため無変更で新規指示を拾えることを確認済み。
-
-新規: `php/press_directive/`配下(`get_ordersheets.php`, `get_variants.php`, `get_dies.php`, `get_masters.php`, `get_directive_history.php`, `save_directive.php`, `update_directive.php`, `press_directive_common.php`)、`press_directive.html`。`index.html`の「📦 生産管理」に導線追加。
-
-Chrome操作で、オーダーシート選択→長さ・金型選択→履歴確認→フォーム入力→保存→編集→更新、の一連の流れを確認済み。
-
-**今回のスコープ外:** ex0.11の`bolster`項目(元々死んでいたフィールド)、Excel/PDF印刷出力、`order_sheet.html`自体の変更、45件の`-ZZZ`複製金型問題への対応。
+金型能力の画面、まずは、金型が使えるのかどうかと言う情報と、
+使えるとしたら、今保有の金型が、後何年分の能力を持っているのか、
+を算出する。
