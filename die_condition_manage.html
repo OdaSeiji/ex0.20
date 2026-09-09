@@ -63,6 +63,7 @@
       .group-header .arrow { transition: transform 0.15s; }
       .group-header.open .arrow { transform: rotate(90deg); }
       .group-header .group-count { color: #777; font-weight: normal; }
+      .group-header .group-extra { color: #2b6ca3; font-weight: normal; }
       .group-content { display: none; }
       .group-content.open { display: block; }
       .group-content > .sub-group { margin: 10px 12px 10px 20px; }
@@ -122,6 +123,7 @@
       const CONDITION_NAMES = { 1: "Trial", 2: "Mass Production Trial", 3: "Mass Production" };
       const PREFIXES = ["CA", "CQ", "CP96", "MSQ", "MXS", "MXQ", "CXS", "MGP", "PS", "XLA"];
       let allDies = [];
+      let PAST_YEARS = [];
       const openGroups = new Set();
 
       // プレフィックスごとのサブ分類文字(数字の直後にこの文字があり、その後が数字またはハイフンなら「あり」)
@@ -210,7 +212,7 @@
         renderList();
       }
 
-      function renderGroupBlock(key, label, count, contentHtml, forceOpen, sub) {
+      function renderGroupBlock(key, label, count, contentHtml, forceOpen, sub, extra) {
         const isOpen = forceOpen || openGroups.has(key);
         return `
           <div class="group${sub ? " sub-group" : ""}">
@@ -218,6 +220,7 @@
               <span class="arrow">▶</span>
               <span>${label}</span>
               <span class="group-count">(${count}件)</span>
+              ${extra ? `<span class="group-extra">${extra}</span>` : ""}
             </div>
             <div class="group-content ${isOpen ? "open" : ""}">${contentHtml}</div>
           </div>
@@ -233,7 +236,7 @@
         const codes = [...new Set(dies.map((d) => baseCodeOf(d.die_number)))].sort();
         return codes.map((code) => {
           const group = dies.filter((d) => baseCodeOf(d.die_number) === code);
-          return renderGroupBlock(`${keyPrefix}:${code}`, code, group.length, renderTable(group), forceOpen, true);
+          return renderGroupBlock(`${keyPrefix}:${code}`, code, group.length, renderTable(group), forceOpen, true, `良品量 ${yearlyGoodLabel(group)}`);
         }).join("");
       }
 
@@ -314,8 +317,17 @@
 
       async function loadList() {
         const res = await fetch("./php/die_condition_manage/get_list.php");
-        allDies = await res.json();
+        const data = await res.json();
+        PAST_YEARS = data.years;
+        allDies = data.dies;
         renderList();
+      }
+
+      function yearlyGoodLabel(group) {
+        return PAST_YEARS.map((y, i) => {
+          const sum = group.reduce((s, d) => s + Number(d[`y${i + 1}_good_quantity`] || 0), 0);
+          return `${y}年:${sum}`;
+        }).join(" / ");
       }
 
       async function changeCondition(dieId, conditionId) {

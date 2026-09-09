@@ -2,6 +2,22 @@
 require_once "../db.php";
 header("Content-Type: application/json; charset=UTF-8");
 
+$currentYear = (int)date("Y");
+$pastYears = [$currentYear - 1, $currentYear - 2, $currentYear - 3];
+
+$yearCaseSql = [];
+$yearSelectSql = [];
+foreach ($pastYears as $i => $y) {
+    $idx = $i + 1;
+    $start = "{$y}-01-01";
+    $end = "{$y}-12-31";
+    $yearCaseSql[] = "SUM(CASE WHEN t_press.pressing_type_id != 1 AND t_press.press_date_at BETWEEN '{$start}' AND '{$end}'
+              THEN IFNULL(q.work_quantity, 0) - IFNULL(q.total_ng, 0) ELSE 0 END) AS y{$idx}_good_quantity";
+    $yearSelectSql[] = "IFNULL(tpl.y{$idx}_good_quantity, 0) AS y{$idx}_good_quantity";
+}
+$yearCaseSql = implode(",\n        ", $yearCaseSql);
+$yearSelectSql = implode(",\n      ", $yearSelectSql);
+
 /*
  * t_using_aging_rack/t_press_quality の集計をメインクエリに直接ネストすると、
  * MariaDBがLATERAL DERIVEDと判断しt_pressの行ごとに再計算してしまい極端に遅くなる
@@ -39,7 +55,8 @@ $sql = "
       lp.last_billet_quantities,
       IFNULL(tpl.total_billet_quantities, 0) AS total_billet_quantities,
       IFNULL(tpl.cut_quantity, 0) AS cut_quantity,
-      IFNULL(tpl.good_quantity, 0) AS good_quantity
+      IFNULL(tpl.good_quantity, 0) AS good_quantity,
+      {$yearSelectSql}
     FROM m_dies d
     LEFT JOIN m_die_conditions c ON d.die_condition_id = c.id
     LEFT JOIN t_die_handover_progress hp ON hp.die_id = d.id
@@ -55,7 +72,8 @@ $sql = "
         MAX(t_press.press_date_at) AS last_press_date_at,
         SUM(t_press.actual_billet_quantities) AS total_billet_quantities,
         SUM(CASE WHEN t_press.pressing_type_id != 1 THEN IFNULL(q.work_quantity, 0) ELSE 0 END) AS cut_quantity,
-        SUM(CASE WHEN t_press.pressing_type_id != 1 THEN IFNULL(q.work_quantity, 0) - IFNULL(q.total_ng, 0) ELSE 0 END) AS good_quantity
+        SUM(CASE WHEN t_press.pressing_type_id != 1 THEN IFNULL(q.work_quantity, 0) - IFNULL(q.total_ng, 0) ELSE 0 END) AS good_quantity,
+        {$yearCaseSql}
       FROM t_press
       JOIN (
         SELECT m_dies.id AS dies_id, m_dies.hole, m_production_numbers.specific_weight
@@ -94,4 +112,4 @@ $sql = "
 
 $rows = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 $pdo->exec("DROP TEMPORARY TABLE IF EXISTS tmp_press_qty");
-echo json_encode($rows);
+echo json_encode(["years" => $pastYears, "dies" => $rows]);
