@@ -5,6 +5,7 @@
   <title>Extrusion Quantity Report</title>
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
@@ -23,6 +24,7 @@
     .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
     .btn-back { background: #546e7a; color: #fff; }
     .btn-csv  { background: #217346; color: #fff; }
+    .btn-excel { background: #185c37; color: #fff; }
     .btn-toggle { background: #8e5ec7; color: #fff; }
 
     .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; transition: opacity .2s; }
@@ -93,6 +95,8 @@
   <div class="toolbar">
     <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
     <button class="btn btn-csv"  onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+    <button class="btn btn-csv"  onclick="exportCombinedCSV()" data-key="btn_csv_all">📥 全体CSV出力（3表統合）</button>
+    <button class="btn btn-excel" onclick="exportExcel()" data-key="btn_excel">📊 Excel出力</button>
     <button class="btn btn-toggle" id="btnToggleView" onclick="toggleView()">📆 月別に展開</button>
   </div>
 
@@ -113,13 +117,45 @@
 
   <div class="chart-wrap">
     <div class="chart-header">
-      <div class="chart-title" data-key="chart_title">📈 押出種別 月別重量（積み上げ）</div>
+      <div class="chart-title" id="chartTitleMain" data-key="chart_title">📈 押出種別 月別重量（積み上げ）</div>
       <div class="chart-switch">
         <button class="chart-switch-btn active" id="btnChartByType" onclick="setChartMode('type')" data-key="chart_by_type">押出種別</button>
         <button class="chart-switch-btn" id="btnChartByMfg" onclick="setChartMode('mfg')" data-key="chart_by_mfg">製造工場</button>
       </div>
     </div>
     <canvas id="myChart"></canvas>
+  </div>
+
+  <div class="section-title" data-key="sec_cut_table">✂️ 切断重量集計（t）</div>
+  <div class="table-wrap">
+    <table id="cutTable">
+      <thead><tr id="cutHead"></tr></thead>
+      <tbody id="cutBody"></tbody>
+    </table>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div class="chart-title" data-key="cut_chart_title">✂️ 押出種別 月別切断重量（積み上げ）</div>
+      <button class="btn btn-csv" id="btnCutCsv" onclick="exportCutCSV()" data-key="btn_csv">📥 CSV出力</button>
+    </div>
+    <canvas id="cutChart"></canvas>
+  </div>
+
+  <div class="section-title" data-key="sec_good_table">✅ 良品重量集計（t）</div>
+  <div class="table-wrap">
+    <table id="goodTable">
+      <thead><tr id="goodHead"></tr></thead>
+      <tbody id="goodBody"></tbody>
+    </table>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div class="chart-title" data-key="good_chart_title">✅ 押出種別 月別良品重量（積み上げ）</div>
+      <button class="btn btn-csv" id="btnGoodCsv" onclick="exportGoodCSV()" data-key="btn_csv">📥 CSV出力</button>
+    </div>
+    <canvas id="goodChart"></canvas>
   </div>
 
   <script>
@@ -132,13 +168,23 @@
         subtitle:   "押出種別 × ビレットサイズ × 製造工場 別：月次投入重量（t）",
         btn_back:   "← 戻る",
         btn_csv:    "📥 CSV出力",
+        btn_csv_all: "📥 全体CSV出力（3表統合）",
+        btn_excel:  "📊 Excel出力",
         label_year: "年度絞り込み：",
         opt_all:    "全期間",
         sec_table:  "📋 重量集計（t）",
+        col_category: "区分",
+        cat_input: "投入重量",
+        cat_cut:   "切断重量",
+        cat_good:  "良品重量",
         chart_title:      "📈 押出種別 月別重量（積み上げ）",
         chart_title_mfg:  "📈 製造工場別 月別重量（積み上げ）",
         chart_by_type: "押出種別",
         chart_by_mfg:  "製造工場",
+        sec_cut_table:  "✂️ 切断重量集計（t）",
+        cut_chart_title:"✂️ 押出種別 月別切断重量（積み上げ）",
+        sec_good_table:  "✅ 良品重量集計（t）",
+        good_chart_title:"✅ 押出種別 月別良品重量（積み上げ）",
         col_type:   "押出種別",
         col_size:   "ビレットサイズ",
         col_mfg:    "製造工場",
@@ -155,13 +201,23 @@
         subtitle:   "Theo Loại ép × Kích thước phôi × Nhà máy：Trọng lượng (t) theo tháng",
         btn_back:   "← Quay lại",
         btn_csv:    "📥 Xuất CSV",
+        btn_csv_all: "📥 Xuất CSV tổng hợp (3 bảng)",
+        btn_excel:  "📊 Xuất Excel",
         label_year: "Lọc theo năm：",
         opt_all:    "Tất cả",
         sec_table:  "📋 Tổng hợp trọng lượng (t)",
+        col_category: "Phân loại",
+        cat_input: "Trọng lượng đầu vào",
+        cat_cut:   "Trọng lượng cắt",
+        cat_good:  "Trọng lượng SP tốt",
         chart_title:      "📈 Trọng lượng theo Loại ép theo tháng（tích lũy）",
         chart_title_mfg:  "📈 Trọng lượng theo Nhà máy theo tháng（tích lũy）",
         chart_by_type: "Loại ép",
         chart_by_mfg:  "Nhà máy",
+        sec_cut_table:  "✂️ Tổng hợp trọng lượng cắt (t)",
+        cut_chart_title:"✂️ Trọng lượng cắt theo Loại ép theo tháng（tích lũy）",
+        sec_good_table:  "✅ Tổng hợp trọng lượng SP tốt (t)",
+        good_chart_title:"✅ Trọng lượng SP tốt theo Loại ép theo tháng（tích lũy）",
         col_type:   "Loại ép",
         col_size:   "KT phôi",
         col_mfg:    "Nhà máy",
@@ -190,12 +246,16 @@
       updateToggleButtonLabel();
       updateChartHeaderLabels();
       if (rawData) renderAll(rawData);
+      if (cutRawData) renderCutSection();
+      if (goodRawData) renderGoodSection();
     }
 
     /* =====================================================
        データ
     ===================================================== */
     let rawData = null;
+    let cutRawData = null;
+    let goodRawData = null;
 
     const TYPE_COLORS = { 1: "#1976d2", 2: "#f57c00", 3: "#2e7d32" };
     const MFG_COLORS  = { 1: "#1976d2", 2: "#ef6c00" };
@@ -218,7 +278,7 @@
       const t = dict[currentLang];
       document.getElementById("btnChartByType").textContent = t.chart_by_type;
       document.getElementById("btnChartByMfg").textContent  = t.chart_by_mfg;
-      const titleEl = document.querySelector(".chart-title");
+      const titleEl = document.getElementById("chartTitleMain");
       if (titleEl) titleEl.textContent = chartMode === "mfg" ? t.chart_title_mfg : t.chart_title;
     }
 
@@ -227,6 +287,18 @@
       rawData = await res.json();
       buildYearFilter(rawData.months);
       renderAll(rawData);
+    }
+
+    async function loadCutData() {
+      const res = await fetch("./php/report_php/get_cutting_weight_monthly.php");
+      cutRawData = await res.json();
+      renderCutSection();
+    }
+
+    async function loadGoodData() {
+      const res = await fetch("./php/report_php/get_good_weight_monthly.php");
+      goodRawData = await res.json();
+      renderGoodSection();
     }
 
     /* =====================================================
@@ -242,11 +314,16 @@
       });
     }
 
-    function applyFilter() { if (rawData) renderAll(rawData); }
+    function applyFilter() {
+      if (rawData) renderAll(rawData);
+      if (cutRawData) renderCutSection();
+      if (goodRawData) renderGoodSection();
+    }
 
-    function filteredMonths() {
+    function filteredMonths(sourceMonths) {
+      const src = sourceMonths || rawData.months;
       const y = document.getElementById("yearFilter").value;
-      return y ? rawData.months.filter(m => m.startsWith(y)) : rawData.months;
+      return y ? src.filter(m => m.startsWith(y)) : src;
     }
 
     /* =====================================================
@@ -314,6 +391,8 @@
       if (!viewExpanded) yearSel.value = "";
       updateToggleButtonLabel();
       if (rawData) renderAll(rawData);
+      if (cutRawData) renderCutSection();
+      if (goodRawData) renderGoodSection();
     }
 
     /* =====================================================
@@ -324,6 +403,20 @@
       const columns = buildColumns(months, viewExpanded);
       renderTable(data, months, columns);
       renderChart(data, columns);
+    }
+
+    function renderCutSection() {
+      const months  = filteredMonths(cutRawData.months);
+      const columns = buildColumns(months, viewExpanded);
+      renderTwoLevelTable(cutRawData, months, columns, "cutHead", "cutBody");
+      renderTypeOnlyChart(cutRawData, columns, "cutChart", "cut");
+    }
+
+    function renderGoodSection() {
+      const months  = filteredMonths(goodRawData.months);
+      const columns = buildColumns(months, viewExpanded);
+      renderTwoLevelTable(goodRawData, months, columns, "goodHead", "goodBody");
+      renderTypeOnlyChart(goodRawData, columns, "goodChart", "good");
     }
 
     function fmtWeight(v) {
@@ -397,6 +490,65 @@
     }
 
     /* =====================================================
+       切断重量テーブル（押出種別 → ビレットサイズ、MFG区分なし）
+    ===================================================== */
+    function renderTwoLevelTable(data, months, columns, headId, bodyId) {
+      const t = dict[currentLang];
+
+      const head = document.getElementById(headId);
+      head.innerHTML =
+        `<th class="label-col col-type">${t.col_type}</th>` +
+        `<th class="label-col col-size">${t.col_size}</th>`;
+      columns.forEach(col => {
+        head.innerHTML += `<th${col.type === "fy-avg" ? ' class="col-fyavg"' : ""}>${columnLabel(col)}</th>`;
+      });
+      head.innerHTML += `<th>${t.col_total}</th>`;
+
+      const body = document.getElementById(bodyId);
+      body.innerHTML = "";
+
+      const colTotals = {};
+      columns.forEach(col => colTotals[col.key] = 0);
+      let grandTotal = 0;
+
+      let prevType = null;
+
+      data.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        let cells = "";
+
+        const typeChanged = row.pressingTypeId !== prevType;
+        cells += `<td class="label-col col-type">${typeChanged ? (t.typeLabel[row.pressingTypeId] ?? row.pressingType ?? "-") : ""}</td>`;
+        cells += `<td class="label-col col-size">φ${row.billetSize}</td>`;
+        prevType = row.pressingTypeId;
+
+        columns.forEach(col => {
+          const v = columnValue(row, col);
+          colTotals[col.key] += v;
+          cells += `<td class="mono${col.type === "fy-avg" ? " col-fyavg" : ""}">${v > 0 ? fmtWeight(v) : ""}</td>`;
+        });
+
+        const rowTotal = months.reduce((s, m) => s + (row.values[m] ?? 0), 0);
+        grandTotal += rowTotal;
+        cells += `<td class="total-col">${fmtWeight(rowTotal)}</td>`;
+
+        tr.innerHTML = cells;
+        body.appendChild(tr);
+      });
+
+      const sumTr = document.createElement("tr");
+      sumTr.className = "sum-row";
+      let sumCells = `<td class="label-col" colspan="2">${t.sum_row}</td>`;
+      columns.forEach(col => {
+        const v = colTotals[col.key];
+        sumCells += `<td${col.type === "fy-avg" ? ' class="col-fyavg"' : ""}>${v > 0 ? fmtWeight(v) : ""}</td>`;
+      });
+      sumCells += `<td class="total-col">${fmtWeight(grandTotal)}</td>`;
+      sumTr.innerHTML = sumCells;
+      body.appendChild(sumTr);
+    }
+
+    /* =====================================================
        グラフ（押出種別ごとの積み上げ棒）
     ===================================================== */
     let chartInstance = null;
@@ -450,6 +602,43 @@
     }
 
     /* =====================================================
+       グラフ（切断重量・良品重量、押出種別ごとの積み上げ棒）
+    ===================================================== */
+    const typeOnlyChartInstances = {};
+
+    function renderTypeOnlyChart(data, columns, canvasId, stackKey) {
+      const t      = dict[currentLang];
+      const labels = columns.map(col => columnLabel(col));
+      const typeIds = [...new Set(data.rows.map(r => r.pressingTypeId))];
+
+      const datasets = typeIds.map(typeId => {
+        const rowsOfType = data.rows.filter(r => r.pressingTypeId === typeId);
+        return {
+          label:           t.typeLabel[typeId] ?? String(typeId),
+          data:            columns.map(col => rowsOfType.reduce((s, r) => s + columnValue(r, col), 0)),
+          backgroundColor: (TYPE_COLORS[typeId] ?? "#999") + "bb",
+          borderColor:     TYPE_COLORS[typeId] ?? "#999",
+          borderWidth:     1,
+          stack:           stackKey,
+        };
+      });
+
+      if (typeOnlyChartInstances[canvasId]) typeOnlyChartInstances[canvasId].destroy();
+      typeOnlyChartInstances[canvasId] = new Chart(document.getElementById(canvasId), {
+        type: "bar",
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          plugins: { legend: { position: "top" } },
+          scales: {
+            y: { beginAtZero: true, stacked: true, title: { display: true, text: "重量 (t)" } },
+            x: { stacked: true },
+          },
+        },
+      });
+    }
+
+    /* =====================================================
        CSV出力
     ===================================================== */
     function exportCSV() {
@@ -478,6 +667,119 @@
       a.click();
     }
 
+    function exportTwoLevelCSV(data, filenamePrefix) {
+      const t      = dict[currentLang];
+      const months = filteredMonths(data.months);
+      const header = [t.col_type, t.col_size, ...months.map(m => m.slice(2).replace("-","/")), t.col_total];
+      const escape = v => `"${String(v).replace(/"/g,'""')}"`;
+      const lines  = [header.map(escape).join(",")];
+
+      data.rows.forEach(row => {
+        let total = 0;
+        const vals = months.map(m => { const v = row.values[m] ?? 0; total += v; return v.toFixed(1); });
+        lines.push([
+          t.typeLabel[row.pressingTypeId] ?? row.pressingType ?? "-",
+          `φ${row.billetSize}`,
+          ...vals,
+          total.toFixed(1),
+        ].map(escape).join(","));
+      });
+
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
+      a.download = `${filenamePrefix}_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function exportCutCSV()  { exportTwoLevelCSV(cutRawData, "切断重量実績"); }
+    function exportGoodCSV() { exportTwoLevelCSV(goodRawData, "良品重量実績"); }
+
+    function sizeLabel(billetSize) {
+      const unit = currentLang === "vi" ? " inch" : "インチ";
+      return `${billetSize}${unit}`;
+    }
+
+    function exportCombinedCSV() {
+      const t = dict[currentLang];
+      const allMonths = [...new Set([
+        ...(rawData?.months ?? []),
+        ...(cutRawData?.months ?? []),
+        ...(goodRawData?.months ?? []),
+      ])].sort();
+      const months  = filteredMonths(allMonths);
+      const columns = buildColumns(months, viewExpanded);
+
+      const header = [
+        t.col_category, t.col_type, t.col_size, t.col_mfg,
+        ...columns.map(columnLabel), t.col_total,
+      ];
+      const escape = v => `"${String(v).replace(/"/g, '""')}"`;
+      const lines  = [header.map(escape).join(",")];
+
+      function pushRows(data, categoryLabel, mfgLabelFor) {
+        if (!data) return;
+        data.rows.forEach(row => {
+          const cells     = columns.map(col => columnValue(row, col).toFixed(1));
+          const rowTotal  = months.reduce((s, m) => s + (row.values[m] ?? 0), 0);
+          lines.push([
+            categoryLabel,
+            t.typeLabel[row.pressingTypeId] ?? row.pressingType ?? "-",
+            sizeLabel(row.billetSize),
+            mfgLabelFor ? (t.mfgLabel[row.mfg] ?? row.mfg) : "",
+            ...cells,
+            rowTotal.toFixed(1),
+          ].map(escape).join(","));
+        });
+      }
+
+      pushRows(rawData,     t.cat_input, true);
+      pushRows(cutRawData,  t.cat_cut,   false);
+      pushRows(goodRawData, t.cat_good,  false);
+
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
+      const a    = document.createElement("a");
+      a.href     = URL.createObjectURL(blob);
+      a.download = `押出実績_統合_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+    }
+
+    function buildSheetAOA(data, hasMfg, months, columns, t) {
+      const header = [t.col_type, t.col_size];
+      if (hasMfg) header.push(t.col_mfg);
+      header.push(...columns.map(columnLabel), t.col_total);
+      const aoa = [header];
+
+      data.rows.forEach(row => {
+        const rowArr = [t.typeLabel[row.pressingTypeId] ?? row.pressingType ?? "-", sizeLabel(row.billetSize)];
+        if (hasMfg) rowArr.push(t.mfgLabel[row.mfg] ?? row.mfg);
+        columns.forEach(col => rowArr.push(Number(columnValue(row, col).toFixed(1))));
+        const rowTotal = months.reduce((s, m) => s + (row.values[m] ?? 0), 0);
+        rowArr.push(Number(rowTotal.toFixed(1)));
+        aoa.push(rowArr);
+      });
+      return aoa;
+    }
+
+    function exportExcel() {
+      const t  = dict[currentLang];
+      const wb = XLSX.utils.book_new();
+
+      [
+        [rawData,     true,  t.cat_input],
+        [cutRawData,  false, t.cat_cut],
+        [goodRawData, false, t.cat_good],
+      ].forEach(([data, hasMfg, sheetName]) => {
+        if (!data) return;
+        const months  = filteredMonths(data.months);
+        const columns = buildColumns(months, viewExpanded);
+        const aoa     = buildSheetAOA(data, hasMfg, months, columns, t);
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), sheetName);
+      });
+
+      XLSX.writeFile(wb, `押出実績_${new Date().toISOString().slice(0,10)}.xlsx`);
+    }
+
     /* =====================================================
        初期化
     ===================================================== */
@@ -485,7 +787,7 @@
       setLang(currentLang);
       document.getElementById("yearFilter").disabled = true;
       document.getElementById("yearFilterRow").classList.add("is-disabled");
-      await loadData();
+      await Promise.all([loadData(), loadCutData(), loadGoodData()]);
     };
   </script>
 </body>
