@@ -5664,3 +5664,96 @@ http://10.163.50.17/ex0.20/production_number.html
 新規、金型、品番登録のメニューは、
 新規、金型、金型部品登録　に変更
 部品の登録画面のnote2は、備考に変更
+
+# 2026/09/15-2
+
+| 日本語                                                         | ベトナム語                                                         | 修正ベトナム語                                                     |
+| -------------------------------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| プレス日報入力                                                 | Nhập báo cáo ngày (Press)                                          | BÁO CÁO HẰNG NGÀY                                                  |
+| 押出日報                                                       | Báo cáo ép ngày                                                    | Báo cáo Đùn                                                        |
+| 戻る                                                           | Quay lại                                                           | Trở lại                                                            |
+| 生産指示書                                                     | Phiếu chỉ thị sản xuất                                             | CTSX                                                               |
+| 日付                                                           | Ngày                                                               | Ngày                                                               |
+| 金型番号                                                       | Số khuôn                                                           | Mã khuôn                                                           |
+| 選択                                                           | Chọn                                                               | Chọn                                                               |
+| 指示書選択                                                     | Chọn phiếu đặt hàng                                                | Chọn phiếu đùn                                                     |
+| 発注書番号・品番で検索                                         | Tìm theo số phiếu / mã SP                                          | Tìm theo số phiếu / mã SP                                          |
+| 発注書番号                                                     | Số phiếu                                                           | Số phiếu                                                           |
+| 品番                                                           | Mã SP                                                              | Mã sản phẩm                                                        |
+| 納期                                                           | Ngày giao                                                          | Kỳ hạn                                                             |
+| キャンセル                                                     | Hủy bỏ                                                             | Hủy bỏ                                                             |
+| 梱包済                                                         | Đã đóng gói                                                        | Đã đóng gói                                                        |
+| 備考                                                           | Ghi chú                                                            | Ghi chú                                                            |
+| 稼働ログ（PLCサンプリング）                                    | Nhật ký PLC (sampling)                                             | Nhật ký PLC (sampling)                                             |
+| 設備                                                           | Máy                                                                | Máy                                                                |
+| 開始                                                           | Bắt đầu                                                            | Bắt đầu                                                            |
+| 終了                                                           | Kết thúc                                                           | Kết thúc                                                           |
+| Billet数                                                       | SL Billet                                                          | SL Billet                                                          |
+| この日のログはありません                                       | Không có log cho ngày này                                          | Không có log cho ngày này                                          |
+| （納期基準）                                                   | （theo ngày giao）                                                 | （theo ngày giao）                                                 |
+| 洗浄済み                                                       | Đã rửa?                                                            | Đã ngâm                                                            |
+| プレス種別                                                     | Loại ép                                                            | Kiểu đùn                                                           |
+| 設備番号                                                       | Số máy                                                             | Số máy                                                             |
+| ビレットサイズ                                                 | Cỡ Billet                                                          | Size billet                                                        |
+| ビレット長さ                                                   | Chiều dài Billet                                                   | Chiều dài Billet                                                   |
+| 計画ビレット数                                                 | SL KH                                                              | Billet kế hoạch                                                    |
+| 実績ビレット数                                                 | SL TT                                                              | Billet thực tế                                                     |
+| プレス時間（開始 - 終了）                                      | Thời gian ép（bắt đầu - kết thúc）                                 | Thời gian đùn                                                      |
+| ラム速度                                                       | Tốc độ Ram                                                         | Tốc độ                                                             |
+| 実測金型温度                                                   | Nhiệt độ khuôn thực đo                                             | Nhiệt độ khuôn thực tế                                             |
+| 担当者                                                         | Người phụ trách                                                    | Người phụ trách                                                    |
+| 押出指示書                                                     | Phiếu chỉ thị ép                                                   | Phiếu đùn                                                          |
+| 実測長さ（SP dài）                                             | SP dài (thực đo)                                                   | Chiều dài thực tế                                                  |
+| ストレッチ                                                     | TL kéo                                                             | Tỉ lệ kéo                                                          |
+| 特記事項                                                       | Ghi chú đặc biệt                                                   | Ghi chú                                                            |
+| ファイル                                                       | Tệp                                                                | Tệp đính kèm                                                       |
+| プレビュー                                                     | Xem trước                                                          | Xem trước                                                          |
+| 図面プレビュー                                                 | Xem trước bản vẽ                                                   | Xem trước bản vẽ                                                   |
+| この形式はプレビューできません。「開く」から確認してください。 | Không thể xem trước định dạng này. Vui lòng nhấn “Mở” để kiểm tra. | Không thể xem trước định dạng này. Vui lòng nhấn “Mở” để kiểm tra. |
+| 開く                                                           | Mở                                                                 | Mở                                                                 |
+| 温度・ラム速度測定                                             | Đo nhiệt độ / tốc độ Ram                                           | Đo nhiệt độ / tốc độ Ram                                           |
+| コンテナ温度                                                   | Nhiệt độ Container                                                 | Nhiệt độ Container                                                 |
+| ラム速度・圧力・温度                                           | Tốc độ / áp lực / nhiệt độ Ram                                     | Tốc độ/Áp suất/Nhiệt độ                                            |
+| 速度                                                           | Tốc độ                                                             | Tốc độ                                                             |
+| 圧力                                                           | Áp lực                                                             | Áp suất                                                            |
+| 温度                                                           | Nhiệt độ                                                           | Nhiệt độ                                                           |
+| ビレット情報                                                   | Thông tin Billet                                                   | Thông tin billet                                                   |
+| 合計本数                                                       | Tổng SL                                                            | Tổng số lượng                                                      |
+| バンドル                                                       | Bundle                                                             | Bundle                                                             |
+| 数量                                                           | SL                                                                 | Số lượng                                                           |
+| ロット                                                         | Lot                                                                | Lot                                                                |
+| 製造                                                           | SX                                                                 | Nguồn                                                              |
+| 検査                                                           | KT                                                                 | Kiểm tra                                                           |
+| 登録データなし                                                 | Chưa có dữ liệu                                                    | Chưa có dữ liệu                                                    |
+| バンドル番号                                                   | Số Bundle                                                          | Số bundle                                                          |
+| 追加                                                           | Thêm                                                               | Thêm                                                               |
+| ラック登録                                                     | Đăng ký Rack                                                       | Đăng ký rack                                                       |
+| 順序                                                           | Thứ tự                                                             | Thứ tự                                                             |
+| ラック                                                         | Rack                                                               | Rack                                                               |
+| ラック番号                                                     | Số Rack                                                            | Số rack                                                            |
+| 定尺・数量登録                                                 | Đăng ký chiều dài / SL                                             | Đăng ký chiều dài sản phẩm                                         |
+| 長さ                                                           | Dài                                                                | Chiều dài                                                          |
+| 合計                                                           | Tổng                                                               | Tổng                                                               |
+| 本                                                             | thanh                                                              | thanh                                                              |
+| 作業時間ログ                                                   | Nhật ký thời gian làm việc                                         | Thời gian thao tác                                                 |
+| 押出時間                                                       | Thời gian ép                                                       | Thời gian đùn                                                      |
+| ストレッチ時間                                                 | Thời gian kéo giãn                                                 | Thời gian kéo                                                      |
+| 切断時間                                                       | Thời gian cắt                                                      | Thời gian cắt                                                      |
+| 停止理由                                                       | Lý do dừng                                                         | Nguyên nhân dừng máy                                               |
+| 保存                                                           | Lưu                                                                | Lưu                                                                |
+| 更新                                                           | Cập nhật                                                           | Cập nhật                                                           |
+| 編集中                                                         | Đang sửa                                                           | Chỉnh sửa                                                          |
+| 設備                                                           | Máy                                                                | Máy                                                                |
+| 種別                                                           | Loại                                                               | Loại                                                               |
+| 期間                                                           | Khoảng thời gian                                                   | Khoảng thời gian                                                   |
+| ダウンロード                                                   | Tải xuống                                                          | Tải xuống                                                          |
+| 実績一覧                                                       | Danh sách kết quả                                                  | Danh sách thực tế                                                  |
+| 金型                                                           | Khuôn                                                              | Khuôn                                                              |
+| 指示書                                                         | Chỉ thị                                                            | Chỉ thị                                                            |
+| 洗浄                                                           | Rửa                                                                | Ngâm khuôn                                                         |
+| 計画数                                                         | SL KH                                                              | Kế hoạch                                                           |
+| 実績数                                                         | SL TT                                                              | Thực tế                                                            |
+| 添付                                                           | Tệp                                                                | Tệp                                                                |
+| 実績データなし                                                 | Chưa có dữ liệu                                                    | Chưa có thực tích                                                  |
+| \<br>                                                          | \<br>                                                              | \<br>                                                              |
+| \<br aria-hidden="true">                                       | \<br aria-hidden="true">                                           | \<br aria-hidden="true">                                           |
