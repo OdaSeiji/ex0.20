@@ -5757,3 +5757,12 @@ http://10.163.50.17/ex0.20/production_number.html
 | 実績データなし                                                 | Chưa có dữ liệu                                                    | Chưa có thực tích                                                  |
 | \<br>                                                          | \<br>                                                              | \<br>                                                              |
 | \<br aria-hidden="true">                                       | \<br aria-hidden="true">                                           | \<br aria-hidden="true">                                           |
+
+# 20260918
+
+T3とTを管理したい。
+
+<figure style="text-align:center;">
+  <img src="./img/20260918-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
