@@ -127,7 +127,7 @@
       const openGroups = new Set();
 
       // プレフィックスごとのサブ分類文字(数字の直後にこの文字があり、その後が数字またはハイフンなら「あり」)
-      const SUB_GROUP_LETTER = { CQ: "T", CP96: "T" };
+      const SUB_GROUP_LETTER = { CP96: "T" };
 
       function prefixOf(dieNumber) {
         return PREFIXES.find((p) => dieNumber.toUpperCase().startsWith(p)) ?? "OTHER";
@@ -242,6 +242,10 @@
 
       // プレフィックスごとの明示的なサブ分類(該当しないものは表示されない)
       const EXPLICIT_SPLITS = {
+        CQ: [
+          { key: "T",  label: "T",  test: (n) => /\dT-/.test(n.toUpperCase()) },
+          { key: "T3", label: "T3", test: (n) => /\dT3-/.test(n.toUpperCase()) },
+        ],
         CXS: [
           { key: "S2", label: "S2", test: (n) => /\dS2-/.test(n.toUpperCase()) },
           { key: "S3", label: "S3", test: (n) => /\dS3-/.test(n.toUpperCase()) },

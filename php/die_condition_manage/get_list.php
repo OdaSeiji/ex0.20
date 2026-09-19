@@ -98,6 +98,7 @@ $sql = "
       WHERE ranked.rn = 1
     ) lp ON lp.dies_id = d.id
     WHERE d.die_number LIKE 'CA%'
+       OR d.die_number REGEXP '^CQ[A-Z0-9]{2}T-'
        OR d.die_number REGEXP '^CQ[A-Z0-9]{2}T3-'
        OR d.die_number REGEXP '^CP96[A-Z0-9]{2}T-'
        OR d.die_number REGEXP '^MSQ[A-Z0-9]{2}B2-'
