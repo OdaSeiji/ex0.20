@@ -255,7 +255,7 @@
       <button onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
-    <h1 data-key="title">金型輸出受領移管一覧</h1>
+    <h1 data-key="title">金型輸出・輸入・固定資産登録</h1>
 
     <div class="toolbar">
       <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
@@ -357,7 +357,7 @@
       ============================================================ */
       const dict = {
         ja: {
-          title:           "金型輸出受領移管一覧",
+          title:           "金型輸出・輸入・固定資産登録",
           col_die:         "型番",
           col_pn:          "品番",
           col_ordered:     "発注日",
@@ -514,6 +514,7 @@
         document.querySelectorAll("#handoverTable tbody tr[data-id]").forEach((tr) => {
           rows.push({
             id:                      Number(tr.dataset.id),
+            die_id:                  tr.dataset.dieId ? Number(tr.dataset.dieId) : null,
             ordered_at:              tr.querySelector('[name="ordered"]').value       || null,
             shipped_at:              tr.querySelector('[name="shipped"]').value       || null,
             instruction_created_at:  tr.querySelector('[name="ins_created"]').value  || null,
@@ -578,6 +579,7 @@
         sorted.forEach((row) => {
           const tr = document.createElement("tr");
           tr.dataset.id = row.id;
+          tr.dataset.dieId = row.die_id ?? "";
           const isChecked = checkedIds.has(Number(row.id));
           if (isChecked) tr.classList.add("checked-row");
 
