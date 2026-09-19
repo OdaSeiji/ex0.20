@@ -1,7 +1,6 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 require_once __DIR__ . "/../db.php";
-require_once __DIR__ . "/production_number_common.php";
 
 $rows = json_decode(file_get_contents("php://input"), true);
 if (!$rows || !is_array($rows)) {
@@ -27,9 +26,6 @@ foreach ($rows as $row) {
     $stmt->execute([$pn, $matId, $len, $area]);
     if ($stmt->rowCount() > 0) {
         $inserted++;
-        if ($len !== null) {
-            saveVariantOptions($pdo, $pdo->lastInsertId(), $pn, $len, []);
-        }
     }
 }
 

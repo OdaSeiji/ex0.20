@@ -2,6 +2,9 @@
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
+// 金型を先に選ぶ運用に対応：指定があれば、その金型の品番のオーダーシートだけに絞り込む
+$productionNumberId = (int)($_GET["production_number_id"] ?? 0);
+
 $sql = "
     SELECT
         o.id,
@@ -38,10 +41,15 @@ $sql = "
         GROUP BY t_packing_box_number.m_ordersheet_id
     ) t20 ON t20.m_ordersheet_id = o.id
     WHERE o.is_available = 1 AND o.production_numbers_id IS NOT NULL
+" . ($productionNumberId > 0 ? " AND o.production_numbers_id = :pnid " : "") . "
     GROUP BY o.id
     HAVING remaining_quantity > 0
     ORDER BY o.delivery_date_at ASC, o.ordersheet_number ASC
 ";
 
-$stmt = $pdo->query($sql);
+$stmt = $pdo->prepare($sql);
+if ($productionNumberId > 0) {
+    $stmt->bindValue(":pnid", $productionNumberId, PDO::PARAM_INT);
+}
+$stmt->execute();
 echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC), JSON_UNESCAPED_UNICODE);

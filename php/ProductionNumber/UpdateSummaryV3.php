@@ -1,6 +1,5 @@
 <?php
   require_once __DIR__ . "/../db.php";
-  require_once __DIR__ . "/production_number_common.php";
 
   try {
     $pdo->beginTransaction();
@@ -44,13 +43,6 @@
     $prepare->bindValue(':id', (INT)$_POST['targetId'], PDO::PARAM_INT);
 
     $prepare->execute();
-
-    $pnId = (int)$_POST['targetId'];
-    $delStmt = $pdo->prepare("DELETE FROM m_production_number_variants WHERE production_number_id = :pn_id");
-    $delStmt->execute([":pn_id" => $pnId]);
-
-    $extraVariants = parseVariantOptions($_POST['variantOptions'] ?? '');
-    saveVariantOptions($pdo, $pnId, $_POST['production_number'], $_POST['production_length'], $extraVariants);
 
     $pdo->commit();
     echo json_encode("Updated");
