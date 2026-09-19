@@ -23,8 +23,10 @@
     .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
     .btn-back { background: #546e7a; color: #fff; }
     .btn-csv  { background: #217346; color: #fff; }
+    .btn-toggle { background: #8e5ec7; color: #fff; }
 
-    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; transition: opacity .2s; }
+    .filter-row.is-disabled { opacity: 0.45; }
     .filter-row label { font-size: 13px; color: #555; }
     .filter-row select { padding: 5px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
 
@@ -43,6 +45,13 @@
     th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; }
     td.label-col { text-align: left; font-weight: bold; min-width: 80px; background: #f5f5f5; position: sticky; left: 0; font-family: "Roboto Mono", monospace; }
     td.total-col { font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+    th.col-fyavg, td.col-fyavg { background: #fff8e1; }
+    tr.sum-row td.col-fyavg { background: #ffecb3; }
+    .fy-toggle-btn {
+      border: none; background: transparent; color: #8e5ec7; cursor: pointer;
+      font-size: 12px; font-weight: bold; padding: 0 2px; vertical-align: middle;
+    }
+    .fy-toggle-btn:hover { text-decoration: underline; }
     tr.sum-row td { background: #e3f2fd; font-weight: bold; color: #1565c0; }
     tr.sum-row td.label-col { background: #bbdefb; }
     tr:hover td { background: #f0f8ff; }
@@ -71,11 +80,12 @@
   <div class="toolbar">
     <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
     <button class="btn btn-csv"  onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+    <button class="btn btn-toggle" id="btnToggleView" onclick="toggleView()">📆 月別に展開</button>
   </div>
 
-  <div class="filter-row">
+  <div class="filter-row is-disabled" id="yearFilterRow">
     <label data-key="label_year">年度絞り込み：</label>
-    <select id="yearFilter" onchange="applyFilter()">
+    <select id="yearFilter" onchange="applyFilter()" disabled>
       <option value="" data-key="opt_all">全期間</option>
     </select>
   </div>
@@ -125,7 +135,13 @@
         sec_extrusion:  "⚖️ ビレット投入量（t）",
         sec_counts:     "🔢 押出回数",
         chart_title:"📈 設備別稼働時間（積み上げ）＋ ビレット投入量 / 良品量",
-        col_total:  "合計",
+        col_total:  "今年度平均",
+        fyLabel:    fy => `${String(fy % 100).padStart(2, "0")}年度(月平均)`,
+        btn_expand:   "📆 月別に展開",
+        btn_collapse: "📅 年度平均で表示",
+        title_expand:   "この年度を月別に展開",
+        title_collapse: "この年度を月平均に戻す",
+        title_avg_excl_current: "当年度(4月〜)の月平均。進行中の当月は除く",
         machine:    n => `設備${n}`,
         sum_row:    "合計",
         count_line: "ビレット投入量 t（合計）",
@@ -142,7 +158,13 @@
         sec_extrusion:  "⚖️ Lượng phôi nạp（t）",
         sec_counts:     "🔢 Số lần ép",
         chart_title:"📈 Giờ HĐ theo máy（tích lũy）＋ Lượng phôi nạp / SP tốt",
-        col_total:  "Tổng",
+        col_total:  "TB năm nay",
+        fyLabel:    fy => `Năm ${String(fy % 100).padStart(2, "0")}(TB tháng)`,
+        btn_expand:   "📆 Xem theo tháng",
+        btn_collapse: "📅 Xem TB năm",
+        title_expand:   "Xem chi tiết theo tháng của năm này",
+        title_collapse: "Quay lại TB tháng của năm này",
+        title_avg_excl_current: "TB tháng của năm tài chính hiện tại (từ tháng 4), không tính tháng hiện tại",
         machine:    n => `Máy ${n}`,
         sum_row:    "Tổng",
         count_line: "Lượng phôi nạp t（tổng）",
@@ -162,6 +184,7 @@
       });
       document.getElementById("btnJa").classList.toggle("active", lang === "ja");
       document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rawData) syncExpandState();
       if (rawData) renderAll(rawData);
     }
 
@@ -180,6 +203,7 @@
       const res = await fetch("./php/report_php/get_machine_monthly.php");
       rawData = await res.json();
       buildYearFilter(rawData.months);
+      syncExpandState();
       renderAll(rawData);
     }
 
@@ -204,17 +228,136 @@
     }
 
     /* =====================================================
+       年度平均表示 ⇔ 月別表示
+       （年度は4月始まり3月終わり。過去年度は月平均1列にまとめ、
+        当年度分は月別のまま表示する。年度平均の列は、その列の
+        ボタンから個別に月別展開／折りたたみができる）
+    ===================================================== */
+    let expandedFYs = new Set(); // 個別に「月別展開」した過去年度の集合
+
+    function fiscalYearOf(monthStr) {
+      const [y, m] = monthStr.split("-").map(Number);
+      return m >= 4 ? y : y - 1;
+    }
+
+    function currentFiscalYear() {
+      const now = new Date();
+      const m = now.getMonth() + 1;
+      return m >= 4 ? now.getFullYear() : now.getFullYear() - 1;
+    }
+
+    // 進行中の当月（例：9月の途中）は日数がそろっていないため、
+    // 右端の「今年度平均」列の計算対象から除外する
+    function currentMonthStr() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    // 「今年度平均」の対象月：当年度（4月〜）のうち、進行中の当月を除いた月
+    // （絞り込み表示の状態に関わらず、常にrawData全体の当年度実績で計算する）
+    function averageMonths() {
+      if (!rawData) return [];
+      const curFY     = currentFiscalYear();
+      const currentMo = currentMonthStr();
+      return rawData.months.filter(m => fiscalYearOf(m) === curFY && m !== currentMo);
+    }
+
+    // 現在のデータに含まれる「当年度より前」の年度一覧（全体・フィルタ前提）
+    function allPastFiscalYears() {
+      if (!rawData) return [];
+      const curFY = currentFiscalYear();
+      return [...new Set(rawData.months.map(fiscalYearOf))].filter(fy => fy < curFY).sort((a, b) => a - b);
+    }
+
+    function buildColumns(months, expandedFYs) {
+      const curFY = currentFiscalYear();
+      const byFY = new Map();
+      months.forEach(m => {
+        const fy = fiscalYearOf(m);
+        if (!byFY.has(fy)) byFY.set(fy, []);
+        byFY.get(fy).push(m);
+      });
+      const columns = [];
+      [...byFY.keys()].sort((a, b) => a - b).forEach(fy => {
+        const fyMonths = byFY.get(fy);
+        const isCurrent = fy === curFY;
+        if (!isCurrent && !expandedFYs.has(fy)) {
+          columns.push({ type: "fy-avg", key: "fy" + fy, fy, months: fyMonths });
+        } else {
+          fyMonths.forEach((m, i) => columns.push({
+            type: "month", key: m, month: m, fy,
+            // 手動で展開した年度だけ、先頭月に「折りたたむ」ボタンを出す
+            collapsible: !isCurrent && i === 0,
+          }));
+        }
+      });
+      return columns;
+    }
+
+    function columnLabel(col) {
+      const t = dict[currentLang];
+      return col.type === "month" ? col.month.slice(2).replace("-", "/") : t.fyLabel(col.fy);
+    }
+
+    function columnValue(mObj, col) {
+      if (col.type === "month") return mObj[col.month] ?? 0;
+      const sum = col.months.reduce((s, m) => s + (mObj[m] ?? 0), 0);
+      // データが揃っていない年度（先頭・末尾の端や、年度絞り込みで一部月だけの
+      // 表示になっている場合）でも実態に合うよう、常に12ではなく実際の月数で割る
+      return sum / (col.months.length || 1);
+    }
+
+    // 年度平均の列見出しについている「▸ 月別に展開」ボタン、
+    // または展開済み年度の先頭月についている「▾ 折りたたむ」ボタン
+    function toggleFY(fy) {
+      if (expandedFYs.has(fy)) expandedFYs.delete(fy); else expandedFYs.add(fy);
+      syncExpandState();
+      if (rawData) renderAll(rawData);
+    }
+
+    // 年度絞り込みドロップダウンの有効/無効、ツールバーボタンの文言を
+    // 現在の展開状況に合わせて更新する
+    function syncExpandState() {
+      const t         = dict[currentLang];
+      const pastFYs   = allPastFiscalYears();
+      const anyExpanded  = expandedFYs.size > 0;
+      const allExpanded  = pastFYs.length > 0 && pastFYs.every(fy => expandedFYs.has(fy));
+
+      const yearSel = document.getElementById("yearFilter");
+      const yearRow = document.getElementById("yearFilterRow");
+      yearSel.disabled = !anyExpanded;
+      yearRow.classList.toggle("is-disabled", !anyExpanded);
+      if (!anyExpanded) yearSel.value = "";
+
+      document.getElementById("btnToggleView").textContent = allExpanded ? t.btn_collapse : t.btn_expand;
+    }
+
+    // ツールバーの「月別に展開」：全年度をまとめて展開／折りたたみ
+    function toggleView() {
+      const pastFYs     = allPastFiscalYears();
+      const allExpanded = pastFYs.length > 0 && pastFYs.every(fy => expandedFYs.has(fy));
+      if (allExpanded) {
+        expandedFYs.clear();
+      } else {
+        pastFYs.forEach(fy => expandedFYs.add(fy));
+      }
+      syncExpandState();
+      if (rawData) renderAll(rawData);
+    }
+
+    /* =====================================================
        描画
     ===================================================== */
     function renderAll(data) {
-      const months = filteredMonths();
-      renderTable("hours",     data, months);
-      renderTable("extrusion", data, months);
-      renderTable("counts",    data, months);
-      renderChart(data, months);
+      const months  = filteredMonths();
+      const columns = buildColumns(months, expandedFYs);
+      renderTable("hours",     data, months, columns);
+      renderTable("extrusion", data, months, columns);
+      renderTable("counts",    data, months, columns);
+      renderChart(data, columns);
     }
 
-    function renderTable(type, data, months) {
+    function renderTable(type, data, months, columns) {
       const t         = dict[currentLang];
       const isHours   = type === "hours";
       const isExtrus  = type === "extrusion";
@@ -226,47 +369,67 @@
       // ヘッダー
       const head = document.getElementById(headId);
       head.innerHTML = `<th class="label-col">設備 / 年月</th>`;
-      months.forEach(m => head.innerHTML += `<th>${m.slice(2).replace("-", "/")}</th>`);
-      head.innerHTML += `<th>${t.col_total}</th>`;
+      columns.forEach(col => {
+        if (col.type === "fy-avg") {
+          head.innerHTML += `<th class="col-fyavg">` +
+            `<button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t.title_expand}">▸</button> ` +
+            `${columnLabel(col)}</th>`;
+        } else if (col.collapsible) {
+          head.innerHTML += `<th>` +
+            `<button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t.title_collapse}">▾</button> ` +
+            `${columnLabel(col)}</th>`;
+        } else {
+          head.innerHTML += `<th>${columnLabel(col)}</th>`;
+        }
+      });
+      head.innerHTML += `<th title="${t.title_avg_excl_current}">${t.col_total}</th>`;
 
       // 行
       const body = document.getElementById(bodyId);
       body.innerHTML = "";
 
+      const avgMonths = averageMonths();
+
       const colTotals = {};
       months.forEach(m => colTotals[m] = 0);
-      let grandTotal = 0;
 
       const decimals = isExtrus ? 0 : 1;
-      const fmt = (v) => isDecimal ? v.toFixed(decimals) : v;
+      const fmt    = (v) => isDecimal ? v.toFixed(decimals) : v;
+      const avgFmt = (v) => v.toFixed(1);
+      // 年度平均列は元の値が整数（押出回数）でも小数になるので、常に小数1桁で丸める
+      const fmtCol = (v, col) => col.type === "fy-avg" ? avgFmt(v) : fmt(v);
 
       data.machines.forEach(mno => {
         const tr  = document.createElement("tr");
         const mObj = dataObj[mno] ?? {};
-        let rowTotal = 0;
         let cells = `<td class="label-col">${t.machine(mno)}</td>`;
 
-        months.forEach(m => {
-          const v = mObj[m] ?? 0;
-          rowTotal     += v;
-          colTotals[m] += v;
-          grandTotal   += v;
-          cells += `<td class="mono">${v > 0 ? fmt(v) : ""}</td>`;
+        columns.forEach(col => {
+          const v = columnValue(mObj, col);
+          cells += `<td class="mono${col.type === "fy-avg" ? " col-fyavg" : ""}">${v > 0 ? fmtCol(v, col) : ""}</td>`;
         });
-        cells += `<td class="total-col">${fmt(rowTotal)}</td>`;
+        months.forEach(m => { colTotals[m] += mObj[m] ?? 0; });
+        // 右端は表示中の実月（進行中の当月を除く）の月平均
+        const rowAvgTotal = avgMonths.reduce((s, m) => s + (mObj[m] ?? 0), 0);
+        const rowAvg = rowAvgTotal / (avgMonths.length || 1);
+        cells += `<td class="total-col">${avgFmt(rowAvg)}</td>`;
         tr.innerHTML = cells;
         body.appendChild(tr);
       });
 
-      // 合計行
+      // 合計行（設備横断の月合計 → その平均）
       const sumTr = document.createElement("tr");
       sumTr.className = "sum-row";
       let sumCells = `<td class="label-col">${t.sum_row}</td>`;
-      months.forEach(m => {
-        const v = colTotals[m];
-        sumCells += `<td>${v > 0 ? fmt(v) : ""}</td>`;
+      columns.forEach(col => {
+        const sum = col.type === "month"
+          ? colTotals[col.month] ?? 0
+          : col.months.reduce((s, m) => s + (colTotals[m] ?? 0), 0) / (col.months.length || 1);
+        sumCells += `<td${col.type === "fy-avg" ? ' class="col-fyavg"' : ""}>${sum > 0 ? fmtCol(sum, col) : ""}</td>`;
       });
-      sumCells += `<td class="total-col">${fmt(grandTotal)}</td>`;
+      const grandAvgTotal = avgMonths.reduce((s, m) => s + (colTotals[m] ?? 0), 0);
+      const grandAvg = grandAvgTotal / (avgMonths.length || 1);
+      sumCells += `<td class="total-col">${avgFmt(grandAvg)}</td>`;
       sumTr.innerHTML = sumCells;
       body.appendChild(sumTr);
     }
@@ -276,9 +439,9 @@
     ===================================================== */
     let chartInstance = null;
 
-    function renderChart(data, months) {
+    function renderChart(data, columns) {
       const t      = dict[currentLang];
-      const labels = months.map(m => m.slice(2).replace("-", "/"));
+      const labels = columns.map(columnLabel);
 
       // 積み上げ棒：設備別稼働時間
       const datasets = data.machines.map((mno, i) => {
@@ -286,7 +449,7 @@
         return {
           type:            "bar",
           label:           t.machine(mno),
-          data:            months.map(m => mObj[m] ?? 0),
+          data:            columns.map(col => columnValue(mObj, col)),
           backgroundColor: PALETTE[i % PALETTE.length] + "bb",
           borderColor:     PALETTE[i % PALETTE.length],
           borderWidth:     1,
@@ -296,8 +459,8 @@
       });
 
       // 折れ線：押出量合計（右軸）
-      const extrusionTotals = months.map(m =>
-        Math.round(data.machines.reduce((sum, mno) => sum + (data.extrusions[mno]?.[m] ?? 0), 0))
+      const extrusionTotals = columns.map(col =>
+        Math.round(data.machines.reduce((sum, mno) => sum + columnValue(data.extrusions[mno] ?? {}, col), 0))
       );
       datasets.push({
         type:            "line",
@@ -313,8 +476,8 @@
       });
 
       // 折れ線：良品量合計（右軸）
-      const goodWeightTotals = months.map(m =>
-        Math.round(data.machines.reduce((sum, mno) => sum + (data.goodWeights[mno]?.[m] ?? 0), 0) * 100) / 100
+      const goodWeightTotals = columns.map(col =>
+        Math.round(data.machines.reduce((sum, mno) => sum + columnValue(data.goodWeights[mno] ?? {}, col), 0) * 100) / 100
       );
       datasets.push({
         type:            "line",
@@ -359,8 +522,13 @@
        CSV出力
     ===================================================== */
     function exportCSV() {
-      const t      = dict[currentLang];
-      const months = filteredMonths();
+      const t         = dict[currentLang];
+      const months    = filteredMonths();
+      const avgMonths = averageMonths();
+      const avgOf     = (mObj) => {
+        const sum = avgMonths.reduce((s, m) => s + (mObj[m] ?? 0), 0);
+        return sum / (avgMonths.length || 1);
+      };
       const header = ["", ...months.map(m => m.slice(2).replace("-","/")), t.col_total];
       const escape = v => `"${String(v).replace(/"/g,'""')}"`;
       const lines  = [header.map(escape).join(",")];
@@ -369,27 +537,24 @@
       lines.push([escape(t.sec_hours)].join(","));
       rawData.machines.forEach(mno => {
         const mObj = rawData.hours[mno] ?? {};
-        let total  = 0;
-        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v.toFixed(1); });
-        lines.push([t.machine(mno), ...vals, total.toFixed(1)].map(escape).join(","));
+        const vals = months.map(m => (mObj[m] ?? 0).toFixed(1));
+        lines.push([t.machine(mno), ...vals, avgOf(mObj).toFixed(1)].map(escape).join(","));
       });
 
       // 押出量
       lines.push([escape(t.sec_extrusion)].join(","));
       rawData.machines.forEach(mno => {
         const mObj = rawData.extrusions[mno] ?? {};
-        let total  = 0;
-        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return Math.round(v); });
-        lines.push([t.machine(mno), ...vals, Math.round(total)].map(escape).join(","));
+        const vals = months.map(m => Math.round(mObj[m] ?? 0));
+        lines.push([t.machine(mno), ...vals, avgOf(mObj).toFixed(1)].map(escape).join(","));
       });
 
       // 押出回数
       lines.push([escape(t.sec_counts)].join(","));
       rawData.machines.forEach(mno => {
         const mObj = rawData.counts[mno] ?? {};
-        let total  = 0;
-        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v; });
-        lines.push([t.machine(mno), ...vals, total].map(escape).join(","));
+        const vals = months.map(m => mObj[m] ?? 0);
+        lines.push([t.machine(mno), ...vals, avgOf(mObj).toFixed(1)].map(escape).join(","));
       });
 
       const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });

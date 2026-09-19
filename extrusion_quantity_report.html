@@ -373,7 +373,9 @@
     function columnValue(row, col) {
       if (col.type === "month") return row.values[col.month] ?? 0;
       const sum = col.months.reduce((s, m) => s + (row.values[m] ?? 0), 0);
-      return sum / 12;
+      // データが揃っていない年度（先頭・末尾の端や、年度絞り込みで一部月だけの
+      // 表示になっている場合）でも実態に合うよう、常に12ではなく実際の月数で割る
+      return sum / (col.months.length || 1);
     }
 
     function updateToggleButtonLabel() {

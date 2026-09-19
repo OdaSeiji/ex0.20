@@ -54,6 +54,7 @@ $sql = "
       AND p.press_machine_no != 0
       AND p.press_start_at   IS NOT NULL
       AND p.press_finish_at  IS NOT NULL
+      AND p.press_date_at    <> '0000-00-00'
     GROUP BY p.press_machine_no, DATE_FORMAT(p.press_date_at, '%Y-%m')
     ORDER BY p.press_machine_no, month
 ";
