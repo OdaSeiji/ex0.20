@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Die Production Number</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Roboto Mono", "Segoe UI", monospace;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1400px; margin: 0 auto; }
+
+      .two-col { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+      .two-col > .card { flex: 1; min-width: 0; margin-bottom: 0; }
+      @media (max-width: 900px) {
+        .two-col { flex-direction: column; }
+      }
+
+      .overview-wrap { max-height: 480px; overflow: auto; border: 1px solid #eee; border-radius: 6px; }
+      #overviewTable { font-size: 15px; border-collapse: collapse; }
+      #overviewTable th, #overviewTable td { white-space: nowrap; padding: 3px 8px; border: 1px solid #ddd; }
+      #overviewTable td.die-number-cell { font-weight: bold; background: #f7f9ff; position: sticky; left: 0; }
+      #overviewTable th:first-child { position: sticky; left: 0; z-index: 1; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+      }
+      .card-title {
+        font-size: 14px; font-weight: bold; color: #1565c0;
+        margin-bottom: 12px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
+        display: flex; align-items: center; gap: 8px;
+      }
+      .card-title .step-num {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 20px; height: 20px; border-radius: 50%; background: #1565c0; color: #fff;
+        font-size: 11px; flex-shrink: 0;
+      }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 7px 10px; border-bottom: 1px solid #eee; text-align: left; }
+      th { color: #777; font-size: 11px; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .del-cell { width: 30px; text-align: right; }
+      .row-del-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
+      .empty-note { color: #999; text-align: center; padding: 16px; }
+
+      input[type="text"] {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 13px; font-family: inherit; width: 100%;
+      }
+
+      .selected-summary {
+        background: #f7f9ff; border: 1px solid #d5e3f7; border-radius: 6px;
+        padding: 10px 14px; margin-top: 10px; font-size: 13px; display: none;
+      }
+      .selected-summary.show { display: block; }
+      .selected-summary .pn-code { font-weight: bold; color: #1565c0; }
+
+      .die-search-wrap { position: relative; }
+      .die-dropdown {
+        position: absolute; top: 100%; left: 0; right: 0; background: #fff;
+        border: 1px solid #ccc; border-radius: 5px; max-height: 220px; overflow-y: auto;
+        z-index: 20; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+      .die-dropdown.show { display: block; }
+      .die-dropdown div { padding: 6px 10px; cursor: pointer; font-size: 13px; }
+      .die-dropdown div:hover { background: #f0f4fa; }
+
+      .add-row { display: flex; gap: 10px; align-items: flex-start; margin-top: 14px; }
+      .add-row .die-search-wrap { flex: 1; }
+      .btn-add { padding: 8px 18px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; white-space: nowrap; }
+      .btn-add:disabled { background: #90a4ae; cursor: default; }
+
+      #toast {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1 data-key="title">金型×品番 登録</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <!-- Step 1: 金型選択 -->
+        <div class="card">
+          <div class="card-title"><span class="step-num">1</span><span data-key="step1_title">金型選択</span></div>
+          <div class="card-body">
+            <div class="die-search-wrap">
+              <input type="text" id="dieSearchInput" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
+              <div class="die-dropdown" id="dieDropdown"></div>
+            </div>
+            <div class="selected-summary" id="selectedDieSummary"></div>
+          </div>
+        </div>
+
+        <!-- Step 2: この金型が作れる品番 -->
+        <div class="card" id="linksCard" style="display:none;">
+          <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">この金型が作れる品番</span></div>
+          <div class="card-body">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="col_pn">品番</th>
+                  <th class="num" data-key="col_length">製品長 (m)</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="linksTbody">
+                <tr><td colspan="3" class="empty-note" data-key="empty_links">登録データなし</td></tr>
+              </tbody>
+            </table>
+
+            <div class="add-row">
+              <div class="die-search-wrap">
+                <input type="text" id="pnSearchInput" data-key-placeholder="ph_pn_search" placeholder="品番で検索して追加" oninput="searchProductionNumbers(this.value)" onfocus="searchProductionNumbers(this.value)" />
+                <div class="die-dropdown" id="pnDropdown"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 全体一覧 -->
+      <div class="card">
+        <div class="card-title"><span data-key="overview_title">全体一覧</span></div>
+        <div class="card-body">
+          <input type="text" id="overviewSearch" data-key-placeholder="ph_overview_search" placeholder="型番で絞り込み" oninput="renderOverview()" style="margin-bottom:10px;" />
+          <div class="overview-wrap">
+            <table id="overviewTable">
+              <thead><tr id="overviewHead"></tr></thead>
+              <tbody id="overviewTbody">
+                <tr><td class="empty-note" data-key="loading">読み込み中...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          title: "金型×品番 登録",
+          step1_title: "金型選択",
+          step2_title: "この金型が作れる品番",
+          ph_die_search: "型番で検索/選択",
+          ph_pn_search: "品番で検索して追加",
+          col_pn: "品番", col_length: "製品長 (m)",
+          empty_links: "登録データなし",
+          overview_title: "全体一覧", ph_overview_search: "型番で絞り込み",
+          col_die_number: "金型番号", col_pn_n: (n) => `品番${n}`,
+          loading: "読み込み中...", empty_overview: "該当する金型がありません",
+        },
+        vi: {
+          title: "Đăng ký Khuôn × Mã SP",
+          step1_title: "Chọn khuôn",
+          step2_title: "Mã SP mà khuôn này có thể sản xuất",
+          ph_die_search: "Tìm/chọn theo mã khuôn",
+          ph_pn_search: "Tìm mã SP để thêm",
+          col_pn: "Mã SP", col_length: "Dài SP (m)",
+          empty_links: "Chưa có dữ liệu",
+          overview_title: "Tổng hợp", ph_overview_search: "Lọc theo mã khuôn",
+          col_die_number: "Mã khuôn", col_pn_n: (n) => `Mã SP ${n}`,
+          loading: "Đang tải...", empty_overview: "Không có khuôn phù hợp",
+        },
+      };
+
+      function currentLang() {
+        return localStorage.getItem("lang") || "ja";
+      }
+
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        document.querySelectorAll("[data-key-placeholder]").forEach((el) => {
+          const k = el.getAttribute("data-key-placeholder");
+          if (dict[lang][k] !== undefined) el.placeholder = dict[lang][k];
+        });
+      }
+
+      function showToast(msg, ok = true) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.style.background = ok ? "#323232" : "#c62828";
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2200);
+      }
+
+      /* ── 状態 ── */
+      let selectedDie = null;
+
+      /* ── Step 1: 金型検索・選択 ── */
+      let dieSearchTimer = null;
+      async function searchDies(q) {
+        clearTimeout(dieSearchTimer);
+        dieSearchTimer = setTimeout(async () => {
+          const res = await fetch(`./php/die_production_number/get_dies.php?q=${encodeURIComponent(q)}`);
+          const dies = await res.json();
+          renderDieDropdown(dies);
+        }, 200);
+      }
+
+      function renderDieDropdown(dies) {
+        const dd = document.getElementById("dieDropdown");
+        if (!dies.length) {
+          dd.innerHTML = `<div style="color:#999;">該当する金型がありません</div>`;
+          dd.classList.add("show");
+          return;
+        }
+        dd.innerHTML = dies.map((d) =>
+          `<div onclick="selectDie(${d.id}, '${d.die_number}')">${d.die_number}　<span style="color:#999;">${d.production_number ?? ""}</span></div>`
+        ).join("");
+        dd.classList.add("show");
+      }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest("#dieSearchInput") && !e.target.closest("#dieDropdown")) {
+          document.getElementById("dieDropdown").classList.remove("show");
+        }
+        if (!e.target.closest("#pnSearchInput") && !e.target.closest("#pnDropdown")) {
+          document.getElementById("pnDropdown").classList.remove("show");
+        }
+      });
+
+      async function selectDie(id, dieNumber) {
+        selectedDie = { id, die_number: dieNumber };
+        document.getElementById("dieSearchInput").value = dieNumber;
+        document.getElementById("dieDropdown").classList.remove("show");
+
+        const summary = document.getElementById("selectedDieSummary");
+        summary.innerHTML = `<span class="pn-code">${dieNumber}</span>`;
+        summary.classList.add("show");
+
+        document.getElementById("linksCard").style.display = "";
+        document.getElementById("pnSearchInput").value = "";
+        await loadLinks();
+      }
+
+      /* ── Step 2: 紐づく品番一覧 ── */
+      async function loadLinks() {
+        const res = await fetch(`./php/die_production_number/get_links.php?die_id=${selectedDie.id}`);
+        const rows = await res.json();
+        renderLinks(rows);
+      }
+
+      function renderLinks(rows) {
+        const tbody = document.getElementById("linksTbody");
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="3" class="empty-note">${dict[currentLang()].empty_links}</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = rows.map((r) => `
+          <tr>
+            <td>${r.production_number ?? ""}</td>
+            <td class="num">${r.production_length != null ? Number(r.production_length).toFixed(1) : "-"}</td>
+            <td class="del-cell"><button type="button" class="row-del-btn" onclick="removeLink(${r.id})">✕</button></td>
+          </tr>
+        `).join("");
+      }
+
+      async function removeLink(id) {
+        const res = await fetch("./php/die_production_number/remove_link.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const result = await res.json();
+        if (result.status !== "ok") { showToast("削除に失敗しました", false); return; }
+        showToast("削除しました");
+        await loadLinks();
+        await loadOverview();
+      }
+
+      /* ── 品番検索・追加 ── */
+      let pnSearchTimer = null;
+      function searchProductionNumbers(q) {
+        if (!selectedDie) return;
+        clearTimeout(pnSearchTimer);
+        pnSearchTimer = setTimeout(async () => {
+          const res = await fetch(`./php/die_production_number/search_production_numbers.php?die_id=${selectedDie.id}&q=${encodeURIComponent(q)}`);
+          const rows = await res.json();
+          renderPnDropdown(rows);
+        }, 200);
+      }
+
+      function renderPnDropdown(rows) {
+        const dd = document.getElementById("pnDropdown");
+        if (!rows.length) {
+          dd.innerHTML = `<div style="color:#999;">該当する品番がありません</div>`;
+          dd.classList.add("show");
+          return;
+        }
+        dd.innerHTML = rows.map((r) =>
+          `<div onclick="addLink(${r.id}, '${r.production_number.replace(/'/g, "&apos;")}')">${r.production_number}　<span style="color:#999;">${r.production_length != null ? Number(r.production_length).toFixed(1) + "m" : ""}</span></div>`
+        ).join("");
+        dd.classList.add("show");
+      }
+
+      async function addLink(productionNumberId, productionNumber) {
+        document.getElementById("pnDropdown").classList.remove("show");
+        const res = await fetch("./php/die_production_number/add_link.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ die_id: selectedDie.id, production_number_id: productionNumberId }),
+        });
+        const result = await res.json();
+        if (result.status !== "ok") { showToast("追加に失敗しました", false); return; }
+        showToast(`${productionNumber} を追加しました`);
+        document.getElementById("pnSearchInput").value = "";
+        await loadLinks();
+        await loadOverview();
+      }
+
+      /* ── 全体一覧 ── */
+      let overviewRows = [];
+
+      async function loadOverview() {
+        const res = await fetch("./php/die_production_number/get_all_links.php");
+        overviewRows = await res.json();
+        renderOverview();
+      }
+
+      function renderOverview() {
+        const t = dict[currentLang()];
+        const q = document.getElementById("overviewSearch").value.trim().toUpperCase();
+        const filtered = q
+          ? overviewRows.filter((r) => r.die_number.toUpperCase().includes(q))
+          : overviewRows;
+
+        const maxCols = filtered.reduce((m, r) => Math.max(m, r.production_numbers.length), 0);
+
+        const head = document.getElementById("overviewHead");
+        head.innerHTML = `<th data-key="col_die_number">${t.col_die_number}</th>`;
+        for (let i = 1; i <= maxCols; i++) {
+          head.innerHTML += `<th>${t.col_pn_n(i)}</th>`;
+        }
+
+        const tbody = document.getElementById("overviewTbody");
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="${maxCols + 1}" class="empty-note">${t.empty_overview}</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = filtered.map((r) => {
+          const dieNum = r.die_number.replace(/'/g, "&apos;");
+          let cells = `<td class="die-number-cell" onclick="selectDieFromOverview(${r.die_id}, '${dieNum}')">${r.die_number}</td>`;
+          for (let i = 0; i < maxCols; i++) {
+            cells += `<td>${r.production_numbers[i] ?? ""}</td>`;
+          }
+          return `<tr>${cells}</tr>`;
+        }).join("");
+      }
+
+      // 一覧表の金型番号をクリックしたら、上部Step1の選択状態に反映してスクロールする
+      function selectDieFromOverview(id, dieNumber) {
+        selectDie(id, dieNumber);
+        document.querySelector(".two-col").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      /* ── 初期化 ── */
+      setLang(currentLang());
+      loadOverview();
+    </script>
+  </body>
+</html>

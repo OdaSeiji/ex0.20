@@ -129,55 +129,21 @@
         </div>
       </div>
 
-      <!-- Step 1: オーダーシート選択 -->
+      <!-- Step 1: 金型選択 -->
       <div class="card">
-        <div class="card-title"><span class="step-num">1</span><span data-key="step1_title">オーダーシート選択(残数量あり)</span></div>
+        <div class="card-title"><span class="step-num">1</span><span data-key="step1_title">金型選択</span></div>
         <div class="card-body">
-          <input type="text" id="ordersheetSearch" data-key-placeholder="ph_ordersheet_search" placeholder="受注番号・品番で検索" oninput="renderOrdersheets()" style="margin-bottom:10px;" />
-          <div style="max-height:260px; overflow-y:auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th data-key="col_ordersheet_no">受注番号</th>
-                  <th data-key="col_pn">品番</th>
-                  <th data-key="col_delivery">納期</th>
-                  <th class="num" data-key="col_qty">数量</th>
-                  <th class="num" data-key="col_remaining">残数量</th>
-                </tr>
-              </thead>
-              <tbody id="ordersheetTbody">
-                <tr><td colspan="5" class="empty-note" data-key="loading">読み込み中...</td></tr>
-              </tbody>
-            </table>
+          <div class="die-search-wrap">
+            <input type="text" id="dieSearchInput" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
+            <div class="die-dropdown" id="dieDropdown"></div>
           </div>
+          <div class="selected-summary" id="selectedDieSummary"></div>
         </div>
       </div>
 
-      <!-- Step 2: 長さ(品番)・金型選択 -->
-      <div class="card" id="step2Card" style="display:none;">
-        <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">長さ(品番)・金型選択</span></div>
-        <div class="card-body">
-          <div class="selected-summary show" id="selectedOrdersheetSummary"></div>
-
-          <div class="form-grid" style="margin-bottom:14px;">
-            <div class="form-group span2">
-              <label class="f-label" data-key="lbl_variant">定尺(長さ)</label>
-              <select id="variantSelect" onchange="onVariantChange()"></select>
-            </div>
-            <div class="form-group span2">
-              <label class="f-label req" data-key="lbl_die">金型</label>
-              <div class="die-search-wrap">
-                <input type="text" id="dieSearchInput" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
-                <div class="die-dropdown" id="dieDropdown"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: 過去の指示履歴 -->
+      <!-- Step 2: 過去の指示履歴 -->
       <div class="card" id="historyCard" style="display:none;">
-        <div class="card-title"><span class="step-num">3</span><span data-key="step3_title">この金型の過去の指示(クリックで読込・複製)</span></div>
+        <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">この金型の過去の指示(クリックで読込・複製)</span></div>
         <div class="card-body">
           <div style="max-height:220px; overflow-y:auto;">
             <table>
@@ -192,6 +158,36 @@
               </thead>
               <tbody id="historyTbody">
                 <tr><td colspan="5" class="empty-note" data-key="empty_history">履歴なし</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: 生産指示(任意)・長さ選択 -->
+      <div class="card" id="step3Card" style="display:none;">
+        <div class="card-title"><span class="step-num">3</span><span data-key="step3_title">生産指示(任意)・長さ選択</span></div>
+        <div class="card-body">
+          <div class="form-group" style="margin-bottom:14px; max-width:320px;">
+            <label class="f-label" data-key="lbl_variant">定尺(長さ)</label>
+            <select id="variantSelect" onchange="onVariantChange()"></select>
+          </div>
+
+          <div class="selected-summary" id="selectedOrdersheetSummary"></div>
+          <input type="text" id="ordersheetSearch" data-key-placeholder="ph_ordersheet_search" placeholder="受注番号・品番で検索" oninput="renderOrdersheets()" style="margin-bottom:10px;" />
+          <div style="max-height:220px; overflow-y:auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th data-key="col_ordersheet_no">受注番号</th>
+                  <th data-key="col_pn">品番</th>
+                  <th data-key="col_delivery">納期</th>
+                  <th class="num" data-key="col_qty">数量</th>
+                  <th class="num" data-key="col_remaining">残数量</th>
+                </tr>
+              </thead>
+              <tbody id="ordersheetTbody">
+                <tr><td colspan="5" class="empty-note" data-key="empty_ordersheet">この品番のオーダーシートはありません(生産指示なしで進められます)</td></tr>
               </tbody>
             </table>
           </div>
@@ -334,9 +330,9 @@
       const dict = {
         ja: {
           title: "プレス指示作成",
-          step1_title: "オーダーシート選択(残数量あり)",
-          step2_title: "長さ(品番)・金型選択",
-          step3_title: "この金型の過去の指示(クリックで読込・複製)",
+          step1_title: "金型選択",
+          step2_title: "この金型の過去の指示(クリックで読込・複製)",
+          step3_title: "生産指示(任意)・長さ選択",
           step4_title: "押出条件",
           ph_ordersheet_search: "受注番号・品番で検索",
           ph_die_search: "型番で検索/選択",
@@ -344,6 +340,7 @@
           col_qty: "数量", col_remaining: "残数量", col_plan_date: "計画日",
           col_variant: "品番(長さ)", col_billet_qty: "投入本数",
           loading: "読み込み中...", empty_history: "履歴なし",
+          empty_ordersheet: "この品番のオーダーシートはありません(生産指示なしで進められます)",
           lbl_variant: "定尺(長さ)", lbl_die: "金型",
           lbl_plan_date: "計画日", lbl_pressing_type: "プレス種別", lbl_machine: "設備",
           lbl_incharge: "担当者", lbl_discard_thickness: "放電しろ (mm)",
@@ -358,9 +355,9 @@
         },
         vi: {
           title: "Tạo chỉ thị ép",
-          step1_title: "Chọn phiếu đặt hàng (còn số lượng)",
-          step2_title: "Chọn chiều dài (mã SP) / khuôn",
-          step3_title: "Lịch sử chỉ thị của khuôn này (bấm để tải/nhân bản)",
+          step1_title: "Chọn khuôn",
+          step2_title: "Lịch sử chỉ thị của khuôn này (bấm để tải/nhân bản)",
+          step3_title: "Phiếu SX (tùy chọn) / Chọn chiều dài",
           step4_title: "Điều kiện ép",
           ph_ordersheet_search: "Tìm theo số đơn / mã SP",
           ph_die_search: "Tìm/chọn theo mã khuôn",
@@ -368,6 +365,7 @@
           col_qty: "SL", col_remaining: "SL còn lại", col_plan_date: "Ngày KH",
           col_variant: "Mã SP (dài)", col_billet_qty: "SL billet",
           loading: "Đang tải...", empty_history: "Chưa có lịch sử",
+          empty_ordersheet: "Không có phiếu đặt hàng cho mã SP này (vẫn có thể tiếp tục không cần phiếu SX)",
           lbl_variant: "Chiều dài tiêu chuẩn", lbl_die: "Khuôn",
           lbl_plan_date: "Ngày kế hoạch", lbl_pressing_type: "Loại ép", lbl_machine: "Máy",
           lbl_incharge: "Người phụ trách", lbl_discard_thickness: "Độ dày xả (mm)",
@@ -409,93 +407,16 @@
       let editingId = null;
       let masters = { pressingTypes: [], nbn: [], staff: [] };
 
-      /* ── Step 1: オーダーシート ── */
-      async function loadOrdersheets() {
-        const res = await fetch("./php/press_directive/get_ordersheets.php");
-        allOrdersheets = await res.json();
-        renderOrdersheets();
-      }
-
-      function renderOrdersheets() {
-        const q = document.getElementById("ordersheetSearch").value.trim().toUpperCase();
-        const filtered = q
-          ? allOrdersheets.filter((o) =>
-              (o.ordersheet_number ?? "").toUpperCase().includes(q) ||
-              (o.production_number ?? "").toUpperCase().includes(q))
-          : allOrdersheets;
-
-        const tbody = document.getElementById("ordersheetTbody");
-        if (!filtered.length) {
-          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_history}</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = filtered.map((o) => `
-          <tr class="selectable ${selectedOrdersheet?.id === o.id ? "selected" : ""}" onclick="selectOrdersheet(${o.id})">
-            <td>${o.ordersheet_number ?? ""}</td>
-            <td>${o.production_number ?? ""}</td>
-            <td>${o.delivery_date_at ?? "-"}</td>
-            <td class="num">${o.production_quantity}</td>
-            <td class="num">${o.remaining_quantity}</td>
-          </tr>
-        `).join("");
-      }
-
       function currentLang() {
         return localStorage.getItem("lang") || "ja";
       }
 
-      async function selectOrdersheet(id) {
-        selectedOrdersheet = allOrdersheets.find((o) => o.id === id) ?? null;
-        renderOrdersheets();
-        if (!selectedOrdersheet) return;
-
-        const summary = document.getElementById("selectedOrdersheetSummary");
-        summary.innerHTML = `
-          <span class="pn-code">${selectedOrdersheet.production_number ?? ""}</span>
-          　受注番号: ${selectedOrdersheet.ordersheet_number ?? ""}
-          　納期: ${selectedOrdersheet.delivery_date_at ?? "-"}
-          　残数量: ${selectedOrdersheet.remaining_quantity}
-        `;
-
-        document.getElementById("step2Card").style.display = "";
-        selectedDie = null;
-        document.getElementById("dieSearchInput").value = "";
-        document.getElementById("historyCard").style.display = "none";
-        document.getElementById("formCard").style.display = "none";
-
-        await loadVariants(selectedOrdersheet.production_numbers_id);
-      }
-
-      /* ── Step 2: 長さ(品番バリアント) ── */
-      async function loadVariants(productionNumberId) {
-        const res = await fetch(`./php/press_directive/get_variants.php?production_number_id=${productionNumberId}`);
-        const variants = await res.json();
-        const sel = document.getElementById("variantSelect");
-
-        if (!variants.length) {
-          sel.innerHTML = `<option value="">-</option>`;
-          return;
-        }
-
-        sel.innerHTML = variants.map((v) =>
-          `<option value="${v.id}">${v.production_number} (${Number(v.length).toFixed(1)}m)${v.is_default ? " [既定]" : ""}</option>`
-        ).join("");
-      }
-
-      function onVariantChange() {
-        /* 長さ選択は保存時に production_number_variant_id として使うのみ、他画面への影響なし */
-      }
-
-      /* ── Step 2: 金型検索 ── */
+      /* ── Step 1: 金型検索・選択（起点） ── */
       let dieSearchTimer = null;
       async function searchDies(q) {
         clearTimeout(dieSearchTimer);
         dieSearchTimer = setTimeout(async () => {
-          const url = selectedOrdersheet
-            ? `./php/press_directive/get_dies.php?production_number_id=${selectedOrdersheet.production_numbers_id}`
-            : `./php/press_directive/get_dies.php?q=${encodeURIComponent(q)}`;
-          const res = await fetch(url);
+          const res = await fetch(`./php/press_directive/get_dies.php?q=${encodeURIComponent(q)}`);
           const dies = await res.json();
           renderDieDropdown(dies);
         }, 200);
@@ -509,7 +430,7 @@
           return;
         }
         dd.innerHTML = dies.map((d) =>
-          `<div onclick="selectDie(${d.id}, '${d.die_number}')">${d.die_number}　<span style="color:#999;">${d.production_number ?? ""}</span></div>`
+          `<div onclick="selectDie(${d.id}, '${d.die_number}', ${d.production_number_id ?? "null"}, '${(d.production_number ?? "").replace(/'/g, "&apos;")}')">${d.die_number}　<span style="color:#999;">${d.production_number ?? ""}</span></div>`
         ).join("");
         dd.classList.add("show");
       }
@@ -520,17 +441,33 @@
         }
       });
 
-      async function selectDie(id, dieNumber) {
-        selectedDie = { id, die_number: dieNumber };
+      async function selectDie(id, dieNumber, productionNumberId, productionNumber) {
+        selectedDie = { id, die_number: dieNumber, production_number_id: productionNumberId };
         document.getElementById("dieSearchInput").value = dieNumber;
         document.getElementById("dieDropdown").classList.remove("show");
+
+        const dieSummary = document.getElementById("selectedDieSummary");
+        dieSummary.innerHTML = `<span class="pn-code">${dieNumber}</span>${productionNumber ? `　品番: ${productionNumber}` : ""}`;
+        dieSummary.classList.add("show");
+
         document.getElementById("historyCard").style.display = "";
+        document.getElementById("step3Card").style.display = "";
         document.getElementById("formCard").style.display = "";
+
+        selectedOrdersheet = null;
+        document.getElementById("selectedOrdersheetSummary").innerHTML = "";
+        document.getElementById("selectedOrdersheetSummary").classList.remove("show");
+        document.getElementById("ordersheetSearch").value = "";
+
         resetForm();
-        await loadHistory(id);
+        await Promise.all([
+          loadHistory(id),
+          loadOrdersheetsForDie(productionNumberId),
+          loadVariants(productionNumberId),
+        ]);
       }
 
-      /* ── Step 3: 過去の指示履歴 ── */
+      /* ── Step 2: 過去の指示履歴 ── */
       async function loadHistory(diesId) {
         const res = await fetch(`./php/press_directive/get_directive_history.php?dies_id=${diesId}`);
         const rows = await res.json();
@@ -589,6 +526,85 @@
 
         document.getElementById("saveBtn").textContent = editingId ? "更新する" : dict[currentLang()].btn_save;
         showToast(editingId ? "編集用に読み込みました" : "内容を複製しました(新規として保存されます)");
+      }
+
+      /* ── Step 3: 生産指示(オーダーシート・任意) ── */
+      async function loadOrdersheetsForDie(productionNumberId) {
+        const url = productionNumberId
+          ? `./php/press_directive/get_ordersheets.php?production_number_id=${productionNumberId}`
+          : `./php/press_directive/get_ordersheets.php`;
+        const res = await fetch(url);
+        allOrdersheets = await res.json();
+        renderOrdersheets();
+      }
+
+      function renderOrdersheets() {
+        const q = document.getElementById("ordersheetSearch").value.trim().toUpperCase();
+        const filtered = q
+          ? allOrdersheets.filter((o) =>
+              (o.ordersheet_number ?? "").toUpperCase().includes(q) ||
+              (o.production_number ?? "").toUpperCase().includes(q))
+          : allOrdersheets;
+
+        const tbody = document.getElementById("ordersheetTbody");
+        if (!filtered.length) {
+          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_ordersheet}</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered.map((o) => `
+          <tr class="selectable ${selectedOrdersheet?.id === o.id ? "selected" : ""}" onclick="selectOrdersheet(${o.id})">
+            <td>${o.ordersheet_number ?? ""}</td>
+            <td>${o.production_number ?? ""}</td>
+            <td>${o.delivery_date_at ?? "-"}</td>
+            <td class="num">${o.production_quantity}</td>
+            <td class="num">${o.remaining_quantity}</td>
+          </tr>
+        `).join("");
+      }
+
+      function selectOrdersheet(id) {
+        // 任意項目のため、選択中の行を再クリックすると選択解除する
+        selectedOrdersheet = selectedOrdersheet?.id === id ? null : (allOrdersheets.find((o) => o.id === id) ?? null);
+        renderOrdersheets();
+
+        const summary = document.getElementById("selectedOrdersheetSummary");
+        if (!selectedOrdersheet) {
+          summary.innerHTML = "";
+          summary.classList.remove("show");
+          return;
+        }
+        summary.innerHTML = `
+          <span class="pn-code">${selectedOrdersheet.production_number ?? ""}</span>
+          　受注番号: ${selectedOrdersheet.ordersheet_number ?? ""}
+          　納期: ${selectedOrdersheet.delivery_date_at ?? "-"}
+          　残数量: ${selectedOrdersheet.remaining_quantity}
+        `;
+        summary.classList.add("show");
+      }
+
+      /* ── Step 3: 長さ(品番バリアント) ── */
+      async function loadVariants(productionNumberId) {
+        if (!productionNumberId) {
+          document.getElementById("variantSelect").innerHTML = `<option value="">-</option>`;
+          return;
+        }
+        const res = await fetch(`./php/press_directive/get_variants.php?production_number_id=${productionNumberId}`);
+        const variants = await res.json();
+        const sel = document.getElementById("variantSelect");
+
+        if (!variants.length) {
+          sel.innerHTML = `<option value="">-</option>`;
+          return;
+        }
+
+        sel.innerHTML = variants.map((v) =>
+          `<option value="${v.id}">${v.production_number} (${Number(v.length).toFixed(1)}m)${v.is_default ? " [既定]" : ""}</option>`
+        ).join("");
+      }
+
+      function onVariantChange() {
+        /* 長さ選択は保存時に production_number_variant_id として使うのみ、他画面への影響なし */
       }
 
       /* ── Step 4: フォーム ── */
@@ -669,12 +685,11 @@
         showToast(editingId ? "更新しました" : "保存しました");
         resetForm();
         await loadHistory(selectedDie.id);
-        await loadOrdersheets();
+        await loadOrdersheetsForDie(selectedDie.production_number_id);
       }
 
       /* ── 初期化 ── */
       setLang(currentLang());
-      loadOrdersheets();
       loadMasters();
     </script>
   </body>

@@ -1,7 +1,6 @@
 <?php
   /* 21/09/05 */
   require_once __DIR__ . "/../db.php";
-  require_once __DIR__ . "/production_number_common.php";
 
   try {
     $pdo->beginTransaction();
@@ -68,9 +67,6 @@ $prepare->bindValue(':production_category2_id', $_POST['production_category2_id'
 
     $prepare->execute();
     $pnId = $pdo->lastInsertId();
-
-    $extraVariants = parseVariantOptions($_POST['variantOptions'] ?? '');
-    saveVariantOptions($pdo, $pnId, $_POST['production_number'], $_POST['production_length'], $extraVariants);
 
     $pdo->commit();
     echo json_encode("INSERTED");

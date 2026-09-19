@@ -7,7 +7,8 @@ $keyword = isset($_GET["q"]) ? trim($_GET["q"]) : "";
 
 if ($productionNumberId > 0) {
     $stmt = $pdo->prepare("
-        SELECT m_dies.id, m_dies.die_number, m_production_numbers.production_number
+        SELECT m_dies.id, m_dies.die_number, m_dies.production_number_id,
+               m_production_numbers.production_number
         FROM m_dies
         LEFT JOIN m_production_numbers ON m_dies.production_number_id = m_production_numbers.id
         WHERE m_dies.production_number_id = :id AND IFNULL(m_dies.is_disable, 0) = 0
@@ -16,7 +17,8 @@ if ($productionNumberId > 0) {
     $stmt->execute([":id" => $productionNumberId]);
 } else {
     $stmt = $pdo->prepare("
-        SELECT m_dies.id, m_dies.die_number, m_production_numbers.production_number
+        SELECT m_dies.id, m_dies.die_number, m_dies.production_number_id,
+               m_production_numbers.production_number
         FROM m_dies
         LEFT JOIN m_production_numbers ON m_dies.production_number_id = m_production_numbers.id
         WHERE m_dies.die_number LIKE :keyword AND IFNULL(m_dies.is_disable, 0) = 0

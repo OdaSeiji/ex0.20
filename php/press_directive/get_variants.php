@@ -10,7 +10,7 @@ if ($productionNumberId === 0) {
 
 $stmt = $pdo->prepare("
     SELECT id, production_number, length, is_default
-    FROM m_production_number_variants
+    FROM m_die_production_number_variants
     WHERE production_number_id = :id
     ORDER BY is_default DESC, length
 ");
