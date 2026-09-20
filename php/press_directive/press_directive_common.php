@@ -8,7 +8,7 @@ function toStrOrNull($v) {
 
 function directiveColumns() {
     return [
-        "dies_id", "plan_date_at",
+        "dies_id", "die_production_number_variant_id", "plan_date_at",
         "pressing_type_id", "discard_thickness", "ram_speed", "billet_size", "billet_length",
         "billet_input_quantity", "billet_temperature", "billet_taper_heating",
         "die_temperature", "die_heating_time", "stretch_ratio", "incharge_person_id",
@@ -20,7 +20,7 @@ function directiveColumns() {
 function bindDirectiveValues($stmt, $p) {
     $stmt->bindValue(":dies_id", (int)$p["dies_id"], PDO::PARAM_INT);
 
-    foreach (["pressing_type_id", "discard_thickness",
+    foreach (["die_production_number_variant_id", "pressing_type_id", "discard_thickness",
               "billet_size", "billet_length", "billet_input_quantity", "billet_temperature",
               "billet_taper_heating", "die_temperature", "incharge_person_id", "value_m", "value_n",
               "nbn_id", "press_machine", "cooling_type", "sub_initial", "initial"] as $col) {

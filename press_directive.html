@@ -52,7 +52,6 @@
         margin-bottom: 12px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
         display: flex; align-items: center; gap: 8px;
       }
-      .card.collapsed .card-body { display: none; }
       .card-title .step-num {
         display: inline-flex; align-items: center; justify-content: center;
         width: 20px; height: 20px; border-radius: 50%; background: #1565c0; color: #fff;
@@ -64,42 +63,44 @@
       th { color: #777; font-size: 11px; }
       tr.selectable { cursor: pointer; }
       tr.selectable:hover td { background: #f7f9ff; }
+      tr.selectable:focus { outline: 2px solid #1565c0; outline-offset: -2px; }
       tr.selected td { background: #e8f1ff; font-weight: bold; }
       .num { text-align: right; font-variant-numeric: tabular-nums; }
-      .neg { color: #c62828; }
 
       input[type="text"], input[type="date"], input[type="number"], select, textarea {
         padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
         font-size: 13px; font-family: inherit; width: 100%;
       }
-      textarea { resize: vertical; min-height: 50px; }
+      textarea { resize: vertical; min-height: 44px; }
 
-      .selected-summary {
-        background: #f7f9ff; border: 1px solid #d5e3f7; border-radius: 6px;
-        padding: 10px 14px; margin-bottom: 12px; font-size: 13px; display: none;
+      /* 金型選択の1段バー(ex0.11のdie-set__wrapper相当): 各項目を罫線ボックス+左ラベルで区切る */
+      .die-header-bar {
+        padding: 4px 0; display: flex; flex-wrap: wrap; align-items: stretch; gap: 0;
       }
-      .selected-summary.show { display: block; }
-      .selected-summary .pn-code { font-weight: bold; color: #1565c0; }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px 16px;
+      .die-header-item {
+        display: flex; flex-direction: row; align-items: center; gap: 8px;
+        border: 1px solid #9fb8dd; background: #fff;
+        padding: 6px 12px; margin: 2px; box-sizing: border-box;
       }
-      .form-group { display: flex; flex-direction: column; gap: 4px; }
-      .form-group.span2 { grid-column: span 2; }
-      .form-group.span4 { grid-column: span 4; }
-      label.f-label { font-size: 11px; font-weight: bold; color: #555; }
-      label.f-label .req { color: #c62828; }
+      .die-header-item.hb-die-number { width: 270px; }
+      .die-header-item.hb-die-size { width: 160px; }
+      .die-header-item.hb-product { width: 300px; }
+      .die-header-item.hb-unit-weight { width: 150px; }
+      .die-header-item.work-length { width: 170px; }
+      .die-header-item .hb-label {
+        font-size: 11px; color: #1565c0; font-weight: bold; white-space: nowrap;
+      }
+      .die-header-item .hb-value { font-size: 15px; font-weight: bold; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .die-header-item.hb-die-number .hb-value,
+      .die-header-item.hb-die-number input,
+      .die-header-item.hb-product .hb-value,
+      .die-header-item.hb-product select { font-size: 17px; }
+      .die-header-item.work-length .hb-value { font-size: 22px; color: #e65100; }
+      .die-header-item.work-length .hb-value .unit { font-size: 12px; font-weight: normal; color: #777; }
+      #productSelect { width: 100%; }
+      #fPressingType, #fPressingType option { font-family: "MS Gothic", "ＭＳ ゴシック", monospace; }
 
-      .btn-row { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
-      .btn-save { background: #1565c0; color: #fff; padding: 9px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-      .btn-save:disabled { background: #90a4ae; cursor: default; }
-      .btn-cancel { background: #9e9e9e; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; }
-      .edit-badge { background: #e65100; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
-
-      .empty-note { color: #999; text-align: center; padding: 16px; }
-      .die-search-wrap { position: relative; }
+      .die-search-wrap { position: relative; width: 100%; }
       .die-dropdown {
         position: absolute; top: 100%; left: 0; right: 0; background: #fff;
         border: 1px solid #ccc; border-radius: 5px; max-height: 200px; overflow-y: auto;
@@ -107,7 +108,47 @@
       }
       .die-dropdown.show { display: block; }
       .die-dropdown div { padding: 6px 10px; cursor: pointer; font-size: 13px; }
-      .die-dropdown div:hover { background: #f0f4fa; }
+      .die-dropdown div:hover, .die-dropdown div.active { background: #e8f1ff; }
+
+      .product-pick-note { font-size: 12px; color: #999; margin-top: 6px; }
+      .product-pick-note.warn { color: #c62828; }
+
+      /* 押出条件: card1と同じくラベル+input横並びのボックスを並べる */
+      .form-grid { display: flex; flex-wrap: wrap; }
+      .form-item {
+        display: flex; flex-direction: column;
+        border: 1px solid #e0c66a; background: #fff8e1;
+        padding: 4px 8px; margin: 2px; box-sizing: border-box;
+        transition: background 0.15s, border-color 0.15s;
+      }
+      .form-item.complete, .form-item.static { background: #fff; border-color: #ccc; }
+      .form-item .fi-row { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+      .fi-label { font-size: 11px; font-weight: bold; color: #555; white-space: nowrap; }
+      .fi-prev { display: block; font-size: 10px; color: #1565c0; white-space: nowrap; min-height: 12px; margin-top: 2px; }
+      .form-item input, .form-item select {
+        background: transparent; border: none; padding: 3px 2px; font-size: 13px; width: 62px;
+      }
+      .form-item select { width: auto; }
+      .form-item.fw-date input { width: 118px; }
+      .form-item.fw-wide select { min-width: 110px; }
+      .form-item.full { width: 100%; }
+      .form-item.full .fi-row { align-items: flex-start; }
+      .form-item.full textarea {
+        background: transparent; border: none; padding: 3px 2px; font-size: 13px; flex: 1; width: auto; min-height: 40px;
+      }
+
+      .btn-row { display: flex; gap: 10px; margin-top: 16px; align-items: center; flex-wrap: wrap; }
+      .btn-save { background: #1565c0; color: #fff; padding: 9px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-save:disabled { background: #90a4ae; cursor: default; }
+      .btn-update { background: #e65100; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-update:disabled { background: #90a4ae; cursor: default; }
+      .btn-print { background: #2e7d32; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-print:disabled { background: #90a4ae; cursor: default; }
+      .btn-cancel { background: #9e9e9e; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; }
+      .edit-badge { background: #e65100; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+      .delete-hint { font-size: 12px; color: #999; }
+
+      .empty-note { color: #999; text-align: center; padding: 16px; }
 
       #toast {
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -115,6 +156,34 @@
         font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
       }
       #toast.show { opacity: 1; }
+
+      dialog#deleteDialog {
+        border: none; border-radius: 10px; padding: 20px 24px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 14px;
+      }
+      dialog#deleteDialog::backdrop { background: rgba(0,0,0,0.4); }
+      dialog#deleteDialog .dlg-btn-row { display: flex; gap: 10px; margin-top: 16px; justify-content: flex-end; }
+      dialog#deleteDialog button { padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; }
+      dialog#deleteDialog .dlg-cancel { background: #9e9e9e; color: #fff; }
+      dialog#deleteDialog .dlg-delete { background: #c62828; color: #fff; }
+
+      .fig-btn {
+        padding: 4px 10px; border: 1px solid #1565c0; background: #fff; color: #1565c0;
+        border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; margin-left: 4px;
+      }
+      .fig-btn:hover { background: #e8f1ff; }
+
+      dialog#figDialog {
+        border: none; border-radius: 10px; padding: 16px; max-width: 90vw; max-height: 90vh;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      dialog#figDialog::backdrop { background: rgba(0,0,0,0.5); }
+      dialog#figDialog .fig-title { font-size: 14px; font-weight: bold; color: #1565c0; margin-bottom: 10px; }
+      dialog#figDialog img { max-width: 100%; max-height: 80vh; display: block; }
+      dialog#figDialog .fig-close-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+      dialog#figDialog .fig-close-row button {
+        padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; background: #9e9e9e; color: #fff;
+      }
     </style>
   </head>
   <body>
@@ -129,199 +198,220 @@
         </div>
       </div>
 
-      <!-- Step 1: 金型選択 -->
+      <!-- 金型・品番選択 -->
       <div class="card">
-        <div class="card-title"><span class="step-num">1</span><span data-key="step1_title">金型選択</span></div>
         <div class="card-body">
-          <div class="die-search-wrap">
-            <input type="text" id="dieSearchInput" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
-            <div class="die-dropdown" id="dieDropdown"></div>
+          <div class="die-header-bar">
+            <div class="die-header-item hb-die-number">
+              <span class="hb-label" data-key="hb_die_number">型番</span>
+              <div class="die-search-wrap">
+                <input type="text" id="dieSearchInput" autocomplete="off" data-key-placeholder="ph_die_search" placeholder="型番で検索/選択" oninput="searchDies(this.value)" onfocus="searchDies(this.value)" />
+                <div class="die-dropdown" id="dieDropdown"></div>
+              </div>
+            </div>
+            <div class="die-header-item hb-die-size">
+              <span class="hb-label" data-key="hb_die_size">金型サイズ</span>
+              <span class="hb-value" id="hbDieSize">-</span>
+            </div>
+            <div class="die-header-item hb-product">
+              <span class="hb-label" data-key="hb_product">品番</span>
+              <span class="hb-value"><select id="productSelect" onchange="onProductSelectChange()"><option value="">-</option></select></span>
+            </div>
+            <div class="die-header-item hb-unit-weight">
+              <span class="hb-label" data-key="hb_unit_weight">単重</span>
+              <span class="hb-value" id="hbUnitWeight">-</span>
+            </div>
+            <div class="die-header-item work-length">
+              <span class="hb-label" data-key="hb_work_length">押出長さ</span>
+              <span class="hb-value"><span id="workLengthValue">-</span> <span class="unit">m</span></span>
+            </div>
           </div>
-          <div class="selected-summary" id="selectedDieSummary"></div>
+          <div class="product-pick-note" id="productPickNote"></div>
         </div>
       </div>
 
-      <!-- Step 2: 過去の指示履歴 -->
-      <div class="card" id="historyCard" style="display:none;">
-        <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">この金型の過去の指示(クリックで読込・複製)</span></div>
+      <!-- 過去の指示履歴 -->
+      <div class="card" id="historyCard">
         <div class="card-body">
-          <div style="max-height:220px; overflow-y:auto;">
+          <div style="max-height:240px; overflow-y:auto;" tabindex="-1">
             <table>
               <thead>
                 <tr>
                   <th data-key="col_plan_date">計画日</th>
-                  <th data-key="col_ordersheet_no">受注番号</th>
-                  <th data-key="col_variant">品番(長さ)</th>
+                  <th data-key="col_pressing_type">プレス種別</th>
+                  <th data-key="col_variant">品番</th>
                   <th class="num" data-key="col_billet_qty">投入本数</th>
-                  <th></th>
                 </tr>
               </thead>
               <tbody id="historyTbody">
-                <tr><td colspan="5" class="empty-note" data-key="empty_history">履歴なし</td></tr>
+                <tr><td colspan="4" class="empty-note" data-key="select_die_first">先に金型を選択してください</td></tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Step 3: 生産指示(任意)・長さ選択 -->
-      <div class="card" id="step3Card" style="display:none;">
-        <div class="card-title"><span class="step-num">3</span><span data-key="step3_title">生産指示(任意)・長さ選択</span></div>
+      <!-- 押出条件 -->
+      <div class="card" id="formCard">
         <div class="card-body">
-          <div class="form-group" style="margin-bottom:14px; max-width:320px;">
-            <label class="f-label" data-key="lbl_variant">定尺(長さ)</label>
-            <select id="variantSelect" onchange="onVariantChange()"></select>
-          </div>
-
-          <div class="selected-summary" id="selectedOrdersheetSummary"></div>
-          <input type="text" id="ordersheetSearch" data-key-placeholder="ph_ordersheet_search" placeholder="受注番号・品番で検索" oninput="renderOrdersheets()" style="margin-bottom:10px;" />
-          <div style="max-height:220px; overflow-y:auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th data-key="col_ordersheet_no">受注番号</th>
-                  <th data-key="col_pn">品番</th>
-                  <th data-key="col_delivery">納期</th>
-                  <th class="num" data-key="col_qty">数量</th>
-                  <th class="num" data-key="col_remaining">残数量</th>
-                </tr>
-              </thead>
-              <tbody id="ordersheetTbody">
-                <tr><td colspan="5" class="empty-note" data-key="empty_ordersheet">この品番のオーダーシートはありません(生産指示なしで進められます)</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4: 押出条件 -->
-      <div class="card" id="formCard" style="display:none;">
-        <div class="card-title">
-          <span class="step-num">4</span><span data-key="step4_title">押出条件</span>
-          <span class="edit-badge" id="editBadge" style="display:none;"></span>
-        </div>
-        <div class="card-body">
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="f-label req" data-key="lbl_plan_date">計画日</label>
-              <input type="date" id="fPlanDate" />
+          <div class="form-grid" id="formGrid">
+            <div class="form-item fw-date" data-field="fPlanDate">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_plan_date">計画日</span><input type="date" id="fPlanDate" /></div>
+              <span class="fi-prev" id="prevFPlanDate"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_pressing_type">プレス種別</label>
-              <select id="fPressingType"></select>
+            <div class="form-item fw-wide" data-field="fPressingType">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_pressing_type">プレス種別</span><select id="fPressingType"></select></div>
+              <span class="fi-prev" id="prevFPressingType"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_machine">設備</label>
-              <select id="fMachine">
-                <option value="1">No.1</option>
-                <option value="2">No.2</option>
-                <option value="3">No.3</option>
-                <option value="4">No.4</option>
-              </select>
+            <div class="form-item" data-field="fRamSpeed">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_ram_speed">ラム速度</span><input type="text" id="fRamSpeed" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFRamSpeed"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_incharge">担当者</label>
-              <select id="fIncharge"></select>
+            <div class="form-item" data-field="fDiscardThickness">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_discard_thickness">ディスカード (mm)</span><input type="text" id="fDiscardThickness" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFDiscardThickness"></span>
             </div>
 
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_discard_thickness">放電しろ (mm)</label>
-              <input type="number" id="fDiscardThickness" />
+            <div class="form-item" data-field="fBilletSize">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_billet_size">ビレットサイズ (inch)</span>
+                <select id="fBilletSize">
+                  <option value="9">9</option>
+                  <option value="12">12</option>
+                  <option value="14">14</option>
+                </select>
+              </div>
+              <span class="fi-prev" id="prevFBilletSize"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_ram_speed">ラム速度</label>
-              <input type="text" id="fRamSpeed" />
+            <div class="form-item" data-field="fBilletLength">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_billet_length">ビレット長さ (mm)</span><input type="number" id="fBilletLength" list="billetLengthOptions" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFBilletLength"></span>
+              <datalist id="billetLengthOptions">
+                <option value="600"></option>
+                <option value="1200"></option>
+              </datalist>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_stretch_ratio">ストレッチ率</label>
-              <input type="text" id="fStretchRatio" />
+            <div class="form-item" data-field="fBilletTemp">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_billet_temp">ビレット温度 (℃)</span><input type="number" id="fBilletTemp" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFBilletTemp"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_cooling">冷却方式</label>
-              <select id="fCooling">
-                <option value="1">空冷</option>
-                <option value="2">水冷</option>
-                <option value="3">ミスト</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_billet_size">ビレットサイズ (inch)</label>
-              <select id="fBilletSize">
-                <option value="9">9</option>
-                <option value="12">12</option>
-                <option value="14">14</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_billet_length">ビレット長さ (mm)</label>
-              <input type="number" id="fBilletLength" />
-            </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_billet_qty">ビレット投入本数</label>
-              <input type="number" id="fBilletQty" />
-            </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_billet_temp">ビレット温度 (℃)</label>
-              <input type="number" id="fBilletTemp" />
+            <div class="form-item" data-field="fBilletTaper">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_billet_taper">テーパー加熱</span>
+                <select id="fBilletTaper">
+                  <option value="-1">-</option>
+                  <option value="0">0</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+              <span class="fi-prev" id="prevFBilletTaper"></span>
             </div>
 
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_billet_taper">ビレットテーパー加熱</label>
-              <select id="fBilletTaper">
-                <option value="-1">-</option>
-                <option value="0">0</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+            <div class="form-item" data-field="fBilletQty">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_billet_qty">ビレット投入本数</span><input type="number" id="fBilletQty" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFBilletQty"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_die_temp">型温度 (℃)</label>
-              <input type="number" id="fDieTemp" />
+            <div class="form-item" data-field="fSubInitial">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_sub_initial">サブ初期高さ</span><input type="number" id="fSubInitial" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFSubInitial"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_die_heat_time">型加熱時間</label>
-              <input type="text" id="fDieHeatTime" />
+            <div class="form-item" data-field="fDieTemp">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_die_temp">型温度 (℃)</span><input type="number" id="fDieTemp" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFDieTemp"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_nbn">nBn</label>
-              <select id="fNbn"></select>
+            <div class="form-item" data-field="fDieHeatTime">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_die_heat_time">型加熱時間</span><input type="text" id="fDieHeatTime" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFDieHeatTime"></span>
             </div>
 
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_sub_initial">サブ初期高さ</label>
-              <input type="number" id="fSubInitial" />
+            <div class="form-item" data-field="fStretchRatio">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_stretch_ratio">ストレッチ率</span><input type="text" id="fStretchRatio" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFStretchRatio"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_initial">初期高さ</label>
-              <input type="number" id="fInitial" />
+            <div class="form-item fw-wide" data-field="fIncharge">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_incharge">担当者</span><select id="fIncharge"></select></div>
+              <span class="fi-prev" id="prevFIncharge"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_value_l">サンプル位置 l</label>
-              <input type="text" id="fValueL" />
+            <div class="form-item" data-field="fValueL">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_value_l">サンプル位置 l</span><input type="text" id="fValueL" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFValueL"></span>
             </div>
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_value_m">サンプル位置 m</label>
-              <input type="number" id="fValueM" />
+            <div class="form-item" data-field="fValueM">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_value_m">サンプル位置 m</span><input type="number" id="fValueM" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFValueM"></span>
             </div>
 
-            <div class="form-group">
-              <label class="f-label" data-key="lbl_value_n">サンプル位置 n</label>
-              <input type="number" id="fValueN" />
+            <div class="form-item" data-field="fValueN">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_value_n">サンプル位置 n</span><input type="number" id="fValueN" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFValueN"></span>
             </div>
-            <div class="form-group span4">
-              <label class="f-label" data-key="lbl_note">備考</label>
-              <textarea id="fNote"></textarea>
+            <div class="form-item fw-wide" data-field="fNbn">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_nbn">nBn</span><select id="fNbn"></select></div>
+              <span class="fi-prev" id="prevFNbn"></span>
+            </div>
+            <div class="form-item" data-field="fMachine">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_machine">設備</span>
+                <select id="fMachine">
+                  <option value="1">No.1</option>
+                  <option value="2">No.2</option>
+                  <option value="3">No.3</option>
+                  <option value="4">No.4</option>
+                </select>
+              </div>
+              <span class="fi-prev" id="prevFMachine"></span>
+            </div>
+            <div class="form-item" data-field="fInitial">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_initial">初期高さ</span><input type="number" id="fInitial" autocomplete="off" /></div>
+              <span class="fi-prev" id="prevFInitial"></span>
+            </div>
+
+            <div class="form-item" data-field="fCooling">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_cooling">冷却方式</span>
+                <select id="fCooling">
+                  <option value="1">空冷</option>
+                  <option value="2">水冷</option>
+                  <option value="3">ミスト</option>
+                </select>
+              </div>
+              <span class="fi-prev" id="prevFCooling"></span>
+            </div>
+            <div class="form-item static">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_fig">切断位置の図</span>
+                <button type="button" class="fig-btn" onclick="openFigModal()" data-key="btn_fig">図</button>
+              </div>
+            </div>
+            <div class="form-item full" data-field="fNote">
+              <div class="fi-row"><span class="fi-label" data-key="lbl_note">備考</span><textarea id="fNote" autocomplete="off"></textarea></div>
+              <span class="fi-prev" id="prevFNote"></span>
             </div>
           </div>
 
           <div class="btn-row">
             <button class="btn-cancel" onclick="resetForm()" data-key="btn_cancel">クリア</button>
-            <button class="btn-save" id="saveBtn" onclick="saveDirective()" data-key="btn_save">指示を保存</button>
+            <button class="btn-save" id="saveBtn" onclick="saveDirective()" data-key="btn_save" disabled>指示を保存</button>
+            <button class="btn-update" id="updateBtn" onclick="updateDirective()" data-key="btn_update" disabled>更新する</button>
+            <button class="btn-print" id="printBtn" onclick="printDirective()" data-key="btn_print" disabled>印刷</button>
+            <span class="edit-badge" id="editBadge" style="display:none;"></span>
+            <span class="delete-hint" id="deleteHint" style="display:none;" data-key="delete_hint">履歴の選択中の行をもう一度クリックすると削除できます</span>
           </div>
         </div>
       </div>
     </div>
+
+    <dialog id="deleteDialog">
+      <div data-key="dlg_confirm">この指示を削除しますか？</div>
+      <div class="dlg-btn-row">
+        <button class="dlg-cancel" onclick="document.getElementById('deleteDialog').close()" data-key="dlg_cancel">キャンセル</button>
+        <button class="dlg-delete" onclick="confirmDeleteDirective()" data-key="dlg_delete">削除する</button>
+      </div>
+    </dialog>
+
+    <dialog id="figDialog">
+      <div class="fig-title" data-key="lbl_fig">切断位置の図</div>
+      <img src="./img/fig_001.svg" alt="切断位置の図" />
+      <div class="fig-close-row">
+        <button onclick="document.getElementById('figDialog').close()" data-key="dlg_cancel">キャンセル</button>
+      </div>
+    </dialog>
 
     <div id="toast"></div>
 
@@ -330,55 +420,57 @@
       const dict = {
         ja: {
           title: "プレス指示作成",
-          step1_title: "金型選択",
-          step2_title: "この金型の過去の指示(クリックで読込・複製)",
-          step3_title: "生産指示(任意)・長さ選択",
-          step4_title: "押出条件",
-          ph_ordersheet_search: "受注番号・品番で検索",
+          hb_die_number: "型番", hb_die_size: "金型サイズ", hb_product: "品番", hb_unit_weight: "単重", hb_work_length: "押出長さ",
           ph_die_search: "型番で検索/選択",
-          col_ordersheet_no: "受注番号", col_pn: "品番", col_delivery: "納期",
-          col_qty: "数量", col_remaining: "残数量", col_plan_date: "計画日",
-          col_variant: "品番(長さ)", col_billet_qty: "投入本数",
-          loading: "読み込み中...", empty_history: "履歴なし",
-          empty_ordersheet: "この品番のオーダーシートはありません(生産指示なしで進められます)",
-          lbl_variant: "定尺(長さ)", lbl_die: "金型",
+          select_die_first: "先に金型を選択してください",
+          col_plan_date: "計画日", col_pressing_type: "プレス種別",
+          col_variant: "品番", col_billet_qty: "投入本数",
+          empty_history: "履歴なし",
           lbl_plan_date: "計画日", lbl_pressing_type: "プレス種別", lbl_machine: "設備",
-          lbl_incharge: "担当者", lbl_discard_thickness: "放電しろ (mm)",
+          lbl_incharge: "担当者", lbl_discard_thickness: "ディスカード (mm)",
           lbl_ram_speed: "ラム速度", lbl_stretch_ratio: "ストレッチ率", lbl_cooling: "冷却方式",
           lbl_billet_size: "ビレットサイズ (inch)", lbl_billet_length: "ビレット長さ (mm)",
           lbl_billet_qty: "ビレット投入本数", lbl_billet_temp: "ビレット温度 (℃)",
-          lbl_billet_taper: "ビレットテーパー加熱", lbl_die_temp: "型温度 (℃)",
+          lbl_billet_taper: "テーパー加熱", lbl_die_temp: "型温度 (℃)",
           lbl_die_heat_time: "型加熱時間", lbl_nbn: "nBn",
           lbl_sub_initial: "サブ初期高さ", lbl_initial: "初期高さ",
           lbl_value_l: "サンプル位置 l", lbl_value_m: "サンプル位置 m", lbl_value_n: "サンプル位置 n",
-          lbl_note: "備考", btn_cancel: "クリア", btn_save: "指示を保存",
+          lbl_note: "備考", btn_cancel: "クリア", btn_save: "指示を保存", btn_update: "更新する",
+          delete_hint: "履歴の選択中の行をもう一度クリックすると削除できます",
+          dlg_confirm: "この指示を削除しますか？", dlg_cancel: "キャンセル", dlg_delete: "削除する",
+          lbl_fig: "切断位置の図", btn_fig: "図", btn_print: "印刷",
+          no_products: "この金型に品番が紐づいていません(die_production_number.htmlで先に登録してください)",
+          pick_product: "この金型は複数の品番に紐づいています。品番を選択してください",
         },
         vi: {
           title: "Tạo chỉ thị ép",
-          step1_title: "Chọn khuôn",
-          step2_title: "Lịch sử chỉ thị của khuôn này (bấm để tải/nhân bản)",
-          step3_title: "Phiếu SX (tùy chọn) / Chọn chiều dài",
-          step4_title: "Điều kiện ép",
-          ph_ordersheet_search: "Tìm theo số đơn / mã SP",
+          hb_die_number: "Mã khuôn", hb_die_size: "Cỡ khuôn", hb_product: "Mã SP", hb_unit_weight: "Khối lượng/m", hb_work_length: "Dài đùn",
           ph_die_search: "Tìm/chọn theo mã khuôn",
-          col_ordersheet_no: "Số đơn", col_pn: "Mã SP", col_delivery: "Ngày giao",
-          col_qty: "SL", col_remaining: "SL còn lại", col_plan_date: "Ngày KH",
-          col_variant: "Mã SP (dài)", col_billet_qty: "SL billet",
-          loading: "Đang tải...", empty_history: "Chưa có lịch sử",
-          empty_ordersheet: "Không có phiếu đặt hàng cho mã SP này (vẫn có thể tiếp tục không cần phiếu SX)",
-          lbl_variant: "Chiều dài tiêu chuẩn", lbl_die: "Khuôn",
+          select_die_first: "Vui lòng chọn khuôn trước",
+          col_plan_date: "Ngày KH", col_pressing_type: "Loại ép",
+          col_variant: "Mã SP", col_billet_qty: "SL billet",
+          empty_history: "Chưa có lịch sử",
           lbl_plan_date: "Ngày kế hoạch", lbl_pressing_type: "Loại ép", lbl_machine: "Máy",
-          lbl_incharge: "Người phụ trách", lbl_discard_thickness: "Độ dày xả (mm)",
+          lbl_incharge: "Người phụ trách", lbl_discard_thickness: "Discard (mm)",
           lbl_ram_speed: "Tốc độ ram", lbl_stretch_ratio: "Tỷ lệ kéo", lbl_cooling: "Kiểu làm mát",
           lbl_billet_size: "Cỡ billet (inch)", lbl_billet_length: "Dài billet (mm)",
           lbl_billet_qty: "SL billet nạp", lbl_billet_temp: "Nhiệt độ billet (℃)",
-          lbl_billet_taper: "Gia nhiệt taper billet", lbl_die_temp: "Nhiệt độ khuôn (℃)",
+          lbl_billet_taper: "Gia nhiệt taper", lbl_die_temp: "Nhiệt độ khuôn (℃)",
           lbl_die_heat_time: "TG gia nhiệt khuôn", lbl_nbn: "nBn",
           lbl_sub_initial: "Chiều cao sub ban đầu", lbl_initial: "Chiều cao ban đầu",
           lbl_value_l: "Vị trí mẫu l", lbl_value_m: "Vị trí mẫu m", lbl_value_n: "Vị trí mẫu n",
-          lbl_note: "Ghi chú", btn_cancel: "Xóa", btn_save: "Lưu chỉ thị",
+          lbl_note: "Ghi chú", btn_cancel: "Xóa", btn_save: "Lưu chỉ thị", btn_update: "Cập nhật",
+          delete_hint: "Bấm lại dòng lịch sử đang chọn để xóa",
+          dlg_confirm: "Xóa chỉ thị này?", dlg_cancel: "Hủy", dlg_delete: "Xóa",
+          lbl_fig: "Hình vị trí cắt", btn_fig: "Hình", btn_print: "In",
+          no_products: "Khuôn này chưa liên kết mã SP nào (đăng ký ở die_production_number.html trước)",
+          pick_product: "Khuôn này liên kết nhiều mã SP. Vui lòng chọn mã SP",
         },
       };
+
+      function currentLang() {
+        return localStorage.getItem("lang") || "ja";
+      }
 
       function setLang(lang) {
         localStorage.setItem("lang", lang);
@@ -401,17 +493,87 @@
       }
 
       /* ── 状態 ── */
-      let allOrdersheets = [];
-      let selectedOrdersheet = null;
-      let selectedDie = null;
+      let selectedDie = null;        // {id, die_number, hole, die_diamater}
+      let dieProducts = [];          // このダイに紐づく品番一覧
+      let selectedVariant = null;    // {variant_id, production_number_id, production_number, specific_weight, production_length}
       let editingId = null;
+      let originalPlanDate = null;   // 編集読込み元レコードの元の計画日(この値と一致する時だけ更新可)
+      let selectedHistoryId = null;
       let masters = { pressingTypes: [], nbn: [], staff: [] };
 
-      function currentLang() {
-        return localStorage.getItem("lang") || "ja";
+      /* ── フィールド定義(Enterキー遷移順・完了バリデーション) ── */
+      const fieldOrder = [
+        "fPlanDate", "fPressingType", "fRamSpeed", "fDiscardThickness",
+        "fBilletSize", "fBilletLength", "fBilletTemp", "fBilletTaper", "fBilletQty",
+        "fSubInitial", "fDieTemp", "fDieHeatTime", "fStretchRatio", "fIncharge",
+        "fValueL", "fValueM", "fValueN", "fNbn", "fMachine", "fInitial", "fCooling", "fNote",
+      ];
+      const validators = {
+        fPlanDate: (v) => !!v,
+        fDiscardThickness: (v) => v !== "" && Number(v) > 0 && Number(v) < 150,
+        fPressingType: (v) => v !== "" && v !== "0",
+        fRamSpeed: (v) => v !== "" && Number(v) > 0 && Number(v) < 50,
+        fBilletLength: (v) => v !== "" && Number(v) > 0,
+        fBilletTemp: (v) => v !== "" && Number(v) > 400 && Number(v) < 550,
+        fBilletTaper: (v) => v !== "" && v !== "-1",
+        fBilletSize: (v) => v !== "" && v !== "0",
+        fBilletQty: (v) => v !== "" && Number(v) >= 0 && Number(v) < 1500,
+        fSubInitial: (v) => v !== "" && Number(v) > 0 && Number(v) < 100,
+        fDieTemp: (v) => v !== "" && Number(v) > 400 && Number(v) < 550,
+        fDieHeatTime: (v) => v !== "" && Number(v) > 1 && Number(v) < 8,
+        fStretchRatio: (v) => v !== "" && !isNaN(v) && Number(v) >= 0 && Number(v) < 5,
+        fIncharge: (v) => v !== "" && v !== "0",
+        fValueL: (v) => v !== "" && !isNaN(v) && Number(v) >= 0 && Number(v) <= 10,
+        fValueM: (v) => v !== "" && !isNaN(v) && Number(v) >= 0 && Number(v) <= 30,
+        fValueN: (v) => v !== "" && !isNaN(v) && Number(v) >= 1 && Number(v) <= 30,
+        fNbn: (v) => v !== "" && v !== "0",
+        fMachine: (v) => v !== "" && v !== "0",
+        fInitial: (v) => v !== "" && Number(v) > 0 && Number(v) < 100,
+        fCooling: (v) => v !== "" && v !== "0",
+        fNote: (v) => v.trim().length > 2,
+      };
+
+      function fieldGroup(id) {
+        return document.querySelector(`.form-item[data-field="${id}"]`);
       }
 
-      /* ── Step 1: 金型検索・選択（起点） ── */
+      function checkFieldComplete(id) {
+        const el = document.getElementById(id);
+        const ok = validators[id](el.value);
+        fieldGroup(id).classList.toggle("complete", ok);
+        return ok;
+      }
+
+      function checkAllComplete() {
+        let allOk = true;
+        fieldOrder.forEach((id) => { if (!checkFieldComplete(id)) allOk = false; });
+        // 計画日が読込み元レコードと同じ時だけ「更新」扱い。日付を変えた場合は
+        // 「このテンプレートを元に新規保存する」とみなし「保存」を使わせる。
+        const isSameDate = !!editingId && document.getElementById("fPlanDate").value === originalPlanDate;
+        document.getElementById("saveBtn").disabled = !(allOk && !isSameDate);
+        document.getElementById("updateBtn").disabled = !(allOk && isSameDate);
+        document.getElementById("printBtn").disabled = !editingId;
+        return allOk;
+      }
+
+      fieldOrder.forEach((id, idx) => {
+        const el = document.getElementById(id);
+        el.addEventListener("input", checkAllComplete);
+        el.addEventListener("change", checkAllComplete);
+        el.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" && el.tagName !== "TEXTAREA") {
+            e.preventDefault();
+            const next = fieldOrder[idx + 1];
+            if (next) document.getElementById(next).focus();
+          }
+        });
+      });
+      ["fBilletSize", "fBilletLength", "fDiscardThickness"].forEach((id) => {
+        document.getElementById(id).addEventListener("input", recalcWorkLength);
+        document.getElementById(id).addEventListener("change", recalcWorkLength);
+      });
+
+      /* ── Step 1: 金型検索・選択 ── */
       let dieSearchTimer = null;
       async function searchDies(q) {
         clearTimeout(dieSearchTimer);
@@ -422,18 +584,52 @@
         }, 200);
       }
 
+      let dieDropdownItems = [];
+      let dieDropdownActiveIndex = -1;
+
       function renderDieDropdown(dies) {
+        dieDropdownItems = dies;
+        dieDropdownActiveIndex = dies.length ? 0 : -1;
         const dd = document.getElementById("dieDropdown");
         if (!dies.length) {
           dd.innerHTML = `<div style="color:#999;">該当する金型がありません</div>`;
           dd.classList.add("show");
           return;
         }
-        dd.innerHTML = dies.map((d) =>
-          `<div onclick="selectDie(${d.id}, '${d.die_number}', ${d.production_number_id ?? "null"}, '${(d.production_number ?? "").replace(/'/g, "&apos;")}')">${d.die_number}　<span style="color:#999;">${d.production_number ?? ""}</span></div>`
-        ).join("");
+        renderDieDropdownItems();
         dd.classList.add("show");
       }
+
+      function renderDieDropdownItems() {
+        const dd = document.getElementById("dieDropdown");
+        dd.innerHTML = dieDropdownItems.map((d, i) =>
+          `<div class="${i === dieDropdownActiveIndex ? "active" : ""}" onmouseenter="dieDropdownActiveIndex=${i}; renderDieDropdownItems();" onclick='selectDie(${JSON.stringify(d)})'>${d.die_number}</div>`
+        ).join("");
+        const activeEl = dd.children[dieDropdownActiveIndex];
+        if (activeEl) activeEl.scrollIntoView({ block: "nearest" });
+      }
+
+      document.getElementById("dieSearchInput").addEventListener("keydown", (e) => {
+        const dd = document.getElementById("dieDropdown");
+        if (!dd.classList.contains("show") || !dieDropdownItems.length) return;
+
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          dieDropdownActiveIndex = Math.min(dieDropdownActiveIndex + 1, dieDropdownItems.length - 1);
+          renderDieDropdownItems();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          dieDropdownActiveIndex = Math.max(dieDropdownActiveIndex - 1, 0);
+          renderDieDropdownItems();
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          if (dieDropdownActiveIndex >= 0) selectDie(dieDropdownItems[dieDropdownActiveIndex]);
+        } else if (e.key === "Escape") {
+          dd.classList.remove("show");
+        } else if (e.key === "Tab") {
+          dd.classList.remove("show");
+        }
+      });
 
       document.addEventListener("click", (e) => {
         if (!e.target.closest(".die-search-wrap")) {
@@ -441,207 +637,292 @@
         }
       });
 
-      async function selectDie(id, dieNumber, productionNumberId, productionNumber) {
-        selectedDie = { id, die_number: dieNumber, production_number_id: productionNumberId };
-        document.getElementById("dieSearchInput").value = dieNumber;
+      async function selectDie(die) {
+        selectedDie = die;
+        document.getElementById("dieSearchInput").value = die.die_number;
         document.getElementById("dieDropdown").classList.remove("show");
+        document.getElementById("hbDieSize").textContent = die.die_diamater ? `Φ${die.die_diamater}mm` : "-";
 
-        const dieSummary = document.getElementById("selectedDieSummary");
-        dieSummary.innerHTML = `<span class="pn-code">${dieNumber}</span>${productionNumber ? `　品番: ${productionNumber}` : ""}`;
-        dieSummary.classList.add("show");
+        selectedVariant = null;
+        editingId = null;
+        selectedHistoryId = null;
+        document.getElementById("editBadge").style.display = "none";
+        document.getElementById("deleteHint").style.display = "none";
 
-        document.getElementById("historyCard").style.display = "";
-        document.getElementById("step3Card").style.display = "";
-        document.getElementById("formCard").style.display = "";
+        const res = await fetch(`./php/press_directive/get_die_products.php?die_id=${die.id}`);
+        dieProducts = await res.json();
+        renderProductPick();
 
-        selectedOrdersheet = null;
-        document.getElementById("selectedOrdersheetSummary").innerHTML = "";
-        document.getElementById("selectedOrdersheetSummary").classList.remove("show");
-        document.getElementById("ordersheetSearch").value = "";
+        await loadHistory(die.id);
+        resetForm(false);
 
-        resetForm();
-        await Promise.all([
-          loadHistory(id),
-          loadOrdersheetsForDie(productionNumberId),
-          loadVariants(productionNumberId),
-        ]);
+        if (dieProducts.length > 1) {
+          document.getElementById("productSelect").focus();
+        } else {
+          focusFirstHistoryRowOrFallback();
+        }
+      }
+
+      function focusFirstHistoryRowOrFallback() {
+        const firstRow = document.querySelector("#historyTbody tr[data-id]");
+        if (firstRow) firstRow.focus();
+        else document.getElementById("fPlanDate").focus();
+      }
+
+      function renderProductPick() {
+        const t = dict[currentLang()];
+        const note = document.getElementById("productPickNote");
+        const sel = document.getElementById("productSelect");
+
+        if (!dieProducts.length) {
+          note.textContent = t.no_products;
+          note.classList.add("warn");
+          sel.innerHTML = `<option value="">-</option>`;
+          selectedVariant = null;
+          updateUnitWeightDisplay();
+          recalcWorkLength();
+          return;
+        }
+        note.classList.remove("warn");
+
+        sel.innerHTML = (dieProducts.length > 1 ? `<option value="">-</option>` : "") +
+          dieProducts.map((p) => `<option value="${p.variant_id}">${p.production_number}</option>`).join("");
+
+        if (dieProducts.length === 1) {
+          note.textContent = "";
+          sel.value = String(dieProducts[0].variant_id);
+          pickProduct(dieProducts[0]);
+          return;
+        }
+
+        note.textContent = t.pick_product;
+      }
+
+      function onProductSelectChange() {
+        const id = document.getElementById("productSelect").value;
+        const p = dieProducts.find((dp) => String(dp.variant_id) === id);
+        pickProduct(p ?? null);
+        focusFirstHistoryRowOrFallback();
+      }
+
+      function pickProduct(p) {
+        selectedVariant = p;
+        document.getElementById("productSelect").value = p ? String(p.variant_id) : "";
+        if (p) document.getElementById("productPickNote").textContent = "";
+        updateUnitWeightDisplay();
+        recalcWorkLength();
+      }
+
+      function updateUnitWeightDisplay() {
+        document.getElementById("hbUnitWeight").textContent =
+          selectedVariant && selectedVariant.specific_weight != null
+            ? `${Number(selectedVariant.specific_weight).toFixed(2)} kg/m` : "-";
+      }
+
+      /* ── 押出長さのリアルタイム計算(ex0.11 calPressLength と同じ式) ── */
+      function recalcWorkLength() {
+        const el = document.getElementById("workLengthValue");
+        if (!el) return;
+        if (!selectedVariant || selectedVariant.specific_weight == null || !selectedDie.hole) {
+          el.textContent = "-";
+          return;
+        }
+        const billetSize = Number(document.getElementById("fBilletSize").value);
+        const billetLength = Number(document.getElementById("fBilletLength").value);
+        const discardThickness = Number(document.getElementById("fDiscardThickness").value);
+        if (!billetLength || document.getElementById("fDiscardThickness").value === "") {
+          el.textContent = "-";
+          return;
+        }
+        let billetWeight, containerDimension;
+        if (billetSize === 9) { billetWeight = 132.3; containerDimension = 237; }
+        else if (billetSize === 12) { billetWeight = 235; containerDimension = 312; }
+        else if (billetSize === 14) { billetWeight = 320; containerDimension = 366; }
+        else { el.textContent = "-"; return; }
+
+        const inputMaterialWeight =
+          billetWeight * (billetLength / 1200) -
+          (((containerDimension ** 2 / 4) * 3.142 * discardThickness) / 10 ** 6) * 2.7;
+        let workLength = inputMaterialWeight / Number(selectedVariant.specific_weight);
+        workLength = workLength / Number(selectedDie.hole);
+        el.textContent = workLength > 0 ? workLength.toFixed(1) : "-";
       }
 
       /* ── Step 2: 過去の指示履歴 ── */
+      let historyRows = [];
       async function loadHistory(diesId) {
         const res = await fetch(`./php/press_directive/get_directive_history.php?dies_id=${diesId}`);
-        const rows = await res.json();
+        historyRows = await res.json();
+        renderHistory();
+      }
+
+      function renderHistory() {
         const tbody = document.getElementById("historyTbody");
-
-        if (!rows.length) {
-          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_history}</td></tr>`;
+        if (!historyRows.length) {
+          tbody.innerHTML = `<tr><td colspan="4" class="empty-note">${dict[currentLang()].empty_history}</td></tr>`;
           return;
         }
+        const ptMap = {};
+        masters.pressingTypes.forEach((t) => { ptMap[t.id] = t.remarks_jp ?? t.pressing_type; });
 
-        tbody.innerHTML = rows.map((r) => `
-          <tr>
+        tbody.innerHTML = historyRows.map((r) => `
+          <tr class="selectable ${String(r.id) === String(selectedHistoryId) ? "selected" : ""}" tabindex="0" data-id="${r.id}" onclick="onHistoryRowClick(${r.id})">
             <td>${r.plan_date_at ?? "-"}</td>
-            <td>${r.ordersheet_number ?? "-"}</td>
-            <td>${r.variant_production_number ? `${r.variant_production_number} (${Number(r.variant_length).toFixed(1)}m)` : "-"}</td>
+            <td>${ptMap[r.pressing_type_id] ?? "-"}</td>
+            <td>${r.variant_production_number ?? "-"}</td>
             <td class="num">${r.billet_input_quantity ?? "-"}</td>
-            <td>
-              <button class="btn-cancel" style="padding:3px 8px; font-size:11px;" onclick='loadIntoForm(${JSON.stringify(r).replace(/'/g, "&apos;")}, true)'>編集</button>
-              <button class="btn-cancel" style="padding:3px 8px; font-size:11px;" onclick='loadIntoForm(${JSON.stringify(r).replace(/'/g, "&apos;")}, false)'>複製</button>
-            </td>
           </tr>
         `).join("");
       }
 
-      function loadIntoForm(r, keepId) {
-        editingId = keepId ? r.id : null;
-        document.getElementById("editBadge").style.display = editingId ? "" : "none";
-        document.getElementById("editBadge").textContent = editingId ? `編集中: ID ${editingId}` : "";
-
-        document.getElementById("fPlanDate").value = r.plan_date_at ?? "";
-        document.getElementById("fPressingType").value = r.pressing_type_id ?? "";
-        document.getElementById("fMachine").value = r.press_machine ?? "1";
-        document.getElementById("fIncharge").value = r.incharge_person_id ?? "";
-        document.getElementById("fDiscardThickness").value = r.discard_thickness ?? "";
-        document.getElementById("fRamSpeed").value = r.ram_speed ?? "";
-        document.getElementById("fStretchRatio").value = r.stretch_ratio ?? "";
-        document.getElementById("fCooling").value = r.cooling_type ?? "1";
-        document.getElementById("fBilletSize").value = r.billet_size ?? "9";
-        document.getElementById("fBilletLength").value = r.billet_length ?? "";
-        document.getElementById("fBilletQty").value = r.billet_input_quantity ?? "";
-        document.getElementById("fBilletTemp").value = r.billet_temperature ?? "";
-        document.getElementById("fBilletTaper").value = r.billet_taper_heating ?? "-1";
-        document.getElementById("fDieTemp").value = r.die_temperature ?? "";
-        document.getElementById("fDieHeatTime").value = r.die_heating_time ?? "";
-        document.getElementById("fNbn").value = r.nbn_id ?? "";
-        document.getElementById("fSubInitial").value = r.sub_initial ?? "";
-        document.getElementById("fInitial").value = r.initial ?? "";
-        document.getElementById("fValueL").value = r.value_l ?? "";
-        document.getElementById("fValueM").value = r.value_m ?? "";
-        document.getElementById("fValueN").value = r.value_n ?? "";
-        document.getElementById("fNote").value = r.previous_press_note ?? "";
-
-        if (r.production_number_variant_id) {
-          document.getElementById("variantSelect").value = r.production_number_variant_id;
+      document.getElementById("historyTbody").addEventListener("keydown", (e) => {
+        const tr = e.target.closest("tr[data-id]");
+        if (!tr) return;
+        if (e.key === "Enter") {
+          e.preventDefault();
+          onHistoryRowClick(Number(tr.dataset.id));
+        } else if (e.key === "ArrowDown") {
+          e.preventDefault();
+          tr.nextElementSibling?.focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          tr.previousElementSibling?.focus();
         }
+      });
 
-        document.getElementById("saveBtn").textContent = editingId ? "更新する" : dict[currentLang()].btn_save;
-        showToast(editingId ? "編集用に読み込みました" : "内容を複製しました(新規として保存されます)");
-      }
-
-      /* ── Step 3: 生産指示(オーダーシート・任意) ── */
-      async function loadOrdersheetsForDie(productionNumberId) {
-        const url = productionNumberId
-          ? `./php/press_directive/get_ordersheets.php?production_number_id=${productionNumberId}`
-          : `./php/press_directive/get_ordersheets.php`;
-        const res = await fetch(url);
-        allOrdersheets = await res.json();
-        renderOrdersheets();
-      }
-
-      function renderOrdersheets() {
-        const q = document.getElementById("ordersheetSearch").value.trim().toUpperCase();
-        const filtered = q
-          ? allOrdersheets.filter((o) =>
-              (o.ordersheet_number ?? "").toUpperCase().includes(q) ||
-              (o.production_number ?? "").toUpperCase().includes(q))
-          : allOrdersheets;
-
-        const tbody = document.getElementById("ordersheetTbody");
-        if (!filtered.length) {
-          tbody.innerHTML = `<tr><td colspan="5" class="empty-note">${dict[currentLang()].empty_ordersheet}</td></tr>`;
+      function onHistoryRowClick(id) {
+        if (String(selectedHistoryId) === String(id)) {
+          document.getElementById("deleteDialog").showModal();
           return;
         }
-
-        tbody.innerHTML = filtered.map((o) => `
-          <tr class="selectable ${selectedOrdersheet?.id === o.id ? "selected" : ""}" onclick="selectOrdersheet(${o.id})">
-            <td>${o.ordersheet_number ?? ""}</td>
-            <td>${o.production_number ?? ""}</td>
-            <td>${o.delivery_date_at ?? "-"}</td>
-            <td class="num">${o.production_quantity}</td>
-            <td class="num">${o.remaining_quantity}</td>
-          </tr>
-        `).join("");
+        selectedHistoryId = id;
+        renderHistory();
+        loadIntoForm(historyRows.find((r) => r.id === id));
       }
 
-      function selectOrdersheet(id) {
-        // 任意項目のため、選択中の行を再クリックすると選択解除する
-        selectedOrdersheet = selectedOrdersheet?.id === id ? null : (allOrdersheets.find((o) => o.id === id) ?? null);
-        renderOrdersheets();
+      function confirmDeleteDirective() {
+        document.getElementById("deleteDialog").close();
+        deleteDirective(selectedHistoryId);
+      }
 
-        const summary = document.getElementById("selectedOrdersheetSummary");
-        if (!selectedOrdersheet) {
-          summary.innerHTML = "";
-          summary.classList.remove("show");
-          return;
+      function openFigModal() {
+        document.getElementById("figDialog").showModal();
+      }
+
+      /* ── 指示書印刷: 別ファイル press_directive_print.html で表示・印刷する ── */
+      function printDirective() {
+        if (!editingId) return;
+        window.open(`./press_directive_print.html?id=${editingId}`, "_blank");
+      }
+
+      async function deleteDirective(id) {
+        const res = await fetch("./php/press_directive/delete_directive.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const result = await res.json();
+        if (result.status !== "ok") { showToast("削除に失敗しました", false); return; }
+        showToast("削除しました");
+        resetForm();
+        await loadHistory(selectedDie.id);
+      }
+
+      function loadIntoForm(r) {
+        editingId = r.id;
+        originalPlanDate = r.plan_date_at ?? null;
+        document.getElementById("editBadge").style.display = "";
+        document.getElementById("editBadge").textContent = `編集中: ID ${editingId}`;
+        document.getElementById("deleteHint").style.display = "";
+
+        const vals = {
+          fPressingType: r.pressing_type_id ?? "",
+          fRamSpeed: r.ram_speed ?? "",
+          fDiscardThickness: r.discard_thickness ?? "",
+          fBilletSize: r.billet_size ?? "9",
+          fBilletLength: r.billet_length ?? "",
+          fBilletTemp: r.billet_temperature ?? "",
+          fBilletTaper: r.billet_taper_heating ?? "-1",
+          fBilletQty: r.billet_input_quantity ?? "",
+          fSubInitial: r.sub_initial ?? "",
+          fDieTemp: r.die_temperature ?? "",
+          fDieHeatTime: r.die_heating_time ?? "",
+          fStretchRatio: r.stretch_ratio ?? "",
+          fIncharge: r.incharge_person_id ?? "",
+          fValueL: r.value_l ?? "",
+          fValueM: r.value_m ?? "",
+          fValueN: r.value_n ?? "",
+          fNbn: r.nbn_id ?? "",
+          fMachine: r.press_machine ?? "1",
+          fInitial: r.initial ?? "",
+          fCooling: r.cooling_type ?? "1",
+          fNote: r.previous_press_note ?? "",
+        };
+        fieldOrder.forEach((id) => {
+          if (id === "fPlanDate") return; // 計画日は履歴の値を反映せず、デフォルト値(今日)を維持する
+          document.getElementById(id).value = vals[id];
+          const prevEl = document.getElementById("prev" + id[0].toUpperCase() + id.slice(1));
+          if (prevEl) prevEl.innerHTML = vals[id] !== "" ? `前回: <span class="val">${vals[id]}</span>` : "";
+        });
+
+        if (r.die_production_number_variant_id) {
+          const p = dieProducts.find((dp) => dp.variant_id === r.die_production_number_variant_id);
+          if (p) pickProduct(p);
         }
-        summary.innerHTML = `
-          <span class="pn-code">${selectedOrdersheet.production_number ?? ""}</span>
-          　受注番号: ${selectedOrdersheet.ordersheet_number ?? ""}
-          　納期: ${selectedOrdersheet.delivery_date_at ?? "-"}
-          　残数量: ${selectedOrdersheet.remaining_quantity}
-        `;
-        summary.classList.add("show");
+
+        checkAllComplete();
+        recalcWorkLength();
+        showToast("編集用に読み込みました");
+        document.getElementById("fPlanDate").focus();
       }
 
-      /* ── Step 3: 長さ(品番バリアント) ── */
-      async function loadVariants(productionNumberId) {
-        if (!productionNumberId) {
-          document.getElementById("variantSelect").innerHTML = `<option value="">-</option>`;
-          return;
-        }
-        const res = await fetch(`./php/press_directive/get_variants.php?production_number_id=${productionNumberId}`);
-        const variants = await res.json();
-        const sel = document.getElementById("variantSelect");
-
-        if (!variants.length) {
-          sel.innerHTML = `<option value="">-</option>`;
-          return;
-        }
-
-        sel.innerHTML = variants.map((v) =>
-          `<option value="${v.id}">${v.production_number} (${Number(v.length).toFixed(1)}m)${v.is_default ? " [既定]" : ""}</option>`
-        ).join("");
-      }
-
-      function onVariantChange() {
-        /* 長さ選択は保存時に production_number_variant_id として使うのみ、他画面への影響なし */
-      }
-
-      /* ── Step 4: フォーム ── */
+      /* ── Step 3: フォーム ── */
       async function loadMasters() {
         const res = await fetch("./php/press_directive/get_masters.php");
         masters = await res.json();
 
         document.getElementById("fPressingType").innerHTML =
-          masters.pressingTypes.map((t) => `<option value="${t.id}">${t.remarks_jp ?? t.pressing_type}</option>`).join("");
+          `<option value="0">-</option>` +
+          masters.pressingTypes.map((t) => `<option value="${t.id}">${t.pressing_type}</option>`).join("");
         document.getElementById("fNbn").innerHTML =
-          `<option value="">-</option>` + masters.nbn.map((n) => `<option value="${n.id}">${n.nbn}</option>`).join("");
+          `<option value="0">-</option>` + masters.nbn.map((n) => `<option value="${n.id}">${n.nbn}</option>`).join("");
         document.getElementById("fIncharge").innerHTML =
-          `<option value="">-</option>` + masters.staff.map((s) => `<option value="${s.id}">${s.staff_name}</option>`).join("");
+          `<option value="0">-</option>` + masters.staff.map((s) => `<option value="${s.id}">${s.staff_name}</option>`).join("");
       }
 
-      function resetForm() {
+      function resetForm(focusDate = true) {
         editingId = null;
+        originalPlanDate = null;
+        selectedHistoryId = null;
         document.getElementById("editBadge").style.display = "none";
-        document.querySelectorAll("#formCard input[type=text], #formCard input[type=number], #formCard input[type=date], #formCard textarea")
-          .forEach((el) => { el.value = ""; });
+        document.getElementById("deleteHint").style.display = "none";
+        renderHistory();
+
+        fieldOrder.forEach((id) => {
+          const el = document.getElementById(id);
+          el.value = "";
+          const prevEl = document.getElementById("prev" + id[0].toUpperCase() + id.slice(1));
+          if (prevEl) prevEl.innerHTML = "";
+        });
         document.getElementById("fMachine").value = "1";
         document.getElementById("fCooling").value = "1";
         document.getElementById("fBilletSize").value = "9";
         document.getElementById("fBilletTaper").value = "-1";
+        document.getElementById("fPressingType").value = "0";
+        document.getElementById("fNbn").value = "0";
+        document.getElementById("fIncharge").value = "0";
         document.getElementById("fPlanDate").value = new Date().toISOString().slice(0, 10);
-        document.getElementById("saveBtn").textContent = dict[currentLang()].btn_save;
+
+        checkAllComplete();
+        recalcWorkLength();
+        if (focusDate) document.getElementById("fPlanDate").focus();
       }
 
-      async function saveDirective() {
-        if (!selectedDie) { showToast("金型を選択してください", false); return; }
-        if (!document.getElementById("fPlanDate").value) { showToast("計画日を入力してください", false); return; }
-
-        const payload = {
+      function collectPayload() {
+        return {
           id: editingId,
           dies_id: selectedDie.id,
-          ordersheet_id: selectedOrdersheet?.id ?? null,
-          production_number_variant_id: document.getElementById("variantSelect").value || null,
+          die_production_number_variant_id: selectedVariant ? selectedVariant.variant_id : null,
           plan_date_at: document.getElementById("fPlanDate").value,
           pressing_type_id: document.getElementById("fPressingType").value,
           discard_thickness: document.getElementById("fDiscardThickness").value,
@@ -665,32 +946,47 @@
           initial: document.getElementById("fInitial").value,
           previous_press_note: document.getElementById("fNote").value,
         };
+      }
 
-        const url = editingId
-          ? "./php/press_directive/update_directive.php"
-          : "./php/press_directive/save_directive.php";
+      async function saveDirective() {
+        if (!selectedDie) { showToast("金型を選択してください", false); return; }
+        if (!checkAllComplete()) { showToast("未入力の項目があります", false); return; }
 
-        const res = await fetch(url, {
+        const res = await fetch("./php/press_directive/save_directive.php", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(collectPayload()),
         });
         const result = await res.json();
+        if (result.status !== "ok") { showToast(result.message || "保存に失敗しました", false); return; }
 
-        if (result.status !== "ok") {
-          showToast(result.message || "保存に失敗しました", false);
-          return;
-        }
-
-        showToast(editingId ? "更新しました" : "保存しました");
-        resetForm();
+        showToast("保存しました");
         await loadHistory(selectedDie.id);
-        await loadOrdersheetsForDie(selectedDie.production_number_id);
+        resetForm();
+      }
+
+      async function updateDirective() {
+        if (!editingId) return;
+        if (!checkAllComplete()) { showToast("未入力の項目があります", false); return; }
+
+        const res = await fetch("./php/press_directive/update_directive.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(collectPayload()),
+        });
+        const result = await res.json();
+        if (result.status !== "ok") { showToast(result.message || "更新に失敗しました", false); return; }
+
+        showToast("更新しました");
+        await loadHistory(selectedDie.id);
+        resetForm();
       }
 
       /* ── 初期化 ── */
       setLang(currentLang());
-      loadMasters();
+      loadMasters().then(() => { checkAllComplete(); });
+      document.getElementById("fPlanDate").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("dieSearchInput").focus();
     </script>
   </body>
 </html>

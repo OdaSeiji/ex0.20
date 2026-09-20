@@ -90,6 +90,23 @@
       .selected-summary.show { display: block; }
       .selected-summary .pn-code { font-weight: bold; color: #1565c0; }
 
+      #overviewSearch {
+        width: 220px;
+        max-width: 100%;
+        font-weight: bold;
+        font-size: 14px;
+        border: 2px solid #1565c0;
+        background: #fffde7;
+      }
+      #overviewSearch:focus {
+        outline: none;
+        border-color: #0d47a1;
+        background: #fff;
+      }
+      .overview-filter-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 10px; }
+      .dup-filter-label { display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; user-select: none; }
+      .dup-filter-label input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+
       .die-search-wrap { position: relative; }
       .die-dropdown {
         position: absolute; top: 100%; left: 0; right: 0; background: #fff;
@@ -118,7 +135,7 @@
 
       <div class="page-header">
         <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
-        <h1 data-key="title">金型×品番 登録</h1>
+        <h1 data-key="title">金型－品番 紐づけ</h1>
         <div class="lang-wrap">
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
           <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
@@ -139,7 +156,7 @@
         </div>
 
         <!-- Step 2: この金型が作れる品番 -->
-        <div class="card" id="linksCard" style="display:none;">
+        <div class="card" id="linksCard">
           <div class="card-title"><span class="step-num">2</span><span data-key="step2_title">この金型が作れる品番</span></div>
           <div class="card-body">
             <table>
@@ -151,7 +168,7 @@
                 </tr>
               </thead>
               <tbody id="linksTbody">
-                <tr><td colspan="3" class="empty-note" data-key="empty_links">登録データなし</td></tr>
+                <tr><td colspan="3" class="empty-note" data-key="select_die_first">先に金型を選択してください</td></tr>
               </tbody>
             </table>
 
@@ -165,11 +182,17 @@
         </div>
       </div>
 
-      <!-- 全体一覧 -->
+      <!-- 登録金型一覧 -->
       <div class="card">
-        <div class="card-title"><span data-key="overview_title">全体一覧</span></div>
+        <div class="card-title"><span data-key="overview_title">登録金型一覧</span></div>
         <div class="card-body">
-          <input type="text" id="overviewSearch" data-key-placeholder="ph_overview_search" placeholder="型番で絞り込み" oninput="renderOverview()" style="margin-bottom:10px;" />
+          <div class="overview-filter-row">
+            <input type="text" id="overviewSearch" data-key-placeholder="ph_overview_search" placeholder="型番で絞り込み" oninput="renderOverview()" />
+            <label class="dup-filter-label">
+              <input type="checkbox" id="dupOnlyCheckbox" onchange="renderOverview()" />
+              <span data-key="dup_only_label">ハイフン2つ以上の金型のみ（-ZZZ, -20K等）</span>
+            </label>
+          </div>
           <div class="overview-wrap">
             <table id="overviewTable">
               <thead><tr id="overviewHead"></tr></thead>
@@ -188,26 +211,30 @@
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
-          title: "金型×品番 登録",
+          title: "金型－品番 紐づけ",
           step1_title: "金型選択",
           step2_title: "この金型が作れる品番",
           ph_die_search: "型番で検索/選択",
           ph_pn_search: "品番で検索して追加",
           col_pn: "品番", col_length: "製品長 (m)",
           empty_links: "登録データなし",
-          overview_title: "全体一覧", ph_overview_search: "型番で絞り込み",
+          select_die_first: "先に金型を選択してください",
+          overview_title: "登録金型一覧", ph_overview_search: "型番で絞り込み",
+          dup_only_label: "ハイフン2つ以上の金型のみ（-ZZZ, -20K等）",
           col_die_number: "金型番号", col_pn_n: (n) => `品番${n}`,
           loading: "読み込み中...", empty_overview: "該当する金型がありません",
         },
         vi: {
-          title: "Đăng ký Khuôn × Mã SP",
+          title: "Liên kết Khuôn – Mã SP",
           step1_title: "Chọn khuôn",
           step2_title: "Mã SP mà khuôn này có thể sản xuất",
           ph_die_search: "Tìm/chọn theo mã khuôn",
           ph_pn_search: "Tìm mã SP để thêm",
           col_pn: "Mã SP", col_length: "Dài SP (m)",
           empty_links: "Chưa có dữ liệu",
-          overview_title: "Tổng hợp", ph_overview_search: "Lọc theo mã khuôn",
+          select_die_first: "Vui lòng chọn khuôn trước",
+          overview_title: "Danh sách khuôn đã đăng ký", ph_overview_search: "Lọc theo mã khuôn",
+          dup_only_label: "Chỉ hiện khuôn có từ 2 dấu gạch ngang trở lên (-ZZZ, -20K...)",
           col_die_number: "Mã khuôn", col_pn_n: (n) => `Mã SP ${n}`,
           loading: "Đang tải...", empty_overview: "Không có khuôn phù hợp",
         },
@@ -374,9 +401,13 @@
       function renderOverview() {
         const t = dict[currentLang()];
         const q = document.getElementById("overviewSearch").value.trim().toUpperCase();
-        const filtered = q
+        const dupOnly = document.getElementById("dupOnlyCheckbox").checked;
+        let filtered = q
           ? overviewRows.filter((r) => r.die_number.toUpperCase().includes(q))
           : overviewRows;
+        if (dupOnly) {
+          filtered = filtered.filter((r) => (r.die_number.match(/-/g) || []).length >= 2);
+        }
 
         const maxCols = filtered.reduce((m, r) => Math.max(m, r.production_numbers.length), 0);
 

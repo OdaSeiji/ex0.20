@@ -6,9 +6,9 @@ $dieId   = (int)($_GET["die_id"] ?? 0);
 $keyword = isset($_GET["q"]) ? trim($_GET["q"]) : "";
 
 if ($keyword === "") {
-    // 未入力時は、既にこの金型に紐づいている品番の先頭5文字に近いものを自動提案する
+    // 未入力時は、既にこの金型に紐づいている品番の先頭7文字に近いものを自動提案する
     $stmt = $pdo->prepare("
-        SELECT DISTINCT LEFT(p.production_number, 5) AS prefix
+        SELECT DISTINCT LEFT(p.production_number, 7) AS prefix
         FROM m_die_production_number_variants v
         JOIN m_production_numbers p ON p.id = v.production_number_id
         WHERE v.die_id = :die_id

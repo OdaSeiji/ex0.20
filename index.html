@@ -74,6 +74,10 @@
         gap: 20px;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
       }
+      /* 各種設定: 列数を3固定にし、3つ未満の行はストレッチさせず左詰めにする */
+      .menu-row.fixed3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
 
       .menu-card {
         background: #ffffff;
@@ -332,6 +336,11 @@
           <div class="menu-title" data-key="daily_report_title">プレス日報入力</div>
           <div class="menu-desc" data-key="daily_report_desc">設備別・日別のプレス実績入力（画面デザインのみ）</div>
         </div>
+        <div class="menu-card" onclick="location.href = 'press_directive.html'">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="press_directive_title">プレス指示作成</div>
+          <div class="menu-desc" data-key="press_directive_desc">金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷</div>
+        </div>
       </div>
     </div>
 
@@ -415,16 +424,11 @@
           <div class="menu-title" data-key="order_sheet_title">発注書管理</div>
           <div class="menu-desc" data-key="order_sheet_desc">発注書の登録・実績・梱包状況の管理</div>
         </div>
-        <div class="menu-card" onclick="location.href = 'press_directive.html'">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="press_directive_title">（試作）プレス指示作成</div>
-          <div class="menu-desc" data-key="press_directive_desc">オーダーシートの進捗を見ながら、長さ(品番)・金型を選んで押出指示を作成</div>
-        </div>
       </div>
     </div>
 
     <!-- ⚙️ 各種設定 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_register">📋 新規、金型、品番登録</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_register">🚢 金型輸出、部品輸出</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_import.html'">
@@ -442,43 +446,47 @@
 
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_settings">⚙️ 各種設定</span></div>
     <div class="accordion-content">
-      <div class="menu-row">
+      <div class="menu-row fixed3">
         <div class="menu-card" onclick="location.href = 'die_handover_progress.html'">
-          <img class="menu-icon" src="./img/handover.svg" alt="" />
+          <img class="menu-icon" src="./img/table.svg" alt="" />
           <div class="menu-title" data-key="handover_progress_title">金型進捗一覧</div>
           <div class="menu-desc" data-key="handover_progress_desc">到着・型検・量産トライ・移管の進捗管理</div>
         </div>
         <div class="menu-card" onclick="location.href = 'handover_list.html'">
-          <img class="menu-icon" src="./img/handover.svg" alt="" />
-          <div class="menu-title" data-key="handover_title">金型輸出・輸入・固定資産登録</div>
+          <img class="menu-icon" src="./img/register.svg" alt="" />
+          <div class="menu-title" data-key="handover_title">金型輸入固定資産登録</div>
           <div class="menu-desc" data-key="handover_desc">書類・検査・到着・資産化の進捗管理</div>
         </div>
       </div>
-      <div class="menu-row">
-        <div class="menu-card" onclick="location.href = 'staff_settings.html'">
-          <img class="menu-icon" src="./img/wrench.svg" alt="" />
-          <div class="menu-title" data-key="staff_title">スタッフ設定</div>
-          <div class="menu-desc" data-key="staff_desc">スタッフのロール・パスワードの管理</div>
-        </div>
+      <div class="menu-row fixed3">
         <div class="menu-card" onclick="location.href = 'production_number.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="pn_title">品番管理</div>
           <div class="menu-desc" data-key="pn_desc">品番の登録・編集・カテゴリ設定</div>
         </div>
-        <div class="menu-card" onclick="location.href = 'production_drawing.html'">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="production_drawing_title">型材図面</div>
-          <div class="menu-desc" data-key="production_drawing_desc">品番ごとの型材図面PDFを登録・閲覧</div>
-        </div>
         <div class="menu-card" onclick="location.href = 'die_register.html'">
-          <img class="menu-icon" src="./img/wrench.svg" alt="" />
-          <div class="menu-title" data-key="die_register_title">金型登録・管理</div>
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="die_register_title">金型管理</div>
           <div class="menu-desc" data-key="die_register_desc">金型の新規登録・編集・削除</div>
         </div>
-        <div class="menu-card" onclick="location.href = 'die_production_number.html'">
+        <div class="menu-card" onclick="location.href = 'production_drawing.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="die_pn_title">金型×品番 登録</div>
+          <div class="menu-title" data-key="production_drawing_title">図面管理</div>
+          <div class="menu-desc" data-key="production_drawing_desc">品番ごとの型材図面PDFを登録・閲覧</div>
+        </div>
+      </div>
+      <div class="menu-row fixed3">
+        <div class="menu-card" onclick="location.href = 'die_production_number.html'">
+          <img class="menu-icon" src="./img/link.svg" alt="" />
+          <div class="menu-title" data-key="die_pn_title">金型－品番 紐づけ</div>
           <div class="menu-desc" data-key="die_pn_desc">金型ごとに作れる品番（長さ違い含む）を登録・管理</div>
+        </div>
+      </div>
+      <div class="menu-row fixed3">
+        <div class="menu-card" onclick="location.href = 'staff_settings.html'">
+          <img class="menu-icon" src="./img/person.svg" alt="" />
+          <div class="menu-title" data-key="staff_title">スタッフ管理</div>
+          <div class="menu-desc" data-key="staff_desc">スタッフのロール・パスワードの管理</div>
         </div>
       </div>
     </div>
@@ -520,7 +528,7 @@
           section_press: "🏭 押出工程",
           section_maintenance: "🧰 金型メンテナンス",
           section_progress: "📊 金型進捗管理",
-          section_register: "📋 新規、金型、品番登録",
+          section_register: "🚢 金型輸出、部品輸出",
           section_settings: "⚙️ 各種設定",
           dashboard_title: "📊 測定ダッシュボード（押出〇）",
 
@@ -538,7 +546,7 @@
           /* ★ 追加：対策必要金型一覧 */
           issue_title: "対策必要金型一覧",
           issue_desc: "NG診断が承認された金型の一覧",
-          handover_title: "金型輸出・輸入・固定資産登録",
+          handover_title: "金型輸入固定資産登録",
           handover_desc: "書類・検査・到着・資産化の進捗管理",
           section_report: "📈 実績レポート",
           startup_report_title: "金型立上 実績レポート",
@@ -550,8 +558,8 @@
           section_production: "📦 生産管理",
           order_sheet_title: "発注書管理",
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
-          press_directive_title: "（試作）プレス指示作成",
-          press_directive_desc: "オーダーシートの進捗を見ながら、長さ(品番)・金型を選んで押出指示を作成",
+          press_directive_title: "プレス指示作成",
+          press_directive_desc: "金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷",
           handover_progress_title: "金型進捗一覧",
           handover_progress_desc: "到着・型検・量産トライ・移管の進捗管理",
           watch_title: "重点管理金型リスト",
@@ -560,7 +568,7 @@
           issue_progress_desc: "Issue別の現在フェーズと停滞状況の一覧",
           condition_manage_title: "（試作）金型コンディション管理",
           condition_manage_desc: "CQ/CP96/MXS/MXQ/CXS/MGP/PS 対象、手動でTrial/MPT/MPを変更",
-          staff_title: "スタッフ設定",
+          staff_title: "スタッフ管理",
           staff_desc: "スタッフのロール・パスワードの管理",
           import_title: "新規金型登録",
           import_desc: "CSVから金型を一括登録",
@@ -572,11 +580,11 @@
           arrival_desc: "現場に到着した金型の到着日を登録",
           pn_title: "品番管理",
           pn_desc: "品番の登録・編集・カテゴリ設定",
-          production_drawing_title: "型材図面",
+          production_drawing_title: "図面管理",
           production_drawing_desc: "品番ごとの型材図面PDFを登録・閲覧",
-          die_register_title: "金型登録・管理",
+          die_register_title: "金型管理",
           die_register_desc: "金型の新規登録・編集・削除",
-          die_pn_title: "金型×品番 登録",
+          die_pn_title: "金型－品番 紐づけ",
           die_pn_desc: "金型ごとに作れる品番（長さ違い含む）を登録・管理",
 
           th_die: "金型",
@@ -603,7 +611,7 @@
           section_press: "🏭 Quy trình ép đùn",
           section_maintenance: "🧰 Bảo trì khuôn",
           section_progress: "📊 Tiến độ khuôn",
-          section_register: "📋 Đăng ký khuôn & linh kiện mới",
+          section_register: "🚢 Xuất khuôn, xuất linh kiện",
           section_settings: "⚙️ Cài đặt chung",
           dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
 
@@ -634,8 +642,8 @@
           section_production: "📦 Quản lý sản xuất",
           order_sheet_title: "Quản lý phiếu đặt hàng",
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
-          press_directive_title: "（Thử nghiệm）Tạo chỉ thị ép",
-          press_directive_desc: "Xem tiến độ phiếu đặt hàng, chọn chiều dài (mã SP)/khuôn để tạo chỉ thị ép",
+          press_directive_title: "Tạo chỉ thị ép",
+          press_directive_desc: "Chọn khuôn, tham khảo chỉ thị trước đó để tạo, lưu và in điều kiện ép",
           handover_progress_title: "Quản lý tiến độ chuyển giao khuôn",
           handover_progress_desc: "Quản lý tiến độ: đến nơi, kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
@@ -644,7 +652,7 @@
           issue_progress_desc: "Danh sách giai đoạn hiện tại và tình trạng trì hoãn theo Issue",
           condition_manage_title: "（Thử nghiệm）Quản lý tình trạng khuôn",
           condition_manage_desc: "Đối tượng CQ/CP96/MXS/MXQ/CXS/MGP/PS, thay đổi thủ công Trial/MPT/MP",
-          staff_title: "Cài đặt nhân viên",
+          staff_title: "Quản lý nhân viên",
           staff_desc: "Quản lý vai trò và mật khẩu của nhân viên",
           import_title: "Nhập khuôn",
           import_desc: "Nhập hàng loạt khuôn từ file CSV",
@@ -656,11 +664,11 @@
           arrival_desc: "Đăng ký ngày đến của khuôn tại hiện trường",
           pn_title: "Quản lý mã SP",
           pn_desc: "Đăng ký, chỉnh sửa mã sản phẩm và danh mục",
-          production_drawing_title: "Bản vẽ khuôn",
+          production_drawing_title: "Quản lý bản vẽ",
           production_drawing_desc: "Đăng ký & xem PDF bản vẽ khuôn theo mã SP",
-          die_register_title: "Đăng ký & Quản lý khuôn",
+          die_register_title: "Quản lý khuôn",
           die_register_desc: "Thêm mới, chỉnh sửa, xóa khuôn",
-          die_pn_title: "Đăng ký Khuôn × Mã SP",
+          die_pn_title: "Liên kết Khuôn – Mã SP",
           die_pn_desc: "Đăng ký các mã SP (kể cả khác chiều dài) mà mỗi khuôn có thể sản xuất",
 
           th_die: "Khuôn",

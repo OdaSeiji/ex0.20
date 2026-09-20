@@ -9,8 +9,11 @@ if ($diesId === 0) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT t.*
+    SELECT t.*, p.production_number AS variant_production_number,
+           p.production_length AS variant_production_length
     FROM t_press_directive t
+    LEFT JOIN m_die_production_number_variants v ON v.id = t.die_production_number_variant_id
+    LEFT JOIN m_production_numbers p ON p.id = v.production_number_id
     WHERE t.dies_id = :dies_id
     ORDER BY t.plan_date_at DESC, t.id DESC
     LIMIT 10
