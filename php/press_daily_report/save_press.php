@@ -29,6 +29,8 @@ foreach (PRESS_REQUIRED_KEYS as $key) {
 try {
     $pdo->beginTransaction();
 
+    $p["die_production_number_variant_id"] = resolveDieProductionNumberVariantId($pdo, toIntOrNull($p["press_directive_id"] ?? null));
+
     $columns = pressColumns();
     $columns[] = "created_at";
     $placeholders = array_map(fn($c) => ":{$c}", $columns);

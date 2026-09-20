@@ -37,6 +37,8 @@ try {
         throw new Exception("対象レコードが見つかりません (id: {$pressId})");
     }
 
+    $p["die_production_number_variant_id"] = resolveDieProductionNumberVariantId($pdo, toIntOrNull($p["press_directive_id"] ?? null));
+
     $columns = pressColumns();
     $setClause = implode(", ", array_map(fn($c) => "{$c} = :{$c}", $columns));
     $stmt = $pdo->prepare("UPDATE t_press SET {$setClause} WHERE id = :id");

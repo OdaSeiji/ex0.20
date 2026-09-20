@@ -14,7 +14,8 @@ function pressColumns() {
         "stretch_ratio", "first_actual_length",
         "container_upside_stemside_temperature", "container_upside_dieside_temperature",
         "container_downside_stemside_temperature", "container_downside_dieide_temperature",
-        "press_directive_scan_file_name", "press_directive_id", "ordersheet_id", "special_note",
+        "press_directive_scan_file_name", "press_directive_id", "die_production_number_variant_id",
+        "ordersheet_id", "special_note",
     ];
     foreach (["no1", "no2", "no3", "no4", "no5"] as $no) {
         foreach (["0200", "1000"] as $pos) {
@@ -52,6 +53,9 @@ function bindPressValues($stmt, $p) {
     $pressDirectiveId = toIntOrNull($p["press_directive_id"] ?? null);
     $stmt->bindValue(":press_directive_id", $pressDirectiveId, $pressDirectiveId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
 
+    $dieProductionNumberVariantId = toIntOrNull($p["die_production_number_variant_id"] ?? null);
+    $stmt->bindValue(":die_production_number_variant_id", $dieProductionNumberVariantId, $dieProductionNumberVariantId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+
     $ordersheetId = toIntOrNull($p["ordersheet_id"] ?? null);
     $stmt->bindValue(":ordersheet_id", $ordersheetId, $ordersheetId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
 
@@ -65,6 +69,17 @@ function bindPressValues($stmt, $p) {
             }
         }
     }
+}
+
+// t_press_directive.die_production_number_variant_id を、紐づく指示書から
+// 実績側(t_press)へコピーする。指示書経由でない実績(press_directive_id無し)は対象外。
+function resolveDieProductionNumberVariantId($pdo, $pressDirectiveId) {
+    if ($pressDirectiveId === null) return null;
+    $stmt = $pdo->prepare("SELECT die_production_number_variant_id FROM t_press_directive WHERE id = :id");
+    $stmt->bindValue(":id", $pressDirectiveId, PDO::PARAM_INT);
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $row ? $row["die_production_number_variant_id"] : null;
 }
 
 const PRESS_REQUIRED_KEYS = [

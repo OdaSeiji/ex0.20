@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>更新履歴</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Roboto Mono", "Segoe UI", monospace;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 900px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+
+      .entry {
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+      }
+      .entry-top {
+        display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+        margin-bottom: 6px;
+      }
+      .entry-badge {
+        font-size: 11px; font-weight: bold; padding: 3px 9px; border-radius: 10px;
+        white-space: nowrap;
+      }
+      .badge-new { background: #e8f5e9; color: #2e7d32; }
+      .badge-update { background: #e3f2fd; color: #1565c0; }
+      .entry-date { font-size: 12px; color: #999; }
+      .entry-title { font-size: 16px; font-weight: bold; color: #222; margin-bottom: 8px; }
+      .entry-purpose { font-size: 13px; color: #444; line-height: 1.7; margin-bottom: 12px; }
+      .entry-purpose .label { font-size: 11px; font-weight: bold; color: #1565c0; margin-right: 4px; }
+
+      .file-links { display: flex; gap: 8px; flex-wrap: wrap; }
+      .file-link {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: #f7f9ff; border: 1px solid #d5e3f7; border-radius: 6px;
+        padding: 6px 12px; font-size: 12px; color: #1565c0; font-weight: bold;
+        cursor: pointer; text-decoration: none;
+      }
+      .file-link:hover { background: #e8f1ff; }
+      .file-link::before { content: "📄"; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'" data-key="back_btn">← メニューへ戻る</button>
+        <h1 data-key="title">更新履歴</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <!-- 2026-09-20 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-20</span>
+        </div>
+        <div class="entry-title" data-key="e1_title">押出日報の実績保存に、指示書の紐づけIDを自動反映</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e1_purpose">一つの金型で複数の製品長さに対応するため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="e1_content">press_directive.htmlで作成した指示をもとにpress_daily_report.htmlで実績を保存すると、t_press.die_production_number_variant_idに自動的に値が入るようにした。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-20</span>
+        </div>
+        <div class="entry-title" data-key="e2_title">押出指示書ページの新設</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e2_purpose">ここで製品長さ(品番)を決め、その紐づけID(m_die_production_number_variants)をt_press_directiveに保存。t_pressに実績レコードを追加する際にこの値を使うため。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+          <a class="file-link" onclick="location.href='press_directive_print.html'">press_directive_print.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-19 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-19</span>
+        </div>
+        <div class="entry-title" data-key="e3_title">金型－品番 紐づけページの追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e3_purpose">1つの金型で複数の長さの製品を切り出せることを記録できるようにする。実績(t_press)に「どの長さを狙ったか」を残すための土台。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_production_number.html'">die_production_number.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-19</span>
+        </div>
+        <div class="entry-title" data-key="e4_title">固定資産登録日を金型移管日に自動反映</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e4_purpose">固定資産登録日を初めて入力した時、同じ日付を金型移管日へ自動的に反映し、二重入力の手間をなくす。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='handover_list.html'">handover_list.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-13 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-13</span>
+        </div>
+        <div class="entry-title" data-key="e5_title">押出日報入力画面の調整</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e5_purpose">入力のしやすさと画面の見やすさを改善(カーソルキーでの選択・自動フォーカス移動・列幅固定など)。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+    </div>
+
+    <script>
+      const dict = {
+        ja: {
+          back_btn: "← メニューへ戻る",
+          title: "更新履歴",
+          badge_new: "新設",
+          badge_update: "変更",
+          lbl_purpose: "目的:",
+          lbl_content: "内容:",
+          e1_title: "押出日報の実績保存に、指示書の紐づけIDを自動反映",
+          e1_purpose: "一つの金型で複数の製品長さに対応するため。",
+          e1_content: "press_directive.htmlで作成した指示をもとにpress_daily_report.htmlで実績を保存すると、t_press.die_production_number_variant_idに自動的に値が入るようにした。",
+          e2_title: "押出指示書ページの新設",
+          e2_purpose: "ここで製品長さ(品番)を決め、その紐づけID(m_die_production_number_variants)をt_press_directiveに保存。t_pressに実績レコードを追加する際にこの値を使うため。",
+          e3_title: "金型－品番 紐づけページの追加",
+          e3_purpose: "1つの金型で複数の長さの製品を切り出せることを記録できるようにする。実績(t_press)に「どの長さを狙ったか」を残すための土台。",
+          e4_title: "固定資産登録日を金型移管日に自動反映",
+          e4_purpose: "固定資産登録日を初めて入力した時、同じ日付を金型移管日へ自動的に反映し、二重入力の手間をなくす。",
+          e5_title: "押出日報入力画面の調整",
+          e5_purpose: "入力のしやすさと画面の見やすさを改善(カーソルキーでの選択・自動フォーカス移動・列幅固定など)。",
+        },
+        vi: {
+          back_btn: "← Về trang chủ",
+          title: "Cập nhật",
+          badge_new: "Mới",
+          badge_update: "Cập nhật",
+          lbl_purpose: "Mục đích:",
+          lbl_content: "Nội dung:",
+          e1_title: "Tự động ghi ID liên kết chỉ thị khi lưu kết quả đùn hàng ngày",
+          e1_purpose: "Để một khuôn có thể tương ứng với nhiều chiều dài sản phẩm khác nhau.",
+          e1_content: "Khi lưu kết quả thực tế ở press_daily_report.html dựa trên chỉ thị đã tạo ở press_directive.html, giá trị t_press.die_production_number_variant_id sẽ được tự động điền.",
+          e2_title: "Thêm mới trang chỉ thị ép đùn",
+          e2_purpose: "Ở đây quyết định chiều dài sản phẩm (mã SP) và lưu ID liên kết (m_die_production_number_variants) vào t_press_directive, để dùng khi thêm bản ghi thực tế vào t_press.",
+          e3_title: "Thêm mới trang liên kết Khuôn – Mã SP",
+          e3_purpose: "Cho phép ghi lại việc 1 khuôn có thể đùn ra sản phẩm với nhiều chiều dài khác nhau. Là nền tảng để lưu lại \"chiều dài nào đã nhắm tới\" trong dữ liệu thực tế (t_press).",
+          e4_title: "Tự động phản ánh ngày đăng ký tài sản cố định vào ngày bàn giao khuôn",
+          e4_purpose: "Khi nhập ngày đăng ký tài sản cố định lần đầu, tự động điền cùng ngày đó vào ngày bàn giao khuôn, giảm việc phải nhập 2 lần.",
+          e5_title: "Điều chỉnh màn hình nhập phiếu đùn hàng ngày",
+          e5_purpose: "Cải thiện độ dễ nhập liệu và độ dễ nhìn của màn hình (chọn bằng phím mũi tên, tự động chuyển focus, cố định độ rộng cột, v.v.).",
+        },
+      };
+
+      function currentLang() {
+        return localStorage.getItem("lang") || "ja";
+      }
+
+      function setLang(lang) {
+        localStorage.setItem("lang", lang);
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+      }
+
+      setLang(currentLang());
+    </script>
+  </body>
+</html>
