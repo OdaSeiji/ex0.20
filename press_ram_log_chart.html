@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<title>ラムログ グラフ（サンプル）</title>
+<title>押出波形（サンプル）</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,7 +63,7 @@
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
   </div>
 
-  <h1 data-key="title">📈 ラムログ グラフ（サンプル）</h1>
+  <h1 data-key="title">📈 押出波形（サンプル）</h1>
   <div class="subtitle" data-key="subtitle">t_press_ram_log：日付・型番・ビレット本数を選択してください</div>
 
   <div class="toolbar">
@@ -123,7 +123,7 @@ let currentRows = [];
 ===================================================== */
 const dict = {
   ja: {
-    title: "📈 ラムログ グラフ（サンプル）",
+    title: "📈 押出波形（サンプル）",
     subtitle: "t_press_ram_log：日付・型番・ビレット本数を選択してください",
     label_date: "日付",
     label_die: "型番",
@@ -143,7 +143,7 @@ const dict = {
     csvHeader: ["日時", "ラム位置(mm)", "ラム圧力(MPa)", "ラム速度(mm/s)", "出口温度(℃)"],
   },
   vi: {
-    title: "📈 Biểu đồ log Ram（Bản mẫu）",
+    title: "📈 Dạng sóng ép đùn（Bản mẫu）",
     subtitle: "t_press_ram_log：Chọn ngày, mã khuôn, số phôi (billet)",
     label_date: "Ngày",
     label_die: "Mã khuôn",
