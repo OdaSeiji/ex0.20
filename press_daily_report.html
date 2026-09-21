@@ -510,9 +510,13 @@
           </table>
         </div>
         <div class="time-add-form">
-          <div class="mmdd-wrap">
-            <input type="date" id="pull_date" />
-            <span class="mmdd-text" id="pull_date_text">MM-DD</span>
+          <div style="display:flex; gap:3px; align-items:center;">
+            <button type="button" class="btn-date-nav" onclick="shiftDate(-1, 'pull_date')" title="前日">◀</button>
+            <div class="mmdd-wrap">
+              <input type="date" id="pull_date" />
+              <span class="mmdd-text" id="pull_date_text">MM-DD</span>
+            </div>
+            <button type="button" class="btn-date-nav" onclick="shiftDate(1, 'pull_date')" title="翌日">▶</button>
           </div>
           <div class="add-form-row" style="gap:3px; margin-top:3px;">
             <input type="text" id="pull_no1" placeholder="No.1" style="width:55px; min-width:0;" />
@@ -531,9 +535,13 @@
           </table>
         </div>
         <div class="time-add-form">
-          <div class="mmdd-wrap">
-            <input type="date" id="cut_date" />
-            <span class="mmdd-text" id="cut_date_text">MM-DD</span>
+          <div style="display:flex; gap:3px; align-items:center;">
+            <button type="button" class="btn-date-nav" onclick="shiftDate(-1, 'cut_date')" title="前日">◀</button>
+            <div class="mmdd-wrap">
+              <input type="date" id="cut_date" />
+              <span class="mmdd-text" id="cut_date_text">MM-DD</span>
+            </div>
+            <button type="button" class="btn-date-nav" onclick="shiftDate(1, 'cut_date')" title="翌日">▶</button>
           </div>
           <div class="add-form-row" style="gap:3px; margin-top:3px;">
             <input type="text" id="cut_no1" placeholder="No.1" style="width:55px; min-width:0;" />
@@ -897,8 +905,8 @@
     }
     document.getElementById("date__input").addEventListener("change", syncSubDatesToPressDate);
 
-    function shiftDate(deltaDays) {
-      const input = document.getElementById("date__input");
+    function shiftDate(deltaDays, inputId = "date__input") {
+      const input = document.getElementById(inputId);
       const base  = input.value ? new Date(input.value + "T00:00:00") : new Date();
       base.setDate(base.getDate() + deltaDays);
       const yyyy = base.getFullYear();
