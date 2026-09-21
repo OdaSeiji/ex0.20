@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-09-20 (最新) -->
+      <!-- 2026-09-21 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-21</span>
+        </div>
+        <div class="entry-title" data-key="e0_title">押出中 ラムログ グラフページの新設（試作）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="e0_purpose">t_press_ram_log（ラム圧力・速度・位置・出口温度）の実測データを可視化し、押出状態を確認しやすくするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="e0_content">日付・型番・ビレット本数を選ぶと、ラム位置（横軸：1200mm→0mm）に対する圧力(MPa)・速度(mm/s)・出口温度(℃)をグラフ表示（PLC生値を単位変換、縦軸は固定レンジ）。900/500/200mm時点の数値表とCSV出力機能、日本語/ベトナム語切替にも対応。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_ram_log_chart.html'">press_ram_log_chart.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-20 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -173,6 +191,9 @@
           badge_update: "変更",
           lbl_purpose: "目的:",
           lbl_content: "内容:",
+          e0_title: "押出中 ラムログ グラフページの新設（試作）",
+          e0_purpose: "t_press_ram_log（ラム圧力・速度・位置・出口温度）の実測データを可視化し、押出状態を確認しやすくするため。",
+          e0_content: "日付・型番・ビレット本数を選ぶと、ラム位置（横軸：1200mm→0mm）に対する圧力(MPa)・速度(mm/s)・出口温度(℃)をグラフ表示（PLC生値を単位変換、縦軸は固定レンジ）。900/500/200mm時点の数値表とCSV出力機能、日本語/ベトナム語切替にも対応。",
           e1_title: "押出日報の実績保存に、指示書の紐づけIDを自動反映",
           e1_purpose: "一つの金型で複数の製品長さに対応するため。",
           e1_content: "press_directive.htmlで作成した指示をもとにpress_daily_report.htmlで実績を保存すると、t_press.die_production_number_variant_idに自動的に値が入るようにした。",
@@ -192,6 +213,9 @@
           badge_update: "Cập nhật",
           lbl_purpose: "Mục đích:",
           lbl_content: "Nội dung:",
+          e0_title: "Thêm mới trang biểu đồ log Ram khi ép（Bản thử nghiệm）",
+          e0_purpose: "Trực quan hóa dữ liệu thực tế của t_press_ram_log（áp suất, tốc độ, vị trí Ram, nhiệt độ đầu ra）để dễ theo dõi tình trạng ép.",
+          e0_content: "Chọn ngày, mã khuôn, số phôi (billet) để hiển thị biểu đồ áp suất(MPa)/tốc độ(mm/s)/nhiệt độ đầu ra(℃) theo vị trí Ram (trục ngang: 1200mm→0mm, đã quy đổi từ giá trị PLC gốc, trục dọc cố định). Có bảng số liệu tại vị trí 900/500/200mm và chức năng xuất CSV, hỗ trợ chuyển đổi tiếng Nhật/tiếng Việt.",
           e1_title: "Tự động ghi ID liên kết chỉ thị khi lưu kết quả đùn hàng ngày",
           e1_purpose: "Để một khuôn có thể tương ứng với nhiều chiều dài sản phẩm khác nhau.",
           e1_content: "Khi lưu kết quả thực tế ở press_daily_report.html dựa trên chỉ thị đã tạo ở press_directive.html, giá trị t_press.die_production_number_variant_id sẽ được tự động điền.",

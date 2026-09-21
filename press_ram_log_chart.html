@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<title>ラムログ グラフ（サンプル）</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+  h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+  .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+  .filter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-row label { font-size: 13px; color: #555; }
+  .filter-row select {
+    padding: 6px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px;
+    min-width: 140px;
+  }
+
+  .chart-wrap {
+    background: #fff; border-radius: 8px; padding: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    max-width: 1100px; margin: 0 auto;
+  }
+  .chart-title-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+  }
+  .chart-title { font-size: 15px; font-weight: bold; color: #2b6ca3; }
+  .btn-csv {
+    padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer;
+    font-size: 12px; font-weight: bold; background: #217346; color: #fff;
+  }
+  .btn-csv:disabled { background: #aaa; cursor: not-allowed; }
+  canvas { max-height: 500px; }
+
+  .summary-table { border-collapse: collapse; width: 100%; margin-bottom: 18px; font-size: 13px; }
+  .summary-table th, .summary-table td {
+    border: 1px solid #e0e0e0; padding: 6px 10px; text-align: center;
+  }
+  .summary-table th { background: #e8f1ff; color: #2b6ca3; }
+  .summary-table td.pos-col { font-weight: bold; background: #f5f5f5; }
+
+  .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+  .btn-back { background: #546e7a; color: #fff; }
+
+  .no-data { color: #999; font-size: 13px; padding: 20px; text-align: center; }
+
+  .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+  .lang-buttons button {
+    padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+    background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+  }
+  .lang-buttons button.active { background: #0078d4; color: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📈 ラムログ グラフ（サンプル）</h1>
+  <div class="subtitle" data-key="subtitle">t_press_ram_log：日付・型番・ビレット本数を選択してください</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+  </div>
+
+  <div class="filter-row">
+    <label for="selDate" data-key="label_date">日付</label>
+    <select id="selDate"><option value="" data-key="opt_select">-- 選択 --</option></select>
+
+    <label for="selDie" data-key="label_die">型番</label>
+    <select id="selDie"><option value="" data-key="opt_select">-- 選択 --</option></select>
+
+    <label for="selBillet" data-key="label_billet">ビレット本数</label>
+    <select id="selBillet"><option value="" data-key="opt_select">-- 選択 --</option></select>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-title-row">
+      <div class="chart-title" id="chartTitle" data-key="chart_title_default">グラフ</div>
+      <button class="btn-csv" id="btnCsv" data-key="btn_csv" disabled>⬇ CSV出力</button>
+    </div>
+    <table class="summary-table" id="summaryTable" style="display:none;">
+      <thead>
+        <tr>
+          <th data-key="th_position">ラム位置 (mm)</th>
+          <th data-key="th_pressure">ラム圧力 (MPa)</th>
+          <th data-key="th_speed">ラム速度 (mm/s)</th>
+          <th data-key="th_temp">出口温度 (℃)</th>
+        </tr>
+      </thead>
+      <tbody id="summaryTableBody"></tbody>
+    </table>
+    <canvas id="ramChart"></canvas>
+    <div class="no-data" id="noData" style="display:none;" data-key="no_data">データがありません</div>
+  </div>
+
+<script>
+const API = "php/press_ram_log/ram_log_api.php";
+
+const selDate = document.getElementById("selDate");
+const selDie = document.getElementById("selDie");
+const selBillet = document.getElementById("selBillet");
+const noData = document.getElementById("noData");
+const chartTitle = document.getElementById("chartTitle");
+const summaryTable = document.getElementById("summaryTable");
+const summaryTableBody = document.getElementById("summaryTableBody");
+const btnCsv = document.getElementById("btnCsv");
+
+const SUMMARY_POSITIONS = [900, 500, 200];
+
+let ramChart = null;
+let currentRows = [];
+
+/* =====================================================
+   多言語
+===================================================== */
+const dict = {
+  ja: {
+    title: "📈 ラムログ グラフ（サンプル）",
+    subtitle: "t_press_ram_log：日付・型番・ビレット本数を選択してください",
+    label_date: "日付",
+    label_die: "型番",
+    label_billet: "ビレット本数",
+    opt_select: "選択",
+    chart_title_default: "グラフ",
+    btn_back: "← 戻る",
+    btn_csv: "⬇ CSV出力",
+    no_data: "データがありません",
+    th_position: "ラム位置 (mm)",
+    th_pressure: "ラム圧力 (MPa)",
+    th_speed: "ラム速度 (mm/s)",
+    th_temp: "出口温度 (℃)",
+    x_axis_title: "ラム位置 (mm)　← 1200mm　　0mm →",
+    dieOption: row => `${row.die_name}（${row.machine}号機）`,
+    chartTitle: (date, die, billet) => `${date}　${die}　ビレット No.${billet}`,
+    csvHeader: ["日時", "ラム位置(mm)", "ラム圧力(MPa)", "ラム速度(mm/s)", "出口温度(℃)"],
+  },
+  vi: {
+    title: "📈 Biểu đồ log Ram（Bản mẫu）",
+    subtitle: "t_press_ram_log：Chọn ngày, mã khuôn, số phôi (billet)",
+    label_date: "Ngày",
+    label_die: "Mã khuôn",
+    label_billet: "Số phôi (Billet)",
+    opt_select: "Chọn",
+    chart_title_default: "Biểu đồ",
+    btn_back: "← Quay lại",
+    btn_csv: "⬇ Xuất CSV",
+    no_data: "Không có dữ liệu",
+    th_position: "Vị trí Ram (mm)",
+    th_pressure: "Áp suất Ram (MPa)",
+    th_speed: "Tốc độ Ram (mm/s)",
+    th_temp: "Nhiệt độ đầu ra (℃)",
+    x_axis_title: "Vị trí Ram (mm)　← 1200mm　　0mm →",
+    dieOption: row => `${row.die_name}（Máy ${row.machine}）`,
+    chartTitle: (date, die, billet) => `${date}　${die}　Billet No.${billet}`,
+    csvHeader: ["Thời gian", "Vị trí Ram(mm)", "Áp suất Ram(MPa)", "Tốc độ Ram(mm/s)", "Nhiệt độ đầu ra(℃)"],
+  },
+};
+
+let currentLang = localStorage.getItem("lang") || "ja";
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-key]").forEach(el => {
+    const val = dict[lang][el.dataset.key];
+    if (val && typeof val === "string") el.textContent = val;
+  });
+  document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+  document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+  if (currentRows.length > 0) {
+    buildSummaryTable(currentRows);
+    renderChart(currentRows);
+  }
+}
+
+function resetSelect(sel) {
+  sel.innerHTML = `<option value="" data-key="opt_select">-- ${dict[currentLang].opt_select} --</option>`;
+}
+
+async function loadDates() {
+  const res = await fetch(`${API}?mode=dates`);
+  const dates = await res.json();
+  dates.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    selDate.appendChild(opt);
+  });
+}
+
+async function loadDies() {
+  resetSelect(selDie);
+  resetSelect(selBillet);
+  if (!selDate.value) return;
+
+  const res = await fetch(`${API}?mode=dies&date=${encodeURIComponent(selDate.value)}`);
+  const dies = await res.json();
+  dies.forEach(row => {
+    const opt = document.createElement("option");
+    opt.value = row.die_name;
+    opt.textContent = dict[currentLang].dieOption(row);
+    selDie.appendChild(opt);
+  });
+}
+
+async function loadBillets() {
+  resetSelect(selBillet);
+  if (!selDate.value || !selDie.value) return;
+
+  const res = await fetch(`${API}?mode=billets&date=${encodeURIComponent(selDate.value)}&die_name=${encodeURIComponent(selDie.value)}`);
+  const billets = await res.json();
+  billets.forEach(b => {
+    const opt = document.createElement("option");
+    opt.value = b;
+    opt.textContent = b;
+    selBillet.appendChild(opt);
+  });
+}
+
+async function loadChart() {
+  if (!selDate.value || !selDie.value || !selBillet.value) return;
+
+  const res = await fetch(`${API}?mode=log&date=${encodeURIComponent(selDate.value)}&die_name=${encodeURIComponent(selDie.value)}&billet_counter=${encodeURIComponent(selBillet.value)}`);
+  const rows = await res.json();
+
+  if (!Array.isArray(rows) || rows.length === 0) {
+    noData.style.display = "block";
+    summaryTable.style.display = "none";
+    btnCsv.disabled = true;
+    currentRows = [];
+    if (ramChart) { ramChart.destroy(); ramChart = null; }
+    return;
+  }
+  noData.style.display = "none";
+  currentRows = rows;
+  btnCsv.disabled = false;
+  buildSummaryTable(rows);
+  renderChart(rows);
+}
+
+function renderChart(rows) {
+  const t = dict[currentLang];
+
+  // PLC生値 → 実単位変換（ラム圧・ラム速は1/10、出口温度は1/1）
+  const pressureData = rows.map(r => ({ x: r.ram_position, y: r.ram_pressure / 10 }));
+  const tempData     = rows.map(r => ({ x: r.ram_position, y: r.exit_temp }));
+  const speedData    = rows.map(r => ({ x: r.ram_position, y: r.ram_speed / 10 }));
+
+  chartTitle.textContent = t.chartTitle(selDate.value, selDie.value, selBillet.value);
+
+  const ctx = document.getElementById("ramChart");
+  if (ramChart) ramChart.destroy();
+
+  ramChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      datasets: [
+        {
+          label: t.th_pressure,
+          data: pressureData,
+          borderColor: "#e53935",
+          backgroundColor: "#e53935",
+          yAxisID: "yPressure",
+          pointRadius: 0,
+          borderWidth: 2,
+          tension: 0.1
+        },
+        {
+          label: t.th_temp,
+          data: tempData,
+          borderColor: "#fb8c00",
+          backgroundColor: "#fb8c00",
+          yAxisID: "yTemp",
+          pointRadius: 0,
+          borderWidth: 2,
+          tension: 0.1
+        },
+        {
+          label: t.th_speed,
+          data: speedData,
+          borderColor: "#1e88e5",
+          backgroundColor: "#1e88e5",
+          yAxisID: "ySpeed",
+          pointRadius: 0,
+          borderWidth: 2,
+          tension: 0.1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      animation: false,
+      parsing: false,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: {
+          type: "linear",
+          reverse: true,
+          min: 0,
+          max: 1200,
+          title: { display: true, text: t.x_axis_title }
+        },
+        yPressure: {
+          type: "linear",
+          position: "left",
+          min: 0,
+          max: 30,
+          title: { display: true, text: t.th_pressure, color: "#e53935" },
+          ticks: { color: "#e53935" }
+        },
+        yTemp: {
+          type: "linear",
+          position: "right",
+          min: 400,
+          max: 600,
+          title: { display: true, text: t.th_temp, color: "#fb8c00" },
+          ticks: { color: "#fb8c00" },
+          grid: { drawOnChartArea: false }
+        },
+        ySpeed: {
+          type: "linear",
+          position: "right",
+          min: 0,
+          max: 8,
+          title: { display: true, text: t.th_speed, color: "#1e88e5" },
+          ticks: { color: "#1e88e5" },
+          grid: { drawOnChartArea: false },
+          offset: true
+        }
+      },
+      plugins: {
+        legend: { position: "top" }
+      }
+    }
+  });
+}
+
+function buildSummaryTable(rows) {
+  summaryTableBody.innerHTML = "";
+  SUMMARY_POSITIONS.forEach(pos => {
+    // 指定位置に最も近い実測点を採用
+    const nearest = rows.reduce((a, b) =>
+      Math.abs(b.ram_position - pos) < Math.abs(a.ram_position - pos) ? b : a
+    );
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="pos-col">${pos}</td>
+      <td>${(nearest.ram_pressure / 10).toFixed(1)}</td>
+      <td>${(nearest.ram_speed / 10).toFixed(1)}</td>
+      <td>${nearest.exit_temp}</td>
+    `;
+    summaryTableBody.appendChild(tr);
+  });
+  summaryTable.style.display = "";
+}
+
+function downloadCsv() {
+  if (currentRows.length === 0) return;
+
+  const lines = [dict[currentLang].csvHeader.join(",")];
+  currentRows.forEach(r => {
+    lines.push([
+      r.date_time,
+      r.ram_position,
+      (r.ram_pressure / 10).toFixed(1),
+      (r.ram_speed / 10).toFixed(1),
+      r.exit_temp
+    ].join(","));
+  });
+
+  const csv = "﻿" + lines.join("\r\n"); // BOM付きでExcel文字化け対策
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `ram_log_${selDate.value}_${selDie.value}_${selBillet.value}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+btnCsv.addEventListener("click", downloadCsv);
+selDate.addEventListener("change", loadDies);
+selDie.addEventListener("change", loadBillets);
+selBillet.addEventListener("change", loadChart);
+
+setLang(currentLang);
+loadDates();
+</script>
+
+</body>
+</html>
