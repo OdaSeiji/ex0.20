@@ -85,7 +85,71 @@
         </div>
       </div>
 
-      <!-- 2026-09-21 (最新) -->
+      <!-- 2026-09-23 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-23</span>
+        </div>
+        <div class="entry-title" data-key="ea_title">押出波形の実測値を押出日報へワンクリック転記</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ea_purpose">「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ea_content">「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-23</span>
+        </div>
+        <div class="entry-title" data-key="eb_title">切出本数テーブルにコピー機能を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="eb_content">「追加」ボタンの隣に「コピー」ボタンを追加し、一番下のレコードの長さ・数量を複製できるようにした。カード見出しを「ビレット－切出本数」から「切出本数」に変更。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-23</span>
+        </div>
+        <div class="entry-title" data-key="ec_title">ラック登録に「本日の使用ラック数」を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ec_purpose">ラックは工場内で共有される資材のため、同じ押出日の使用状況を入力画面から確認できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ec_content">「追加」ボタンの下に、同じ押出日の全レコードを合計した使用ラック数（レコードごとの最大順序の合計）を表示。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-23</span>
+        </div>
+        <div class="entry-title" data-key="ed_title">表示名の整理</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ed_content">index.htmlの実績レポート名を短縮（金型立上実績／設備稼働実績／押出実績(t)）。押出波形（サンプル）の位置別数値表を1000/400/200mmに統一。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+          <a class="file-link" onclick="location.href='press_ram_log_chart.html'">press_ram_log_chart.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-21 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -205,6 +269,16 @@
           badge_update: "変更",
           lbl_purpose: "目的:",
           lbl_content: "内容:",
+          ea_title: "押出波形の実測値を押出日報へワンクリック転記",
+          ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
+          ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
+          eb_title: "切出本数テーブルにコピー機能を追加",
+          eb_content: "「追加」ボタンの隣に「コピー」ボタンを追加し、一番下のレコードの長さ・数量を複製できるようにした。カード見出しを「ビレット－切出本数」から「切出本数」に変更。",
+          ec_title: "ラック登録に「本日の使用ラック数」を追加",
+          ec_purpose: "ラックは工場内で共有される資材のため、同じ押出日の使用状況を入力画面から確認できるようにするため。",
+          ec_content: "「追加」ボタンの下に、同じ押出日の全レコードを合計した使用ラック数（レコードごとの最大順序の合計）を表示。",
+          ed_title: "表示名の整理",
+          ed_content: "index.htmlの実績レポート名を短縮（金型立上実績／設備稼働実績／押出実績(t)）。押出波形（サンプル）の位置別数値表を1000/400/200mmに統一。",
           e0b_title: "「発注書管理」を「生産管理」に名称変更",
           e0b_content: "order_sheet.htmlのページ名およびメニューカードの表記を「発注書管理」から「生産管理」に変更。",
           e0_title: "押出波形ページの新設（試作）",
@@ -229,6 +303,16 @@
           badge_update: "Cập nhật",
           lbl_purpose: "Mục đích:",
           lbl_content: "Nội dung:",
+          ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
+          ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
+          ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",
+          eb_title: "Thêm chức năng sao chép cho bảng chiều dài cắt",
+          eb_content: "Thêm nút \"Sao chép\" cạnh nút \"Thêm\", cho phép nhân bản chiều dài/số lượng của dòng cuối cùng. Đổi tên thẻ từ \"Đăng ký chiều dài sản phẩm Billet\" thành \"Đăng ký chiều dài sản phẩm\".",
+          ec_title: "Thêm \"Số rack đã dùng trong ngày\" vào đăng ký rack",
+          ec_purpose: "Vì rack là vật tư dùng chung trong nhà máy, cần xem được tình hình sử dụng trong cùng ngày ép ngay trên màn hình nhập liệu.",
+          ec_content: "Hiển thị bên dưới nút \"Thêm\" tổng số rack đã dùng trong cùng ngày ép, tính trên tất cả các bản ghi (tổng thứ tự lớn nhất của từng bản ghi).",
+          ed_title: "Sắp xếp lại tên hiển thị",
+          ed_content: "Rút gọn tên các báo cáo thực tế trong index.html (Thực tế khởi động khuôn／Thực tế hoạt động máy／Thực tế ép (t)). Thống nhất bảng số liệu theo vị trí của trang dạng sóng ép đùn (bản mẫu) về 1000/400/200mm.",
           e0b_title: "Đổi tên「Quản lý phiếu đặt hàng」thành「Quản lý sản xuất」",
           e0b_content: "Đổi tên trang order_sheet.html và thẻ menu tương ứng từ「Quản lý phiếu đặt hàng」thành「Quản lý sản xuất」.",
           e0_title: "Thêm mới trang dạng sóng ép đùn（Bản thử nghiệm）",
