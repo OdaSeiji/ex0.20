@@ -96,7 +96,7 @@
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ee_purpose">時効ラックが日々どれだけ使われ、どれだけ空いているかを把握するため。</span>
         </div>
         <div class="entry-purpose">
-          <span class="label" data-key="lbl_content">内容:</span><span data-key="ee_content">日別の使用ラック数（押出日で計上）と解放ラック数（そのラックの最終梱包日で計上）を棒グラフと表で表示。期間は7日／30日／90日または任意指定、差（使用−解放）・1日平均・合計、CSV出力、日本語/ベトナム語切替に対応。梱包日報が未入力のラックは解放に計上されない。</span>
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ee_content">日別の使用ラック数（押出日で計上）と解放ラック数（そのラックの最終梱包日で計上）を棒グラフと表で表示。期間は7日／30日／90日または任意指定、差（使用−解放）・1日平均・合計、CSV出力、日本語/ベトナム語切替に対応。梱包日報が未入力のラックは解放に計上されない。下部には使用期間（押出日→最終梱包日）の平均・中央値・最長、日数の分布、直近12か月の月別推移を表示。</span>
         </div>
         <div class="file-links">
           <a class="file-link" onclick="location.href='aging_rack_report.html'">aging_rack_report.html</a>
@@ -288,7 +288,7 @@
           lbl_content: "内容:",
           ee_title: "時効ラック 使用・解放実績ページの新設",
           ee_purpose: "時効ラックが日々どれだけ使われ、どれだけ空いているかを把握するため。",
-          ee_content: "日別の使用ラック数（押出日で計上）と解放ラック数（そのラックの最終梱包日で計上）を棒グラフと表で表示。期間は7日／30日／90日または任意指定、差（使用−解放）・1日平均・合計、CSV出力、日本語/ベトナム語切替に対応。梱包日報が未入力のラックは解放に計上されない。",
+          ee_content: "日別の使用ラック数（押出日で計上）と解放ラック数（そのラックの最終梱包日で計上）を棒グラフと表で表示。期間は7日／30日／90日または任意指定、差（使用−解放）・1日平均・合計、CSV出力、日本語/ベトナム語切替に対応。梱包日報が未入力のラックは解放に計上されない。下部には使用期間（押出日→最終梱包日）の平均・中央値・最長、日数の分布、直近12か月の月別推移を表示。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -325,7 +325,7 @@
           lbl_content: "Nội dung:",
           ee_title: "Thêm mới trang thực tế sử dụng/giải phóng giá hóa già",
           ee_purpose: "Nắm được mỗi ngày giá hóa già được sử dụng bao nhiêu và được giải phóng bao nhiêu.",
-          ee_content: "Hiển thị bằng biểu đồ cột và bảng số giá sử dụng theo ngày (tính theo ngày ép) và số giá giải phóng (tính theo ngày đóng gói cuối cùng của giá). Chọn thời gian 7/30/90 ngày hoặc tùy chọn; có chênh lệch (SD−GP), TB/ngày, tổng, xuất CSV, chuyển đổi tiếng Nhật/tiếng Việt. Giá chưa nhập báo cáo đóng gói sẽ không được tính là giải phóng.",
+          ee_content: "Hiển thị bằng biểu đồ cột và bảng số giá sử dụng theo ngày (tính theo ngày ép) và số giá giải phóng (tính theo ngày đóng gói cuối cùng của giá). Chọn thời gian 7/30/90 ngày hoặc tùy chọn; có chênh lệch (SD−GP), TB/ngày, tổng, xuất CSV, chuyển đổi tiếng Nhật/tiếng Việt. Giá chưa nhập báo cáo đóng gói sẽ không được tính là giải phóng. Phần dưới hiển thị thời gian sử dụng (ngày ép → ngày đóng gói cuối): trung bình, trung vị, dài nhất, phân bố số ngày và xu hướng theo tháng trong 12 tháng gần nhất.",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

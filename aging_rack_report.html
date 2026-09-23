@@ -69,6 +69,23 @@
     tr:hover td { background: #f0f8ff; }
     tr.sum-row td { background: #e3f2fd; font-weight: bold; color: #1565c0; }
     tr.avg-row td { background: #fff8e1; font-weight: bold; color: #8d6e00; }
+
+    /* 使用期間 */
+    .stat-cards { display: flex; gap: 12px; flex-wrap: wrap; }
+    .stat-card {
+      background: #fff; border-radius: 8px; padding: 12px 20px; min-width: 140px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-top: 4px solid #90a4ae;
+    }
+    .stat-card.main { border-top-color: #0078d4; }
+    .stat-label { font-size: 12px; color: #777; }
+    .stat-value { font-size: 24px; font-weight: bold; font-family: "Roboto Mono", monospace; color: #333; }
+    .stat-card.main .stat-value { color: #0078d4; }
+    .duration-row { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 16px; margin-bottom: 30px; }
+    .chart-wrap.half { flex: 1 1 480px; min-width: 0; }
+    .chart-title { font-size: 14px; font-weight: bold; color: #2b6ca3; margin-bottom: 10px; }
+    .chart-wrap.half canvas { max-height: 260px; }
+    .mini-table { margin-top: 14px; }
+    .mini-table td:first-child { text-align: center; font-family: "Roboto Mono", monospace; background: #f5f5f5; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -120,6 +137,35 @@
     </table>
   </div>
 
+  <!-- 使用期間 -->
+  <div class="section-title" data-key="sec_duration">⏱️ 使用期間（押出日 → 最終梱包日）</div>
+  <div class="stat-cards">
+    <div class="stat-card"><div class="stat-label" data-key="stat_count">対象ラック数</div><div class="stat-value" id="statCount">-</div></div>
+    <div class="stat-card"><div class="stat-label" data-key="stat_avg">平均</div><div class="stat-value" id="statAvg">-</div></div>
+    <div class="stat-card main"><div class="stat-label" data-key="stat_median">中央値</div><div class="stat-value" id="statMedian">-</div></div>
+    <div class="stat-card"><div class="stat-label" data-key="stat_max">最長</div><div class="stat-value" id="statMax">-</div></div>
+  </div>
+  <div class="note" id="durationNote"></div>
+
+  <div class="duration-row">
+    <div class="chart-wrap half">
+      <div class="chart-title" data-key="dist_title">📊 使用期間の分布（期間内に解放されたラック）</div>
+      <canvas id="distChart"></canvas>
+      <table class="mini-table">
+        <thead><tr><th data-key="col_days">使用期間</th><th data-key="col_racks">ラック数</th><th data-key="col_ratio">割合</th></tr></thead>
+        <tbody id="distBody"></tbody>
+      </table>
+    </div>
+    <div class="chart-wrap half">
+      <div class="chart-title" data-key="monthly_title">📈 月別の使用期間（解放月ベース・直近12か月）</div>
+      <canvas id="monthlyChart"></canvas>
+      <table class="mini-table">
+        <thead><tr><th data-key="col_month">解放月</th><th data-key="col_racks">ラック数</th><th data-key="stat_avg">平均</th><th data-key="stat_median">中央値</th><th data-key="stat_max">最長</th></tr></thead>
+        <tbody id="monthlyBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <script>
     /* =====================================================
        多言語
@@ -145,6 +191,21 @@
         avg_row:      "1日平均",
         axis_y:       "ラック数",
         weekdays:     ["日", "月", "火", "水", "木", "金", "土"],
+        sec_duration:  "⏱️ 使用期間（押出日 → 最終梱包日）",
+        stat_count:    "対象ラック数",
+        stat_avg:      "平均",
+        stat_median:   "中央値",
+        stat_max:      "最長",
+        dist_title:    "📊 使用期間の分布（期間内に解放されたラック）",
+        monthly_title: "📈 月別の使用期間（解放月ベース・直近12か月）",
+        col_days:      "使用期間",
+        col_racks:     "ラック数",
+        col_ratio:     "割合",
+        col_month:     "解放月",
+        unit_day:      "日",
+        unit_rack:     "台",
+        duration_note: (n) => `※ 期間内に解放された（最終梱包日が期間内の）ラックが対象。梱包日報が未入力のラックは含まれません。長期滞留ラックが1台あるだけで平均は大きく動くため、中央値もあわせて見てください。` +
+                              (n > 0 ? `梱包日が押出日より前のラック（入力ミスと思われる）${n}台は除外しています。` : ""),
       },
       vi: {
         title:        "🗄️ Giá hóa già: Sử dụng / Giải phóng",
@@ -166,6 +227,21 @@
         avg_row:      "TB/ngày",
         axis_y:       "Số giá",
         weekdays:     ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+        sec_duration:  "⏱️ Thời gian sử dụng (ngày ép → ngày đóng gói cuối)",
+        stat_count:    "Số giá",
+        stat_avg:      "Trung bình",
+        stat_median:   "Trung vị",
+        stat_max:      "Dài nhất",
+        dist_title:    "📊 Phân bố thời gian sử dụng (giá giải phóng trong kỳ)",
+        monthly_title: "📈 Thời gian sử dụng theo tháng (theo tháng giải phóng, 12 tháng gần nhất)",
+        col_days:      "Thời gian SD",
+        col_racks:     "Số giá",
+        col_ratio:     "Tỷ lệ",
+        col_month:     "Tháng GP",
+        unit_day:      " ngày",
+        unit_rack:     "",
+        duration_note: (n) => `※ Đối tượng là các giá được giải phóng trong kỳ (ngày đóng gói cuối nằm trong kỳ). Giá chưa nhập báo cáo đóng gói không được tính. Chỉ cần một giá tồn lâu là trung bình thay đổi nhiều, nên hãy xem cả trung vị.` +
+                              (n > 0 ? ` Đã loại ${n} giá có ngày đóng gói trước ngày ép (có thể nhập sai).` : ""),
       },
     };
 
@@ -182,6 +258,7 @@
       document.getElementById("btnJa").classList.toggle("active", lang === "ja");
       document.getElementById("btnVi").classList.toggle("active", lang === "vi");
       if (rawData) render();
+      if (durationData) renderDuration();
     }
 
     /* =====================================================
@@ -210,16 +287,23 @@
        データ
     ===================================================== */
     let rawData = null;
+    let durationData = null;
 
     async function loadData() {
       const from = document.getElementById("fromDate").value;
       const to   = document.getElementById("toDate").value;
-      const res  = await fetch(`./php/report_php/get_aging_rack_daily.php?from=${from}&to=${to}`);
-      rawData = await res.json();
+      const query = `from=${from}&to=${to}`;
+      const [dailyRes, durationRes] = await Promise.all([
+        fetch(`./php/report_php/get_aging_rack_daily.php?${query}`),
+        fetch(`./php/report_php/get_aging_rack_duration.php?${query}`),
+      ]);
+      rawData      = await dailyRes.json();
+      durationData = await durationRes.json();
       // サーバー側で補正された期間（前後の入れ替え等）を画面に反映
       document.getElementById("fromDate").value = rawData.from;
       document.getElementById("toDate").value   = rawData.to;
       render();
+      renderDuration();
     }
 
     /* =====================================================
@@ -309,6 +393,83 @@
         `<tr class="sum-row"><td>${t.sum_row}</td><td>${sumUsed}</td><td>${sumReleased}</td><td>${sumUsed - sumReleased > 0 ? "+" : ""}${sumUsed - sumReleased}</td></tr>`,
       );
       body.innerHTML = rows.join("");
+    }
+
+    /* =====================================================
+       使用期間
+    ===================================================== */
+    let distChartInstance = null;
+    let monthlyChartInstance = null;
+
+    function fmtDays(v) {
+      return v === null || v === undefined ? "-" : `${v}${dict[currentLang].unit_day}`;
+    }
+
+    function bucketLabel(b) {
+      return `${b.label}${dict[currentLang].unit_day}`;
+    }
+
+    function renderDuration() {
+      const t = dict[currentLang];
+      const s = durationData.summary;
+
+      document.getElementById("statCount").textContent  = `${s.count.toLocaleString()}${t.unit_rack}`;
+      document.getElementById("statAvg").textContent    = fmtDays(s.avg);
+      document.getElementById("statMedian").textContent = fmtDays(s.median);
+      document.getElementById("statMax").textContent    = fmtDays(s.max);
+      document.getElementById("durationNote").textContent = t.duration_note(s.excluded);
+
+      // 分布
+      const buckets = durationData.buckets;
+      const total = buckets.reduce((sum, b) => sum + b.count, 0) || 1;
+      document.getElementById("distBody").innerHTML = buckets.map(b =>
+        `<tr><td>${bucketLabel(b)}</td>${numCell(b.count)}<td class="mono">${(b.count / total * 100).toFixed(1)}%</td></tr>`
+      ).join("");
+
+      if (distChartInstance) distChartInstance.destroy();
+      distChartInstance = new Chart(document.getElementById("distChart"), {
+        type: "bar",
+        data: {
+          labels: buckets.map(bucketLabel),
+          datasets: [{
+            label: t.col_racks,
+            data: buckets.map(b => b.count),
+            // 長期になるほど警告色
+            backgroundColor: ["#2e7d32bb", "#2e7d32bb", "#1976d2bb", "#f9a825bb", "#ef6c00bb", "#c62828bb"],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true, title: { display: true, text: t.axis_y }, ticks: { precision: 0 } } },
+        },
+      });
+
+      // 月別
+      const monthly = durationData.monthly;
+      document.getElementById("monthlyBody").innerHTML = [...monthly].reverse().map(m =>
+        `<tr><td>${m.month}</td>${numCell(m.count)}` +
+        `<td class="mono">${fmtDays(m.avg)}</td><td class="mono">${fmtDays(m.median)}</td><td class="mono">${fmtDays(m.max)}</td></tr>`
+      ).join("");
+
+      if (monthlyChartInstance) monthlyChartInstance.destroy();
+      monthlyChartInstance = new Chart(document.getElementById("monthlyChart"), {
+        type: "line",
+        data: {
+          labels: monthly.map(m => m.month.slice(2).replace("-", "/")),
+          datasets: [
+            { label: t.stat_median, data: monthly.map(m => m.median), borderColor: "#0078d4", backgroundColor: "#0078d4", tension: 0.2 },
+            { label: t.stat_avg,    data: monthly.map(m => m.avg),    borderColor: "#90a4ae", backgroundColor: "#90a4ae", borderDash: [5, 4], tension: 0.2 },
+          ],
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: "index", intersect: false },
+          plugins: { legend: { position: "top" } },
+          scales: { y: { beginAtZero: true, title: { display: true, text: t.unit_day.trim() || "ngày" } } },
+        },
+      });
     }
 
     /* =====================================================
