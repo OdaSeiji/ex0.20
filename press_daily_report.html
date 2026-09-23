@@ -469,7 +469,7 @@
         </div>
 
         <div class="sub-title sub-title-total">
-          <span data-key="card_worklength">ビレット－切出本数</span>
+          <span data-key="card_worklength">切出本数</span>
           <span class="header-total"><span data-key="lbl_worklength_total">合計</span>: <span id="worklength-total__value" class="mono">0</span><span data-key="unit_pieces">本</span></span>
         </div>
         <div class="table-wrap worklength-wrap">
@@ -482,6 +482,7 @@
           <input type="text" id="length_exd" data-key-ph="ph_len" placeholder="len" />
           <input type="text" id="quantity_cut" data-key-ph="ph_qty" placeholder="qty" />
           <button class="btn btn-add" id="add_row__button" disabled data-key="btn_save">追加</button>
+          <button type="button" class="btn btn-add" id="copy_row__button" disabled data-key="btn_copy" title="一番下のレコードをコピーして追加">コピー</button>
         </div>
       </div>
     </div>
@@ -782,7 +783,7 @@
         btn_save: "追加",
         card_rack: "ラック登録", lbl_rack_total: "合計本数", col_order: "順序", col_rack: "ラック",
         empty_rack: "登録データなし", ph_rack: "ラック番号",
-        card_worklength: "ビレット－切出本数", col_len: "長さ",
+        card_worklength: "切出本数", col_len: "長さ", btn_copy: "コピー",
         lbl_worklength_total: "合計", unit_pieces: "本",
         empty_worklength: "登録データなし", ph_len: "長さ",
         card_worktime: "作業時間ログ", sub_time_extrusion: "押出時間",
@@ -848,7 +849,7 @@
         btn_save: "Thêm",
         card_rack: "Đăng ký rack", lbl_rack_total: "Tổng số lượng", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số rack",
-        card_worklength: "Đăng ký chiều dài sản phẩm", col_len: "Chiều dài",
+        card_worklength: "Đăng ký chiều dài sản phẩm", col_len: "Chiều dài", btn_copy: "Sao chép",
         lbl_worklength_total: "Tổng", unit_pieces: "thanh",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Chiều dài",
         card_worktime: "Thời gian thao tác", sub_time_extrusion: "Thời gian đùn",
@@ -1536,7 +1537,26 @@
         renumberWorkLengthRows();
       }
       updateWorkLengthTotal();
+      updateCopyRowButtonState();
     }
+
+    function getWorkLengthRows() {
+      return [...document.querySelectorAll("#work-length__table tbody tr")]
+        .filter(tr => !tr.querySelector(".empty-note"));
+    }
+
+    function updateCopyRowButtonState() {
+      document.getElementById("copy_row__button").disabled = getWorkLengthRows().length === 0;
+    }
+
+    function copyLastWorkLengthRow() {
+      const rows = getWorkLengthRows();
+      const lastRow = rows[rows.length - 1];
+      if (!lastRow) return;
+      const inputs = lastRow.querySelectorAll("input");
+      appendWorkLengthRow(inputs[0].value, inputs[1].value);
+    }
+    document.getElementById("copy_row__button").addEventListener("click", copyLastWorkLengthRow);
 
     function appendWorkLengthRow(len, qty) {
       const tbody = document.querySelector("#work-length__table tbody");
@@ -1574,6 +1594,7 @@
       tr.appendChild(delTd);
       tbody.appendChild(tr);
       updateWorkLengthTotal();
+      updateCopyRowButtonState();
     }
 
     document.getElementById("add_row__button").addEventListener("click", function () {
