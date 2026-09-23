@@ -467,6 +467,9 @@
           <input type="text" id="rackqty__input" data-key-ph="ph_qty" placeholder="Qty" />
           <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">追加</button>
         </div>
+        <div style="font-size:12px; color:#555; margin-top:6px;">
+          <span data-key="lbl_rack_day_total">本日の使用ラック数</span>: <span id="rack-day-total__value" class="mono">0</span>
+        </div>
 
         <div class="sub-title sub-title-total">
           <span data-key="card_worklength">切出本数</span>
@@ -781,7 +784,7 @@
         empty_bundle: "登録データなし",
         ph_bundle: "バンドル番号", ph_qty: "数量", ph_lot: "ロット", ph_note: "備考",
         btn_save: "追加",
-        card_rack: "ラック登録", lbl_rack_total: "合計本数", col_order: "順序", col_rack: "ラック",
+        card_rack: "ラック登録", lbl_rack_total: "合計本数", lbl_rack_day_total: "本日の使用ラック数", col_order: "順序", col_rack: "ラック",
         empty_rack: "登録データなし", ph_rack: "ラック番号",
         card_worklength: "切出本数", col_len: "長さ", btn_copy: "コピー",
         lbl_worklength_total: "合計", unit_pieces: "本",
@@ -847,7 +850,7 @@
         empty_bundle: "Chưa có dữ liệu",
         ph_bundle: "Số bundle", ph_qty: "Số lượng", ph_lot: "Lot", ph_note: "Ghi chú",
         btn_save: "Thêm",
-        card_rack: "Đăng ký rack", lbl_rack_total: "Tổng số lượng", col_order: "Thứ tự", col_rack: "Rack",
+        card_rack: "Đăng ký rack", lbl_rack_total: "Tổng số lượng", lbl_rack_day_total: "Số rack đã dùng trong ngày", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số rack",
         card_worklength: "Đăng ký chiều dài sản phẩm", col_len: "Chiều dài", btn_copy: "Sao chép",
         lbl_worklength_total: "Tổng", unit_pieces: "thanh",
@@ -952,6 +955,7 @@
     // （まだ未入力の場合のみ。ユーザーが個別に変えた値は上書きしない）
     function syncSubDatesToPressDate() {
       const pressDate = document.getElementById("date__input").value;
+      refreshRackDayTotal();
       if (!pressDate) return;
       ["pull_date", "cut_date"].forEach(id => {
         const el = document.getElementById(id);
@@ -1423,6 +1427,36 @@
         if (!isNaN(n)) total += n;
       });
       document.getElementById("rack-total__value").textContent = total;
+      refreshRackDayTotal();
+    }
+
+    // 押出日（date__input）に登録されている、他レコード分のラック本数（DB）＋ 今この画面のラック表の本数、を合算して表示
+    // 編集中レコード自身の分はDB側から除外し、二重計上を防ぐ
+    let rackDayTotalRequestSeq = 0;
+    // 使用ラック数（今この画面のラック表分） = 登録行数（順序の最大値と同じ）。数量(Qty)の合計ではない。
+    function getLocalRackCount() {
+      return document.querySelectorAll("#rack__table tbody tr td:nth-child(2)").length;
+    }
+
+    async function refreshRackDayTotal() {
+      const date = document.getElementById("date__input").value;
+      const el = document.getElementById("rack-day-total__value");
+      const localTotal = getLocalRackCount();
+      const seq = ++rackDayTotalRequestSeq; // 連続で呼ばれた場合、古い応答が後から上書きしないようにする
+      if (!date) {
+        el.textContent = localTotal;
+        return;
+      }
+      try {
+        const params = new URLSearchParams({ date });
+        if (editingPressId) params.set("exclude_press_id", editingPressId);
+        const res = await fetch(`./php/press_daily_report/get_rack_total_for_date.php?${params}`);
+        const data = await res.json();
+        if (seq !== rackDayTotalRequestSeq) return; // 途中で新しいリクエストが発生済み→この応答は破棄
+        el.textContent = (data.total || 0) + localTotal;
+      } catch (e) {
+        console.error(e);
+      }
     }
 
     function renumberRackOrder() {
@@ -2633,6 +2667,7 @@
         editingPressId = id;
         document.getElementById("editing-id__label").textContent = id;
         document.getElementById("edit-mode__badge").style.display = "inline-flex";
+        refreshRackDayTotal();
 
         showSaveStatus("", false);
         checkAllRequiredFields();
