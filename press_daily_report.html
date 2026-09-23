@@ -398,11 +398,12 @@
         <div class="table-wrap" style="margin-bottom: 0;">
           <table id="ram-values__table">
             <thead>
-              <tr><th></th><th colspan="3">1000/400mm</th><th colspan="3">200mm</th></tr>
+              <tr><th></th><th colspan="3">1000/400mm</th><th colspan="3">200mm</th><th></th></tr>
               <tr>
                 <th></th>
                 <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
                 <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+                <th></th>
               </tr>
             </thead>
             <tbody id="ram-values__body"></tbody>
@@ -901,9 +902,19 @@
           <td><input type="text" id="no${no}_0200_ram_speed" class="num-input" /></td>
           <td><input type="text" id="no${no}_0200_ram_pressure" class="num-input" /></td>
           <td><input type="text" id="no${no}_0200_work_temperature" class="num-input" /></td>
+          <td><button type="button" class="btn btn-cancel-edit" title="この行をクリア" onclick="clearRamRow(${no})" style="padding:2px 6px;">✕</button></td>
         `;
         body.appendChild(tr);
       }
+    }
+
+    // 「ラム速度・圧力・温度」テーブルの指定行（No.1〜5）の値をクリア
+    function clearRamRow(no) {
+      ["1000_ram_speed", "1000_ram_pressure", "1000_work_temperature",
+       "0200_ram_speed", "0200_ram_pressure", "0200_work_temperature"].forEach(suf => {
+        const el = document.getElementById(`no${no}_${suf}`);
+        if (el) setInputValue(el, "");
+      });
     }
 
     /* 日付のデフォルト値：t_press の最新日付の翌日 */
