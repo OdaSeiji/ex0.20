@@ -391,7 +391,10 @@
           </table>
         </div>
 
-        <div class="sub-title" data-key="sub_ram_values" style="margin: 6px 0 2px;">ラム速度・圧力・温度</div>
+        <div class="sub-title sub-title-total" style="margin: 6px 0 2px;">
+          <span data-key="sub_ram_values">ラム速度・圧力・温度</span>
+          <button type="button" class="btn btn-add" id="waveformBtn" title="押出波形を表示" onclick="openWaveformModal()" style="padding:3px 8px;">🍓</button>
+        </div>
         <div class="table-wrap" style="margin-bottom: 0;">
           <table id="ram-values__table">
             <thead>
@@ -704,6 +707,31 @@
     </div>
   </div>
 
+  <!-- 押出波形（ラムログ）モーダル -->
+  <div class="modal-overlay" id="waveformModal" style="display:none;" onclick="if(event.target===this) closeWaveformModal()">
+    <div class="modal-box" style="width:820px;">
+      <h2 data-key="modal_waveform_title">📈 押出波形</h2>
+      <div style="font-size:12px; color:#666; margin-bottom:10px;" id="waveformDieArea"></div>
+      <div class="modal-table-wrap">
+        <table>
+          <thead>
+            <tr><th></th><th colspan="3">1000mm</th><th colspan="3">400mm</th><th colspan="3">200mm</th></tr>
+            <tr>
+              <th data-key="col_billet">Billet</th>
+              <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+              <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+              <th data-key="col_spd">spd</th><th data-key="col_press">press</th><th data-key="col_temp">temp</th>
+            </tr>
+          </thead>
+          <tbody id="waveformModalBody"></tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-back" onclick="closeWaveformModal()" data-key="btn_cancel">キャンセル</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const dict = {
       ja: {
@@ -719,6 +747,15 @@
         col_machine: "設備", col_start: "開始", col_end: "終了",
         col_billet_inc: "Billet数",
         empty_plc: "この日のログはありません",
+        modal_waveform_title: "📈 押出波形",
+        col_billet: "Billet",
+        opt_select: "選択",
+        empty_waveform: "データがありません",
+        msg_fill_date_die: "日付・金型番号を先に入力してください。",
+        msg_no_log: date => `${date} のラムログは記録されていません。`,
+        msg_no_exact_match: dieNumber => `金型番号「${dieNumber}」と完全一致するラムログが見つかりません。候補から選択してください：`,
+        lbl_waveform_target: (dieName, machine) => `対象: ${dieName}（${machine}号機）`,
+        dieOption: (dieName, machine) => `${dieName}（${machine}号機）`,
         lbl_delivery_month: "（納期基準）",
         lbl_washed: "洗浄済み", opt_no: "No", opt_yes: "Yes",
         lbl_press_type: "プレス種別", lbl_machine: "設備番号",
@@ -776,6 +813,15 @@
         col_machine: "Máy", col_start: "Bắt đầu", col_end: "Kết thúc",
         col_billet_inc: "SL Billet",
         empty_plc: "Không có log cho ngày này",
+        modal_waveform_title: "📈 Dạng sóng ép đùn",
+        col_billet: "Billet",
+        opt_select: "Chọn",
+        empty_waveform: "Không có dữ liệu",
+        msg_fill_date_die: "Vui lòng nhập ngày và mã khuôn trước.",
+        msg_no_log: date => `Không có log Ram nào được ghi vào ngày ${date}.`,
+        msg_no_exact_match: dieNumber => `Không tìm thấy log Ram khớp hoàn toàn với mã khuôn "${dieNumber}". Vui lòng chọn từ danh sách：`,
+        lbl_waveform_target: (dieName, machine) => `Đối tượng: ${dieName}（Máy ${machine}）`,
+        dieOption: (dieName, machine) => `${dieName}（Máy ${machine}）`,
         lbl_delivery_month: "（theo ngày giao）",
         lbl_washed: "Đã ngâm", opt_no: "No", opt_yes: "Yes",
         lbl_press_type: "Kiểu đùn", lbl_machine: "Số máy",
@@ -1922,12 +1968,115 @@
       document.getElementById("previewModal").style.display = "none";
     }
 
+    /* -------------------------
+       押出波形（ラムログ）モーダル
+       金型番号（例：CA40T-V02C）から「-」より前のベース名（CA40T）を取り出し、
+       その日にt_press_ram_logへ記録されたdie_nameと完全一致するものを自動選択する。
+       一致しない／複数ある場合は、その日に記録された候補から選んでもらう。
+    ------------------------- */
+    const WAVEFORM_API = "./php/press_ram_log/ram_log_api.php";
+
+    function closeWaveformModal() {
+      document.getElementById("waveformModal").style.display = "none";
+    }
+
+    async function openWaveformModal() {
+      document.getElementById("waveformModal").style.display = "flex";
+      document.getElementById("waveformModalBody").innerHTML = "";
+
+      const date = document.getElementById("date__input").value;
+      const dieNumber = document.getElementById("die__input").value.trim();
+      const area = document.getElementById("waveformDieArea");
+
+      if (!date || !dieNumber) {
+        area.textContent = dict[currentLang].msg_fill_date_die;
+        return;
+      }
+
+      const baseName = dieNumber.split("-")[0];
+      const res = await fetch(`${WAVEFORM_API}?mode=dies&date=${encodeURIComponent(date)}`);
+      const dies = await res.json();
+      const exact = dies.filter(d => d.die_name === baseName);
+
+      if (dies.length === 0) {
+        area.textContent = dict[currentLang].msg_no_log(date);
+      } else if (exact.length === 1) {
+        area.textContent = dict[currentLang].lbl_waveform_target(exact[0].die_name, exact[0].machine);
+        loadWaveformSummary(date, exact[0].die_name);
+      } else {
+        const options = dies.map(d =>
+          `<option value="${d.die_name}">${dict[currentLang].dieOption(d.die_name, d.machine)}</option>`
+        ).join("");
+        area.innerHTML = `
+          ${dict[currentLang].msg_no_exact_match(dieNumber)}
+          <select id="waveformDieSelect"><option value="">-- ${dict[currentLang].opt_select} --</option>${options}</select>
+        `;
+        document.getElementById("waveformDieSelect").addEventListener("change", (e) => {
+          if (e.target.value) loadWaveformSummary(date, e.target.value);
+        });
+      }
+    }
+
+    async function loadWaveformSummary(date, dieName) {
+      const tbody = document.getElementById("waveformModalBody");
+      tbody.innerHTML = "";
+      const res = await fetch(`${WAVEFORM_API}?mode=summary&date=${encodeURIComponent(date)}&die_name=${encodeURIComponent(dieName)}`);
+      const rows = await res.json();
+
+      if (rows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="empty-note">${dict[currentLang].empty_waveform}</td></tr>`;
+        return;
+      }
+      rows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <th>${r.billet_counter}</th>
+          <td>${r.pos_1000.speed}</td><td>${r.pos_1000.pressure}</td><td>${r.pos_1000.temp}</td>
+          <td>${r.pos_400.speed}</td><td>${r.pos_400.pressure}</td><td>${r.pos_400.temp}</td>
+          <td>${r.pos_200.speed}</td><td>${r.pos_200.pressure}</td><td>${r.pos_200.temp}</td>
+        `;
+        tr.addEventListener("click", () => transferWaveformRow(r, tr));
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 実測ラム位置が1000mmに十分近ければ1000mm側の値を、そうでなければ400mm側の値を「1000/400mm」欄へ転記する
+    const WAVEFORM_1000_TOLERANCE = 100;
+
+    function transferWaveformRow(row, tr) {
+      const group1 = Math.abs(row.pos_1000.position - 1000) <= WAVEFORM_1000_TOLERANCE
+        ? row.pos_1000
+        : row.pos_400;
+      const group2 = row.pos_200;
+
+      for (let no = 1; no <= 5; no++) {
+        const speedInput = document.getElementById(`no${no}_1000_ram_speed`);
+        if (speedInput.value !== "") continue;
+
+        setInputValue(speedInput, group1.speed);
+        setInputValue(document.getElementById(`no${no}_1000_ram_pressure`), group1.pressure);
+        setInputValue(document.getElementById(`no${no}_1000_work_temperature`), group1.temp);
+        setInputValue(document.getElementById(`no${no}_0200_ram_speed`), group2.speed);
+        setInputValue(document.getElementById(`no${no}_0200_ram_pressure`), group2.pressure);
+        setInputValue(document.getElementById(`no${no}_0200_work_temperature`), group2.temp);
+        tr.classList.add("active");
+        return;
+      }
+    }
+
+    // 値をセットしたうえで input イベントを発火し、必須項目チェック等の既存リスナーに反映させる
+    function setInputValue(el, value) {
+      el.value = value;
+      el.dispatchEvent(new Event("input", { bubbles: true }));
+    }
+
     // Escキーでモーダルを閉じる
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         if (document.getElementById("directiveModal").style.display !== "none") closeDirectiveModal();
         if (document.getElementById("plcSessionModal").style.display !== "none") closePlcSessionModal();
         if (document.getElementById("previewModal").style.display !== "none") closeDrawingPreview();
+        if (document.getElementById("waveformModal").style.display !== "none") closeWaveformModal();
         return;
       }
       // 稼働ログモーダル表示中はカーソルキー／Enterで選択行を移動
