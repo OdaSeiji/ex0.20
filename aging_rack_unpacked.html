@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Unpacked Aging Racks</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-csv  { background: #217346; color: #fff; }
+    .btn-show { background: #0078d4; color: #fff; }
+
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filter-row label { font-size: 13px; color: #555; }
+    .filter-row input[type=date],
+    .filter-row input[type=text] { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .filter-row input[type=text] { width: 200px; }
+    .seg { display: flex; border: 1px solid #0078d4; border-radius: 5px; overflow: hidden; }
+    .seg button {
+      padding: 6px 12px; border: none; background: #fff; color: #0078d4;
+      font-size: 12px; font-weight: bold; cursor: pointer;
+    }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+
+    .note { font-size: 12px; color: #777; margin: 6px 0 16px 4px; line-height: 1.6; }
+
+    /* サマリー */
+    .stat-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .stat-card {
+      background: #fff; border-radius: 8px; padding: 12px 20px; min-width: 140px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-top: 4px solid #90a4ae;
+    }
+    .stat-card.main { border-top-color: #0078d4; }
+    .stat-card.warn { border-top-color: #e65100; }
+    .stat-label { font-size: 12px; color: #777; }
+    .stat-value { font-size: 24px; font-weight: bold; font-family: "Roboto Mono", monospace; color: #333; }
+    .stat-card.main .stat-value { color: #0078d4; }
+    .stat-card.warn .stat-value { color: #e65100; }
+    .stat-sub { font-size: 11px; color: #999; }
+
+    .age-bar { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 16px; }
+    .age-chip {
+      background: #fff; border: 2px solid #ddd; border-radius: 16px; padding: 4px 12px;
+      font-size: 12px; cursor: pointer; user-select: none;
+    }
+    .age-chip b { font-family: "Roboto Mono", monospace; margin-left: 4px; }
+    .age-chip.active { border-color: #0078d4; background: #e8f1ff; }
+
+    .section-title {
+      font-size: 15px; font-weight: bold; color: #2b6ca3;
+      margin: 8px 0 8px; padding-left: 8px;
+      border-left: 4px solid #0078d4;
+    }
+
+    /* テーブル */
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow: auto; max-height: calc(100vh - 120px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; font-size: 13px; width: 100%; }
+    th, td { padding: 6px 12px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
+    th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; z-index: 1; cursor: pointer; }
+    th.sorted::after { content: " ▲"; }
+    th.sorted.desc::after { content: " ▼"; }
+    td.mono, td.date-col { font-family: "Roboto Mono", monospace; }
+    td.date-col, td.center { text-align: center; }
+    td.text { text-align: left; }
+    td.zero { color: #bbb; }
+    td.remain { font-weight: bold; color: #0078d4; }
+    tr:hover td { background: #f0f8ff; }
+    tr.sum-row td { background: #e3f2fd; font-weight: bold; color: #1565c0; position: sticky; bottom: 0; }
+
+    .days { display: inline-block; min-width: 42px; padding: 1px 6px; border-radius: 10px; text-align: center; font-weight: bold; }
+    .days.d0 { background: #e8f5e9; color: #2e7d32; }
+    .days.d1 { background: #fff8e1; color: #8d6e00; }
+    .days.d2 { background: #fff3e0; color: #e65100; }
+    .days.d3 { background: #ffebee; color: #c62828; }
+
+    .badge { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .badge.none    { background: #eceff1; color: #455a64; }
+    .badge.partial { background: #fff3e0; color: #e65100; }
+
+    .empty { padding: 30px; text-align: center; color: #999; }
+
+    /* 生産指示一覧 */
+    .os-wrap { max-height: 360px; margin-bottom: 20px; }
+    #osTable tbody tr { cursor: pointer; }
+    #osTable tbody tr.selected td { background: #fff3cd; }
+    #osTable td.os-num { font-weight: bold; color: #0078d4; }
+    #osTable td.dies { max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+    .progress { display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .progress .bar { width: 80px; height: 8px; background: #eceff1; border-radius: 4px; overflow: hidden; }
+    .progress .bar i { display: block; height: 100%; background: #43a047; }
+    .progress .bar i.over { background: #1e88e5; }
+    td.overdue { color: #c62828; font-weight: bold; }
+    .os-filter {
+      display: none; align-items: center; gap: 8px; margin-bottom: 8px;
+      font-size: 13px; color: #8d6e00;
+    }
+    .os-filter.show { display: flex; }
+    .os-filter button { padding: 3px 10px; border: 1px solid #8d6e00; background: #fff; color: #8d6e00; border-radius: 4px; cursor: pointer; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📦 未梱包ラック一覧</h1>
+  <div class="subtitle" data-key="subtitle">押出済みで、まだ梱包が終わっていない時効ラック（残本数 &gt; 0）</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-csv" onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+  </div>
+
+  <div class="filter-row">
+    <label data-key="label_period">押出日：</label>
+    <input type="date" id="fromDate" />
+    <span>〜</span>
+    <input type="date" id="toDate" />
+    <button class="btn btn-show" onclick="clearPreset(); loadData()" data-key="btn_show">表示</button>
+    <div class="seg" id="presetSeg">
+      <button data-days="30"  onclick="setPreset(30)"  data-key="preset_30">30日</button>
+      <button data-days="90"  onclick="setPreset(90)"  data-key="preset_90">90日</button>
+      <button data-days="180" onclick="setPreset(180)" data-key="preset_180">180日</button>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <label data-key="label_machine">号機：</label>
+    <div class="seg" id="machineSeg"></div>
+    <label data-key="label_status" style="margin-left:12px">状態：</label>
+    <div class="seg" id="statusSeg">
+      <button data-status="all"     data-key="st_all">すべて</button>
+      <button data-status="none"    data-key="st_none">未梱包</button>
+      <button data-status="partial" data-key="st_partial">一部梱包</button>
+    </div>
+    <input type="text" id="keyword" style="margin-left:12px" data-ph="ph_keyword" placeholder="型番・品番で絞り込み" />
+  </div>
+
+  <div class="stat-cards">
+    <div class="stat-card main"><div class="stat-label" data-key="stat_racks">ラック数</div><div class="stat-value" id="statRacks">-</div></div>
+    <div class="stat-card main"><div class="stat-label" data-key="stat_remain">残本数</div><div class="stat-value" id="statRemain">-</div></div>
+    <div class="stat-card"><div class="stat-label" data-key="stat_none">未梱包</div><div class="stat-value" id="statNone">-</div><div class="stat-sub" id="statNoneQty"></div></div>
+    <div class="stat-card"><div class="stat-label" data-key="stat_partial">一部梱包</div><div class="stat-value" id="statPartial">-</div><div class="stat-sub" id="statPartialQty"></div></div>
+    <div class="stat-card warn"><div class="stat-label" data-key="stat_old">15日以上経過</div><div class="stat-value" id="statOld">-</div></div>
+  </div>
+
+  <div class="age-bar" id="ageBar"></div>
+
+  <div class="section-title" data-key="sec_os">📑 生産指示一覧</div>
+  <div class="table-wrap os-wrap">
+    <table id="osTable">
+      <thead><tr id="osHead"></tr></thead>
+      <tbody id="osBody"></tbody>
+    </table>
+  </div>
+
+  <div class="section-title" data-key="sec_rack">🗄️ 未梱包ラック</div>
+  <div class="os-filter" id="osFilter">
+    <span id="osFilterText"></span>
+    <button onclick="selectOrdersheet(null)" data-key="btn_clear_os">✕ 解除</button>
+  </div>
+
+  <div class="note" data-key="note">
+    ※ 残本数 = 押出本数 − NG本数 − 梱包済み本数。梱包日報でラックを最後まで梱包しなかった場合も、ここに残り続けます。経過日数は押出日から今日まで。
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr id="headRow"></tr>
+      </thead>
+      <tbody id="rackBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title:        "📦 未梱包ラック一覧",
+        subtitle:     "押出済みで、まだ梱包が終わっていない時効ラック（残本数 > 0）",
+        btn_back:     "← 戻る",
+        btn_csv:      "📥 CSV出力",
+        btn_show:     "表示",
+        label_period: "押出日：",
+        label_machine:"号機：",
+        label_status: "状態：",
+        preset_30:    "30日",
+        preset_90:    "90日",
+        preset_180:   "180日",
+        m_all:        "全号機",
+        m_prefix:     "",
+        m_suffix:     "号機",
+        st_all:       "すべて",
+        st_none:      "未梱包",
+        st_partial:   "一部梱包",
+        ph_keyword:   "型番・品番で絞り込み",
+        stat_racks:   "ラック数",
+        stat_remain:  "残本数",
+        stat_none:    "未梱包",
+        stat_partial: "一部梱包",
+        stat_old:     "15日以上経過",
+        unit_pcs:     "本",
+        unit_day:     "日",
+        age_all:      "全経過日数",
+        note:         "※ 残本数 = 押出本数 − NG本数 − 梱包済み本数。梱包日報でラックを最後まで梱包しなかった場合も、ここに残り続けます。経過日数は押出日から今日まで。",
+        col_press_date: "押出日",
+        col_days:       "経過",
+        col_machine:    "号機",
+        col_die:        "型番",
+        col_pn:         "品番",
+        col_rack:       "ラックNo",
+        col_order:      "順",
+        col_work:       "押出本数",
+        col_ng:         "NG",
+        col_packed:     "梱包済",
+        col_remain:     "残本数",
+        col_status:     "状態",
+        sum_row:        "合計",
+        empty:          "該当するラックはありません",
+        sec_os:         "📑 生産指示一覧",
+        sec_rack:       "🗄️ 未梱包ラック",
+        os_col_number:   "生産指示No",
+        os_col_pn:       "品番",
+        os_col_die:      "型番",
+        os_col_delivery: "納期",
+        os_col_press:    "押出日",
+        os_col_racks:    "ラック",
+        os_col_remain:   "残本数",
+        os_col_days:     "最長経過",
+        os_col_progress: "梱包済 / 指示数",
+        os_none:         "（生産指示なし）",
+        os_selected:     (n) => `生産指示 ${n} のラックだけを表示中`,
+        btn_clear_os:    "✕ 解除",
+      },
+      vi: {
+        title:        "📦 Danh sách giá chưa đóng gói",
+        subtitle:     "Giá hóa già đã ép nhưng chưa đóng gói xong (số còn lại > 0)",
+        btn_back:     "← Quay lại",
+        btn_csv:      "📥 Xuất CSV",
+        btn_show:     "Hiển thị",
+        label_period: "Ngày ép：",
+        label_machine:"Máy：",
+        label_status: "Trạng thái：",
+        preset_30:    "30 ngày",
+        preset_90:    "90 ngày",
+        preset_180:   "180 ngày",
+        m_all:        "Tất cả",
+        m_prefix:     "Máy ",
+        m_suffix:     "",
+        st_all:       "Tất cả",
+        st_none:      "Chưa đóng gói",
+        st_partial:   "Đóng gói một phần",
+        ph_keyword:   "Lọc theo mã khuôn / mã SP",
+        stat_racks:   "Số giá",
+        stat_remain:  "Số còn lại",
+        stat_none:    "Chưa đóng gói",
+        stat_partial: "Đóng gói một phần",
+        stat_old:     "Quá 15 ngày",
+        unit_pcs:     " cây",
+        unit_day:     " ngày",
+        age_all:      "Tất cả",
+        note:         "※ Số còn lại = số cây ép − NG − đã đóng gói. Nếu báo cáo đóng gói không đóng hết giá, giá vẫn còn trong danh sách này. Số ngày tính từ ngày ép đến hôm nay.",
+        col_press_date: "Ngày ép",
+        col_days:       "Số ngày",
+        col_machine:    "Máy",
+        col_die:        "Mã khuôn",
+        col_pn:         "Mã SP",
+        col_rack:       "Số giá",
+        col_order:      "TT",
+        col_work:       "Số cây ép",
+        col_ng:         "NG",
+        col_packed:     "Đã đóng gói",
+        col_remain:     "Còn lại",
+        col_status:     "Trạng thái",
+        sum_row:        "Tổng",
+        empty:          "Không có giá phù hợp",
+        sec_os:         "📑 Danh sách lệnh sản xuất",
+        sec_rack:       "🗄️ Giá chưa đóng gói",
+        os_col_number:   "Số lệnh SX",
+        os_col_pn:       "Mã SP",
+        os_col_die:      "Mã khuôn",
+        os_col_delivery: "Hạn giao",
+        os_col_press:    "Ngày ép",
+        os_col_racks:    "Số giá",
+        os_col_remain:   "Còn lại",
+        os_col_days:     "Lâu nhất",
+        os_col_progress: "Đã đóng gói / SL lệnh",
+        os_none:         "(Không có lệnh SX)",
+        os_selected:     (n) => `Đang chỉ hiển thị giá của lệnh SX ${n}`,
+        btn_clear_os:    "✕ Bỏ chọn",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k) => dict[currentLang][k];
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const val = dict[lang][el.dataset.key];
+        if (val && typeof val === "string") el.textContent = val;
+      });
+      document.querySelectorAll("[data-ph]").forEach(el => el.placeholder = dict[lang][el.dataset.ph]);
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rawRows) render();
+    }
+
+    /* =====================================================
+       期間・フィルター
+    ===================================================== */
+    function ymd(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    }
+    function setPreset(days) {
+      const to = new Date();
+      const from = new Date();
+      from.setDate(to.getDate() - (days - 1));
+      document.getElementById("fromDate").value = ymd(from);
+      document.getElementById("toDate").value   = ymd(to);
+      document.querySelectorAll("#presetSeg button").forEach(b =>
+        b.classList.toggle("active", Number(b.dataset.days) === days));
+      loadData();
+    }
+    function clearPreset() {
+      document.querySelectorAll("#presetSeg button").forEach(b => b.classList.remove("active"));
+    }
+
+    // 経過日数の区分（押出日 → 今日）
+    const AGE_BUCKETS = [
+      { id: 0, min: 0,  max: 3 },
+      { id: 1, min: 4,  max: 7 },
+      { id: 2, min: 8,  max: 14 },
+      { id: 3, min: 15, max: null },
+    ];
+    const ageBucket = (days) => AGE_BUCKETS.find(b => days >= b.min && (b.max === null || days <= b.max)).id;
+    const ageLabel  = (b) => b.max === null ? `${b.min}${t("unit_day")}〜` : `${b.min}〜${b.max}${t("unit_day")}`;
+
+    const filter = { machine: "all", status: "all", age: "all", keyword: "", ordersheet: null };
+
+    document.getElementById("statusSeg").addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      filter.status = btn.dataset.status;
+      render();
+    });
+    document.getElementById("machineSeg").addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      filter.machine = btn.dataset.machine;
+      render();
+    });
+    document.getElementById("ageBar").addEventListener("click", (e) => {
+      const chip = e.target.closest(".age-chip");
+      if (!chip) return;
+      filter.age = chip.dataset.age;
+      render();
+    });
+    document.getElementById("keyword").addEventListener("input", (e) => {
+      filter.keyword = e.target.value.trim().toLowerCase();
+      render();
+    });
+
+    /* =====================================================
+       データ
+    ===================================================== */
+    let rawRows = null;
+    let ordersheets = {};
+
+    async function loadData() {
+      const from = document.getElementById("fromDate").value;
+      const to   = document.getElementById("toDate").value;
+      const res  = await fetch(`./php/aging_rack/get_unpacked_racks.php?from=${from}&to=${to}`);
+      const data = await res.json();
+      document.getElementById("fromDate").value = data.from;
+      document.getElementById("toDate").value   = data.to;
+      rawRows = data.rows || [];
+      ordersheets = data.ordersheets || {};
+      render();
+    }
+
+    // 号機・状態・キーワードで絞った行（経過日数チップの件数はこれを母集団にする）
+    function baseRows() {
+      return rawRows.filter(r =>
+        (filter.machine === "all" || String(r.machine) === filter.machine) &&
+        (filter.status === "all" || (filter.status === "partial") === r.is_partial) &&
+        (!filter.keyword ||
+          (r.die_number || "").toLowerCase().includes(filter.keyword) ||
+          (r.production_number || "").toLowerCase().includes(filter.keyword))
+      );
+    }
+    function visibleRows() {
+      return baseRows().filter(r => filter.age === "all" || String(ageBucket(r.days)) === filter.age);
+    }
+    // 生産指示の選択（"none" = 生産指示なし）
+    const osKey = (r) => r.ordersheet_id === null ? "none" : String(r.ordersheet_id);
+    function rackRows() {
+      return visibleRows().filter(r => filter.ordersheet === null || osKey(r) === filter.ordersheet);
+    }
+    function selectOrdersheet(key) {
+      filter.ordersheet = filter.ordersheet === key ? null : key;
+      render();
+    }
+    document.getElementById("osBody").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-os]");
+      if (tr) selectOrdersheet(tr.dataset.os);
+    });
+
+    /* =====================================================
+       並び替え
+    ===================================================== */
+    const COLUMNS = [
+      { key: "press_date",        label: "col_press_date" },
+      { key: "days",              label: "col_days" },
+      { key: "machine",           label: "col_machine" },
+      { key: "die_number",        label: "col_die" },
+      { key: "production_number", label: "col_pn" },
+      { key: "rack_number",       label: "col_rack" },
+      { key: "order_number",      label: "col_order" },
+      { key: "work_qty",          label: "col_work" },
+      { key: "ng_qty",            label: "col_ng" },
+      { key: "packed_qty",        label: "col_packed" },
+      { key: "remain_qty",        label: "col_remain" },
+      { key: "is_partial",        label: "col_status" },
+    ];
+    let sortKey = null;
+    let sortDesc = false;
+
+    document.getElementById("headRow").addEventListener("click", (e) => {
+      const th = e.target.closest("th");
+      if (!th) return;
+      if (sortKey === th.dataset.col) {
+        // 昇順 → 降順 → 元の並び（押出日順）
+        if (sortDesc) sortKey = null; else sortDesc = true;
+      } else {
+        sortKey = th.dataset.col;
+        sortDesc = false;
+      }
+      render();
+    });
+
+    function sorted(rows) {
+      if (!sortKey) return rows;
+      const dir = sortDesc ? -1 : 1;
+      return [...rows].sort((a, b) => {
+        const x = a[sortKey], y = b[sortKey];
+        if (x === y) return 0;
+        if (x === null) return 1;
+        if (y === null) return -1;
+        return (x > y ? 1 : -1) * dir;
+      });
+    }
+
+    /* =====================================================
+       描画
+    ===================================================== */
+    const fmt = (n) => Number(n).toLocaleString();
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    function render() {
+      // 号機ボタン（データに含まれる号機から生成）
+      const machines = [...new Set(rawRows.map(r => r.machine))].sort((a, b) => a - b);
+      if (filter.machine !== "all" && !machines.includes(Number(filter.machine))) filter.machine = "all";
+      document.getElementById("machineSeg").innerHTML =
+        `<button data-machine="all">${t("m_all")}</button>` +
+        machines.map(m => `<button data-machine="${m}">${t("m_prefix")}${m}${t("m_suffix")}</button>`).join("");
+      document.querySelectorAll("#machineSeg button").forEach(b => b.classList.toggle("active", b.dataset.machine === filter.machine));
+      document.querySelectorAll("#statusSeg button").forEach(b => b.classList.toggle("active", b.dataset.status === filter.status));
+
+      // 経過日数チップ
+      const base = baseRows();
+      const ageCounts = AGE_BUCKETS.map(b => base.filter(r => ageBucket(r.days) === b.id).length);
+      document.getElementById("ageBar").innerHTML =
+        `<span class="age-chip ${filter.age === "all" ? "active" : ""}" data-age="all">${t("age_all")}<b>${base.length}</b></span>` +
+        AGE_BUCKETS.map(b =>
+          `<span class="age-chip ${filter.age === String(b.id) ? "active" : ""}" data-age="${b.id}">` +
+          `<span class="days d${b.id}">${ageLabel(b)}</span><b>${ageCounts[b.id]}</b></span>`
+        ).join("");
+
+      renderOrdersheets(visibleRows());
+      const rows = rackRows();
+      const osf = document.getElementById("osFilter");
+      osf.classList.toggle("show", filter.ordersheet !== null);
+      if (filter.ordersheet !== null) {
+        const o = ordersheets[filter.ordersheet];
+        document.getElementById("osFilterText").textContent = t("os_selected")(o ? o.ordersheet_number : t("os_none"));
+      }
+
+      // サマリー
+      const sum = (arr, k) => arr.reduce((s, r) => s + r[k], 0);
+      const none    = rows.filter(r => !r.is_partial);
+      const partial = rows.filter(r => r.is_partial);
+      document.getElementById("statRacks").textContent   = fmt(rows.length);
+      document.getElementById("statRemain").textContent  = fmt(sum(rows, "remain_qty"));
+      document.getElementById("statNone").textContent    = fmt(none.length);
+      document.getElementById("statNoneQty").textContent = `${fmt(sum(none, "remain_qty"))}${t("unit_pcs")}`;
+      document.getElementById("statPartial").textContent    = fmt(partial.length);
+      document.getElementById("statPartialQty").textContent = `${fmt(sum(partial, "remain_qty"))}${t("unit_pcs")}`;
+      document.getElementById("statOld").textContent     = fmt(rows.filter(r => r.days >= 15).length);
+
+      // ヘッダー
+      document.getElementById("headRow").innerHTML = COLUMNS.map(c => {
+        const cls = sortKey === c.key ? `sorted${sortDesc ? " desc" : ""}` : "";
+        return `<th data-col="${c.key}" class="${cls}">${t(c.label)}</th>`;
+      }).join("");
+
+      // 明細
+      const body = document.getElementById("rackBody");
+      if (rows.length === 0) {
+        body.innerHTML = `<tr><td colspan="${COLUMNS.length}" class="empty">${t("empty")}</td></tr>`;
+        return;
+      }
+      body.innerHTML = sorted(rows).map(r => `
+        <tr>
+          <td class="date-col">${r.press_date}</td>
+          <td class="center"><span class="days d${ageBucket(r.days)}">${r.days}${t("unit_day")}</span></td>
+          <td class="center">${r.machine}</td>
+          <td class="text mono">${esc(r.die_number)}</td>
+          <td class="text mono">${esc(r.production_number)}</td>
+          <td class="mono">${r.rack_number}</td>
+          <td class="mono">${r.order_number}</td>
+          <td class="mono">${fmt(r.work_qty)}</td>
+          <td class="mono ${r.ng_qty ? "" : "zero"}">${fmt(r.ng_qty)}</td>
+          <td class="mono ${r.packed_qty ? "" : "zero"}">${fmt(r.packed_qty)}</td>
+          <td class="mono remain">${fmt(r.remain_qty)}</td>
+          <td class="center"><span class="badge ${r.is_partial ? "partial" : "none"}">${t(r.is_partial ? "st_partial" : "st_none")}</span></td>
+        </tr>`).join("") + `
+        <tr class="sum-row">
+          <td class="center" colspan="7">${t("sum_row")}（${fmt(rows.length)}）</td>
+          <td class="mono">${fmt(sum(rows, "work_qty"))}</td>
+          <td class="mono">${fmt(sum(rows, "ng_qty"))}</td>
+          <td class="mono">${fmt(sum(rows, "packed_qty"))}</td>
+          <td class="mono">${fmt(sum(rows, "remain_qty"))}</td>
+          <td></td>
+        </tr>`;
+    }
+
+    /* =====================================================
+       生産指示一覧（表示中のラックを生産指示ごとにまとめる）
+    ===================================================== */
+    function renderOrdersheets(rows) {
+      document.getElementById("osHead").innerHTML = [
+        "os_col_number", "os_col_pn", "os_col_die", "os_col_delivery", "os_col_press",
+        "os_col_racks", "os_col_remain", "os_col_days", "os_col_progress",
+      ].map(k => `<th>${t(k)}</th>`).join("");
+
+      const groups = new Map();
+      rows.forEach(r => {
+        const k = osKey(r);
+        if (!groups.has(k)) groups.set(k, { key: k, rows: [] });
+        groups.get(k).rows.push(r);
+      });
+      if (filter.ordersheet !== null && !groups.has(filter.ordersheet)) filter.ordersheet = null;
+
+      const today = ymd(new Date());
+      // 押出日の古い順（生産指示なしは最後）
+      const list = [...groups.values()].map(g => ({
+        ...g,
+        o:       ordersheets[g.key] || null,
+        dates:   [...new Set(g.rows.map(r => r.press_date))].sort(),
+        dies:    [...new Set(g.rows.map(r => r.die_number).filter(Boolean))],
+        remain:  g.rows.reduce((s, r) => s + r.remain_qty, 0),
+        maxDays: Math.max(...g.rows.map(r => r.days)),
+      })).sort((a, b) => (a.key === "none") - (b.key === "none") || a.dates[0].localeCompare(b.dates[0]));
+
+      const body = document.getElementById("osBody");
+      if (list.length === 0) {
+        body.innerHTML = `<tr><td colspan="9" class="empty">${t("empty")}</td></tr>`;
+        return;
+      }
+      body.innerHTML = list.map(g => {
+        const o = g.o;
+        const first = g.dates[0].slice(5);
+        const last  = g.dates[g.dates.length - 1].slice(5);
+        const pressText = g.dates.length === 1 ? first : `${first} 〜 ${last} (${g.dates.length})`;
+        let progress = "";
+        if (o && o.production_quantity > 0) {
+          const pct = Math.round(o.packed_total / o.production_quantity * 100);
+          progress = `<div class="progress"><span class="mono">${fmt(o.packed_total)} / ${fmt(o.production_quantity)}</span>` +
+                     `<span class="bar"><i class="${pct > 100 ? "over" : ""}" style="width:${Math.min(pct, 100)}%"></i></span>` +
+                     `<span class="mono" style="width:40px">${pct}%</span></div>`;
+        }
+        return `
+          <tr data-os="${g.key}" class="${filter.ordersheet === g.key ? "selected" : ""}">
+            <td class="text mono os-num">${o ? esc(o.ordersheet_number) : t("os_none")}</td>
+            <td class="text mono">${esc(o ? o.production_number : g.rows[0].production_number)}</td>
+            <td class="text mono dies" title="${esc(g.dies.join(", "))}">${esc(g.dies.join(", "))}</td>
+            <td class="date-col ${o && o.delivery_date < today ? "overdue" : ""}">${o ? o.delivery_date : ""}</td>
+            <td class="date-col">${pressText}</td>
+            <td class="mono">${g.rows.length}</td>
+            <td class="mono remain">${fmt(g.remain)}</td>
+            <td class="center"><span class="days d${ageBucket(g.maxDays)}">${g.maxDays}${t("unit_day")}</span></td>
+            <td>${progress}</td>
+          </tr>`;
+      }).join("");
+    }
+
+    /* =====================================================
+       CSV（画面の絞り込み・並び順のまま出力）
+    ===================================================== */
+    function exportCSV() {
+      if (!rawRows) return;
+      const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const lines = [COLUMNS.map(c => q(t(c.label))).join(",")];
+      sorted(rackRows()).forEach(r => {
+        lines.push([
+          r.press_date, r.days, r.machine, r.die_number, r.production_number,
+          r.rack_number, r.order_number, r.work_qty, r.ng_qty, r.packed_qty, r.remain_qty,
+          t(r.is_partial ? "st_partial" : "st_none"),
+        ].map(q).join(","));
+      });
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `unpacked_racks_${ymd(new Date())}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* =====================================================
+       初期表示
+    ===================================================== */
+    setLang(currentLang);
+    setPreset(30);
+  </script>
+</body>
+</html>

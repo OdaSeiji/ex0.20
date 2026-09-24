@@ -290,6 +290,20 @@
       .wx-temp  { font-weight: bold; color: #1a3a5c; }
       .wx-label { font-size: 11px; color: #666; margin-left: 2px; }
       .wx-card.loading .wx-icon { opacity: 0.4; }
+      /* ── 設備稼働状況（タイトル右側） ── */
+      .title-row { position: relative; }
+      .machine-status {
+        position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+        display: flex; align-items: center; gap: 8px;
+        font-size: 13px;
+      }
+      .ms-label { font-weight: bold; color: #2b6ca3; }
+      .ms-die {
+        min-width: 90px; padding: 3px 10px;
+        border: 2px solid #0000cc; border-radius: 6px;
+        background: #fff; text-align: center; font-weight: bold; color: #1a3a5c;
+      }
+      .ms-die.running { border-color: #adff2f; box-shadow: 0 0 6px rgba(173,255,47,0.8); }
     </style>
   </head>
 
@@ -321,7 +335,14 @@
       <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
     </div>
 
-    <h1 id="title">トップメニュー</h1>
+    <div class="title-row">
+      <h1 id="title">トップメニュー</h1>
+      <!-- 🏭 設備稼働状況（ex0.11 number1/2_status 相当） -->
+      <div class="machine-status" id="machine_status">
+        <span class="ms-label">No1:</span><span class="ms-die" id="number1_status">---</span>
+        <span class="ms-label">No2:</span><span class="ms-die" id="number2_status">---</span>
+      </div>
+    </div>
 
     <!-- 🏭 押出工程 -->
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_press">🏭 押出工程</span></div>
@@ -341,6 +362,11 @@
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="press_directive_title">プレス指示作成</div>
           <div class="menu-desc" data-key="press_directive_desc">金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'aging_rack_unpacked.html'">
+          <img class="menu-icon" src="./img/table.svg" alt="" />
+          <div class="menu-title" data-key="unpacked_rack_title">未梱包ラック一覧</div>
+          <div class="menu-desc" data-key="unpacked_rack_desc">押出済みでまだ梱包が終わっていない時効ラックと残本数</div>
         </div>
       </div>
     </div>
@@ -576,6 +602,8 @@
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
           press_directive_title: "プレス指示作成",
           press_directive_desc: "金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷",
+          unpacked_rack_title: "未梱包ラック一覧",
+          unpacked_rack_desc: "押出済みでまだ梱包が終わっていない時効ラックと残本数",
           handover_progress_title: "金型進捗一覧",
           handover_progress_desc: "到着・型検・量産トライ・移管の進捗管理",
           watch_title: "重点管理金型リスト",
@@ -665,6 +693,8 @@
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
           press_directive_title: "Tạo chỉ thị ép",
           press_directive_desc: "Chọn khuôn, tham khảo chỉ thị trước đó để tạo, lưu và in điều kiện ép",
+          unpacked_rack_title: "Danh sách giá chưa đóng gói",
+          unpacked_rack_desc: "Giá hóa già đã ép nhưng chưa đóng gói xong và số cây còn lại",
           handover_progress_title: "Quản lý tiến độ chuyển giao khuôn",
           handover_progress_desc: "Quản lý tiến độ: đến nơi, kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
@@ -1002,6 +1032,29 @@
 
       loadWeather();
       updateWeatherLabels();
+
+      /* -------------------------
+       設備稼働状況（1分ごとに更新）
+       最終記録が10分より古ければ "---"、press_mode=1 で稼働中（黄緑枠）
+      ------------------------- */
+      async function loadMachineStatus() {
+        try {
+          const res = await fetch("php/machine_status/get_machine_status.php");
+          const rows = await res.json();
+          rows.forEach((r, i) => {
+            const el = document.getElementById(`number${i + 1}_status`);
+            if (!el) return;
+            const alive = r.age_min !== null && r.age_min <= 10;
+            el.textContent = alive && r.die_name ? r.die_name : "---";
+            el.classList.toggle("running", alive && r.press_mode === 1);
+            el.title = r.date_time ? `last: ${r.date_time}` : "";
+          });
+        } catch (e) {
+          console.error("machine status", e);
+        }
+      }
+      loadMachineStatus();
+      setInterval(loadMachineStatus, 60 * 1000);
     </script>
   </body>
 </html>
