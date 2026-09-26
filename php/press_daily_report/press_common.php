@@ -71,6 +71,17 @@ function bindPressValues($stmt, $p) {
     }
 }
 
+// 副担当者（t_press_staff）を保存する。主担当（t_press.staff_id）と重複する人・重複指定は除く
+function saveSubStaff($pdo, $pressId, $subStaff, $mainStaffId) {
+    $ids = array_unique(array_filter(array_map("intval", $subStaff), fn($id) => $id > 0 && $id !== (int)$mainStaffId));
+    $stmt = $pdo->prepare("INSERT INTO t_press_staff (t_press_id, m_staff_id) VALUES (:press_id, :staff_id)");
+    foreach ($ids as $staffId) {
+        $stmt->bindValue(":press_id", $pressId, PDO::PARAM_INT);
+        $stmt->bindValue(":staff_id", $staffId, PDO::PARAM_INT);
+        $stmt->execute();
+    }
+}
+
 // t_press_directive.die_production_number_variant_id を、紐づく指示書から
 // 実績側(t_press)へコピーする。指示書経由でない実績(press_directive_id無し)は対象外。
 function resolveDieProductionNumberVariantId($pdo, $pressDirectiveId) {

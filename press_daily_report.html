@@ -963,7 +963,7 @@
     /* -------------------------
        副担当者（複数）：プルダウンで選ぶとリストに追加し、プルダウンは「＋ 追加」に戻す
        リストはビレット情報の下の「副担当者」カードに表示。主担当・追加済みの人は選択肢で無効化
-       ※ 保存（t_press_staff）は未実装
+       保存先は t_press_staff（主担当は t_press.staff_id）
     ------------------------- */
     let subStaff = [];   // [{ id, name }]
 
@@ -2729,6 +2729,7 @@
         (data.time || []).forEach(row => appendTimeRow(row.code, row.time_start, row.time_end));
         (data.pull || []).forEach(row => pullHandlers.appendRow(row.date, row.no1, row.no2, row.start, row.end));
         (data.cut || []).forEach(row => cutHandlers.appendRow(row.date, row.no1, row.no2, row.start, row.end));
+        setSubStaff(data.subStaff || []);
 
         editingPressId = id;
         document.getElementById("editing-id__label").textContent = id;
@@ -2770,6 +2771,7 @@
           time: collectTimeRows(),
           pull: pullHandlers.collect(),
           cut: cutHandlers.collect(),
+          subStaff: subStaff.map(st => st.id),
         };
         const res = await fetch("./php/press_daily_report/update_press.php", {
           method: "POST",
@@ -2802,6 +2804,7 @@
           time: collectTimeRows(),
           pull: pullHandlers.collect(),
           cut: cutHandlers.collect(),
+          subStaff: subStaff.map(st => st.id),
         };
         const res = await fetch("./php/press_daily_report/save_press.php", {
           method: "POST",

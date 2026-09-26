@@ -53,6 +53,7 @@ $rack   = fetchAllFor($pdo, "SELECT order_number, rack_number, work_quantity FRO
 $workLength = fetchAllFor($pdo, "SELECT billet_number, work_number, work_length, work_quantity FROM t_press_work_length_quantity WHERE press_id = :id ORDER BY billet_number", $id);
 $time = fetchAllFor($pdo, "SELECT Code AS code, DATE_FORMAT(time_start,'%H:%i') AS time_start, DATE_FORMAT(time_end,'%H:%i') AS time_end FROM t_time_press WHERE press_id = :id ORDER BY id", $id);
 $pull = fetchAllFor($pdo, "SELECT DATE_FORMAT(pull_date,'%Y-%m-%d') AS date, pull_no1 AS no1, pull_no2 AS no2, DATE_FORMAT(pull_start,'%H:%i') AS start, DATE_FORMAT(pull_end,'%H:%i') AS end FROM t_pull_press WHERE press_id = :id ORDER BY id", $id);
+$subStaff = fetchAllFor($pdo, "SELECT s.m_staff_id AS id, m.staff_name AS name FROM t_press_staff s LEFT JOIN m_staff m ON m.id = s.m_staff_id WHERE s.t_press_id = :id ORDER BY s.id", $id);
 $cut  = fetchAllFor($pdo, "SELECT DATE_FORMAT(cut_date,'%Y-%m-%d') AS date, cut_no1 AS no1, cut_no2 AS no2, DATE_FORMAT(cut_start,'%H:%i') AS start, DATE_FORMAT(cut_end,'%H:%i') AS end FROM t_cut_press WHERE press_id = :id ORDER BY id", $id);
 
 echo json_encode([
@@ -63,4 +64,5 @@ echo json_encode([
     "time" => $time,
     "pull" => $pull,
     "cut" => $cut,
+    "subStaff" => $subStaff,
 ], JSON_UNESCAPED_UNICODE);

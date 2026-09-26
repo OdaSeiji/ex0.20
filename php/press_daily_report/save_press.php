@@ -17,6 +17,7 @@ $workLen = is_array($body["workLength"] ?? null) ? $body["workLength"] : [];
 $time    = is_array($body["time"] ?? null) ? $body["time"] : [];
 $pull    = is_array($body["pull"] ?? null) ? $body["pull"] : [];
 $cut     = is_array($body["cut"] ?? null) ? $body["cut"] : [];
+$subStaff = is_array($body["subStaff"] ?? null) ? $body["subStaff"] : [];
 
 foreach (PRESS_REQUIRED_KEYS as $key) {
     if (!isset($p[$key]) || $p[$key] === "") {
@@ -42,6 +43,7 @@ try {
     $pressId = (int)$pdo->lastInsertId();
 
     saveSubTables($pdo, $pressId, $bundle, $rack, $workLen, $time, $pull, $cut, $p["press_date_at"]);
+    saveSubStaff($pdo, $pressId, $subStaff, $p["staff_id"]);
 
     $pdo->commit();
     echo json_encode(["success" => true, "press_id" => $pressId], JSON_UNESCAPED_UNICODE);

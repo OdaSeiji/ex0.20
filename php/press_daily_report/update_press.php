@@ -18,6 +18,7 @@ $workLen = is_array($body["workLength"] ?? null) ? $body["workLength"] : [];
 $time    = is_array($body["time"] ?? null) ? $body["time"] : [];
 $pull    = is_array($body["pull"] ?? null) ? $body["pull"] : [];
 $cut     = is_array($body["cut"] ?? null) ? $body["cut"] : [];
+$subStaff = is_array($body["subStaff"] ?? null) ? $body["subStaff"] : [];
 
 foreach (PRESS_REQUIRED_KEYS as $key) {
     if (!isset($p[$key]) || $p[$key] === "") {
@@ -54,6 +55,7 @@ try {
         "t_time_press" => "press_id",
         "t_pull_press" => "press_id",
         "t_cut_press" => "press_id",
+        "t_press_staff" => "t_press_id",
     ] as $table => $col) {
         $del = $pdo->prepare("DELETE FROM {$table} WHERE {$col} = :id");
         $del->bindValue(":id", $pressId, PDO::PARAM_INT);
@@ -61,6 +63,7 @@ try {
     }
 
     saveSubTables($pdo, $pressId, $bundle, $rack, $workLen, $time, $pull, $cut, $p["press_date_at"]);
+    saveSubStaff($pdo, $pressId, $subStaff, $p["staff_id"]);
 
     $pdo->commit();
     echo json_encode(["success" => true, "press_id" => $pressId], JSON_UNESCAPED_UNICODE);
