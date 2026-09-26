@@ -85,7 +85,77 @@
         </div>
       </div>
 
-      <!-- 2026-09-23 (最新) -->
+      <!-- 2026-09-26 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-26</span>
+        </div>
+        <div class="entry-title" data-key="ef_title">押出日報に副担当者を登録</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ef_purpose">押出作業に複数のメンバーが関わった場合に、主担当以外のメンバーも記録するため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ef_content">担当者の右に「副担当者」のプルダウンを追加。選んだ人は、ビレット情報の下の「副担当者」カードに一覧表示される（人数表示、✕で削除）。主担当や追加済みの人は選べない。編集で開いたときは副担当者も復元される。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-26</span>
+        </div>
+        <div class="entry-title" data-key="eg_title">押出日報の入力欄の並びと入力チェックを見直し</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="eg_purpose">カードの高さを変えずに副担当者の欄を確保するため。あわせて、実際の運用に合わない入力チェックを直すため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="eg_content">プレス時間を3段目に移動。ラム速度・実測金型温度の幅を詰めて、その右に実測長さ・ストレッチを並べた。計画ビレット数を0〜50の範囲で入力できるようにした（以前は1〜50）。量産（プレス種別●）のときの生産指示書を必須から外した（●を選ぶと選択画面が開く動きは残している）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-26</span>
+        </div>
+        <div class="entry-title" data-key="eh_title">品質記録・梱包の記録がある押出日報は修正できないように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="eh_purpose">押出日報を修正したときに、あとから入力された品質記録（NG）が消えてしまう問題を防ぐため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="eh_content">ラックに品質記録（NG）・梱包・時効の記録が1件でも付いている押出日報は、編集で開くと🔒の理由が表示され、「更新」ボタンが押せない。記録がまだない押出日報（入力直後の打ち間違いなど）は、今までどおり修正できる。あわせて、NG記録が付いたラックはDB側でも削除できないようにした。ex0.11でNG記録付きのラックや押出日報を削除しようとすると「DB connect error」と表示されて削除されない。削除が必要な場合は、先に品質記録画面でNGを消す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-26</span>
+        </div>
+        <div class="entry-title" data-key="ei_title">生産指示書の一覧などの表示を高速化</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ei_purpose">DBの再構築（8月）で失われていた高速化の設定を戻すため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ei_content">生産指示書の一覧や未梱包ラック一覧など、生産指示ごとに集計する画面の表示が速くなった（例：未梱包ラック一覧の90日分が約1.3秒 → 約0.1秒）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='order_sheet.html'">order_sheet.html</a>
+          <a class="file-link" onclick="location.href='aging_rack_unpacked.html'">aging_rack_unpacked.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-23 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -289,6 +359,18 @@
           ee_title: "時効ラック 使用・解放実績ページの新設",
           ee_purpose: "時効ラックが日々どれだけ使われ、どれだけ空いているかを把握するため。",
           ee_content: "日別の使用ラック数（押出日で計上）と解放ラック数（そのラックの最終梱包日で計上）を棒グラフと表で表示。期間は7日／30日／90日または任意指定、差（使用−解放）・1日平均・合計、CSV出力、日本語/ベトナム語切替に対応。梱包日報が未入力のラックは解放に計上されない。下部には使用期間（押出日→最終梱包日）の平均・中央値・最長、日数の分布、直近12か月の月別推移を表示。",
+          ef_title: "押出日報に副担当者を登録",
+          ef_purpose: "押出作業に複数のメンバーが関わった場合に、主担当以外のメンバーも記録するため。",
+          ef_content: "担当者の右に「副担当者」のプルダウンを追加。選んだ人は、ビレット情報の下の「副担当者」カードに一覧表示される（人数表示、✕で削除）。主担当や追加済みの人は選べない。編集で開いたときは副担当者も復元される。",
+          eg_title: "押出日報の入力欄の並びと入力チェックを見直し",
+          eg_purpose: "カードの高さを変えずに副担当者の欄を確保するため。あわせて、実際の運用に合わない入力チェックを直すため。",
+          eg_content: "プレス時間を3段目に移動。ラム速度・実測金型温度の幅を詰めて、その右に実測長さ・ストレッチを並べた。計画ビレット数を0〜50の範囲で入力できるようにした（以前は1〜50）。量産（プレス種別●）のときの生産指示書を必須から外した（●を選ぶと選択画面が開く動きは残している）。",
+          eh_title: "品質記録・梱包の記録がある押出日報は修正できないように",
+          eh_purpose: "押出日報を修正したときに、あとから入力された品質記録（NG）が消えてしまう問題を防ぐため。",
+          eh_content: "ラックに品質記録（NG）・梱包・時効の記録が1件でも付いている押出日報は、編集で開くと🔒の理由が表示され、「更新」ボタンが押せない。記録がまだない押出日報（入力直後の打ち間違いなど）は、今までどおり修正できる。あわせて、NG記録が付いたラックはDB側でも削除できないようにした。ex0.11でNG記録付きのラックや押出日報を削除しようとすると「DB connect error」と表示されて削除されない。削除が必要な場合は、先に品質記録画面でNGを消す。",
+          ei_title: "生産指示書の一覧などの表示を高速化",
+          ei_purpose: "DBの再構築（8月）で失われていた高速化の設定を戻すため。",
+          ei_content: "生産指示書の一覧や未梱包ラック一覧など、生産指示ごとに集計する画面の表示が速くなった（例：未梱包ラック一覧の90日分が約1.3秒 → 約0.1秒）。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -326,6 +408,18 @@
           ee_title: "Thêm mới trang thực tế sử dụng/giải phóng giá hóa già",
           ee_purpose: "Nắm được mỗi ngày giá hóa già được sử dụng bao nhiêu và được giải phóng bao nhiêu.",
           ee_content: "Hiển thị bằng biểu đồ cột và bảng số giá sử dụng theo ngày (tính theo ngày ép) và số giá giải phóng (tính theo ngày đóng gói cuối cùng của giá). Chọn thời gian 7/30/90 ngày hoặc tùy chọn; có chênh lệch (SD−GP), TB/ngày, tổng, xuất CSV, chuyển đổi tiếng Nhật/tiếng Việt. Giá chưa nhập báo cáo đóng gói sẽ không được tính là giải phóng. Phần dưới hiển thị thời gian sử dụng (ngày ép → ngày đóng gói cuối): trung bình, trung vị, dài nhất, phân bố số ngày và xu hướng theo tháng trong 12 tháng gần nhất.",
+          ef_title: "Đăng ký người phụ trách phụ trong báo cáo đùn",
+          ef_purpose: "Ghi nhận cả các thành viên ngoài người phụ trách chính khi có nhiều người cùng tham gia công việc ép.",
+          ef_content: "Thêm danh sách chọn \"Phụ trách phụ\" bên phải ô người phụ trách. Người được chọn hiển thị trong thẻ \"Phụ trách phụ\" bên dưới thông tin billet (hiển thị số người, xóa bằng ✕). Không thể chọn người phụ trách chính hoặc người đã thêm. Khi mở để chỉnh sửa, danh sách phụ trách phụ cũng được khôi phục.",
+          eg_title: "Sắp xếp lại ô nhập và kiểm tra dữ liệu của báo cáo đùn",
+          eg_purpose: "Tạo chỗ cho ô người phụ trách phụ mà không làm thẻ cao hơn, đồng thời sửa các kiểm tra nhập liệu không phù hợp với thực tế vận hành.",
+          eg_content: "Chuyển thời gian ép lên hàng thứ 3. Thu hẹp ô tốc độ ram và nhiệt độ khuôn thực tế, đặt chiều dài thực tế và tỉ lệ kéo bên phải. Số billet kế hoạch có thể nhập trong khoảng 0–50 (trước đây 1–50). Lệnh sản xuất không còn bắt buộc khi sản xuất hàng loạt (kiểu đùn ●) (khi chọn ● vẫn tự mở màn hình chọn).",
+          eh_title: "Không thể sửa báo cáo đùn đã có dữ liệu chất lượng / đóng gói",
+          eh_purpose: "Ngăn việc dữ liệu chất lượng (NG) nhập sau bị mất khi sửa báo cáo đùn.",
+          eh_content: "Báo cáo đùn có giá đã có dù chỉ 1 dữ liệu chất lượng (NG), đóng gói hoặc hóa già thì khi mở để chỉnh sửa sẽ hiển thị lý do 🔒 và không bấm được nút \"Cập nhật\". Báo cáo chưa có dữ liệu (ví dụ nhập sai ngay sau khi nhập) vẫn sửa được như trước. Ngoài ra, phía DB cũng không cho xóa giá đã có dữ liệu NG. Nếu xóa giá hoặc báo cáo đùn có dữ liệu NG trên ex0.11 sẽ hiện \"DB connect error\" và không xóa được. Khi cần xóa, hãy xóa NG trên màn hình dữ liệu chất lượng trước.",
+          ei_title: "Tăng tốc hiển thị danh sách lệnh sản xuất v.v.",
+          ei_purpose: "Khôi phục thiết lập tăng tốc đã bị mất khi dựng lại DB (tháng 8).",
+          ei_content: "Các màn hình tổng hợp theo lệnh sản xuất như danh sách lệnh sản xuất, danh sách giá chưa đóng gói hiển thị nhanh hơn (ví dụ: danh sách giá chưa đóng gói 90 ngày từ khoảng 1,3 giây → khoảng 0,1 giây).",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",
