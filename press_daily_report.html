@@ -75,6 +75,7 @@
 
     .basic-card { width: 600px; flex-shrink: 0; }
     .mid-card   { width: 420px; flex-shrink: 0; }
+    .mid-col    { display: flex; flex-direction: column; gap: 16px; flex-shrink: 0; }
     .right-card { width: 230px; flex-shrink: 0; }
     .time-card  { width: 310px; flex-shrink: 0; }
 
@@ -313,10 +314,6 @@
                 <label data-key="lbl_actual_qty">実績ビレット数</label>
                 <input type="text" id="actual-billet-qty__input" class="num-input" />
               </div>
-            </div>
-          </div>
-          <div class="form-group full">
-            <div style="display:flex; gap:10px;">
               <div class="form-group" style="width:210px; flex-shrink:0;">
                 <label data-key="lbl_press_time">プレス時間（開始 - 終了）</label>
                 <div class="inline-pair">
@@ -325,21 +322,17 @@
                   <input type="text" id="press-finish__input" maxlength="5" onblur="formatTimeField(this)" />
                 </div>
               </div>
-              <div class="form-group" style="flex:1;">
-                <label data-key="lbl_ram_speed">ラム速度 (mm/s)</label>
-                <input type="text" id="actual-ram-speed__input" />
-              </div>
-              <div class="form-group" style="flex:1;">
-                <label data-key="lbl_die_temp">実測金型温度 (℃)</label>
-                <input type="text" id="actual-die-temp__input" />
-              </div>
             </div>
           </div>
           <div class="form-group full">
             <div style="display:flex; gap:10px;">
-              <div class="form-group" style="flex:1;">
-                <label data-key="lbl_name">担当者</label>
-                <select id="name__select"><option value="0">-</option></select>
+              <div class="form-group" style="width:100px; flex-shrink:0;">
+                <label data-key="lbl_ram_speed">ラム速度 (mm/s)</label>
+                <input type="text" id="actual-ram-speed__input" />
+              </div>
+              <div class="form-group" style="width:145px; flex-shrink:0;">
+                <label data-key="lbl_die_temp">実測金型温度 (℃)</label>
+                <input type="text" id="actual-die-temp__input" />
               </div>
               <div class="form-group" style="width:100px; flex-shrink:0;">
                 <label data-key="lbl_actual_length">実測長さ (SP dài)</label>
@@ -348,6 +341,18 @@
               <div class="form-group" style="width:100px; flex-shrink:0;">
                 <label data-key="lbl_stretch_ratio">ストレッチ</label>
                 <input type="text" id="stretch-ratio__input" class="num-input" onblur="formatStretchRatio(this)" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group full">
+            <div style="display:flex; gap:10px;">
+              <div class="form-group" style="width:185px; flex-shrink:0;">
+                <label data-key="lbl_name">担当者</label>
+                <select id="name__select"><option value="0">-</option></select>
+              </div>
+              <div class="form-group" style="width:185px; flex-shrink:0;">
+                <label><span data-key="lbl_sub_staff">副担当者</span>（<span id="sub-staff-count__value" class="mono">0</span>）</label>
+                <select id="sub-staff__select" onchange="addSubStaff(this)"><option value="0" data-key="opt_add_sub_staff">＋ 追加</option></select>
               </div>
             </div>
           </div>
@@ -412,7 +417,8 @@
       </div>
     </div>
 
-    <!-- mid__wrapper 相当：ビレット情報 -->
+    <!-- mid__wrapper 相当：ビレット情報 ＋ 副担当者（縦に並べる） -->
+    <div class="mid-col">
     <div class="card mid-card">
       <div class="card-header card-header-total">
         <span data-key="card_bundle">ビレット情報</span>
@@ -447,6 +453,23 @@
           <button class="btn btn-add" id="add_bundle__button" disabled data-key="btn_save">追加</button>
         </div>
       </div>
+    </div>
+
+    <!-- 副担当者：押出日報カードの「副担当者」プルダウンで追加した人の一覧 -->
+    <div class="card mid-card">
+      <div class="card-header card-header-total">
+        <span data-key="card_sub_staff">副担当者</span>
+        <span class="header-total"><span data-key="lbl_sub_staff_total">人数</span>: <span id="sub-staff-total__value" class="mono">0</span></span>
+      </div>
+      <div class="card-body">
+        <div class="table-wrap" style="margin-bottom:0;">
+          <table id="sub-staff__table">
+            <thead><tr><th style="width:38px;">No.</th><th data-key="col_staff_name">名前</th><th style="width:22px;"></th></tr></thead>
+            <tbody><tr><td colspan="3" class="empty-note" data-key="empty_sub_staff">登録データなし</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
     </div>
 
     <!-- right__wrapper 相当：ラック登録 ＋ 定尺・数量登録 -->
@@ -769,6 +792,7 @@
         lbl_press_time: "プレス時間（開始 - 終了）",
         lbl_ram_speed: "ラム速度 (mm/s)", lbl_die_temp: "実測金型温度 (℃)",
         lbl_name: "担当者", lbl_press_directive: "押出指示書",
+        lbl_sub_staff: "副担当者", card_sub_staff: "副担当者", lbl_sub_staff_total: "人数", opt_add_sub_staff: "＋ 追加", col_staff_name: "名前", empty_sub_staff: "登録データなし",
         lbl_actual_length: "実測長さ (SP dài)", lbl_stretch_ratio: "ストレッチ",
         lbl_special_note: "特記事項", lbl_file: "ファイル", btn_preview: "プレビュー",
         btn_choose_file: "File", modal_preview_title: "🖼 図面プレビュー",
@@ -835,6 +859,7 @@
         lbl_press_time: "Thời gian đùn",
         lbl_ram_speed: "Tốc độ (mm/s)", lbl_die_temp: "Nhiệt độ khuôn thực tế (℃)",
         lbl_name: "Người phụ trách", lbl_press_directive: "Phiếu đùn",
+        lbl_sub_staff: "Phụ trách phụ", card_sub_staff: "Phụ trách phụ", lbl_sub_staff_total: "Số người", opt_add_sub_staff: "＋ Thêm", col_staff_name: "Tên", empty_sub_staff: "Chưa có dữ liệu",
         lbl_actual_length: "Chiều dài thực tế", lbl_stretch_ratio: "Tỉ lệ kéo",
         lbl_special_note: "Ghi chú", lbl_file: "Tệp đính kèm", btn_preview: "Xem trước",
         btn_choose_file: "File", modal_preview_title: "🖼 Xem trước bản vẽ",
@@ -927,12 +952,62 @@
       const res  = await fetch("./php/press_daily_report/get_staff.php");
       const rows = await res.json();
       const sel  = document.getElementById("name__select");
+      const sub  = document.getElementById("sub-staff__select");
       rows.forEach(row => {
-        const opt = document.createElement("option");
-        opt.value = row.id;
-        opt.textContent = row.staff_name;
-        sel.appendChild(opt);
+        sel.appendChild(new Option(row.staff_name, row.id));
+        sub.appendChild(new Option(row.staff_name, row.id));
       });
+      sel.addEventListener("change", renderSubStaff);
+    }
+
+    /* -------------------------
+       副担当者（複数）：プルダウンで選ぶとリストに追加し、プルダウンは「＋ 追加」に戻す
+       リストはビレット情報の下の「副担当者」カードに表示。主担当・追加済みの人は選択肢で無効化
+       ※ 保存（t_press_staff）は未実装
+    ------------------------- */
+    let subStaff = [];   // [{ id, name }]
+
+    function addSubStaff(sel) {
+      const id = sel.value;
+      if (id !== "0" && !subStaff.some(s => s.id === id)) {
+        subStaff.push({ id, name: sel.options[sel.selectedIndex].textContent });
+      }
+      sel.value = "0";
+      renderSubStaff();
+    }
+
+    function removeSubStaff(id) {
+      subStaff = subStaff.filter(s => s.id !== id);
+      renderSubStaff();
+    }
+
+    function setSubStaff(list) {
+      subStaff = list.map(s => ({ id: String(s.id), name: s.name }));
+      renderSubStaff();
+    }
+
+    function renderSubStaff() {
+      // 主担当に選ばれた人は副担当者から外す
+      const mainId = document.getElementById("name__select").value;
+      subStaff = subStaff.filter(s => s.id !== mainId);
+
+      [...document.getElementById("sub-staff__select").options].forEach(opt => {
+        opt.disabled = opt.value !== "0" && (opt.value === mainId || subStaff.some(s => s.id === opt.value));
+      });
+      document.getElementById("sub-staff-count__value").textContent = subStaff.length;
+      document.getElementById("sub-staff-total__value").textContent = subStaff.length;
+
+      const body = document.querySelector("#sub-staff__table tbody");
+      if (subStaff.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" class="empty-note">${dict[currentLang].empty_sub_staff}</td></tr>`;
+        return;
+      }
+      body.innerHTML = subStaff.map((s, i) => `
+        <tr>
+          <td class="mono">${i + 1}</td>
+          <td class="left">${s.name}</td>
+          <td><button type="button" class="row-del-btn" onclick="removeSubStaff('${s.id}')">✕</button></td>
+        </tr>`).join("");
     }
 
     async function setDefaultDate() {
@@ -1098,15 +1173,9 @@
       document.getElementById("is-washed__select").focus();
     }
 
-    /* プレス種別「●」選択時：指示書番号をアクティブにしてモーダルを開く */
+    /* プレス種別「●」選択時：生産指示書の選択モーダルを開く（入力は任意） */
     document.getElementById("pressing-type__select").addEventListener("change", function () {
-      const group = document.getElementById("directive__group");
-      if (this.value === "3") {
-        group.classList.add("required");
-        openDirectiveModal();
-      } else {
-        group.classList.remove("required");
-      }
+      if (this.value === "3") openDirectiveModal();
     });
 
     /* -------------------------
@@ -2271,11 +2340,11 @@
     document.getElementById("download_data").addEventListener("click", exportSummaryCSV);
 
     /* -------------------------
-       必須項目チェック（基本情報カード：special_note以外すべて）
+       必須項目チェック（基本情報カード：special_note・生産指示書・副担当者以外すべて）
     ------------------------- */
     const REQUIRED_FIELD_IDS = [
       "date__input", "die__input", "press-directive__select",
-      "pressing-type__select", "directive__input", "is-washed__select",
+      "pressing-type__select", "is-washed__select",
       "machine-number__select", "billet-size__select",
       "billet-length__select", "plan-billet-qty__input", "actual-billet-qty__input",
       "press-start__input", "press-finish__input", "actual-ram-speed__input", "actual-die-temp__input",
@@ -2310,10 +2379,6 @@
       const el = document.getElementById(id);
       if (!el) return;
       let empty = isFieldEmpty(el);
-      // 生産指示書はプレス種別が「●」の時のみ必須
-      if (id === "directive__input" && document.getElementById("pressing-type__select").value !== "3") {
-        empty = false;
-      }
       // ラム速度テーブル：No.(実績ビレット数)までの行のみ必須（例：実績ビレット数4ならNo.5は不要）
       const ramMatch = id.match(/^no(\d)_/);
       if (ramMatch) {
@@ -2351,7 +2416,7 @@
     const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
 
     const VALIDATORS = {
-      "plan-billet-qty__input":   val => /^\d+$/.test(val) && Number(val) >= 1 && Number(val) <= 50,
+      "plan-billet-qty__input":   val => /^\d+$/.test(val) && Number(val) >= 0 && Number(val) <= 50,
       "actual-billet-qty__input": val => /^\d+$/.test(val) && Number(val) >= 1 && Number(val) <= 50,
       "actual-ram-speed__input":  val => isFinite(val) && Number(val) >= 0.1 && Number(val) <= 20.0,
       "actual-die-temp__input":   val => isFinite(val) && Number(val) >= 400 && Number(val) <= 510,
@@ -2545,6 +2610,7 @@
       updateBundleTotal();
       updateRackTotal();
       updateWorkLengthTotal();
+      setSubStaff([]);
     }
 
     function resetPressForm() {
