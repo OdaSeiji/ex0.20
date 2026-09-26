@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quality Summary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-csv  { background: #217346; color: #fff; }
+    .btn-clear { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filter-row label { font-size: 13px; color: #555; }
+    .filter-row input, .filter-row select { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; background: #fff; }
+    .filter-row input[type=text] { width: 150px; }
+    .seg { display: flex; border: 1px solid #0078d4; border-radius: 5px; overflow: hidden; }
+    .seg button {
+      padding: 6px 12px; border: none; background: #fff; color: #0078d4;
+      font-size: 12px; font-weight: bold; cursor: pointer;
+    }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+    .gap { margin-left: 12px; }
+
+    .note { font-size: 12px; color: #777; margin: 6px 0 12px 4px; line-height: 1.6; }
+    .legend { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: middle; margin: 0 3px 0 10px; }
+
+    /* サマリー */
+    .stat-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .stat-card {
+      background: #fff; border-radius: 8px; padding: 12px 20px; min-width: 130px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-top: 4px solid #90a4ae;
+    }
+    .stat-card.main { border-top-color: #0078d4; }
+    .stat-card.warn { border-top-color: #e65100; }
+    .stat-label { font-size: 12px; color: #777; }
+    .stat-value { font-size: 22px; font-weight: bold; font-family: "Roboto Mono", monospace; color: #333; }
+    .stat-card.main .stat-value { color: #0078d4; }
+    .stat-card.warn .stat-value { color: #e65100; }
+
+    /* テーブル */
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow: auto; max-height: calc(100vh - 140px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; font-size: 12px; }
+    th, td { padding: 3px 2px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
+    th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; z-index: 2; }
+    th.code, td.code { width: 26px; min-width: 26px; padding-left: 1px; padding-right: 1px; }
+    th.code { cursor: help; }
+    td.pn { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    td.center { text-align: center; }
+    td.text { text-align: left; }
+    td.ng { background: #ffcc80; font-weight: bold; }
+    td.qc-ok { color: #2e7d32; font-weight: bold; }
+    td.sticky-l { position: sticky; left: 0; background: inherit; z-index: 1; }
+    th.sticky-l { left: 0; z-index: 3; }
+    tr { background: #fff; }
+    tr.low-yield { background: #eaffb0; }
+    tr.has-note td { color: #c62828; }
+    tr.has-note { cursor: pointer; }
+    tr:hover td { background: #f0f8ff; }
+    tr.selected td { background: #fff3cd; }
+    tfoot td { position: sticky; bottom: 0; background: #e3f2fd; font-weight: bold; color: #1565c0; z-index: 1; }
+    .empty { padding: 30px; text-align: center; color: #999; }
+
+    .loading { color: #0078d4; font-size: 13px; }
+
+    /* 特記事項（行クリックで表示） */
+    #notePop {
+      display: none; position: fixed; z-index: 50; max-width: 420px;
+      background: #fffde7; border: 1px solid #f9a825; border-radius: 6px;
+      padding: 8px 12px; font-size: 13px; line-height: 1.5; white-space: pre-wrap;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    #notePop .pop-title { font-size: 11px; color: #8d6e00; font-weight: bold; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🔍 品質サマリー</h1>
+  <div class="subtitle" data-key="subtitle">押出ごとの本数・NG（コード別）・各工程のチェック日・生産性</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-csv" onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+    <span class="loading" id="loading"></span>
+  </div>
+
+  <!-- サーバー側で絞る条件 -->
+  <div class="filter-row">
+    <label data-key="label_die">型番：</label>
+    <input type="text" id="dieNumber" data-ph="ph_die" placeholder="前方一致" />
+    <label class="gap" data-key="label_machine">号機：</label>
+    <div class="seg" id="machineSeg">
+      <button data-machine="0" data-key="m_all">全号機</button>
+      <button data-machine="1">1</button>
+      <button data-machine="2">2</button>
+      <button data-machine="3">3</button>
+      <button data-machine="4">4</button>
+    </div>
+    <label class="gap" data-key="label_month">月：</label>
+    <input type="month" id="month" />
+    <label class="gap" data-key="label_period">押出日：</label>
+    <input type="date" id="fromDate" />
+    <span>〜</span>
+    <input type="date" id="toDate" />
+    <button class="btn btn-clear" onclick="clearPeriod()" data-key="btn_clear_period">期間クリア</button>
+  </div>
+
+  <!-- 画面上で絞る条件 -->
+  <div class="filter-row">
+    <label data-key="label_type">プレス種別：</label>
+    <div class="seg" id="typeSeg">
+      <button data-type="all" data-key="t_all">すべて</button>
+      <button data-type="〇">〇</button>
+      <button data-type="◎">◎</button>
+      <button data-type="●">●</button>
+      <button data-type="not〇" data-key="t_not_o">〇以外</button>
+    </div>
+    <label class="gap" data-key="label_check">チェック日：</label>
+    <select id="checkKind">
+      <option value="all" data-key="ck_all">いずれか</option>
+      <option value="dcd" data-key="ck_dim">寸法</option>
+      <option value="ett" data-key="ck_etching">エッチング</option>
+      <option value="hcd" data-key="ck_aging">時効</option>
+      <option value="pcd" data-key="ck_packing">梱包</option>
+    </select>
+    <input type="date" id="checkDate" />
+  </div>
+
+  <div class="stat-cards">
+    <div class="stat-card"><div class="stat-label" data-key="stat_press">押出数</div><div class="stat-value" id="statPress">-</div></div>
+    <div class="stat-card"><div class="stat-label" data-key="stat_qty">本数</div><div class="stat-value" id="statQty">-</div></div>
+    <div class="stat-card warn"><div class="stat-label" data-key="stat_ng">NG</div><div class="stat-value" id="statNg">-</div></div>
+    <div class="stat-card main"><div class="stat-label" data-key="stat_yield">良品率</div><div class="stat-value" id="statYield">-</div></div>
+    <div class="stat-card main"><div class="stat-label" data-key="stat_productivity">生産性</div><div class="stat-value" id="statProd">-</div></div>
+  </div>
+
+  <div class="note">
+    <span data-key="note">※ 条件なしの場合は最新400件。良品率 =（本数 − NG + コード401）÷ 本数。生産性 = 総重量 ÷ 正味押出時間（停止時間を除く）。NGコードの見出しにマウスを乗せると説明が出ます。</span>
+    <span class="legend" style="background:#ffcc80"></span><span data-key="lg_ng">NGあり</span>
+    <span class="legend" style="background:#eaffb0"></span><span data-key="lg_low">良品率90%以下（〇以外）</span>
+    <span class="legend" style="background:#c62828"></span><span data-key="lg_note">特記事項あり（行クリックで表示）</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="headRow"></tr></thead>
+      <tbody id="body"></tbody>
+      <tfoot><tr id="footRow"></tr></tfoot>
+    </table>
+  </div>
+  <div id="notePop"><div class="pop-title" id="notePopTitle"></div><div id="notePopText"></div></div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title: "🔍 品質サマリー",
+        subtitle: "押出ごとの本数・NG（コード別）・各工程のチェック日・生産性",
+        btn_back: "← 戻る", btn_csv: "📥 CSV出力", btn_clear_period: "期間クリア",
+        label_die: "型番：", ph_die: "前方一致", label_machine: "号機：", m_all: "全号機",
+        label_month: "月：", label_period: "押出日：",
+        label_type: "プレス種別：", t_all: "すべて", t_not_o: "〇以外",
+        label_check: "チェック日：", ck_all: "いずれか", ck_dim: "寸法", ck_etching: "エッチング", ck_aging: "時効", ck_packing: "梱包",
+        stat_press: "押出数", stat_qty: "本数", stat_ng: "NG", stat_yield: "良品率", stat_productivity: "生産性",
+        note: "※ 条件なしの場合は最新400件。良品率 =（本数 − NG + コード401）÷ 本数。生産性 = 総重量 ÷ 正味押出時間（停止時間を除く）。NGコードの見出しにマウスを乗せると説明が出ます。",
+        lg_ng: "NGあり", lg_low: "良品率90%以下（〇以外）", lg_note: "特記事項あり（行クリックで表示）",
+        loading: "読込中…", empty: "該当する押出はありません", sum: "合計",
+        col_date: "押出日", col_die: "型番", col_pn: "品番", col_type: "種別", col_machine: "号機",
+        col_pb: "計画ビレット数", col_ab: "実績ビレット数（ビレット情報の合計）", col_qty: "本数", col_ng: "NG", col_ok: "OK", col_per: "良品率",
+        col_dim: "寸法", col_etching: "エッチング", col_aging: "時効", col_qc: "QC", col_packing: "梱包",
+        col_prod: "生産性（ton/h）", col_cycle: "サイクルタイム（秒/本）", col_weight: "総重量（t）", col_time: "正味押出時間（h）", col_note: "特記事項",
+      },
+      vi: {
+        title: "🔍 Tổng hợp chất lượng",
+        subtitle: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
+        btn_back: "← Quay lại", btn_csv: "📥 Xuất CSV", btn_clear_period: "Xóa thời gian",
+        label_die: "Mã khuôn：", ph_die: "Khớp phần đầu", label_machine: "Máy：", m_all: "Tất cả",
+        label_month: "Tháng：", label_period: "Ngày ép：",
+        label_type: "Kiểu đùn：", t_all: "Tất cả", t_not_o: "Trừ 〇",
+        label_check: "Ngày kiểm tra：", ck_all: "Bất kỳ", ck_dim: "Kích thước", ck_etching: "Etching", ck_aging: "Hóa già", ck_packing: "Đóng gói",
+        stat_press: "Số lần ép", stat_qty: "Số cây", stat_ng: "NG", stat_yield: "Tỷ lệ đạt", stat_productivity: "Năng suất",
+        note: "※ Khi không có điều kiện sẽ hiển thị 400 lần ép mới nhất. Tỷ lệ đạt = (số cây − NG + mã 401) ÷ số cây. Năng suất = tổng khối lượng ÷ thời gian ép thực (trừ thời gian dừng). Di chuột lên tiêu đề mã NG để xem giải thích.",
+        lg_ng: "Có NG", lg_low: "Tỷ lệ đạt ≤ 90% (trừ 〇)", lg_note: "Có ghi chú đặc biệt (bấm vào dòng để xem)",
+        loading: "Đang tải…", empty: "Không có dữ liệu phù hợp", sum: "Tổng",
+        col_date: "Ngày ép", col_die: "Mã khuôn", col_pn: "Mã SP", col_type: "Kiểu", col_machine: "Máy",
+        col_pb: "Số billet kế hoạch", col_ab: "Số billet thực tế (tổng thông tin billet)", col_qty: "Số cây", col_ng: "NG", col_ok: "OK", col_per: "Tỷ lệ đạt",
+        col_dim: "Kích thước", col_etching: "Etching", col_aging: "Hóa già", col_qc: "QC", col_packing: "Đóng gói",
+        col_prod: "Năng suất (ton/h)", col_cycle: "Chu kỳ (giây/cây)", col_weight: "Tổng khối lượng (t)", col_time: "Thời gian ép thực (h)", col_note: "Ghi chú",
+      },
+    };
+
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k) => dict[currentLang][k];
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const v = dict[lang][el.dataset.key];
+        if (v) el.textContent = v;
+      });
+      document.querySelectorAll("[data-ph]").forEach(el => el.placeholder = dict[lang][el.dataset.ph]);
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rows) render();
+    }
+
+    /* =====================================================
+       列定義
+    ===================================================== */
+    const NG_CODES = [...Array(24)].map((_, i) => String(301 + i)).concat(["351", "401"]);
+    const num = (v) => (v === null || v === "" || v === undefined) ? 0 : Number(v);
+    const fmt = (n) => Number(n).toLocaleString();
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    // "1.23 ton/h" や "45 s/pcs" の数値部分（NULL は空）
+    const unitText = (v) => (v === null || v === undefined) ? "" : String(v);
+
+    // head: 見出し（V9 と同じ短い表記、言語共通）／ label: ツールチップに出す正式名
+    const COLS = [
+      { key: "prs_d",                  head: "Date",         label: "col_date",    cls: "mono center sticky-l" },
+      { key: "die_number",             head: "DieNumber",    label: "col_die",     cls: "mono text" },
+      { key: "production_number",      head: "PN",           label: "col_pn",      cls: "mono text pn" },
+      { key: "pressing_type",          head: "P/T",          label: "col_type",    cls: "center" },
+      { key: "press_machine_no",       head: "M/C",          label: "col_machine", cls: "center" },
+      { key: "plan_billet_quantities", head: "P/B",          label: "col_pb",      cls: "mono", sum: true },
+      { key: "prs_quantity",           head: "A/B",          label: "col_ab",      cls: "mono", sum: true },
+      { key: "work_quantity",          head: "Qty",          label: "col_qty",     cls: "mono", sum: true },
+      { key: "total_ng",               head: "T_ng",         label: "col_ng",      cls: "mono", sum: true },
+      { key: "total_ok",               head: "T_ok",         label: "col_ok",      cls: "mono", sum: true },
+      { key: "per",                    head: "Ok/Tt",        label: "col_per",     cls: "mono" },
+      { key: "dcd",                    head: "dim",          label: "col_dim",     cls: "mono center" },
+      { key: "ett",                    head: "etching",      label: "col_etching", cls: "mono center" },
+      { key: "hcd",                    head: "aging",        label: "col_aging",   cls: "mono center" },
+      { key: "qc_check_result",        head: "QC",           label: "col_qc",      cls: "center" },
+      { key: "pcd",                    head: "packing",      label: "col_packing", cls: "mono center" },
+      ...NG_CODES.map(c => ({ key: "code_" + c, code: c, cls: "mono code", sum: true })),
+      { key: "productivity",           head: "Productivity", label: "col_prod",    cls: "mono" },
+      { key: "actual_cycletime",       head: "Cycle time",   label: "col_cycle",   cls: "mono" },
+      // hide: 表には出さない（生産性の合計計算と CSV には使う。特記事項は行クリックで表示）
+      { key: "total_weight",           head: "Total weight", label: "col_weight",  sum: true, dec: 2, hide: true },
+      { key: "total_time",             head: "Total time",   label: "col_time",    sum: true, dec: 2, hide: true },
+      { key: "special_note",           head: "Note",         label: "col_note",    hide: true },
+    ];
+    const SHOW = COLS.filter(c => !c.hide);
+
+    /* =====================================================
+       NGコードの説明（見出しのツールチップ）
+    ===================================================== */
+    let codeInfo = {};
+    async function loadCodes() {
+      try {
+        const res = await fetch("./php/quality_summary/get_codes.php");
+        (await res.json()).forEach(c => codeInfo[c.quality_code] = c);
+      } catch (e) { /* 説明が取れなくても表は出す */ }
+    }
+    function codeTitle(code) {
+      const c = codeInfo[code];
+      if (!c) return code;
+      const [d, n] = currentLang === "vi" ? [c.description_vn, c.note_vn] : [c.description_jp, c.note_jp];
+      return `${code}: ${d ?? ""}${n ? "\n" + n : ""}`;
+    }
+
+    /* =====================================================
+       条件
+    ===================================================== */
+    const filter = { machine: "0", type: "all" };
+    let rows = null;
+    let reqSeq = 0;
+
+    async function loadData() {
+      const q = new URLSearchParams({
+        die_number: document.getElementById("dieNumber").value.trim(),
+        machine: filter.machine,
+      });
+      const from = document.getElementById("fromDate").value;
+      const to   = document.getElementById("toDate").value;
+      if (from && to) { q.set("from", from); q.set("to", to); }
+
+      const seq = ++reqSeq;
+      document.getElementById("loading").textContent = t("loading");
+      try {
+        const res  = await fetch("./php/quality_summary/get_summary.php?" + q);
+        const data = await res.json();
+        if (seq !== reqSeq) return;   // 後から出したリクエストを優先
+        rows = Array.isArray(data) ? data : [];
+      } finally {
+        if (seq === reqSeq) document.getElementById("loading").textContent = "";
+      }
+      render();
+    }
+
+    let dieTimer = null;
+    document.getElementById("dieNumber").addEventListener("input", () => {
+      clearTimeout(dieTimer);
+      dieTimer = setTimeout(loadData, 300);
+    });
+    document.getElementById("machineSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      filter.machine = b.dataset.machine;
+      loadData();
+    });
+    document.getElementById("typeSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      filter.type = b.dataset.type;
+      render();
+    });
+    ["fromDate", "toDate"].forEach(id => document.getElementById(id).addEventListener("change", () => {
+      document.getElementById("month").value = "";
+      const from = document.getElementById("fromDate").value;
+      const to   = document.getElementById("toDate").value;
+      if ((from && to) || (!from && !to)) loadData();
+    }));
+    document.getElementById("month").addEventListener("change", (e) => {
+      const v = e.target.value;
+      if (!v) return clearPeriod();
+      const [y, m] = v.split("-").map(Number);
+      const last = new Date(y, m, 0).getDate();
+      document.getElementById("fromDate").value = `${v}-01`;
+      document.getElementById("toDate").value   = `${v}-${String(last).padStart(2, "0")}`;
+      loadData();
+    });
+    function clearPeriod() {
+      ["month", "fromDate", "toDate"].forEach(id => document.getElementById(id).value = "");
+      loadData();
+    }
+    ["checkKind", "checkDate"].forEach(id => document.getElementById(id).addEventListener("change", render));
+
+    // 画面上の絞り込み（プレス種別・チェック日）
+    function visibleRows() {
+      const kind = document.getElementById("checkKind").value;
+      const date = document.getElementById("checkDate").value;   // YYYY-MM-DD → チェック日は MM-DD で比較
+      const mmdd = date ? date.slice(5) : "";
+      return rows.filter(r => {
+        if (filter.type === "not〇" ? r.pressing_type === "〇" : (filter.type !== "all" && r.pressing_type !== filter.type)) return false;
+        if (mmdd) {
+          const keys = kind === "all" ? ["dcd", "ett", "hcd", "pcd"] : [kind];
+          if (!keys.some(k => r[k] === mmdd)) return false;
+        }
+        return true;
+      });
+    }
+
+    /* =====================================================
+       描画
+    ===================================================== */
+    function cellHtml(c, r) {
+      const v = r[c.key];
+      if (c.code) return num(v) > 0 ? fmt(v) : "";
+      if (c.key === "qc_check_result") return v === "Checked" ? "OK" : "";
+      if (c.dec) return v === null ? "" : Number(v).toFixed(c.dec);
+      if (c.key === "productivity" || c.key === "actual_cycletime") return esc(unitText(v));
+      return esc(v ?? "");
+    }
+
+    function render() {
+      document.querySelectorAll("#machineSeg button").forEach(b => b.classList.toggle("active", b.dataset.machine === filter.machine));
+      document.querySelectorAll("#typeSeg button").forEach(b => b.classList.toggle("active", b.dataset.type === filter.type));
+
+      document.getElementById("headRow").innerHTML = SHOW.map(c => c.code
+        ? `<th class="code" title="${esc(codeTitle(c.code))}">${c.code}</th>`
+        : `<th class="${c.key === "prs_d" ? "sticky-l" : ""}" title="${esc(t(c.label))}">${c.head}</th>`).join("");
+
+      const list = visibleRows();
+      const body = document.getElementById("body");
+      if (list.length === 0) {
+        body.innerHTML = `<tr><td colspan="${SHOW.length}" class="empty">${t("empty")}</td></tr>`;
+      } else {
+        body.innerHTML = list.map(r => {
+          const perNum = parseFloat(r.per);
+          const cls = [
+            !isNaN(perNum) && perNum <= 90 && r.pressing_type !== "〇" ? "low-yield" : "",
+            r.special_note ? "has-note" : "",
+          ].join(" ");
+          return `<tr class="${cls}" data-id="${r.id}">` + SHOW.map(c => {
+            let k = c.cls;
+            if (c.code && num(r[c.key]) > 0) k += " ng";
+            if (c.key === "qc_check_result" && r[c.key] === "Checked") k += " qc-ok";
+            const title = c.key === "production_number" && r.production_number ? ` title="${esc(r.production_number)}"` : "";
+            return `<td class="${k}"${title}>${cellHtml(c, r)}</td>`;
+          }).join("") + "</tr>";
+        }).join("");
+      }
+
+      // 合計（表示中の行）
+      const sums = {};
+      COLS.filter(c => c.sum).forEach(c => sums[c.key] = list.reduce((s, r) => s + num(r[c.key]), 0));
+      const qty = sums.work_quantity, ng = sums.total_ng, ok401 = sums.code_401;
+      const yieldPct = qty > 0 ? ((qty - ng + ok401) / qty * 100).toFixed(1) + "%" : "-";
+      const prod = sums.total_time > 0 ? (sums.total_weight / sums.total_time).toFixed(2) + " ton/h" : "-";
+
+      document.getElementById("footRow").innerHTML = SHOW.map(c => {
+        if (c.key === "prs_d") return `<td class="center sticky-l">${t("sum")}</td>`;
+        if (c.key === "per") return `<td class="mono">${yieldPct}</td>`;
+        if (c.key === "productivity") return `<td class="mono">${prod}</td>`;
+        if (!c.sum) return "<td></td>";
+        const v = sums[c.key];
+        if (c.code && v === 0) return "<td></td>";
+        return `<td class="mono">${c.dec ? v.toFixed(c.dec) : fmt(v)}</td>`;
+      }).join("");
+
+      document.getElementById("statPress").textContent = fmt(list.length);
+      document.getElementById("statQty").textContent   = fmt(qty);
+      document.getElementById("statNg").textContent    = fmt(ng);
+      document.getElementById("statYield").textContent = yieldPct;
+      document.getElementById("statProd").textContent  = prod;
+    }
+
+    // 行クリックで選択（特記事項は長い場合セルにマウスを乗せると全文）
+    document.getElementById("body").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+      document.querySelectorAll("#body tr.selected").forEach(el => el.classList.remove("selected"));
+      tr.classList.add("selected");
+
+      const r = rows.find(x => String(x.id) === tr.dataset.id);
+      const pop = document.getElementById("notePop");
+      if (!r || !r.special_note) { pop.style.display = "none"; return; }
+      document.getElementById("notePopTitle").textContent = `${t("col_note")}（${r.prs_d} ${r.die_number}）`;
+      document.getElementById("notePopText").textContent = r.special_note;
+      pop.style.display = "block";
+      // クリック位置の下に出す（画面からはみ出す場合は内側へ）
+      const x = Math.min(e.clientX + 12, window.innerWidth - pop.offsetWidth - 10);
+      const y = e.clientY + 16 + pop.offsetHeight > window.innerHeight ? e.clientY - pop.offsetHeight - 8 : e.clientY + 16;
+      pop.style.left = x + "px";
+      pop.style.top  = y + "px";
+      e.stopPropagation();
+    });
+    // ポップアップ以外をクリック・スクロールしたら閉じる
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest("#notePop")) document.getElementById("notePop").style.display = "none";
+    });
+    document.querySelector(".table-wrap").addEventListener("scroll", () => {
+      document.getElementById("notePop").style.display = "none";
+    });
+
+    /* =====================================================
+       CSV（画面に表示中の行）
+    ===================================================== */
+    function exportCSV() {
+      if (!rows) return;
+      const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const head = COLS.map(c => q(c.code ?? c.head));
+      const lines = [head.join(",")].concat(visibleRows().map(r => COLS.map(c => {
+        const v = r[c.key];
+        if (c.code) return q(num(v) || "");
+        if (c.key === "qc_check_result") return q(v === "Checked" ? "OK" : "");
+        return q(v);
+      }).join(",")));
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      const d = new Date();
+      a.download = `quality_summary_${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, "0")}${String(d.getDate()).padStart(2, "0")}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    /* =====================================================
+       初期表示
+    ===================================================== */
+    setLang(currentLang);
+    loadCodes().then(() => { if (rows) render(); });
+    loadData();
+  </script>
+</body>
+</html>
