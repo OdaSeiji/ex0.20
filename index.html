@@ -231,6 +231,14 @@
         font-weight: bold;
       }
 
+      /* 絵文字の代わりに画像アイコンを使う見出し（言語切替で文字だけ書き換わるよう span の外に置く） */
+      .accordion-icon {
+        width: 1.25em;
+        height: 1.25em;
+        vertical-align: -0.3em;
+        margin-right: 0.25em;
+      }
+
       .accordion.open {
         background: #e0eaff;
       }
@@ -372,11 +380,11 @@
     </div>
 
     <!-- 🔍 品質 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_quality">🔍 品質</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/caliper.svg" alt="" /><span data-key="section_quality">品質</span></div>
     <div class="accordion-content">
-      <div class="menu-row">
+      <div class="menu-row fixed3">
         <div class="menu-card" onclick="location.href = 'quality_summary.html'">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <img class="menu-icon" src="./img/caliper.svg" alt="" />
           <div class="menu-title" data-key="quality_summary_title">品質サマリー</div>
           <div class="menu-desc" data-key="quality_summary_desc">押出ごとの本数・NG（コード別）・各工程のチェック日・生産性</div>
         </div>
@@ -576,7 +584,7 @@
           title: "トップメニュー",
           whats_new_btn: "📋 更新履歴",
           section_press: "🏭 押出工程",
-          section_quality: "🔍 品質",
+          section_quality: "品質",
           section_maintenance: "🧰 金型メンテナンス",
           section_progress: "📊 金型進捗管理",
           section_register: "🚢 金型輸出、部品輸出",
@@ -669,7 +677,7 @@
           title: "Menu Chính",
           whats_new_btn: "📋 Cập nhật",
           section_press: "🏭 Quy trình ép đùn",
-          section_quality: "🔍 Chất lượng",
+          section_quality: "Chất lượng",
           section_maintenance: "🧰 Bảo trì khuôn",
           section_progress: "📊 Tiến độ khuôn",
           section_register: "🚢 Xuất khuôn, xuất linh kiện",
