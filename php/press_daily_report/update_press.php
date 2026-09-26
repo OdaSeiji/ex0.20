@@ -28,6 +28,17 @@ foreach (PRESS_REQUIRED_KEYS as $key) {
     }
 }
 
+$locks = pressEditLocks($pdo, $pressId);
+if (array_sum($locks) > 0) {
+    http_response_code(409);
+    echo json_encode([
+        "success" => false,
+        "locks"   => $locks,
+        "error"   => "品質記録(NG) {$locks["quality"]}件・梱包 {$locks["packing"]}件・時効 {$locks["aging"]}件 の記録があるため修正できません",
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 try {
     $pdo->beginTransaction();
 

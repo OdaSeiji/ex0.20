@@ -1,6 +1,7 @@
 <?php
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
+require_once "press_common.php";
 
 $id = isset($_GET["id"]) ? (int)$_GET["id"] : 0;
 if ($id <= 0) {
@@ -65,4 +66,5 @@ echo json_encode([
     "pull" => $pull,
     "cut" => $cut,
     "subStaff" => $subStaff,
+    "locks" => pressEditLocks($pdo, $id),
 ], JSON_UNESCAPED_UNICODE);

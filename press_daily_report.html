@@ -2364,6 +2364,7 @@
     });
 
     let editingPressId = null;
+    let editLocked = false;   // 後工程の記録（NG・梱包・時効）がある押出は修正不可
 
     function isFieldEmpty(el) {
       if (el.type === "file") {
@@ -2403,7 +2404,7 @@
       const valid = !cardBody.querySelector(".field-empty, .field-invalid");
       if (editingPressId) {
         document.getElementById("save__button").disabled = true;
-        document.getElementById("update__button").disabled = !valid;
+        document.getElementById("update__button").disabled = !valid || editLocked;
       } else {
         document.getElementById("save__button").disabled = !valid;
         document.getElementById("update__button").disabled = true;
@@ -2638,6 +2639,7 @@
       });
 
       editingPressId = null;
+      editLocked = false;
       document.getElementById("existing_scan_filename").value = "";
       document.getElementById("edit-mode__badge").style.display = "none";
       const selected = document.querySelector("#summary__table tbody tr.selected-record");
@@ -2736,7 +2738,11 @@
         document.getElementById("edit-mode__badge").style.display = "inline-flex";
         refreshRackDayTotal();
 
-        showSaveStatus("", false);
+        const lk = data.locks || { quality: 0, packing: 0, aging: 0 };
+        editLocked = lk.quality + lk.packing + lk.aging > 0;
+        showSaveStatus(editLocked
+          ? `🔒 品質記録(NG) ${lk.quality}件・梱包 ${lk.packing}件・時効 ${lk.aging}件 の記録があるため修正できません`
+          : "", editLocked);
         checkAllRequiredFields();
       } catch (err) {
         showSaveStatus("❌ " + err.message, true);

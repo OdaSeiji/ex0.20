@@ -71,6 +71,27 @@ function bindPressValues($stmt, $p) {
     }
 }
 
+// 修正ロック：この押出のラックに、後工程の記録（NG・梱包・時効）がいくつ付いているか。
+// 更新はラックを全削除→再登録するため、記録があると NG は CASCADE で消え、梱包・時効は RESTRICT で失敗する。
+// どれか1件でもあれば修正させない（使い方を把握してから差分更新を検討する）。
+function pressEditLocks($pdo, $pressId) {
+    $count = function ($table) use ($pdo, $pressId) {
+        $stmt = $pdo->prepare("
+            SELECT COUNT(*) FROM {$table} x
+            JOIN t_using_aging_rack r ON r.id = x.using_aging_rack_id
+            WHERE r.t_press_id = :id
+        ");
+        $stmt->bindValue(":id", $pressId, PDO::PARAM_INT);
+        $stmt->execute();
+        return (int)$stmt->fetchColumn();
+    };
+    return [
+        "quality" => $count("t_press_quality"),
+        "packing" => $count("t_packing_box"),
+        "aging"   => $count("t_aging"),
+    ];
+}
+
 // 副担当者（t_press_staff）を保存する。主担当（t_press.staff_id）と重複する人・重複指定は除く
 function saveSubStaff($pdo, $pressId, $subStaff, $mainStaffId) {
     $ids = array_unique(array_filter(array_map("intval", $subStaff), fn($id) => $id > 0 && $id !== (int)$mainStaffId));
