@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quality Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-main { background: #0078d4; color: #fff; }
+    .btn-ok   { background: #2e7d32; color: #fff; }
+    .btn-sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .btn-del  { background: #fff; color: #c62828; border: 1px solid #c62828; }
+    .btn-del.armed { background: #c62828; color: #fff; }
+    .status-msg { font-size: 13px; }
+    .status-msg.err { color: #c62828; font-weight: bold; }
+    .status-msg.ok  { color: #2e7d32; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card-body { padding: 12px; }
+
+    /* 左：やることリスト */
+    .left { width: 600px; flex-shrink: 0; }
+    .seg { display: inline-flex; border: 1px solid #0078d4; border-radius: 5px; overflow: hidden; }
+    .seg button { padding: 6px 12px; border: none; background: #fff; color: #0078d4; font-size: 13px; font-weight: bold; cursor: pointer; }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+    .seg button .cnt { font-family: "Roboto Mono", monospace; font-weight: normal; margin-left: 4px; opacity: 0.85; }
+    .tabs-row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+    .list-wrap { max-height: calc(100vh - 260px); overflow: auto; }
+    .hint { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.5; }
+
+    table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    th, td { padding: 4px 5px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    th { background: #e8f1ff; font-size: 11px; position: sticky; top: 0; z-index: 1; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    td.c { text-align: center; }
+    td.r { text-align: right; }
+    tbody tr.pick { cursor: pointer; }
+    tbody tr.pick:hover td { background: #f0f8ff; }
+    tbody tr.selected td { background: #fff3cd !important; }
+    .empty { padding: 24px; text-align: center; color: #999; }
+
+    .st { display: inline-block; width: 18px; text-align: center; font-size: 13px; }
+    .st.done { color: #2e7d32; }
+    .st.todo { color: #bbb; }
+    .st.na   { color: #ddd; }
+    .days { display: inline-block; min-width: 38px; padding: 0 5px; border-radius: 9px; text-align: center; font-weight: bold; }
+    .days.d0 { background: #e8f5e9; color: #2e7d32; }
+    .days.d1 { background: #fff8e1; color: #8d6e00; }
+    .days.d2 { background: #ffebee; color: #c62828; }
+    .left-badge { display: inline-block; padding: 0 6px; border-radius: 9px; background: #c62828; color: #fff; font-size: 11px; font-weight: bold; }
+
+    /* 右：選んだ押出 */
+    .right { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+    .placeholder { padding: 40px; text-align: center; color: #999; }
+    .press-info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; }
+    .press-info b { font-family: "Roboto Mono", monospace; font-size: 14px; }
+    .press-info .lbl { color: #777; font-size: 11px; margin-right: 4px; }
+
+    .steps { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .step { flex: 1 1 180px; border: 2px solid #ddd; border-radius: 8px; padding: 8px 10px; }
+    .step.done { border-color: #66bb6a; background: #f1f8e9; }
+    .step.need { border-color: #ffb74d; }
+    .step-title { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 4px; }
+    .step-val { font-family: "Roboto Mono", monospace; font-size: 14px; font-weight: bold; }
+    .step-src { font-size: 11px; color: #888; }
+    .step input[type=date] { padding: 3px 6px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .step .row { display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+
+    .code-totals { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip { font-size: 12px; background: #ffcc80; border-radius: 10px; padding: 2px 8px; font-family: "Roboto Mono", monospace; }
+    .chip.zero { background: #eceff1; color: #777; }
+
+    .work { display: flex; gap: 14px; align-items: flex-start; }
+    .rack-card { width: 330px; flex-shrink: 0; }
+    .ng-card { flex: 1; min-width: 0; }
+    td.ok-neg { color: #c62828; font-weight: bold; }
+
+    .form-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; font-size: 13px; }
+    .form-grid label { color: #555; font-size: 12px; }
+    .form-grid select, .form-grid input { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .code-row { display: flex; gap: 6px; }
+    .code-row input { width: 70px; }
+    .code-row select { flex: 1; min-width: 0; }
+    .form-buttons { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .form-target { font-size: 12px; color: #0055a5; margin-bottom: 8px; font-weight: bold; }
+    .editing-badge { background: #f0a000; color: #fff; border-radius: 4px; padding: 1px 6px; font-size: 11px; margin-left: 6px; }
+    .ng-list { margin-top: 12px; max-height: 300px; overflow: auto; }
+    td.code0 { color: #2e7d32; }
+
+    .qc-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; }
+    .qc-row select, .qc-row input { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .qc-missing { color: #e65100; font-size: 12px; margin-top: 6px; }
+    .qc-done { color: #2e7d32; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📝 品質評価入力</h1>
+  <div class="subtitle" data-key="subtitle">押出を選び、ラックごとに不良コードと本数を記録します。3工程がそろったら QC 担当者が確認して完了にします。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div class="layout">
+    <!-- 左：評価する押出の一覧 -->
+    <div class="left card">
+      <div class="card-header"><span data-key="list_title">押出の一覧（直近1か月）</span></div>
+      <div class="card-body">
+        <div class="tabs-row">
+          <div class="seg" id="typeSeg">
+            <button data-type="3">● <span class="cnt"></span></button>
+            <button data-type="2">◎ <span class="cnt"></span></button>
+            <button data-type="1">〇 <span class="cnt"></span></button>
+          </div>
+          <div class="seg" id="statusSeg">
+            <button data-status="open" data-key="st_open">未完了</button>
+            <button data-status="done" data-key="st_done">完了済み</button>
+          </div>
+        </div>
+        <div class="list-wrap">
+          <table>
+            <thead><tr id="listHead"></tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div class="hint" data-key="list_hint">※ 押出日が1か月より前の押出は、この一覧から消えます（旧画面 QualityReportV7 で扱います）。「あと◯日」は一覧から消えるまでの日数です。</div>
+      </div>
+    </div>
+
+    <!-- 右：選んだ押出 -->
+    <div class="right" id="right">
+      <div class="card"><div class="placeholder" data-key="placeholder">← 左の一覧から押出を選んでください</div></div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title: "📝 品質評価入力",
+        subtitle: "押出を選び、ラックごとに不良コードと本数を記録します。3工程がそろったら QC 担当者が確認して完了にします。",
+        btn_back: "← 戻る",
+        list_title: "押出の一覧（直近1か月）",
+        st_open: "未完了", st_done: "完了済み",
+        list_hint: "※ 押出日が1か月より前の押出は、この一覧から消えます（旧画面 QualityReportV7 で扱います）。「あと◯日」は一覧から消えるまでの日数です。",
+        placeholder: "← 左の一覧から押出を選んでください",
+        col_date: "押出日", col_machine: "号機", col_die: "型番", col_days: "経過", col_ng: "NG", col_left: "残り",
+        col_dim: "寸", col_etch: "エ", col_aging: "時", col_qc: "QC",
+        days_unit: "日", left_fmt: (n) => `あと${n}日`,
+        empty: "該当する押出はありません",
+        info_date: "押出日", info_machine: "号機", info_die: "型番", info_pn: "品番", info_type: "種別",
+        info_billets: "実績ビレット", info_qty: "本数", info_ng: "NG", info_ok: "OK",
+        step_dimension: "寸法", step_etching: "エッチング", step_aging: "時効", step_qc: "QC（最終確認）",
+        step_not_yet: "未完了", step_not_required: "〇は不要",
+        src_etching: "エッチングの画面で入力", src_aging: "硬度の画面で入力",
+        btn_save_date: "保存", btn_clear_date: "取消",
+        code_totals: "NGコード別の合計",
+        rack_title: "ラック", col_order: "順", col_rack: "ラックNo", col_qty: "本数", col_ok: "OK",
+        rack_all: "全ラック表示",
+        ng_title: "NG の入力",
+        form_target: (r) => r ? `ラック ${r.rack_number}（順 ${r.order_number}）に入力` : "ラックを選んでください",
+        editing: "編集中",
+        lbl_process: "工程", lbl_code: "コード", lbl_qty: "本数", lbl_staff: "判定者", lbl_note: "備考",
+        ph_code: "番号",
+        code0: "不良なし",
+        opt_select: "-- 選択 --",
+        btn_add: "追加", btn_update: "更新", btn_delete: "削除", btn_delete_armed: "もう一度押すと削除", btn_cancel: "キャンセル",
+        col_process: "工程", col_code: "コード", col_staff: "判定者", col_note: "備考", col_created: "入力日",
+        qc_title: "QC（最終確認）",
+        lbl_qc_date: "確認日", lbl_qc_staff: "確認者",
+        btn_qc_confirm: "確認して完了にする",
+        btn_qc_cancel: "完了を取り消す", btn_qc_cancel_armed: "もう一度押すと取り消します",
+        qc_missing: (names) => `未完了の工程があります：${names}`,
+        qc_done_fmt: (d, n) => `✅ 確認済み ${d}　${n}`,
+        qc_legacy: "✅ 旧画面（V7）で確認済み（確認日・確認者の記録なし）",
+        msg_saved: "保存しました", msg_deleted: "削除しました", msg_confirmed: "完了にしました", msg_cancelled: "完了を取り消しました",
+        err_rack: "ラックを選んでください", err_code: "コードを選んでください", err_qty: "本数は1〜500の整数で入力してください",
+        err_staff: "判定者を選んでください", err_qc_staff: "確認者を選んでください", err_qc_date: "確認日を入力してください",
+      },
+      vi: {
+        title: "📝 Nhập đánh giá chất lượng",
+        subtitle: "Chọn lần ép, ghi mã lỗi và số cây NG theo từng giá. Khi đủ 3 công đoạn, người phụ trách QC xác nhận để hoàn thành.",
+        btn_back: "← Quay lại",
+        list_title: "Danh sách lần ép (1 tháng gần nhất)",
+        st_open: "Chưa xong", st_done: "Đã xong",
+        list_hint: "※ Lần ép quá 1 tháng sẽ biến mất khỏi danh sách (xử lý ở màn hình cũ QualityReportV7). \"Còn ◯ ngày\" là số ngày trước khi biến mất.",
+        placeholder: "← Chọn lần ép ở danh sách bên trái",
+        col_date: "Ngày ép", col_machine: "Máy", col_die: "Mã khuôn", col_days: "Đã qua", col_ng: "NG", col_left: "Còn",
+        col_dim: "KT", col_etch: "ET", col_aging: "HG", col_qc: "QC",
+        days_unit: " ngày", left_fmt: (n) => `Còn ${n} ngày`,
+        empty: "Không có lần ép phù hợp",
+        info_date: "Ngày ép", info_machine: "Máy", info_die: "Mã khuôn", info_pn: "Mã SP", info_type: "Kiểu",
+        info_billets: "Billet TT", info_qty: "Số cây", info_ng: "NG", info_ok: "OK",
+        step_dimension: "Kích thước", step_etching: "Etching", step_aging: "Hóa già", step_qc: "QC (xác nhận cuối)",
+        step_not_yet: "Chưa xong", step_not_required: "〇 không cần",
+        src_etching: "Nhập ở màn hình Etching", src_aging: "Nhập ở màn hình độ cứng",
+        btn_save_date: "Lưu", btn_clear_date: "Xóa",
+        code_totals: "Tổng theo mã NG",
+        rack_title: "Giá", col_order: "TT", col_rack: "Số giá", col_qty: "Số cây", col_ok: "OK",
+        rack_all: "Hiện tất cả giá",
+        ng_title: "Nhập NG",
+        form_target: (r) => r ? `Nhập cho giá ${r.rack_number} (TT ${r.order_number})` : "Hãy chọn giá",
+        editing: "Đang sửa",
+        lbl_process: "Công đoạn", lbl_code: "Mã", lbl_qty: "Số cây", lbl_staff: "Người đánh giá", lbl_note: "Ghi chú",
+        ph_code: "Mã số",
+        code0: "Không có lỗi",
+        opt_select: "-- Chọn --",
+        btn_add: "Thêm", btn_update: "Cập nhật", btn_delete: "Xóa", btn_delete_armed: "Bấm lần nữa để xóa", btn_cancel: "Hủy",
+        col_process: "Công đoạn", col_code: "Mã", col_staff: "Người đánh giá", col_note: "Ghi chú", col_created: "Ngày nhập",
+        qc_title: "QC (xác nhận cuối)",
+        lbl_qc_date: "Ngày xác nhận", lbl_qc_staff: "Người xác nhận",
+        btn_qc_confirm: "Xác nhận và hoàn thành",
+        btn_qc_cancel: "Hủy hoàn thành", btn_qc_cancel_armed: "Bấm lần nữa để hủy",
+        qc_missing: (names) => `Còn công đoạn chưa xong: ${names}`,
+        qc_done_fmt: (d, n) => `✅ Đã xác nhận ${d}　${n}`,
+        qc_legacy: "✅ Đã xác nhận ở màn hình cũ (V7) (không có ngày/người xác nhận)",
+        msg_saved: "Đã lưu", msg_deleted: "Đã xóa", msg_confirmed: "Đã hoàn thành", msg_cancelled: "Đã hủy hoàn thành",
+        err_rack: "Hãy chọn giá", err_code: "Hãy chọn mã", err_qty: "Số cây phải là số nguyên từ 1 đến 500",
+        err_staff: "Hãy chọn người đánh giá", err_qc_staff: "Hãy chọn người xác nhận", err_qc_date: "Hãy nhập ngày xác nhận",
+      },
+    };
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k) => dict[currentLang][k];
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem("lang", lang);
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const v = dict[lang][el.dataset.key];
+        if (typeof v === "string") el.textContent = v;
+      });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      renderList();
+      renderRight();
+    }
+
+    /* =====================================================
+       共通
+    ===================================================== */
+    const API = "./php/quality_report/";
+    const PROCESSES = [
+      { id: 1, key: "dimension", label: "step_dimension" },
+      { id: 2, key: "etching",   label: "step_etching" },
+      { id: 3, key: "aging",     label: "step_aging" },
+    ];
+    const TYPE_TEST = 1;   // 〇
+
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const fmt = (n) => Number(n).toLocaleString();
+    const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+    const lsGet = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+
+    function showMsg(msg, isErr) {
+      const el = document.getElementById("statusMsg");
+      el.textContent = msg || "";
+      el.className = "status-msg " + (isErr ? "err" : "ok");
+      if (msg && !isErr) setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 3000);
+    }
+
+    async function getJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || res.statusText);
+      return data;
+    }
+    async function postJson(file, body) {
+      const res = await fetch(API + file, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        const err = new Error(data.error || res.statusText);
+        err.data = data;
+        throw err;
+      }
+      return data;
+    }
+
+    // 「もう一度押すと実行」ボタン（ブラウザの確認ダイアログを使わない）
+    function armButton(btn, armedKey, action) {
+      if (btn.classList.contains("armed")) {
+        btn.classList.remove("armed");
+        action();
+        return;
+      }
+      const orig = btn.textContent;
+      btn.classList.add("armed");
+      btn.textContent = t(armedKey);
+      setTimeout(() => { if (btn.classList.contains("armed")) { btn.classList.remove("armed"); btn.textContent = orig; } }, 3000);
+    }
+
+    /* =====================================================
+       状態
+    ===================================================== */
+    const state = {
+      type: Number(lsGet("qr_type") || 3),
+      status: "open",
+      counts: {},
+      rows: null,
+      pressId: null,
+      detail: null,
+      rackId: null,        // 入力先のラック
+      showAllRacks: false, // NG の一覧を全ラック分表示
+      editingNgId: null,
+      process: 1,
+    };
+    let masters = { codes: [], inspectors: [] };
+
+    /* =====================================================
+       左：一覧
+    ===================================================== */
+    async function loadList() {
+      const data = await getJson(`${API}get_list.php?type=${state.type}&status=${state.status}`);
+      state.counts = data.counts || {};
+      state.rows = data.rows;
+      if (state.pressId && !state.rows.some(r => r.id === state.pressId) && state.detail && !state.detail.press.in_window) {
+        state.pressId = null;
+      }
+      renderList();
+    }
+
+    document.getElementById("typeSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      state.type = Number(b.dataset.type);
+      lsSet("qr_type", state.type);
+      loadList().catch(err => showMsg(err.message, true));
+    });
+    document.getElementById("statusSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      state.status = b.dataset.status;
+      loadList().catch(err => showMsg(err.message, true));
+    });
+    document.getElementById("listBody").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+      selectPress(Number(tr.dataset.id));
+    });
+
+    const stepMark = (done, required = true) =>
+      !required ? `<span class="st na">－</span>` : `<span class="st ${done ? "done" : "todo"}">${done ? "✅" : "⬜"}</span>`;
+    const daysClass = (d) => d <= 3 ? "d0" : d <= 7 ? "d1" : "d2";
+
+    function renderList() {
+      document.querySelectorAll("#typeSeg button").forEach(b => {
+        const c = state.counts[b.dataset.type] || { open: 0, done: 0 };
+        b.querySelector(".cnt").textContent = `(${state.status === "done" ? c.done : c.open})`;
+        b.classList.toggle("active", Number(b.dataset.type) === state.type);
+      });
+      document.querySelectorAll("#statusSeg button").forEach(b => b.classList.toggle("active", b.dataset.status === state.status));
+
+      document.getElementById("listHead").innerHTML =
+        [t("col_date"), t("col_machine"), t("col_die"), t("col_days"), t("col_dim"), t("col_etch"), t("col_aging"), t("col_qc"), t("col_ng"), t("col_left")]
+          .map(h => `<th>${h}</th>`).join("");
+      const body = document.getElementById("listBody");
+      if (!state.rows) return;
+      if (state.rows.length === 0) {
+        body.innerHTML = `<tr><td colspan="10" class="empty">${t("empty")}</td></tr>`;
+        return;
+      }
+      const isTest = state.type === TYPE_TEST;
+      body.innerHTML = state.rows.map(r => `
+        <tr class="pick ${r.id === state.pressId ? "selected" : ""}" data-id="${r.id}">
+          <td class="mono">${r.press_date.slice(5)} <span style="color:#999">${esc(r.press_start || "")}</span></td>
+          <td class="c">${r.machine}</td>
+          <td class="mono">${esc(r.die_number)}</td>
+          <td class="c"><span class="days ${daysClass(r.days)}">${r.days}${t("days_unit")}</span></td>
+          <td class="c">${stepMark(r.dimension_date)}</td>
+          <td class="c">${stepMark(r.etching_date, !isTest)}</td>
+          <td class="c">${stepMark(r.aging_date, !isTest)}</td>
+          <td class="c">${stepMark(r.qc_done)}</td>
+          <td class="r mono">${r.ng ? fmt(r.ng) : ""}</td>
+          <td class="c">${!r.qc_done && r.days_left <= 7 ? `<span class="left-badge">${t("left_fmt")(r.days_left)}</span>` : ""}</td>
+        </tr>`).join("");
+    }
+
+    /* =====================================================
+       右：選んだ押出
+    ===================================================== */
+    async function selectPress(id) {
+      if (state.pressId !== id) {
+        state.pressId = id;
+        state.rackId = null;
+        state.editingNgId = null;
+        state.showAllRacks = false;
+        state.process = null;   // 押出を選び直したら、未完了の工程を既定にする
+      }
+      renderList();
+      await loadDetail();
+    }
+
+    async function loadDetail() {
+      if (!state.pressId) return;
+      try {
+        state.detail = await getJson(`${API}get_press.php?id=${state.pressId}`);
+        const d = state.detail;
+        if (state.rackId && !d.racks.some(r => r.id === state.rackId)) state.rackId = null;
+        if (!state.rackId && d.racks.length) state.rackId = d.racks[0].id;
+        if (state.process === null) {
+          const p = d.press;
+          const firstTodo = PROCESSES.find(pr =>
+            !p[`${pr.key}_date`] && (pr.id === 1 || p.pressing_type_id !== TYPE_TEST));
+          state.process = firstTodo ? firstTodo.id : 1;
+        }
+        renderRight();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    function renderRight() {
+      const right = document.getElementById("right");
+      if (!state.detail) {
+        right.innerHTML = `<div class="card"><div class="placeholder">${t("placeholder")}</div></div>`;
+        return;
+      }
+      const { press: p, racks, ngs } = state.detail;
+      const isTest = p.pressing_type_id === TYPE_TEST;
+      const qtyTotal = racks.reduce((s, r) => s + r.qty, 0);
+      const ngTotal  = racks.reduce((s, r) => s + r.ng, 0);
+
+      // NG コード別の合計（押出全体）
+      const byCode = {};
+      ngs.forEach(n => { if (n.quality_code !== "0") byCode[n.quality_code] = (byCode[n.quality_code] || 0) + n.qty; });
+      const codeChips = Object.keys(byCode).sort().map(c => `<span class="chip">${c}: ${byCode[c]}</span>`).join("")
+        || `<span class="chip zero">NG 0</span>`;
+
+      // 工程の状態
+      const stepBox = (key, value, required, extra) => `
+        <div class="step ${!required ? "" : value ? "done" : "need"}">
+          <div class="step-title">${t("step_" + key)}</div>
+          <div class="step-val">${!required ? `<span style="color:#aaa">${t("step_not_required")}</span>` : value ? esc(value) : `<span style="color:#e65100">${t("step_not_yet")}</span>`}</div>
+          ${extra || ""}
+        </div>`;
+      const dimExtra = `
+        <div class="row">
+          <input type="date" id="dimDate" value="${p.dimension_date || today()}" />
+          <button class="btn btn-main" id="dimSave">${t("btn_save_date")}</button>
+          ${p.dimension_date ? `<button class="btn btn-del" id="dimClear">${t("btn_clear_date")}</button>` : ""}
+        </div>`;
+      const qcValue = p.qc_legacy ? "✅ V7" : p.qc_date ? `${p.qc_date}` : null;
+
+      const rack = racks.find(r => r.id === state.rackId) || null;
+      const shownNgs = state.showAllRacks ? ngs : ngs.filter(n => n.rack_id === state.rackId);
+      const rackNo = (id) => (racks.find(r => r.id === id) || {}).rack_number ?? "";
+      const procLabel = (id) => t((PROCESSES.find(x => x.id === id) || {}).label || "");
+      const editing = state.editingNgId ? ngs.find(n => n.id === state.editingNgId) : null;
+
+      const codeOptions = `<option value="">${t("opt_select")}</option>` + masters.codes.map(c => {
+        const desc = c.quality_code === "0" ? t("code0") : (currentLang === "vi" ? c.description_vn : c.description_jp) || "";
+        return `<option value="${c.id}" data-code="${c.quality_code}">${c.quality_code} ${esc(desc)}</option>`;
+      }).join("");
+      const staffOptions = (sel) => `<option value="">${t("opt_select")}</option>` +
+        masters.inspectors.map(s => `<option value="${s.id}" ${String(s.id) === String(sel) ? "selected" : ""}>${esc(s.staff_name)}</option>`).join("");
+
+      const lastStaff = lsGet("qr_staff") || "";
+      const missingNames = (p.missing_steps || []).map(k => t("step_" + k)).join("、");
+
+      right.innerHTML = `
+        <div class="card">
+          <div class="card-body">
+            <div class="press-info">
+              <span><span class="lbl">${t("info_date")}</span><b>${p.press_date} ${esc(p.press_start || "")}</b></span>
+              <span><span class="lbl">${t("info_machine")}</span><b>${p.machine}</b></span>
+              <span><span class="lbl">${t("info_die")}</span><b>${esc(p.die_number)}</b></span>
+              <span><span class="lbl">${t("info_pn")}</span><b>${esc(p.production_number)}</b></span>
+              <span><span class="lbl">${t("info_type")}</span><b>${esc(p.pressing_type)}</b></span>
+              <span><span class="lbl">${t("info_billets")}</span><b>${p.billets ?? "-"}</b></span>
+              <span><span class="lbl">${t("info_qty")}</span><b>${fmt(qtyTotal)}</b></span>
+              <span><span class="lbl">${t("info_ng")}</span><b style="color:#e65100">${fmt(ngTotal)}</b></span>
+              <span><span class="lbl">${t("info_ok")}</span><b style="color:#2e7d32">${fmt(qtyTotal - ngTotal)}</b></span>
+            </div>
+            <div class="steps">
+              ${stepBox("dimension", p.dimension_date, true, dimExtra)}
+              ${stepBox("etching", p.etching_date, !isTest, `<div class="step-src">${t("src_etching")}</div>`)}
+              ${stepBox("aging", p.aging_date, !isTest, `<div class="step-src">${t("src_aging")}</div>`)}
+              ${stepBox("qc", qcValue, true, "")}
+            </div>
+            <div class="code-totals"><span style="font-size:12px;color:#777">${t("code_totals")}：</span>${codeChips}</div>
+          </div>
+        </div>
+
+        <div class="work">
+          <div class="card rack-card">
+            <div class="card-header"><span>${t("rack_title")}</span></div>
+            <div class="card-body" style="padding:0">
+              <table>
+                <thead><tr><th>${t("col_order")}</th><th>${t("col_rack")}</th><th>${t("col_qty")}</th><th>NG</th><th>${t("col_ok")}</th></tr></thead>
+                <tbody id="rackBody">
+                  ${racks.length ? racks.map(r => `
+                    <tr class="pick ${r.id === state.rackId ? "selected" : ""}" data-rack="${r.id}">
+                      <td class="c mono">${r.order_number}</td>
+                      <td class="c mono">${r.rack_number}</td>
+                      <td class="r mono">${fmt(r.qty)}</td>
+                      <td class="r mono" style="color:#e65100">${r.ng || ""}</td>
+                      <td class="r mono ${r.ok < 0 ? "ok-neg" : ""}">${fmt(r.ok)}</td>
+                    </tr>`).join("") : `<tr><td colspan="5" class="empty">-</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card ng-card">
+            <div class="card-header">
+              <span>${t("ng_title")}${editing ? `<span class="editing-badge">${t("editing")}</span>` : ""}</span>
+              <label style="font-weight:normal;font-size:12px;color:#555"><input type="checkbox" id="showAll" ${state.showAllRacks ? "checked" : ""}/> ${t("rack_all")}</label>
+            </div>
+            <div class="card-body">
+              <div class="form-target">${t("form_target")(editing ? racks.find(r => r.id === editing.rack_id) : rack)}</div>
+              <div class="form-grid">
+                <label>${t("lbl_process")}</label>
+                <div class="seg" id="procSeg">
+                  ${PROCESSES.map(pr => `<button data-proc="${pr.id}" class="${pr.id === state.process ? "active" : ""}">${t(pr.label)}</button>`).join("")}
+                </div>
+                <label>${t("lbl_code")}</label>
+                <div class="code-row">
+                  <input type="text" id="codeInput" placeholder="${t("ph_code")}" inputmode="numeric" />
+                  <select id="codeSelect">${codeOptions}</select>
+                </div>
+                <label>${t("lbl_qty")}</label>
+                <input type="text" id="qtyInput" inputmode="numeric" style="width:90px" />
+                <label>${t("lbl_staff")}</label>
+                <select id="staffSelect">${staffOptions(editing ? editing.staff_id : lastStaff)}</select>
+                <label>${t("lbl_note")}</label>
+                <input type="text" id="noteInput" maxlength="100" />
+              </div>
+              <div class="form-buttons">
+                ${editing
+                  ? `<button class="btn btn-main" id="ngUpdate">${t("btn_update")}</button>
+                     <button class="btn btn-del" id="ngDelete">${t("btn_delete")}</button>
+                     <button class="btn btn-sub" id="ngCancel">${t("btn_cancel")}</button>`
+                  : `<button class="btn btn-main" id="ngAdd" ${rack ? "" : "disabled"}>${t("btn_add")}</button>`}
+              </div>
+
+              <div class="ng-list">
+                <table>
+                  <thead><tr>
+                    ${state.showAllRacks ? `<th>${t("col_rack")}</th>` : ""}
+                    <th>${t("col_process")}</th><th>${t("col_code")}</th><th>${t("col_qty")}</th><th>${t("col_staff")}</th><th>${t("col_note")}</th><th>${t("col_created")}</th>
+                  </tr></thead>
+                  <tbody id="ngBody">
+                    ${shownNgs.length ? shownNgs.map(n => `
+                      <tr class="pick ${n.id === state.editingNgId ? "selected" : ""}" data-ng="${n.id}">
+                        ${state.showAllRacks ? `<td class="c mono">${rackNo(n.rack_id)}</td>` : ""}
+                        <td>${procLabel(n.process_id)}</td>
+                        <td class="mono ${n.quality_code === "0" ? "code0" : ""}">${n.quality_code === "0" ? "0 " + t("code0") : esc(n.quality_code)}</td>
+                        <td class="r mono">${n.qty}</td>
+                        <td>${esc(n.staff_name || "")}</td>
+                        <td>${esc(n.note || "")}</td>
+                        <td class="mono">${esc(n.created_at || "")}</td>
+                      </tr>`).join("") : `<tr><td colspan="7" class="empty">-</td></tr>`}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><span>${t("qc_title")}</span></div>
+          <div class="card-body">
+            ${p.qc_done ? `
+              <div class="qc-row">
+                <span class="qc-done">${p.qc_legacy ? t("qc_legacy") : t("qc_done_fmt")(p.qc_date, esc(p.qc_staff_name || ""))}</span>
+                <button class="btn btn-del" id="qcCancel">${t("btn_qc_cancel")}</button>
+              </div>` : `
+              <div class="qc-row">
+                <label>${t("lbl_qc_date")}</label><input type="date" id="qcDate" value="${today()}" />
+                <label>${t("lbl_qc_staff")}</label><select id="qcStaff">${staffOptions(lsGet("qr_qc_staff") || "")}</select>
+                <button class="btn btn-ok" id="qcConfirm" ${p.missing_steps.length ? "disabled" : ""}>${t("btn_qc_confirm")}</button>
+              </div>
+              ${p.missing_steps.length ? `<div class="qc-missing">${t("qc_missing")(missingNames)}</div>` : ""}`}
+          </div>
+        </div>`;
+
+      // 編集中なら、フォームに値を入れる
+      if (editing) {
+        document.getElementById("codeSelect").value = editing.quality_code_id;
+        document.getElementById("qtyInput").value = editing.qty;
+        document.getElementById("noteInput").value = editing.note || "";
+      }
+      syncQtyForCode();
+      bindRight();
+    }
+
+    // コード 0（不良なし）のときは本数0で固定
+    function syncQtyForCode() {
+      const sel = document.getElementById("codeSelect");
+      const qty = document.getElementById("qtyInput");
+      if (!sel || !qty) return;
+      const isZero = sel.selectedOptions[0]?.dataset.code === "0";
+      qty.disabled = isZero;
+      if (isZero) qty.value = "0";
+      else if (qty.value === "0") qty.value = "";
+    }
+
+    function bindRight() {
+      const $ = (id) => document.getElementById(id);
+
+      $("rackBody").addEventListener("click", (e) => {
+        const tr = e.target.closest("tr[data-rack]");
+        if (!tr) return;
+        state.rackId = Number(tr.dataset.rack);
+        state.editingNgId = null;
+        renderRight();
+        $("codeInput").focus();
+      });
+      $("showAll").addEventListener("change", (e) => { state.showAllRacks = e.target.checked; renderRight(); });
+      $("procSeg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        state.process = Number(b.dataset.proc);
+        document.querySelectorAll("#procSeg button").forEach(x => x.classList.toggle("active", x === b));
+      });
+
+      // コード：番号を打つと選択肢が合わせて動く。Enter で本数へ
+      $("codeInput").addEventListener("input", (e) => {
+        const v = e.target.value.trim();
+        const opt = [...$("codeSelect").options].find(o => o.dataset.code === v);
+        $("codeSelect").value = opt ? opt.value : "";
+        syncQtyForCode();
+      });
+      $("codeInput").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); ($("qtyInput").disabled ? $("staffSelect") : $("qtyInput")).focus(); }
+      });
+      $("codeSelect").addEventListener("change", () => {
+        $("codeInput").value = $("codeSelect").selectedOptions[0]?.dataset.code || "";
+        syncQtyForCode();
+      });
+      $("qtyInput").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $("staffSelect").focus(); } });
+      $("staffSelect").addEventListener("change", (e) => lsSet("qr_staff", e.target.value));
+
+      $("ngBody").addEventListener("click", (e) => {
+        const tr = e.target.closest("tr[data-ng]");
+        if (!tr) return;
+        const n = state.detail.ngs.find(x => x.id === Number(tr.dataset.ng));
+        state.editingNgId = n.id;
+        state.rackId = n.rack_id;
+        state.process = n.process_id;
+        renderRight();
+      });
+
+      if ($("ngAdd"))    $("ngAdd").addEventListener("click", () => saveNg("add"));
+      if ($("ngUpdate")) $("ngUpdate").addEventListener("click", () => saveNg("update"));
+      if ($("ngCancel")) $("ngCancel").addEventListener("click", () => { state.editingNgId = null; renderRight(); });
+      if ($("ngDelete")) $("ngDelete").addEventListener("click", (e) => armButton(e.currentTarget, "btn_delete_armed", deleteNg));
+
+      $("dimSave").addEventListener("click", () => saveDimension($("dimDate").value));
+      if ($("dimClear")) $("dimClear").addEventListener("click", (e) => armButton(e.currentTarget, "btn_delete_armed", () => saveDimension(null)));
+
+      if ($("qcConfirm")) $("qcConfirm").addEventListener("click", confirmQc);
+      if ($("qcStaff"))   $("qcStaff").addEventListener("change", (e) => lsSet("qr_qc_staff", e.target.value));
+      if ($("qcCancel"))  $("qcCancel").addEventListener("click", (e) => armButton(e.currentTarget, "btn_qc_cancel_armed", cancelQc));
+    }
+
+    /* =====================================================
+       保存
+    ===================================================== */
+    async function afterChange(msgKey) {
+      showMsg(t(msgKey), false);
+      await Promise.all([loadDetail(), loadList()]);
+    }
+
+    async function saveNg(action) {
+      const $ = (id) => document.getElementById(id);
+      const codeOpt = $("codeSelect").selectedOptions[0];
+      const isZero = codeOpt?.dataset.code === "0";
+      const qty = $("qtyInput").value.trim();
+      const staff = $("staffSelect").value;
+      if (action === "add" && !state.rackId) return showMsg(t("err_rack"), true);
+      if (!$("codeSelect").value) return showMsg(t("err_code"), true);
+      if (!isZero && !(/^\d+$/.test(qty) && Number(qty) >= 1 && Number(qty) <= 500)) return showMsg(t("err_qty"), true);
+      if (!staff) return showMsg(t("err_staff"), true);
+
+      const body = {
+        action,
+        process_id: state.process,
+        quality_code_id: Number($("codeSelect").value),
+        qty: isZero ? 0 : Number(qty),
+        staff_id: Number(staff),
+        note: $("noteInput").value.trim(),
+      };
+      if (action === "add") body.rack_id = state.rackId;
+      else body.id = state.editingNgId;
+      try {
+        await postJson("save_ng.php", body);
+        state.editingNgId = null;
+        await afterChange("msg_saved");
+        document.getElementById("codeInput")?.focus();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    async function deleteNg() {
+      try {
+        await postJson("save_ng.php", { action: "delete", id: state.editingNgId });
+        state.editingNgId = null;
+        await afterChange("msg_deleted");
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    async function saveDimension(date) {
+      try {
+        await postJson("save_dimension_date.php", { press_id: state.pressId, date });
+        await afterChange("msg_saved");
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    async function confirmQc() {
+      const date = document.getElementById("qcDate").value;
+      const staff = document.getElementById("qcStaff").value;
+      if (!date) return showMsg(t("err_qc_date"), true);
+      if (!staff) return showMsg(t("err_qc_staff"), true);
+      try {
+        await postJson("save_qc.php", { action: "confirm", press_id: state.pressId, date, staff_id: Number(staff) });
+        await afterChange("msg_confirmed");
+      } catch (err) {
+        const missing = err.data && err.data.missing_steps;
+        showMsg(missing ? t("qc_missing")(missing.map(k => t("step_" + k)).join("、")) : err.message, true);
+      }
+    }
+
+    async function cancelQc() {
+      try {
+        await postJson("save_qc.php", { action: "cancel", press_id: state.pressId });
+        await afterChange("msg_cancelled");
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    /* =====================================================
+       初期表示
+    ===================================================== */
+    (async () => {
+      setLang(currentLang);
+      try {
+        masters = await getJson(API + "get_masters.php");
+        await loadList();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    })();
+  </script>
+</body>
+</html>

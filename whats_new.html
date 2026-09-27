@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-09-26 (最新) -->
+      <!-- 2026-09-27 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-27</span>
+        </div>
+        <div class="entry-title" data-key="ek_title">品質評価入力ページの新設</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ek_purpose">ex0.11 の品質評価（QualityReport V7）を ex0.20 に移植し、評価が終わっていない押出を見落とさず、ラックごとの不良を正しく記録できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ek_content">トップメニューの「品質」に新設。プレス種別（●・◎・〇）のタブと「未完了／完了済み」の切替で、直近1か月の押出を一覧表示（工程ごとの状況、経過日数、一覧から消えるまでの残り日数付き）。押出を選び、ラックごとに工程・不良コード・本数・判定者・備考を記録する。「0 不良なし」も記録できる。寸法の完了日はこの画面で入力し、エッチング・時効の完了日はそれぞれの画面の記録を表示する。必要な工程（●◎は寸法・エッチング・時効、〇は寸法）がそろったら、QC 担当者が確認日と確認者を入れて完了にする（取消可）。判定者・確認者は在籍中の検査員から選ぶ。ラックの本数を超える NG は保存できない。1か月より前の押出は従来の画面で扱う。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-26 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -391,6 +409,9 @@
           ej_title: "品質サマリーページの新設（トップメニューに「品質」を追加）",
           ej_purpose: "ex0.11 の Quality Summary（V9）を ex0.20 に移植し、押出ごとの品質結果を確認できるようにするため。",
           ej_content: "トップメニューの押出工程の次に「品質」セクションを新設。押出ごとに計画・実績ビレット数、本数、NG（コード別）、良品率、各工程（寸法・エッチング・時効・QC・梱包）のチェック日、生産性を一覧表示する。型番・号機・月・期間、プレス種別、チェック日で絞り込み、合計行・集計カード、CSV出力、日本語/ベトナム語切替に対応。NGコードの見出しにマウスを乗せると説明が出る。特記事項は行クリックで表示。V9からの主な変更：生産性の計算に押出ごとの品番（型番⇔品番の多対多に対応）を使用、NGコードは全26種を表示（V9では313・318など8種が常に非表示で、NGがあっても列に出なかった）、押出時間の入力ミスがある押出は生産性を空欄にする。1920px幅の画面に収まる列幅。",
+          ek_title: "品質評価入力ページの新設",
+          ek_purpose: "ex0.11 の品質評価（QualityReport V7）を ex0.20 に移植し、評価が終わっていない押出を見落とさず、ラックごとの不良を正しく記録できるようにするため。",
+          ek_content: "トップメニューの「品質」に新設。プレス種別（●・◎・〇）のタブと「未完了／完了済み」の切替で、直近1か月の押出を一覧表示（工程ごとの状況、経過日数、一覧から消えるまでの残り日数付き）。押出を選び、ラックごとに工程・不良コード・本数・判定者・備考を記録する。「0 不良なし」も記録できる。寸法の完了日はこの画面で入力し、エッチング・時効の完了日はそれぞれの画面の記録を表示する。必要な工程（●◎は寸法・エッチング・時効、〇は寸法）がそろったら、QC 担当者が確認日と確認者を入れて完了にする（取消可）。判定者・確認者は在籍中の検査員から選ぶ。ラックの本数を超える NG は保存できない。1か月より前の押出は従来の画面で扱う。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -443,6 +464,9 @@
           ej_title: "Thêm mới trang tổng hợp chất lượng (thêm mục \"Chất lượng\" vào menu chính)",
           ej_purpose: "Chuyển Quality Summary (V9) của ex0.11 sang ex0.20 để xem kết quả chất lượng theo từng lần ép.",
           ej_content: "Thêm mục \"Chất lượng\" ngay sau quy trình ép đùn trên menu chính. Hiển thị theo từng lần ép: số billet kế hoạch/thực tế, số cây, NG (theo mã), tỷ lệ đạt, ngày kiểm tra từng công đoạn (kích thước, etching, hóa già, QC, đóng gói) và năng suất. Lọc theo mã khuôn, máy, tháng, thời gian, kiểu đùn, ngày kiểm tra; có dòng tổng và thẻ tổng hợp, xuất CSV, chuyển đổi tiếng Nhật/tiếng Việt. Di chuột lên tiêu đề mã NG để xem giải thích. Bấm vào dòng để xem ghi chú đặc biệt. Thay đổi chính so với V9: tính năng suất theo mã sản phẩm của từng lần ép (hỗ trợ quan hệ nhiều-nhiều khuôn ⇔ mã SP), hiển thị đủ 26 mã NG (V9 luôn ẩn 8 mã như 313, 318 nên dù có NG cũng không hiện trong cột), lần ép nhập sai thời gian ép sẽ để trống năng suất. Độ rộng cột vừa màn hình rộng 1920px.",
+          ek_title: "Thêm mới trang nhập đánh giá chất lượng",
+          ek_purpose: "Chuyển màn hình đánh giá chất lượng (QualityReport V7) của ex0.11 sang ex0.20, để không bỏ sót lần ép chưa đánh giá và ghi đúng số lỗi theo từng giá.",
+          ek_content: "Thêm mới trong mục \"Chất lượng\" của menu chính. Chọn tab theo kiểu đùn (●・◎・〇) và chuyển \"Chưa xong / Đã xong\" để xem danh sách lần ép trong 1 tháng gần nhất (có tình trạng từng công đoạn, số ngày đã qua, số ngày còn lại trước khi biến mất khỏi danh sách). Chọn lần ép, ghi công đoạn, mã lỗi, số cây, người đánh giá, ghi chú theo từng giá. Có thể ghi \"0 Không có lỗi\". Ngày hoàn thành kích thước nhập ở màn hình này, ngày hoàn thành etching và hóa già hiển thị từ màn hình tương ứng. Khi đủ các công đoạn cần thiết (●◎: kích thước, etching, hóa già; 〇: kích thước), người phụ trách QC nhập ngày và người xác nhận để hoàn thành (có thể hủy). Người đánh giá và người xác nhận chọn từ nhân viên kiểm tra đang làm việc. Không lưu được số NG vượt quá số cây của giá. Lần ép quá 1 tháng xử lý ở màn hình cũ.",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",
