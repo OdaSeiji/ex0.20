@@ -91,6 +91,23 @@
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
           <span class="entry-date">2026-09-27</span>
         </div>
+        <div class="entry-title" data-key="el_title">（テスト）サンプル位置の図を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="el_purpose">エッチング・硬度・表面粗さの評価を1つのページで記録する構想に向けて、押出材・製品・サンプル位置の関係を図で確認するため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="el_content">トップメニューの「品質」にテストページを追加。押出を選ぶと、押出材（縦）ごとに取れた製品を □ で並べ、ビレットの継ぎ目と評価サンプルの位置を表示する。サンプル位置の名前は新しいルールの案（頭 T、尾 Z、継ぎ目のペア A・B、C・D …、中央 M・M2 …）で表示し、過去のエッチング・表面粗さの記録（H・E・END などの旧名）を読み替えて比較できる。nBn（ビレット何本で押出材何本か）と切出本数から位置を自動で決めている。テスト用のため、画面は日本語のみ。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='sample_map_test.html'">sample_map_test.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-09-27</span>
+        </div>
         <div class="entry-title" data-key="ek_title">品質評価入力ページの新設</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ek_purpose">ex0.11 の品質評価（QualityReport V7）を ex0.20 に移植し、評価が終わっていない押出を見落とさず、ラックごとの不良を正しく記録できるようにするため。</span>
@@ -412,6 +429,9 @@
           ek_title: "品質評価入力ページの新設",
           ek_purpose: "ex0.11 の品質評価（QualityReport V7）を ex0.20 に移植し、評価が終わっていない押出を見落とさず、ラックごとの不良を正しく記録できるようにするため。",
           ek_content: "トップメニューの「品質」に新設。プレス種別（●・◎・〇）のタブと「未完了／完了済み」の切替で、直近1か月の押出を一覧表示（工程ごとの状況、経過日数、一覧から消えるまでの残り日数付き）。押出を選び、ラックごとに工程・不良コード・本数・判定者・備考を記録する。「0 不良なし」も記録できる。寸法の完了日はこの画面で入力し、エッチング・時効の完了日はそれぞれの画面の記録を表示する。必要な工程（●◎は寸法・エッチング・時効、〇は寸法）がそろったら、QC 担当者が確認日と確認者を入れて完了にする（取消可）。判定者・確認者は在籍中の検査員から選ぶ。ラックの本数を超える NG は保存できない。1か月より前の押出は従来の画面で扱う。",
+          el_title: "（テスト）サンプル位置の図を追加",
+          el_purpose: "エッチング・硬度・表面粗さの評価を1つのページで記録する構想に向けて、押出材・製品・サンプル位置の関係を図で確認するため。",
+          el_content: "トップメニューの「品質」にテストページを追加。押出を選ぶと、押出材（縦）ごとに取れた製品を □ で並べ、ビレットの継ぎ目と評価サンプルの位置を表示する。サンプル位置の名前は新しいルールの案（頭 T、尾 Z、継ぎ目のペア A・B、C・D …、中央 M・M2 …）で表示し、過去のエッチング・表面粗さの記録（H・E・END などの旧名）を読み替えて比較できる。nBn（ビレット何本で押出材何本か）と切出本数から位置を自動で決めている。テスト用のため、画面は日本語のみ。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -467,6 +487,9 @@
           ek_title: "Thêm mới trang nhập đánh giá chất lượng",
           ek_purpose: "Chuyển màn hình đánh giá chất lượng (QualityReport V7) của ex0.11 sang ex0.20, để không bỏ sót lần ép chưa đánh giá và ghi đúng số lỗi theo từng giá.",
           ek_content: "Thêm mới trong mục \"Chất lượng\" của menu chính. Chọn tab theo kiểu đùn (●・◎・〇) và chuyển \"Chưa xong / Đã xong\" để xem danh sách lần ép trong 1 tháng gần nhất (có tình trạng từng công đoạn, số ngày đã qua, số ngày còn lại trước khi biến mất khỏi danh sách). Chọn lần ép, ghi công đoạn, mã lỗi, số cây, người đánh giá, ghi chú theo từng giá. Có thể ghi \"0 Không có lỗi\". Ngày hoàn thành kích thước nhập ở màn hình này, ngày hoàn thành etching và hóa già hiển thị từ màn hình tương ứng. Khi đủ các công đoạn cần thiết (●◎: kích thước, etching, hóa già; 〇: kích thước), người phụ trách QC nhập ngày và người xác nhận để hoàn thành (có thể hủy). Người đánh giá và người xác nhận chọn từ nhân viên kiểm tra đang làm việc. Không lưu được số NG vượt quá số cây của giá. Lần ép quá 1 tháng xử lý ở màn hình cũ.",
+          el_title: "Thêm sơ đồ vị trí mẫu (thử nghiệm)",
+          el_purpose: "Hướng tới việc ghi các đánh giá etching, độ cứng, độ nhám bề mặt trên một trang, để xác nhận bằng hình mối quan hệ giữa thanh ép, sản phẩm và vị trí lấy mẫu.",
+          el_content: "Thêm trang thử nghiệm vào mục \"Chất lượng\" của menu chính. Khi chọn lần ép, hiển thị sản phẩm lấy được theo từng thanh ép (dọc) bằng ô □, cùng mối nối billet và vị trí lấy mẫu đánh giá. Tên vị trí mẫu hiển thị theo quy tắc mới (đầu T, đuôi Z, cặp mối nối A・B, C・D…, giữa M・M2…), có thể so sánh với dữ liệu etching và độ nhám bề mặt cũ (tên cũ H・E・END…). Vị trí được xác định tự động từ nBn và số cây cắt. Vì là thử nghiệm nên màn hình chỉ có tiếng Nhật.",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

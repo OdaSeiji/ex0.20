@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sample Map Test</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
+    .test-badge { background: #f0a000; color: #fff; font-size: 12px; border-radius: 4px; padding: 2px 8px; margin-left: 8px; vertical-align: middle; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; margin-top: 14px; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; }
+    .card-body { padding: 12px; }
+
+    .left { width: 420px; flex-shrink: 0; }
+    .date-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+    .date-row input { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    table { border-collapse: collapse; width: 100%; font-size: 12px; }
+    th, td { padding: 4px 6px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    th { background: #e8f1ff; font-size: 11px; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    td.c { text-align: center; }
+    tbody tr.pick { cursor: pointer; }
+    tbody tr.pick:hover td { background: #f0f8ff; }
+    tbody tr.selected td { background: #fff3cd; }
+    .empty { padding: 20px; text-align: center; color: #999; }
+
+    .right { flex: 1; min-width: 0; }
+    .info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; margin-bottom: 12px; }
+    .info .lbl { color: #777; font-size: 11px; margin-right: 4px; }
+    .info b { font-family: "Roboto Mono", monospace; }
+    .note-box { font-size: 12px; color: #555; background: #f4f8fc; border-left: 4px solid #0078d4; padding: 6px 10px; margin-bottom: 12px; line-height: 1.6; }
+
+    /* 図 */
+    .map { overflow-x: auto; padding-bottom: 6px; }
+    .axis-x { font-size: 11px; color: #777; margin: 0 0 4px 160px; }
+    .strand { display: flex; align-items: center; min-height: 34px; }
+    .strand.billet-first { border-top: 2px solid #90a4ae; }
+    .strand-label { width: 160px; flex-shrink: 0; font-size: 12px; padding-right: 8px; }
+    .strand-label .no { font-family: "Roboto Mono", monospace; font-weight: bold; color: #0055a5; }
+    .strand-label .billet { color: #777; font-size: 11px; }
+    .pieces { display: flex; align-items: center; padding: 3px 0; }
+    .piece {
+      width: 32px; height: 26px; border: 1.5px solid #5c7fa3; background: #fff; margin-right: 2px;
+      font-size: 10px; font-family: "Roboto Mono", monospace; display: flex; align-items: center; justify-content: center;
+      color: #333; flex-shrink: 0;
+    }
+    .piece.sample { font-weight: bold; }
+    .piece.head   { background: #e3f2fd; border-color: #1e88e5; color: #0d47a1; }
+    .piece.pair   { background: #fff3cd; border-color: #f0a000; color: #8d6e00; }
+    .piece.center { background: #e8f5e9; border-color: #43a047; color: #1b5e20; }
+    .piece.tail   { background: #ede7f6; border-color: #7e57c2; color: #4527a0; }
+    .seam { width: 3px; height: 32px; background: #e53935; margin: 0 4px 0 2px; border-radius: 2px; flex-shrink: 0; }
+    .strand-qty { font-size: 11px; color: #777; margin-left: 8px; white-space: nowrap; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #555; margin-top: 12px; align-items: center; }
+    .legend .piece { display: inline-flex; margin: 0 4px 0 0; vertical-align: middle; }
+    .legend .seam { display: inline-block; height: 18px; vertical-align: middle; margin: 0 4px 0 0; }
+
+    .compare { margin-top: 14px; font-size: 12px; line-height: 1.8; }
+    .compare-row { margin-top: 6px; }
+    .chip { display: inline-block; font-family: "Roboto Mono", monospace; border-radius: 9px; padding: 0 7px; margin: 1px; font-size: 11px; }
+    .chip.ok    { background: #e8f5e9; color: #2e7d32; }
+    .chip.miss  { background: #ffebee; color: #c62828; }
+    .chip.extra { background: #fff3e0; color: #e65100; }
+    .chip.redo  { background: #e1f5fe; color: #01579b; }
+    .rule { font-size: 12px; color: #555; margin-top: 16px; line-height: 1.7; border-top: 1px dashed #ccc; padding-top: 10px; }
+    .rule b { font-family: "Roboto Mono", monospace; }
+  </style>
+</head>
+<body>
+  <h1>🧪 押出材・製品・サンプル位置の図 <span class="test-badge">テスト</span></h1>
+  <div class="subtitle">押出を選ぶと、押出材（縦）ごとに取れた製品（横の □）と、サンプル位置を新しい名前のルール（頭 T・尾 Z）で表示します。</div>
+  <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
+
+  <div class="layout">
+    <div class="left card">
+      <div class="card-header">押出を選ぶ</div>
+      <div class="card-body">
+        <div class="date-row">
+          <label style="font-size:13px;color:#555">押出日</label>
+          <input type="date" id="date" />
+        </div>
+        <table>
+          <thead><tr><th>開始</th><th>号機</th><th>型番</th><th>nBn</th><th>ビレット</th><th>押出材</th></tr></thead>
+          <tbody id="pressBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="right card">
+      <div class="card-header">図</div>
+      <div class="card-body" id="mapArea"><div class="empty">← 押出を選んでください</div></div>
+    </div>
+  </div>
+
+  <script>
+    const API = "./php/sample_map/get_data.php";
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    /* =====================================================
+       新しい名前のルール（表示だけ。DB には位置の意味で持つ想定）
+         頭 = T、尾 = Z、中央 = M（ビレット部分ごと：M, M2, M3 …）
+         継ぎ目のペア = A・B、C・D、E・F、G・H …（T・Z・M は使わない）
+    ===================================================== */
+    const PAIR_LETTERS = "ABCDEFGHIJKLNOPQRSUVWXY".split("");   // M・T・Z を除く
+    const pairOf = (j) => [PAIR_LETTERS[(j - 1) * 2] || "?", PAIR_LETTERS[(j - 1) * 2 + 1] || "?"];
+    const centerName = (seg) => seg === 1 ? "M" : `M${seg}`;
+
+    function parseNbn(nbn) {
+      const m = /^(\d+)B(\d+)$/.exec(nbn || "");
+      return m ? { n: Number(m[1]), m: Number(m[2]) } : { n: 1, m: 1 };
+    }
+
+    // 押出材1本のサンプル位置（□の番号 → { name, kind }）
+    //   nEff：この押出材に実際に使ったビレットの本数。継ぎ目は押出材を nEff 等分した位置とみなす
+    function samplePositions(strandNo, qty, nEff) {
+      const marks = {};
+      const seams = [];
+      if (qty <= 0) return { marks, seams };
+      const put = (idx, name, kind) => { if (idx >= 0 && idx < qty && !marks[idx]) marks[idx] = { name: `${strandNo}${name}`, kind }; };
+
+      // 継ぎ目の位置（この □ の前に継ぎ目がある）
+      const bounds = [0];
+      for (let j = 1; j < nEff; j++) {
+        const at = Math.round(qty * j / nEff);
+        if (at > 0 && at < qty) { seams.push(at); bounds.push(at); }
+      }
+      bounds.push(qty);
+
+      put(0, "T", "head");
+      put(qty - 1, "Z", "tail");
+      seams.forEach((at, i) => {
+        const [a, b] = pairOf(i + 1);
+        put(at - 1, a, "pair");
+        put(at, b, "pair");
+      });
+      // ビレット部分ごとの中央（頭・尾・継ぎ目とぶつかる場合は出さない）
+      for (let sgm = 0; sgm < bounds.length - 1; sgm++) {
+        const mid = Math.floor((bounds[sgm] + bounds[sgm + 1] - 1) / 2);
+        put(mid, centerName(sgm + 1), "center");
+      }
+      return { marks, seams };
+    }
+
+    /* =====================================================
+       古い名前（現場の記録）→ 新しい名前への読み替え
+         H → T ／ 尾の E（4B1以上は END）→ Z ／ 5B1 の I・K → G・H
+         中央：1本目の部分 M → M、2本目以降は M1, M2 … → M2, M3 …（多ビレットのとき）
+         名前の最後の数字（1H1 など）は取り直し → 比較の対象外
+    ===================================================== */
+    function legacyToNew(name, n) {
+      const mt = /^(\d+)([A-Z]+)(\d*)$/.exec(String(name).trim().toUpperCase());
+      if (!mt) return { name: null, raw: name };
+      const [, no, letters, suffix] = mt;
+      if (letters === "M") {
+        if (suffix === "") return { name: `${no}M` };
+        if (n > 1) return { name: `${no}M${Number(suffix) + 1}` };   // 2つ目以降の中央
+        return { redo: true, raw: name };                              // 1ビレット：取り直し
+      }
+      if (suffix !== "") return { redo: true, raw: name };             // 取り直し
+      if (letters === "H") return { name: `${no}T` };
+      if (letters === "END") return { name: `${no}Z` };
+      if (letters === "E" && n < 4) return { name: `${no}Z` };
+      const map = { I: "G", K: "H" };                                   // 5B1 の4つ目のペア
+      return { name: `${no}${map[letters] || letters}` };
+    }
+
+    /* ---------- 押出の一覧 ---------- */
+    let selectedId = null;
+    async function loadPresses(date) {
+      const res = await fetch(`${API}?date=${date}`);
+      const data = await res.json();
+      document.getElementById("date").value = data.date;
+      const body = document.getElementById("pressBody");
+      if (!data.presses || data.presses.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">押出がありません</td></tr>`;
+        return;
+      }
+      body.innerHTML = data.presses.map(p => `
+        <tr class="pick ${p.id === selectedId ? "selected" : ""}" data-id="${p.id}">
+          <td class="mono">${esc(p.press_start || "")}</td>
+          <td class="c">${p.machine}</td>
+          <td class="mono">${esc(p.die_number)}</td>
+          <td class="c mono">${esc(p.nbn || "-")}</td>
+          <td class="c mono">${p.billets ?? "-"}</td>
+          <td class="c mono">${p.strands}</td>
+        </tr>`).join("");
+    }
+    document.getElementById("date").addEventListener("change", (e) => loadPresses(e.target.value));
+    document.getElementById("pressBody").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if (!tr) return;
+      selectedId = Number(tr.dataset.id);
+      document.querySelectorAll("#pressBody tr").forEach(x => x.classList.toggle("selected", x === tr));
+      loadMap(selectedId);
+    });
+
+    /* ---------- 図 ---------- */
+    function compareRow(title, recordedRaw, predictedAll, n, kindsUsed) {
+      if (!recordedRaw.length) return `<div class="compare-row">${title}：<span style="color:#999">記録なし</span></div>`;
+      const converted = recordedRaw.map(r => legacyToNew(r, n));
+      const recNew = new Set(converted.filter(c => c.name).map(c => c.name));
+      const redo = converted.filter(c => c.redo).map(c => c.raw);
+      const unknown = converted.filter(c => !c.name && !c.redo).map(c => c.raw);
+      // この評価で使う種類のサンプルだけを比べる（エッチングは中央を取らない、など）
+      const pred = predictedAll.filter(p => kindsUsed.includes(p.kind)).map(p => p.name);
+      const predSet = new Set(pred);
+      return `<div class="compare-row"><b>${title}</b>：
+        ${pred.map(x => `<span class="chip ${recNew.has(x) ? "ok" : "miss"}">${esc(x)}</span>`).join("")}
+        ${[...recNew].filter(x => !predSet.has(x)).map(x => `<span class="chip extra">${esc(x)}</span>`).join("")}
+        ${redo.length ? `<br>取り直し（旧名）：${redo.map(x => `<span class="chip redo">${esc(x)}</span>`).join("")}` : ""}
+        ${unknown.length ? `<br>読み替えできない名前：${unknown.map(x => `<span class="chip extra">${esc(x)}</span>`).join("")}` : ""}
+      </div>`;
+    }
+
+    async function loadMap(id) {
+      const res = await fetch(`${API}?id=${id}`);
+      const data = await res.json();
+      const area = document.getElementById("mapArea");
+      if (data.error) { area.innerHTML = `<div class="empty">${esc(data.error)}</div>`; return; }
+
+      const p = data.press;
+      const { n, m } = parseNbn(p.nbn);
+      const totalPieces = data.strands.reduce((s, r) => s + r.qty, 0);
+      const predicted = [];
+
+      const rows = data.strands.map((s, i) => {
+        const nEff = n > 1 && p.billets ? Math.max(1, Math.min(n, p.billets - (s.no - 1) * n)) : n;
+        let billetText;
+        if (n > 1) {
+          const from = (s.no - 1) * n + 1;
+          billetText = nEff > 1 ? `ビレット ${from}〜${from + nEff - 1}` : `ビレット ${from}`;
+          if (nEff < n) billetText += `（${n}本中${nEff}本）`;
+        } else {
+          billetText = `ビレット ${Math.ceil(s.no / m)}${m > 1 ? `（${m}本中${(s.no - 1) % m + 1}本目）` : ""}`;
+        }
+        const billetFirst = m > 1 ? (s.no - 1) % m === 0 : true;
+
+        const { marks, seams } = samplePositions(s.no, s.qty, nEff);
+        Object.values(marks).forEach(mk => predicted.push(mk));
+        let cells = "";
+        for (let k = 0; k < s.qty; k++) {
+          if (seams.includes(k)) cells += `<div class="seam" title="ビレットの継ぎ目"></div>`;
+          const mk = marks[k];
+          cells += mk
+            ? `<div class="piece sample ${mk.kind}" title="製品 ${k + 1} 本目：サンプル ${mk.name}">${mk.name}</div>`
+            : `<div class="piece" title="製品 ${k + 1} 本目"></div>`;
+        }
+        return `
+          <div class="strand ${billetFirst && i > 0 ? "billet-first" : ""}">
+            <div class="strand-label"><span class="no">押出材 ${s.no}</span><br><span class="billet">${billetText}</span></div>
+            <div class="pieces">${cells || `<span style="color:#bbb;font-size:12px">（製品なし）</span>`}</div>
+            <span class="strand-qty">${s.qty}本${s.length ? ` / ${s.length}m` : ""}</span>
+          </div>`;
+      }).join("");
+
+      area.innerHTML = `
+        <div class="info">
+          <span><span class="lbl">押出日</span><b>${p.press_date} ${esc(p.press_start || "")}</b></span>
+          <span><span class="lbl">号機</span><b>${p.machine}</b></span>
+          <span><span class="lbl">型番</span><b>${esc(p.die_number)}</b></span>
+          <span><span class="lbl">品番</span><b>${esc(p.production_number)}</b></span>
+          <span><span class="lbl">製品長さ</span><b>${p.product_length ?? "-"}m</b></span>
+          <span><span class="lbl">nBn</span><b>${esc(p.nbn || "-")}</b></span>
+          <span><span class="lbl">ビレット</span><b>${p.billets ?? "-"}本 × ${p.billet_length ?? "-"}mm</b></span>
+          <span><span class="lbl">押出材</span><b>${data.strands.length}本</b></span>
+          <span><span class="lbl">製品</span><b>${totalPieces}本</b></span>
+        </div>
+        <div class="note-box">
+          ${n > 1 ? `nBn = ${esc(p.nbn)}：ビレット${n}本で押出材1本。押出材の途中に継ぎ目が${n - 1}か所（赤い線）。継ぎ目は、ビレットの長さが同じとみなして押出材を${n}等分した場所に描いています。中央（M）はビレットの部分ごとに取ります。`
+                  : m > 1 ? `nBn = ${esc(p.nbn)}：ビレット1本から押出材${m}本。同じビレットから出た押出材を、灰色の線でまとめています。`
+                  : `nBn = ${esc(p.nbn || "不明")}：ビレット1本で押出材1本。`}
+        </div>
+        <div class="map">
+          <div class="axis-x">→ 押出材から取れた製品（□ 1つ ＝ 製品1本）</div>
+          ${rows || `<div class="empty">切出本数の記録がありません</div>`}
+        </div>
+        <div class="legend">
+          <span><span class="piece sample head">T</span>頭</span>
+          <span><span class="piece sample pair">A</span>継ぎ目の両側</span>
+          <span><span class="piece sample center">M</span>中央（ビレット部分ごと）</span>
+          <span><span class="piece sample tail">Z</span>尾</span>
+          <span><span class="seam"></span>ビレットの継ぎ目</span>
+          <span><span class="piece"></span>製品</span>
+        </div>
+        <div class="compare">
+          <b>実際の記録（旧名を新しい名前に読み替え）との比較</b>　緑＝一致、赤＝図にあるが記録なし、橙＝記録にあるが図にない
+          ${compareRow("エッチング", data.etching_positions, predicted, n, ["head", "pair", "tail"])}
+          ${compareRow("表面粗さ", data.measurement_positions, predicted, n, ["head", "pair", "center", "tail"])}
+        </div>
+        <div class="rule">
+          <b>新しい名前のルール（案）</b>：頭 <b>T</b>、尾 <b>Z</b>（nBn に関係なく同じ）、継ぎ目のペア <b>A・B</b>、<b>C・D</b>、<b>E・F</b>、<b>G・H</b> …（T・Z・M は使わない）、
+          中央 <b>M</b>（ビレット部分ごとに M、M2 …）。<br>
+          旧名からの読み替え：H→T、尾の E（4B1以上は END）→Z、5B1 の I・K→G・H、2つ目以降の中央 M1→M2。名前の最後の数字（1H1 など）は取り直しとして比較から外しています。
+        </div>`;
+    }
+
+    /* ---------- 初期表示 ---------- */
+    const params = new URLSearchParams(location.search);
+    loadPresses(params.get("date") || "2026-09-15").then(() => {
+      if (params.get("id")) { selectedId = Number(params.get("id")); loadMap(selectedId); }
+    });
+  </script>
+</body>
+</html>
