@@ -9,6 +9,7 @@ require_once "../db.php";
 $machines = [
     "No1" => 1,
     "No2" => 2,
+    "No3" => 3,
 ];
 
 try {
