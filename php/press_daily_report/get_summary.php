@@ -54,7 +54,9 @@ $prepare = $pdo->prepare("
         t_press.press_finish_at,
         t_press.actual_ram_speed,
         t_press.actual_die_temperature,
-        t_press.press_directive_scan_file_name
+        t_press.press_directive_scan_file_name,
+        t_press.entry_source,
+        DATE_FORMAT(t_press.inserted_at, '%m-%d %H:%i') AS inserted_at
     FROM t_press
     LEFT JOIN m_dies ON t_press.dies_id = m_dies.id
     LEFT JOIN m_ordersheet ON t_press.ordersheet_id = m_ordersheet.id
