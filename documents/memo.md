@@ -5800,3 +5800,12 @@ T3とTを管理したい。
   <img src="./img/20260929-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 20261001
+
+同じレイアウトを希望する。
+
+<figure style="text-align:center;">
+  <img src="./img/20261001-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
