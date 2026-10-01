@@ -75,7 +75,7 @@
 </head>
 <body>
   <h1>🧪 押出材・製品・サンプル位置の図 <span class="test-badge">テスト</span></h1>
-  <div class="subtitle">押出を選ぶと、押出材（縦）ごとに取れた製品（横の □）と、サンプル位置を新しい名前のルール（頭 T・尾 Z）で表示します。</div>
+  <div class="subtitle">押出を選ぶと、押出材（縦）ごとに取れた製品（横の □）と、サンプル位置を現場の名前のルール（頭 H・尾 E／END）で表示します。</div>
   <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
 
   <div class="layout">
@@ -104,13 +104,20 @@
     const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
     /* =====================================================
-       新しい名前のルール（表示だけ。DB には位置の意味で持つ想定）
-         頭 = T、尾 = Z、中央 = M（ビレット部分ごと：M, M2, M3 …）
-         継ぎ目のペア = A・B、C・D、E・F、G・H …（T・Z・M は使わない）
+       現場の名前のルール（表示だけ。DB には位置の意味で持つ想定）
+         1B1〜1B4：H、E
+         2B1：H、A・B、E
+         3B1：H、A・B、C・D、E
+         4B1：H、A・B、C・D、E・F、END
+         5B1：H、A・B、C・D、E・F、I・K、END
+         頭 = H、尾 = E（4B1 以上は E が継ぎ目に使われるので END）
+         継ぎ目のペア = A・B、C・D、E・F、I・K（G・H・J は使わない）
+         中央 = M（ビレット部分ごと：1つ目 M、2つ目以降 M1, M2 …。記録どおり）
     ===================================================== */
-    const PAIR_LETTERS = "ABCDEFGHIJKLNOPQRSUVWXY".split("");   // M・T・Z を除く
-    const pairOf = (j) => [PAIR_LETTERS[(j - 1) * 2] || "?", PAIR_LETTERS[(j - 1) * 2 + 1] || "?"];
-    const centerName = (seg) => seg === 1 ? "M" : `M${seg}`;
+    const PAIRS = [["A", "B"], ["C", "D"], ["E", "F"], ["I", "K"]];
+    const pairOf = (j) => PAIRS[j - 1] || ["?", "?"];
+    const centerName = (seg) => seg === 1 ? "M" : `M${seg - 1}`;
+    const tailName = (n) => n >= 4 ? "END" : "E";
 
     function parseNbn(nbn) {
       const m = /^(\d+)B(\d+)$/.exec(nbn || "");
@@ -119,7 +126,7 @@
 
     // 押出材1本のサンプル位置（□の番号 → { name, kind }）
     //   nEff：この押出材に実際に使ったビレットの本数。継ぎ目は押出材を nEff 等分した位置とみなす
-    function samplePositions(strandNo, qty, nEff) {
+    function samplePositions(strandNo, qty, nEff, n) {
       const marks = {};
       const seams = [];
       if (qty <= 0) return { marks, seams };
@@ -133,8 +140,8 @@
       }
       bounds.push(qty);
 
-      put(0, "T", "head");
-      put(qty - 1, "Z", "tail");
+      put(0, "H", "head");
+      put(qty - 1, tailName(n), "tail");
       seams.forEach((at, i) => {
         const [a, b] = pairOf(i + 1);
         put(at - 1, a, "pair");
@@ -148,27 +155,13 @@
       return { marks, seams };
     }
 
-    /* =====================================================
-       古い名前（現場の記録）→ 新しい名前への読み替え
-         H → T ／ 尾の E（4B1以上は END）→ Z ／ 5B1 の I・K → G・H
-         中央：1本目の部分 M → M、2本目以降は M1, M2 … → M2, M3 …（多ビレットのとき）
-         名前の最後の数字（1H1 など）は取り直し → 比較の対象外
-    ===================================================== */
-    function legacyToNew(name, n) {
-      const mt = /^(\d+)([A-Z]+)(\d*)$/.exec(String(name).trim().toUpperCase());
-      if (!mt) return { name: null, raw: name };
-      const [, no, letters, suffix] = mt;
-      if (letters === "M") {
-        if (suffix === "") return { name: `${no}M` };
-        if (n > 1) return { name: `${no}M${Number(suffix) + 1}` };   // 2つ目以降の中央
-        return { redo: true, raw: name };                              // 1ビレット：取り直し
-      }
-      if (suffix !== "") return { redo: true, raw: name };             // 取り直し
-      if (letters === "H") return { name: `${no}T` };
-      if (letters === "END") return { name: `${no}Z` };
-      if (letters === "E" && n < 4) return { name: `${no}Z` };
-      const map = { I: "G", K: "H" };                                   // 5B1 の4つ目のペア
-      return { name: `${no}${map[letters] || letters}` };
+    // 記録の名前を比較用に整える。図に無い名前で、最後に数字が付くもの（1H1 など）は取り直しとみなす
+    function classifyRecorded(name, predSet) {
+      const v = String(name).trim().toUpperCase();
+      if (predSet.has(v)) return { name: v };
+      if (/^\d+[A-Z]+\d+$/.test(v)) return { redo: true, raw: name };
+      if (/^\d+[A-Z]+$/.test(v)) return { name: v };
+      return { raw: name };
     }
 
     /* ---------- 押出の一覧 ---------- */
@@ -204,17 +197,17 @@
     /* ---------- 図 ---------- */
     function compareRow(title, recordedRaw, predictedAll, n, kindsUsed) {
       if (!recordedRaw.length) return `<div class="compare-row">${title}：<span style="color:#999">記録なし</span></div>`;
-      const converted = recordedRaw.map(r => legacyToNew(r, n));
-      const recNew = new Set(converted.filter(c => c.name).map(c => c.name));
-      const redo = converted.filter(c => c.redo).map(c => c.raw);
-      const unknown = converted.filter(c => !c.name && !c.redo).map(c => c.raw);
       // この評価で使う種類のサンプルだけを比べる（エッチングは中央を取らない、など）
       const pred = predictedAll.filter(p => kindsUsed.includes(p.kind)).map(p => p.name);
       const predSet = new Set(pred);
+      const converted = recordedRaw.map(r => classifyRecorded(r, predSet));
+      const recNew = new Set(converted.filter(c => c.name).map(c => c.name));
+      const redo = converted.filter(c => c.redo).map(c => c.raw);
+      const unknown = converted.filter(c => !c.name && !c.redo).map(c => c.raw);
       return `<div class="compare-row"><b>${title}</b>：
         ${pred.map(x => `<span class="chip ${recNew.has(x) ? "ok" : "miss"}">${esc(x)}</span>`).join("")}
         ${[...recNew].filter(x => !predSet.has(x)).map(x => `<span class="chip extra">${esc(x)}</span>`).join("")}
-        ${redo.length ? `<br>取り直し（旧名）：${redo.map(x => `<span class="chip redo">${esc(x)}</span>`).join("")}` : ""}
+        ${redo.length ? `<br>取り直し：${redo.map(x => `<span class="chip redo">${esc(x)}</span>`).join("")}` : ""}
         ${unknown.length ? `<br>読み替えできない名前：${unknown.map(x => `<span class="chip extra">${esc(x)}</span>`).join("")}` : ""}
       </div>`;
     }
@@ -242,7 +235,7 @@
         }
         const billetFirst = m > 1 ? (s.no - 1) % m === 0 : true;
 
-        const { marks, seams } = samplePositions(s.no, s.qty, nEff);
+        const { marks, seams } = samplePositions(s.no, s.qty, nEff, n);
         Object.values(marks).forEach(mk => predicted.push(mk));
         let cells = "";
         for (let k = 0; k < s.qty; k++) {
@@ -282,22 +275,23 @@
           ${rows || `<div class="empty">切出本数の記録がありません</div>`}
         </div>
         <div class="legend">
-          <span><span class="piece sample head">T</span>頭</span>
+          <span><span class="piece sample head">H</span>頭</span>
           <span><span class="piece sample pair">A</span>継ぎ目の両側</span>
           <span><span class="piece sample center">M</span>中央（ビレット部分ごと）</span>
-          <span><span class="piece sample tail">Z</span>尾</span>
+          <span><span class="piece sample tail">E</span>尾（4B1以上は END）</span>
           <span><span class="seam"></span>ビレットの継ぎ目</span>
           <span><span class="piece"></span>製品</span>
         </div>
         <div class="compare">
-          <b>実際の記録（旧名を新しい名前に読み替え）との比較</b>　緑＝一致、赤＝図にあるが記録なし、橙＝記録にあるが図にない
+          <b>実際の記録との比較</b>　緑＝一致、赤＝図にあるが記録なし、橙＝記録にあるが図にない
           ${compareRow("エッチング", data.etching_positions, predicted, n, ["head", "pair", "tail"])}
           ${compareRow("表面粗さ", data.measurement_positions, predicted, n, ["head", "pair", "center", "tail"])}
         </div>
         <div class="rule">
-          <b>新しい名前のルール（案）</b>：頭 <b>T</b>、尾 <b>Z</b>（nBn に関係なく同じ）、継ぎ目のペア <b>A・B</b>、<b>C・D</b>、<b>E・F</b>、<b>G・H</b> …（T・Z・M は使わない）、
-          中央 <b>M</b>（ビレット部分ごとに M、M2 …）。<br>
-          旧名からの読み替え：H→T、尾の E（4B1以上は END）→Z、5B1 の I・K→G・H、2つ目以降の中央 M1→M2。名前の最後の数字（1H1 など）は取り直しとして比較から外しています。
+          <b>現場の名前のルール</b>：頭 <b>H</b>、尾 <b>E</b>（4B1 以上は <b>END</b>）、継ぎ目のペア <b>A・B</b>、<b>C・D</b>、<b>E・F</b>、<b>I・K</b>、
+          中央 <b>M</b>（ビレット部分ごとに M、M1 …）。<br>
+          1B1〜1B4：H、E ／ 2B1：H、A・B、E ／ 3B1：H、A・B、C・D、E ／ 4B1：H、A・B、C・D、E・F、END ／ 5B1：H、A・B、C・D、E・F、I・K、END<br>
+          図に無い名前で、最後に数字が付くもの（1H1 など）は取り直しとして比較から外しています。
         </div>`;
     }
 
