@@ -34,11 +34,13 @@ try {
 
     $columns = pressColumns();
     $columns[] = "created_at";
+    $columns[] = "entry_source";   // 入力元：1 = ex0.20 押出日報（旧画面 ex0.11 は列の初期値 0）。作った画面の記録なので更新では変えない
     $placeholders = array_map(fn($c) => ":{$c}", $columns);
     $sql = "INSERT INTO t_press (" . implode(", ", $columns) . ") VALUES (" . implode(", ", $placeholders) . ")";
     $stmt = $pdo->prepare($sql);
     bindPressValues($stmt, $p);
     $stmt->bindValue(":created_at", date("Y-m-d"), PDO::PARAM_STR);
+    $stmt->bindValue(":entry_source", 1, PDO::PARAM_INT);
     $stmt->execute();
     $pressId = (int)$pdo->lastInsertId();
 
