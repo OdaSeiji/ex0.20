@@ -139,6 +139,11 @@
         <h1>金型 到着日入力</h1>
       </div>
 
+      <!-- 停止中のお知らせ（2026-10-01：到着日は引き継ぎ一覧 t_die_handover を正とするため、この画面での入力を止めた） -->
+      <div class="card" style="border-left: 6px solid #e65100; background: #fff3e0; color: #e65100; font-weight: bold;">
+        ⛔ この画面は停止中です。金型の到着日は「<a href="handover_list.html">引き継ぎ一覧</a>」で入力してください。
+      </div>
+
       <!-- 一括入力 -->
       <div class="card">
         <div class="card-title">一括入力</div>
@@ -240,11 +245,14 @@
         });
       }
 
+      // この画面は停止中（ボタンを常に不活性にする）。再開するときは false にし、save_arrival.php の停止も外す
+      const PAGE_DISABLED = true;
+
       /* ── チェック変更 ── */
       function onCheckChange() {
         const n = document.querySelectorAll(".row-check:checked").length;
         document.getElementById("selectedInfo").textContent = `${n} 件選択中`;
-        document.getElementById("bulkBtn").disabled = n === 0;
+        document.getElementById("bulkBtn").disabled = PAGE_DISABLED || n === 0;
 
         document.querySelectorAll("#dieTable tbody tr").forEach((tr) => {
           const cb = tr.querySelector(".row-check");
@@ -267,7 +275,7 @@
           ? [...document.querySelectorAll(".arrival-input")].filter((el) => el.value).length
           : 0;
         document.getElementById("inputCount").textContent = `入力済み：${n} 件`;
-        document.getElementById("saveBtn").disabled = n === 0;
+        document.getElementById("saveBtn").disabled = PAGE_DISABLED || n === 0;
       }
 
       /* ── 一括適用 ── */
@@ -285,6 +293,7 @@
 
       /* ── 保存 ── */
       async function saveAll() {
+        if (PAGE_DISABLED) return;
         const rows = [];
         document.querySelectorAll(".arrival-input").forEach((input) => {
           if (input.value) {

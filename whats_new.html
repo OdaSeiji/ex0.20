@@ -85,7 +85,95 @@
         </div>
       </div>
 
-      <!-- 2026-09-27 (最新) -->
+      <!-- 2026-10-01 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-01</span>
+        </div>
+        <div class="entry-title" data-key="em_title">押出日報の実績一覧に入力元・入力日時を表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="em_purpose">押出日報の入力漏れをチェックできるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="em_content">実績一覧の右端に「入力元」（新画面＝ex0.20 の押出日報／旧画面＝ex0.11）と「入力日時」（mm-dd hh:mm）を追加。CSV にも出る。入力日時は 10/1 以降に入力された押出から記録され、それより前の押出は「-」と表示する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-01</span>
+        </div>
+        <div class="entry-title" data-key="en_title">金型の到着日を引き継ぎ一覧に一本化</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="en_purpose">到着日が複数の画面・表に別々に入力されていて、値が食い違っていたため（もとは別々の担当者の Excel をデータベース化したことによる）。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="en_content">到着日は「引き継ぎ一覧」で入力した値を正とする。金型引き継ぎ進捗と金型進捗確認表は、引き継ぎ一覧の到着日（同じ型で複数行あるときは最初に入力した行）を表示し、ここでは変更できない。「金型 到着日入力」の画面は停止した（ボタンを押せない）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_handover_progress.html'">die_handover_progress.html</a>
+          <a class="file-link" onclick="location.href='handover_list.html'">handover_list.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-01</span>
+        </div>
+        <div class="entry-title" data-key="eo_title">（テスト）サンプル位置の図を現場の名前で表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="eo_purpose">サンプル名の付け方は現場で変えるのが難しいため、現場のルールのまま表示する。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="eo_content">頭 T・尾 Z の案をやめ、現場のルール（1B1〜1B4：H・E、2B1：H・A・B・E、3B1：H・A・B・C・D・E、4B1：H・A・B・C・D・E・F・END、5B1：…・I・K・END）で表示する。中央は M、M1、M2 …。過去のエッチング・表面粗さの記録と、そのまま比べられる。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='sample_map_test.html'">sample_map_test.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-28 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-28</span>
+        </div>
+        <div class="entry-title" data-key="ep_title">トップメニューの設備稼働状況に3号機を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ep_purpose">3号機の稼働状況もトップメニューで確認できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ep_content">見出しの右側に No3 を追加。表示のルールは No1・No2 と同じ（10分以上記録がなければ「---」、稼働中は黄緑の枠）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-09-28</span>
+        </div>
+        <div class="entry-title" data-key="eq_title">品質評価入力の工程名「時効」を「硬度」に変更</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="eq_purpose">硬度の画面の呼び方と合わせるため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="eq_content">NG 入力の工程ボタン、工程の欄、NG の一覧、QC の注意書き、一覧の列見出しの表示を「時効」から「硬度」に変更（ベトナム語は Độ cứng）。表示だけの変更で、記録の中身は変わらない。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-09-27 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -432,6 +520,21 @@
           el_title: "（テスト）サンプル位置の図を追加",
           el_purpose: "エッチング・硬度・表面粗さの評価を1つのページで記録する構想に向けて、押出材・製品・サンプル位置の関係を図で確認するため。",
           el_content: "トップメニューの「品質」にテストページを追加。押出を選ぶと、押出材（縦）ごとに取れた製品を □ で並べ、ビレットの継ぎ目と評価サンプルの位置を表示する。サンプル位置の名前は新しいルールの案（頭 T、尾 Z、継ぎ目のペア A・B、C・D …、中央 M・M2 …）で表示し、過去のエッチング・表面粗さの記録（H・E・END などの旧名）を読み替えて比較できる。nBn（ビレット何本で押出材何本か）と切出本数から位置を自動で決めている。テスト用のため、画面は日本語のみ。",
+          em_title: "押出日報の実績一覧に入力元・入力日時を表示",
+          em_purpose: "押出日報の入力漏れをチェックできるようにするため。",
+          em_content: "実績一覧の右端に「入力元」（新画面＝ex0.20 の押出日報／旧画面＝ex0.11）と「入力日時」（mm-dd hh:mm）を追加。CSV にも出る。入力日時は 10/1 以降に入力された押出から記録され、それより前の押出は「-」と表示する。",
+          en_title: "金型の到着日を引き継ぎ一覧に一本化",
+          en_purpose: "到着日が複数の画面・表に別々に入力されていて、値が食い違っていたため（もとは別々の担当者の Excel をデータベース化したことによる）。",
+          en_content: "到着日は「引き継ぎ一覧」で入力した値を正とする。金型引き継ぎ進捗と金型進捗確認表は、引き継ぎ一覧の到着日（同じ型で複数行あるときは最初に入力した行）を表示し、ここでは変更できない。「金型 到着日入力」の画面は停止した（ボタンを押せない）。",
+          eo_title: "（テスト）サンプル位置の図を現場の名前で表示",
+          eo_purpose: "サンプル名の付け方は現場で変えるのが難しいため、現場のルールのまま表示する。",
+          eo_content: "頭 T・尾 Z の案をやめ、現場のルール（1B1〜1B4：H・E、2B1：H・A・B・E、3B1：H・A・B・C・D・E、4B1：H・A・B・C・D・E・F・END、5B1：…・I・K・END）で表示する。中央は M、M1、M2 …。過去のエッチング・表面粗さの記録と、そのまま比べられる。",
+          ep_title: "トップメニューの設備稼働状況に3号機を追加",
+          ep_purpose: "3号機の稼働状況もトップメニューで確認できるようにするため。",
+          ep_content: "見出しの右側に No3 を追加。表示のルールは No1・No2 と同じ（10分以上記録がなければ「---」、稼働中は黄緑の枠）。",
+          eq_title: "品質評価入力の工程名「時効」を「硬度」に変更",
+          eq_purpose: "硬度の画面の呼び方と合わせるため。",
+          eq_content: "NG 入力の工程ボタン、工程の欄、NG の一覧、QC の注意書き、一覧の列見出しの表示を「時効」から「硬度」に変更（ベトナム語は Độ cứng）。表示だけの変更で、記録の中身は変わらない。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -490,6 +593,21 @@
           el_title: "Thêm sơ đồ vị trí mẫu (thử nghiệm)",
           el_purpose: "Hướng tới việc ghi các đánh giá etching, độ cứng, độ nhám bề mặt trên một trang, để xác nhận bằng hình mối quan hệ giữa thanh ép, sản phẩm và vị trí lấy mẫu.",
           el_content: "Thêm trang thử nghiệm vào mục \"Chất lượng\" của menu chính. Khi chọn lần ép, hiển thị sản phẩm lấy được theo từng thanh ép (dọc) bằng ô □, cùng mối nối billet và vị trí lấy mẫu đánh giá. Tên vị trí mẫu hiển thị theo quy tắc mới (đầu T, đuôi Z, cặp mối nối A・B, C・D…, giữa M・M2…), có thể so sánh với dữ liệu etching và độ nhám bề mặt cũ (tên cũ H・E・END…). Vị trí được xác định tự động từ nBn và số cây cắt. Vì là thử nghiệm nên màn hình chỉ có tiếng Nhật.",
+          em_title: "Hiển thị nguồn nhập và thời điểm nhập trong danh sách báo cáo đùn",
+          em_purpose: "Để kiểm tra việc quên nhập báo cáo đùn.",
+          em_content: "Thêm cột \"Nguồn nhập\" (màn hình mới = báo cáo đùn ex0.20 / màn hình cũ = ex0.11) và \"Thời điểm nhập\" (mm-dd hh:mm) ở bên phải danh sách kết quả. Cũng xuất ra CSV. Thời điểm nhập được ghi từ các lần ép nhập sau ngày 1/10, các lần ép trước đó hiển thị \"-\".",
+          en_title: "Thống nhất ngày đến của khuôn về danh sách bàn giao",
+          en_purpose: "Vì ngày đến được nhập riêng ở nhiều màn hình và bảng nên giá trị bị lệch nhau (do trước đây số hóa các file Excel của những người phụ trách khác nhau).",
+          en_content: "Ngày đến lấy giá trị nhập ở \"danh sách bàn giao\" làm chuẩn. Màn hình tiến độ bàn giao khuôn và bảng xác nhận tiến độ khuôn hiển thị ngày đến của danh sách bàn giao (nếu một khuôn có nhiều dòng thì lấy dòng nhập đầu tiên) và không sửa được ở đó. Màn hình \"Nhập ngày đến của khuôn\" đã ngừng sử dụng (không bấm được nút).",
+          eo_title: "Hiển thị sơ đồ vị trí mẫu (thử nghiệm) theo tên ở hiện trường",
+          eo_purpose: "Vì khó thay đổi cách đặt tên mẫu ở hiện trường nên hiển thị theo quy tắc hiện tại.",
+          eo_content: "Bỏ phương án đầu T, đuôi Z, hiển thị theo quy tắc hiện trường (1B1〜1B4: H・E, 2B1: H・A・B・E, 3B1: H・A・B・C・D・E, 4B1: H・A・B・C・D・E・F・END, 5B1: …・I・K・END). Giữa là M, M1, M2 …. Có thể so sánh trực tiếp với dữ liệu etching và độ nhám bề mặt cũ.",
+          ep_title: "Thêm máy số 3 vào tình trạng thiết bị ở menu chính",
+          ep_purpose: "Để xem được tình trạng hoạt động của máy số 3 ở menu chính.",
+          ep_content: "Thêm No3 bên phải tiêu đề. Quy tắc hiển thị giống No1, No2 (không có dữ liệu trên 10 phút thì \"---\", đang chạy thì viền xanh lá).",
+          eq_title: "Đổi tên công đoạn \"Hóa già\" thành \"Độ cứng\" trong nhập đánh giá chất lượng",
+          eq_purpose: "Để thống nhất với cách gọi của màn hình độ cứng.",
+          eq_content: "Đổi hiển thị ở nút công đoạn khi nhập NG, ô công đoạn, danh sách NG, ghi chú QC và tiêu đề cột danh sách từ \"Hóa già\" thành \"Độ cứng\". Chỉ đổi hiển thị, nội dung dữ liệu không đổi.",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

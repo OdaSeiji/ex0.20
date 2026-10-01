@@ -266,6 +266,7 @@
         f_original:    "元表番号",
         f_step:        "Step",
         f_arrival:     "到着日",
+        arrival_src:   "到着日は引き継ぎ一覧で入力します（ここでは変更できません）",
         f_vn_prod:     "VN製造型検日",
         f_vn_qa:       "VN QA型検日",
         f_submit_jp:   "型検日本提出日",
@@ -326,6 +327,7 @@
         f_original:    "Số bảng gốc",
         f_step:        "Step",
         f_arrival:     "Ngày đến",
+        arrival_src:   "Ngày đến được nhập ở danh sách bàn giao (không sửa được ở đây)",
         f_vn_prod:     "KT khuôn SX VN",
         f_vn_qa:       "KT khuôn QA VN",
         f_submit_jp:   "Ngày gửi KT JP",
@@ -408,7 +410,7 @@
     const FIELDS = [
       { key: "original_table_no",                         labelKey: "f_original",    type: "number"   },
       { key: "die_planning_phase_steps",                  labelKey: "f_step",        type: "number"   },
-      { key: "arrival_at",                                labelKey: "f_arrival",     type: "date"     },
+      { key: "arrival_at",                                labelKey: "f_arrival",     type: "date",    readonly: true },  // 引き継ぎ一覧の値を表示するだけ
       { key: "vn_production_dimensional_inspection_at",   labelKey: "f_vn_prod",     type: "date"     },
       { key: "vn_qa_dimensional_inspection_at",           labelKey: "f_vn_qa",       type: "date"     },
       { key: "submit_dimensional_inspection_to_japan_at", labelKey: "f_submit_jp",   type: "date"     },
@@ -490,7 +492,7 @@
           </td>
           <td class="die-num sticky-die">${row.die_number ?? ""}</td>
           <td class="mono">${row.die_planning_phase_steps ?? ""}</td>
-          ${makeDateCell("arrival_at", dieId, row.id, row.arrival_at)}
+          <td class="mono" title="${t.arrival_src}">${fmtDate(row.arrival_at)}</td>
           ${makeDateCell("vn_production_dimensional_inspection_at", dieId, row.id, row.vn_production_dimensional_inspection_at)}
           ${makeDateCell("vn_qa_dimensional_inspection_at", dieId, row.id, row.vn_qa_dimensional_inspection_at)}
           ${makeDateCell("submit_dimensional_inspection_to_japan_at", dieId, row.id, row.submit_dimensional_inspection_to_japan_at)}
@@ -687,6 +689,8 @@
           if (f.type === "check") {
             html += `<td style="text-align:center"><input type="checkbox" name="${f.key}"
                        data-die-id="${dieId}" data-hp-id="${hpId}" ${val ? "checked" : ""} /></td>`;
+          } else if (f.readonly) {
+            html += `<td class="mono" title="${t.arrival_src}">${fmtDate(val)}</td>`;
           } else if (f.type === "textarea") {
             html += `<td><textarea name="${f.key}" data-die-id="${dieId}"
                        data-hp-id="${hpId}">${val}</textarea></td>`;

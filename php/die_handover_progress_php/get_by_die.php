@@ -15,7 +15,7 @@ $sql = "
         h.id        AS handover_id,
         h.original_table_no,
         h.die_planning_phase_steps,
-        h.arrival_at,
+        ha.die_arrived_at AS arrival_at,   -- t_die_handover_progress.arrival_at は使わない（列は残す）
         h.vn_production_dimensional_inspection_at,
         h.vn_qa_dimensional_inspection_at,
         h.submit_dimensional_inspection_to_japan_at,
@@ -34,6 +34,12 @@ $sql = "
         h.updated_at
     FROM m_dies d
     LEFT JOIN t_die_handover_progress h ON h.die_id = d.id
+    -- 到着日は引き継ぎ一覧（t_die_handover）を正とする。同じ型で複数行あるとき（型＋部品）は最初に入力された行
+    LEFT JOIN (
+        SELECT th.die_id, th.die_arrived_at
+        FROM t_die_handover th
+        JOIN (SELECT die_id, MIN(id) AS first_id FROM t_die_handover GROUP BY die_id) f ON f.first_id = th.id
+    ) ha ON ha.die_id = d.id
     WHERE d.id = ?
 ";
 

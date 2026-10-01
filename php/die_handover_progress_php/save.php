@@ -11,7 +11,7 @@ if (!$rows || !is_array($rows)) {
 $fields = [
     "original_table_no",
     "die_planning_phase_steps",
-    "arrival_at",
+    // "arrival_at" … 到着日は引き継ぎ一覧（t_die_handover.die_arrived_at）を正とするので、ここでは保存しない
     "vn_production_dimensional_inspection_at",
     "vn_qa_dimensional_inspection_at",
     "submit_dimensional_inspection_to_japan_at",

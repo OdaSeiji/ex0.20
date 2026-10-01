@@ -5811,3 +5811,8 @@ T3とTを管理したい。
 </figure>
 
 押出日報の入力漏れチェックが出来るように、入力日を表示する。
+
+## 宿題（Claude 追記）
+
+- 似たような表が2つある（t_die_handover と t_die_handover_progress）。到着日は引き継ぎ一覧（t_die_handover）を正にして表示を一本化したが、表そのものの整理は今後の課題。m_dies.arrival_at も含めて整理する（documents/2026-10-01_work_summary.md）。
+- 金型 到着日入力（die_arrival.html）は停止した。
