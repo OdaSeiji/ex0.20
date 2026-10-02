@@ -47,6 +47,8 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         margin-bottom: 16px;
       }
+      /* 過去の指示履歴：上下の余白を詰める（18px → 12px） */
+      #historyCard { padding-top: 12px; padding-bottom: 12px; }
       .card-title {
         font-size: 14px; font-weight: bold; color: #1565c0;
         margin-bottom: 12px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
@@ -110,7 +112,7 @@
       .die-dropdown div { padding: 6px 10px; cursor: pointer; font-size: 13px; }
       .die-dropdown div:hover, .die-dropdown div.active { background: #e8f1ff; }
 
-      .product-pick-note { font-size: 12px; color: #999; margin-top: 6px; }
+      .product-pick-note { font-size: 12px; color: #999; margin-top: 6px; min-height: 16px; }  /* メッセージが無くても1行分を確保（出たときにレイアウトが動かないように） */
       .product-pick-note.warn { color: #c62828; }
 
       /* 押出条件: card1と同じくラベル+input横並びのボックスを並べる */
@@ -125,11 +127,13 @@
       .form-item .fi-row { display: flex; flex-direction: row; align-items: center; gap: 6px; }
       .fi-label { font-size: 11px; font-weight: bold; color: #555; white-space: nowrap; }
       .fi-prev { display: block; font-size: 10px; color: #1565c0; white-space: nowrap; min-height: 12px; margin-top: 2px; }
+      /* 入力欄の文字を大きく（13px → 18px）。上下の余白を 0 にして、項目の高さ（50px）は変えない */
       .form-item input, .form-item select {
-        background: transparent; border: none; padding: 3px 2px; font-size: 13px; width: 62px;
+        background: transparent; border: none; padding: 0 2px; font-size: 18px; width: 82px;
       }
+      .form-item input[type=number] { width: 100px; }   /* 上下の矢印（スピンボタン）のぶん広く */
       .form-item select { width: auto; }
-      .form-item.fw-date input { width: 118px; }
+      .form-item.fw-date input { width: 152px; }
       .form-item.fw-wide select { min-width: 110px; }
       .form-item.full { width: 100%; }
       .form-item.full .fi-row { align-items: flex-start; }
@@ -233,7 +237,7 @@
       <!-- 過去の指示履歴 -->
       <div class="card" id="historyCard">
         <div class="card-body">
-          <div style="max-height:240px; overflow-y:auto;" tabindex="-1">
+          <div style="height:160px; overflow-y:auto;" tabindex="-1"><!-- 高さ固定：履歴の行数でレイアウトが動かないように -->
             <table>
               <thead>
                 <tr>
@@ -600,14 +604,41 @@
         dd.classList.add("show");
       }
 
+      // 候補を描く（マウスが乗るたびに作り直すとクリックが成立しなくなるので、作り直すのは候補が変わったときだけ）
       function renderDieDropdownItems() {
         const dd = document.getElementById("dieDropdown");
         dd.innerHTML = dieDropdownItems.map((d, i) =>
-          `<div class="${i === dieDropdownActiveIndex ? "active" : ""}" onmouseenter="dieDropdownActiveIndex=${i}; renderDieDropdownItems();" onclick='selectDie(${JSON.stringify(d)})'>${d.die_number}</div>`
+          `<div class="${i === dieDropdownActiveIndex ? "active" : ""}" data-index="${i}">${d.die_number}</div>`
         ).join("");
-        const activeEl = dd.children[dieDropdownActiveIndex];
+        scrollActiveIntoView();
+      }
+
+      // 選択中の印だけを付け替える（キーボード操作のときだけ、選択中の候補が見えるようにスクロール）
+      function setDieDropdownActive(index, scroll) {
+        const dd = document.getElementById("dieDropdown");
+        dieDropdownActiveIndex = index;
+        [...dd.children].forEach((el, i) => el.classList.toggle("active", i === index));
+        if (scroll) scrollActiveIntoView();
+      }
+
+      function scrollActiveIntoView() {
+        const activeEl = document.getElementById("dieDropdown").children[dieDropdownActiveIndex];
         if (activeEl) activeEl.scrollIntoView({ block: "nearest" });
       }
+
+      // マウス操作：乗ったら印を付け替え、クリックで選ぶ。押した瞬間に入力欄のフォーカスが外れないようにする
+      (() => {
+        const dd = document.getElementById("dieDropdown");
+        dd.addEventListener("mouseover", (e) => {
+          const el = e.target.closest("[data-index]");
+          if (el && Number(el.dataset.index) !== dieDropdownActiveIndex) setDieDropdownActive(Number(el.dataset.index), false);
+        });
+        dd.addEventListener("mousedown", (e) => e.preventDefault());
+        dd.addEventListener("click", (e) => {
+          const el = e.target.closest("[data-index]");
+          if (el) selectDie(dieDropdownItems[Number(el.dataset.index)]);
+        });
+      })();
 
       document.getElementById("dieSearchInput").addEventListener("keydown", (e) => {
         const dd = document.getElementById("dieDropdown");
@@ -615,12 +646,10 @@
 
         if (e.key === "ArrowDown") {
           e.preventDefault();
-          dieDropdownActiveIndex = Math.min(dieDropdownActiveIndex + 1, dieDropdownItems.length - 1);
-          renderDieDropdownItems();
+          setDieDropdownActive(Math.min(dieDropdownActiveIndex + 1, dieDropdownItems.length - 1), true);
         } else if (e.key === "ArrowUp") {
           e.preventDefault();
-          dieDropdownActiveIndex = Math.max(dieDropdownActiveIndex - 1, 0);
-          renderDieDropdownItems();
+          setDieDropdownActive(Math.max(dieDropdownActiveIndex - 1, 0), true);
         } else if (e.key === "Enter") {
           e.preventDefault();
           if (dieDropdownActiveIndex >= 0) selectDie(dieDropdownItems[dieDropdownActiveIndex]);
@@ -639,6 +668,7 @@
 
       async function selectDie(die) {
         selectedDie = die;
+        clearTimeout(dieSearchTimer);   // 予約中の候補検索で、選んだあとに一覧が開き直さないように
         document.getElementById("dieSearchInput").value = die.die_number;
         document.getElementById("dieDropdown").classList.remove("show");
         document.getElementById("hbDieSize").textContent = die.die_diamater ? `Φ${die.die_diamater}mm` : "-";
