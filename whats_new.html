@@ -91,6 +91,57 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-02</span>
         </div>
+        <div class="entry-title" data-key="ev_title">品質集計：表示を速く（条件なしで約9秒→約0.15秒）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ev_purpose">条件を付けずに開くと、表示まで9秒ほどかかっていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ev_content">表示する押出（押出日の新しい順に最大400件）を先に決めて、その分だけ不良・ラック・梱包などを集計するようにした。表示される押出と数字は修正前と同じ。押出日と開始時刻がまったく同じ押出は、開くたびに順番が入れ替わることがあったため、新しく登録した押出が上になるように並びを固定した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_summary.html'">quality_summary.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
+        <div class="entry-title" data-key="ew_title">トップメニュー：押出工程の表示名を変更、「ビレット投入」を削除</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ew_purpose">押出工程のメニューを、現場で使う名前と実際に使う画面に合わせるため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ew_content">「プレス指示作成」を「押出指示書」（説明：押出指示書の作成、印刷）に、「プレス日報入力」を「押出日報入力」（説明：押出日報入力画面）に変更し、押出日報入力の試作中の印を外した。使っていない「ビレット投入」をメニューから外した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
+        <div class="entry-title" data-key="ex_title">押出指示書：ex0.20 で作ったものか旧画面で作ったものかを記録</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ex_purpose">押出実績と同じく、押出指示書がどちらの画面で作られたかを区別できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ex_content">押出指示書に「入力元」を追加した。ex0.20 のプレス指示作成で新しく保存（複製を含む）すると 1、旧画面で作ったものは 0 になる。あとから直しても値は変わらない。これまでの押出指示書はすべて 0。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
         <div class="entry-title" data-key="es_title">プレス指示作成：型番の候補をマウスで選べるように修正</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="es_purpose">型番の候補の一覧を開いたあと、マウスでクリックしても選べないことがあったため（キーボードでは選べた）。</span>
@@ -616,6 +667,15 @@
           eu_title: "トップメニュー：「金型進捗一覧」の説明から「到着」を削除",
           eu_purpose: "到着日はこの画面では入力しなくなったため（引き継ぎ一覧で入力する）。",
           eu_content: "各種設定の「金型進捗一覧」の説明を「型検・量産トライ・移管の進捗管理」に変更した。",
+          ev_title: "品質集計：表示を速く（条件なしで約9秒→約0.15秒）",
+          ev_purpose: "条件を付けずに開くと、表示まで9秒ほどかかっていたため。",
+          ev_content: "表示する押出（押出日の新しい順に最大400件）を先に決めて、その分だけ不良・ラック・梱包などを集計するようにした。表示される押出と数字は修正前と同じ。押出日と開始時刻がまったく同じ押出は、開くたびに順番が入れ替わることがあったため、新しく登録した押出が上になるように並びを固定した。",
+          ew_title: "トップメニュー：押出工程の表示名を変更、「ビレット投入」を削除",
+          ew_purpose: "押出工程のメニューを、現場で使う名前と実際に使う画面に合わせるため。",
+          ew_content: "「プレス指示作成」を「押出指示書」（説明：押出指示書の作成、印刷）に、「プレス日報入力」を「押出日報入力」（説明：押出日報入力画面）に変更し、押出日報入力の試作中の印を外した。使っていない「ビレット投入」をメニューから外した。",
+          ex_title: "押出指示書：ex0.20 で作ったものか旧画面で作ったものかを記録",
+          ex_purpose: "押出実績と同じく、押出指示書がどちらの画面で作られたかを区別できるようにするため。",
+          ex_content: "押出指示書に「入力元」を追加した。ex0.20 のプレス指示作成で新しく保存（複製を含む）すると 1、旧画面で作ったものは 0 になる。あとから直しても値は変わらない。これまでの押出指示書はすべて 0。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -701,6 +761,15 @@
           eu_title: "Menu chính: bỏ \"đến nơi\" khỏi mô tả \"Danh sách tiến độ khuôn\"",
           eu_purpose: "Vì ngày đến không còn nhập ở màn hình này nữa (nhập ở danh sách bàn giao).",
           eu_content: "Đổi mô tả \"Danh sách tiến độ khuôn\" trong mục cài đặt thành \"Quản lý tiến độ: kiểm tra khuôn, thử SX, bàn giao\".",
+          ev_title: "Tổng hợp chất lượng: hiển thị nhanh hơn (không điều kiện: khoảng 9 giây → khoảng 0,15 giây)",
+          ev_purpose: "Vì khi mở mà không đặt điều kiện thì mất khoảng 9 giây mới hiển thị.",
+          ev_content: "Xác định trước các lần ép sẽ hiển thị (tối đa 400, ngày ép mới nhất trước), rồi chỉ tổng hợp lỗi, giá, đóng gói… cho các lần đó. Các lần ép và số liệu hiển thị giống như trước khi sửa. Các lần ép có cùng ngày ép và giờ bắt đầu trước đây có thể đổi thứ tự mỗi lần mở; nay cố định để lần đăng ký mới hơn nằm trên.",
+          ew_title: "Menu chính: đổi tên mục công đoạn đùn, bỏ \"Nạp phôi\"",
+          ew_purpose: "Để menu công đoạn đùn khớp với tên gọi tại xưởng và các màn hình thực sự được dùng.",
+          ew_content: "Đổi \"Tạo chỉ thị ép\" thành \"Phiếu chỉ thị ép\" (mô tả: Tạo và in phiếu chỉ thị ép), đổi \"Nhập báo cáo ngày (Press)\" thành \"Nhập báo cáo đùn hằng ngày\" và bỏ dấu đang thử nghiệm. Bỏ \"Nạp phôi\" không còn dùng khỏi menu.",
+          ex_title: "Phiếu chỉ thị ép: ghi lại phiếu được tạo ở ex0.20 hay màn hình cũ",
+          ex_purpose: "Giống như kết quả ép, để phân biệt phiếu chỉ thị ép được tạo ở màn hình nào.",
+          ex_content: "Thêm \"Nguồn nhập\" vào phiếu chỉ thị ép. Lưu mới (kể cả sao chép) ở màn hình tạo chỉ thị ép của ex0.20 là 1, tạo ở màn hình cũ là 0. Sửa sau đó thì giá trị không đổi. Các phiếu trước đây đều là 0.",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

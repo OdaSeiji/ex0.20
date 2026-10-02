@@ -41,6 +41,33 @@ if ($isDate($from) && $isDate($to)) {
 }
 $whereSql = implode("\n  AND ", $where);
 
+// 1. 表示する押出（押出日の新しい順に最大400件）の id を先に決める
+//    集計（ラック・不良・梱包など）を全件で行うと遅いため、2. ではこの id の分だけ集計する
+try {
+    $idStmt = $pdo->prepare("
+        SELECT t_press.id
+        FROM t_press
+        LEFT JOIN m_dies ON t_press.dies_id = m_dies.id
+        WHERE {$whereSql}
+        ORDER BY t_press.press_date_at DESC, t_press.press_start_at DESC, t_press.id DESC
+        LIMIT 400
+    ");
+    foreach ($params as $k => $v) {
+        $idStmt->bindValue($k, $v, is_int($v) ? PDO::PARAM_INT : PDO::PARAM_STR);
+    }
+    $idStmt->execute();
+    $ids = array_map('intval', $idStmt->fetchAll(PDO::FETCH_COLUMN));
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode(["error" => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+if (!$ids) {
+    echo "[]";
+    exit;
+}
+$idList = implode(",", $ids);
+
 // 正味押出時間（秒）＝ 終了 − 開始 − 停止（コード700以外）
 //   0以下（終了が開始より前などの入力ミス。2024年以降5件）は NULL にして、生産性・サイクルタイムを出さない
 $rawSec = "((TIME_TO_SEC(t_press.press_finish_at) - TIME_TO_SEC(t_press.press_start_at)) - IFNULL(ttp.stop_seconds, 0))";
@@ -91,12 +118,14 @@ LEFT JOIN t_press_sub ON t_press.id = t_press_sub.press_id
 LEFT JOIN (
     SELECT press_id, SUM(work_quantity) AS quantity
     FROM t_press_work_length_quantity
+    WHERE press_id IN ({$idList})
     GROUP BY press_id
 ) tpq ON tpq.press_id = t_press.id
 LEFT JOIN (
     SELECT press_id,
            SUM(CASE WHEN Code <> 700 THEN TIME_TO_SEC(time_end) - TIME_TO_SEC(time_start) ELSE 0 END) AS stop_seconds
     FROM t_time_press
+    WHERE press_id IN ({$idList})
     GROUP BY press_id
 ) ttp ON ttp.press_id = t_press.id
 LEFT JOIN (
@@ -107,30 +136,28 @@ LEFT JOIN (
     FROM t_using_aging_rack r
     LEFT JOIN t_press_quality q ON q.using_aging_rack_id = r.id
     LEFT JOIN m_quality_code c  ON q.quality_code_id = c.id
+    WHERE r.t_press_id IN ({$idList})
     GROUP BY r.t_press_id
 ) t10 ON t10.t_press_id = t_press.id
 LEFT JOIN (
     SELECT t_press_id, SUM(work_quantity) AS work_quantity
     FROM t_using_aging_rack
+    WHERE t_press_id IN ({$idList})
     GROUP BY t_press_id
 ) t20 ON t20.t_press_id = t_press.id
 LEFT JOIN (
     SELECT press_id, SUM(quantity) AS prs_quantity
     FROM t_bundle
+    WHERE press_id IN ({$idList})
     GROUP BY press_id
 ) t30 ON t30.press_id = t_press.id
-WHERE {$whereSql}
+WHERE t_press.id IN ({$idList})
 GROUP BY t_press.id
-ORDER BY t_press.press_date_at DESC, t_press.press_start_at DESC
-LIMIT 400
+ORDER BY t_press.press_date_at DESC, t_press.press_start_at DESC, t_press.id DESC
 ";
 
 try {
-    $stmt = $pdo->prepare($sql);
-    foreach ($params as $k => $v) {
-        $stmt->bindValue($k, $v, is_int($v) ? PDO::PARAM_INT : PDO::PARAM_STR);
-    }
-    $stmt->execute();
+    $stmt = $pdo->query($sql);
     echo json_encode($stmt->fetchAll(), JSON_UNESCAPED_UNICODE);
 } catch (PDOException $e) {
     http_response_code(500);

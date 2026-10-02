@@ -357,20 +357,15 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_press">🏭 押出工程</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick="location.href = 'PressBilletCharge-SelectMachine.html'">
+        <div class="menu-card" onclick="location.href = 'press_daily_report.html'">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
-          <div class="menu-title" data-key="billet_title">ビレット投入</div>
-          <div class="menu-desc" data-key="billet_desc">ビレット投入に関するページ</div>
-        </div>
-        <div class="menu-card beta" onclick="location.href = 'press_daily_report.html'">
-          <img class="menu-icon" src="./img/factory.svg" alt="" />
-          <div class="menu-title" data-key="daily_report_title">プレス日報入力</div>
-          <div class="menu-desc" data-key="daily_report_desc">設備別・日別のプレス実績入力（画面デザインのみ）</div>
+          <div class="menu-title" data-key="daily_report_title">押出日報入力</div>
+          <div class="menu-desc" data-key="daily_report_desc">押出日報入力画面</div>
         </div>
         <div class="menu-card" onclick="location.href = 'press_directive.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="press_directive_title">プレス指示作成</div>
-          <div class="menu-desc" data-key="press_directive_desc">金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷</div>
+          <div class="menu-title" data-key="press_directive_title">押出指示書</div>
+          <div class="menu-desc" data-key="press_directive_desc">押出指示書の作成、印刷</div>
         </div>
         <div class="menu-card" onclick="location.href = 'aging_rack_unpacked.html'">
           <img class="menu-icon" src="./img/table.svg" alt="" />
@@ -604,8 +599,8 @@
 
           billet_title: "ビレット投入",
           billet_desc: "ビレット投入に関するページ",
-          daily_report_title: "プレス日報入力",
-          daily_report_desc: "設備別・日別のプレス実績入力（画面デザインのみ）",
+          daily_report_title: "押出日報入力",
+          daily_report_desc: "押出日報入力画面",
           maintenance_title: "金型メンテナンス",
           maintenance_desc: "金型メンテナンスに関するページ",
           die_wash_title: "金型洗浄・棚入れ",
@@ -632,8 +627,8 @@
           section_production: "📦 生産管理",
           order_sheet_title: "生産管理",
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
-          press_directive_title: "プレス指示作成",
-          press_directive_desc: "金型を選んで過去の指示を参考にしながら押出条件を作成・保存・印刷",
+          press_directive_title: "押出指示書",
+          press_directive_desc: "押出指示書の作成、印刷",
           unpacked_rack_title: "未梱包ラック一覧",
           quality_summary_title: "品質サマリー",
           quality_summary_desc: "押出ごとの本数・NG（コード別）・各工程のチェック日・生産性",
@@ -701,8 +696,8 @@
 
           billet_title: "Nạp Billet",
           billet_desc: "Trang liên quan đến việc nạp billet",
-          daily_report_title: "Nhập báo cáo ngày (Press)",
-          daily_report_desc: "Nhập kết quả ép theo máy / theo ngày（chỉ giao diện）",
+          daily_report_title: "Nhập báo cáo đùn hằng ngày",
+          daily_report_desc: "Màn hình nhập báo cáo đùn hằng ngày",
           maintenance_title: "Bảo trì khuôn",
           maintenance_desc: "Trang liên quan đến bảo trì khuôn",
           die_wash_title: "Rửa & xếp kệ khuôn",
@@ -731,7 +726,7 @@
           order_sheet_title: "Quản lý sản xuất",
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
           press_directive_title: "Tạo chỉ thị ép",
-          press_directive_desc: "Chọn khuôn, tham khảo chỉ thị trước đó để tạo, lưu và in điều kiện ép",
+          press_directive_desc: "Tạo và in phiếu chỉ thị ép",
           unpacked_rack_title: "Danh sách giá chưa đóng gói",
           quality_summary_title: "Tổng hợp chất lượng",
           quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
