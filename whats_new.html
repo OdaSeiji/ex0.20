@@ -91,6 +91,41 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-02</span>
         </div>
+        <div class="entry-title" data-key="ez_title">押出指示書：「入力済みリスト」を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ez_purpose">押出指示書が新しい画面と旧画面のどちらで作られているかを、ひと目で確認できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ez_content">見出しの右に「入力済みリスト」ボタンを追加した。押すと、全部の金型の押出指示書を入力した順に新しいほうから30件、モーダルで表示する。列は計画日・入力日・機械番号・型番・プレス種別・投入本数・入力元。入力元は ex0.20 で作ったものを緑の「新」、旧画面で作ったものを灰色の「旧」のバッジで表示する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
+        <div class="entry-title" data-key="ey_title">押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ey_purpose">トップメニューの名前と各画面の見出しを同じにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ey_content">押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
         <div class="entry-title" data-key="ev_title">品質集計：表示を速く（条件なしで約9秒→約0.15秒）</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ev_purpose">条件を付けずに開くと、表示まで9秒ほどかかっていたため。</span>
@@ -676,6 +711,12 @@
           ex_title: "押出指示書：ex0.20 で作ったものか旧画面で作ったものかを記録",
           ex_purpose: "押出実績と同じく、押出指示書がどちらの画面で作られたかを区別できるようにするため。",
           ex_content: "押出指示書に「入力元」を追加した。ex0.20 のプレス指示作成で新しく保存（複製を含む）すると 1、旧画面で作ったものは 0 になる。あとから直しても値は変わらない。これまでの押出指示書はすべて 0。",
+          ez_title: "押出指示書：「入力済みリスト」を追加",
+          ez_purpose: "押出指示書が新しい画面と旧画面のどちらで作られているかを、ひと目で確認できるようにするため。",
+          ez_content: "見出しの右に「入力済みリスト」ボタンを追加した。押すと、全部の金型の押出指示書を入力した順に新しいほうから30件、モーダルで表示する。列は計画日・入力日・機械番号・型番・プレス種別・投入本数・入力元。入力元は ex0.20 で作ったものを緑の「新」、旧画面で作ったものを灰色の「旧」のバッジで表示する。",
+          ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
+          ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
+          ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -770,6 +811,12 @@
           ex_title: "Phiếu chỉ thị ép: ghi lại phiếu được tạo ở ex0.20 hay màn hình cũ",
           ex_purpose: "Giống như kết quả ép, để phân biệt phiếu chỉ thị ép được tạo ở màn hình nào.",
           ex_content: "Thêm \"Nguồn nhập\" vào phiếu chỉ thị ép. Lưu mới (kể cả sao chép) ở màn hình tạo chỉ thị ép của ex0.20 là 1, tạo ở màn hình cũ là 0. Sửa sau đó thì giá trị không đổi. Các phiếu trước đây đều là 0.",
+          ez_title: "Phiếu chỉ thị ép: thêm \"Danh sách đã nhập\"",
+          ez_purpose: "Để xem nhanh phiếu chỉ thị ép được tạo ở màn hình mới hay màn hình cũ.",
+          ez_content: "Thêm nút \"Danh sách đã nhập\" bên phải tiêu đề. Bấm vào sẽ hiện modal 30 phiếu chỉ thị ép mới nhất của tất cả khuôn, theo thứ tự nhập. Các cột: Ngày KH, Ngày nhập, Số máy, Mã khuôn, Loại ép, SL billet, Nguồn nhập. Nguồn nhập hiển thị bằng nhãn: tạo ở ex0.20 là \"Mới\" (xanh lá), tạo ở màn hình cũ là \"Cũ\" (xám).",
+          ey_title: "Phiếu chỉ thị ép, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
+          ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
+          ey_content: "Đổi tiêu đề tiếng Nhật của màn hình chỉ thị ép và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt của màn hình báo cáo ngày đổi thành \"🏭 Nhập báo cáo đùn hằng ngày\" (màn hình chỉ thị ép vẫn là \"Tạo chỉ thị ép\", giống menu chính).",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

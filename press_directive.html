@@ -188,6 +188,29 @@
       dialog#figDialog .fig-close-row button {
         padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; background: #9e9e9e; color: #fff;
       }
+
+      /* 入力済みリスト */
+      .list-btn {
+        padding: 6px 14px; border: 1px solid #2b6ca3; background: #fff; color: #2b6ca3;
+        border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap;
+      }
+      .list-btn:hover { background: #e8f1ff; }
+      dialog#recentDialog {
+        border: none; border-radius: 10px; padding: 16px 20px; width: 760px; max-width: 95vw;
+        margin: auto; /* 先頭の * { margin: 0 } で中央寄せが消えるため */
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      }
+      dialog#recentDialog::backdrop { background: rgba(0,0,0,0.4); }
+      dialog#recentDialog .recent-title { font-size: 15px; font-weight: bold; color: #2b6ca3; margin-bottom: 10px; }
+      dialog#recentDialog .recent-scroll { max-height: 70vh; overflow-y: auto; }
+      dialog#recentDialog thead th { position: sticky; top: 0; background: #fff; }
+      dialog#recentDialog .recent-close-row { display: flex; justify-content: flex-end; margin-top: 10px; }
+      dialog#recentDialog .recent-close-row button {
+        padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; background: #9e9e9e; color: #fff;
+      }
+      .src-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+      .src-badge.src-new { background: #2e7d32; color: #fff; }
+      .src-badge.src-old { background: #e0e0e0; color: #666; }
     </style>
   </head>
   <body>
@@ -195,7 +218,8 @@
 
       <div class="page-header">
         <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
-        <h1 data-key="title">プレス指示作成</h1>
+        <h1 data-key="title">押出指示書</h1>
+        <button class="list-btn" onclick="openRecentDialog()" data-key="btn_recent">入力済みリスト</button>
         <div class="lang-wrap">
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
           <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
@@ -417,13 +441,36 @@
       </div>
     </dialog>
 
+    <dialog id="recentDialog">
+      <div class="recent-title" data-key="recent_title">入力済みリスト（最新30件）</div>
+      <div class="recent-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="col_plan_date">計画日</th>
+              <th data-key="col_created_at">入力日</th>
+              <th data-key="col_machine">機械番号</th>
+              <th data-key="hb_die_number">型番</th>
+              <th data-key="col_pressing_type">プレス種別</th>
+              <th class="num" data-key="col_billet_qty">投入本数</th>
+              <th data-key="col_entry_source">入力元</th>
+            </tr>
+          </thead>
+          <tbody id="recentTbody"></tbody>
+        </table>
+      </div>
+      <div class="recent-close-row">
+        <button onclick="document.getElementById('recentDialog').close()" data-key="btn_close">閉じる</button>
+      </div>
+    </dialog>
+
     <div id="toast"></div>
 
     <script>
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
-          title: "プレス指示作成",
+          title: "押出指示書",
           hb_die_number: "型番", hb_die_size: "金型サイズ", hb_product: "品番", hb_unit_weight: "単重", hb_work_length: "押出長さ",
           ph_die_search: "型番で検索/選択",
           select_die_first: "先に金型を選択してください",
@@ -445,6 +492,9 @@
           lbl_fig: "切断位置の図", btn_fig: "図", btn_print: "印刷",
           no_products: "この金型に品番が紐づいていません(die_production_number.htmlで先に登録してください)",
           pick_product: "この金型は複数の品番に紐づいています。品番を選択してください",
+          btn_recent: "入力済みリスト", recent_title: "入力済みリスト（最新30件）",
+          col_created_at: "入力日", col_machine: "機械番号", col_entry_source: "入力元",
+          src_new: "新", src_old: "旧", btn_close: "閉じる", recent_empty: "データなし",
         },
         vi: {
           title: "Tạo chỉ thị ép",
@@ -469,6 +519,9 @@
           lbl_fig: "Hình vị trí cắt", btn_fig: "Hình", btn_print: "In",
           no_products: "Khuôn này chưa liên kết mã SP nào (đăng ký ở die_production_number.html trước)",
           pick_product: "Khuôn này liên kết nhiều mã SP. Vui lòng chọn mã SP",
+          btn_recent: "Danh sách đã nhập", recent_title: "Danh sách đã nhập (30 mục mới nhất)",
+          col_created_at: "Ngày nhập", col_machine: "Số máy", col_entry_source: "Nguồn nhập",
+          src_new: "Mới", src_old: "Cũ", btn_close: "Đóng", recent_empty: "Không có dữ liệu",
         },
       };
 
@@ -904,6 +957,37 @@
         recalcWorkLength();
         showToast("編集用に読み込みました");
         document.getElementById("fPlanDate").focus();
+      }
+
+      /* ── 入力済みリスト（全金型の最新30件。入力元：新＝ex0.20、旧＝ex0.11） ── */
+      async function openRecentDialog() {
+        const d = dict[currentLang()];
+        const tbody = document.getElementById("recentTbody");
+        tbody.innerHTML = "";
+        document.getElementById("recentDialog").showModal();
+
+        const res = await fetch("./php/press_directive/get_recent_directives.php");
+        const rows = await res.json();
+        if (!rows.length) {
+          tbody.innerHTML = `<tr><td colspan="7" class="empty-note">${d.recent_empty}</td></tr>`;
+          return;
+        }
+        const ptMap = {};
+        masters.pressingTypes.forEach((t) => { ptMap[t.id] = t.remarks_jp ?? t.pressing_type; });
+
+        tbody.innerHTML = rows.map((r) => `
+          <tr>
+            <td>${r.plan_date_at ?? "-"}</td>
+            <td>${r.created_at ?? "-"}</td>
+            <td>${r.press_machine ? "No." + r.press_machine : "-"}</td>
+            <td>${r.die_number ?? "-"}</td>
+            <td>${ptMap[r.pressing_type_id] ?? "-"}</td>
+            <td class="num">${r.billet_input_quantity ?? "-"}</td>
+            <td>${String(r.entry_source) === "1"
+              ? `<span class="src-badge src-new">${d.src_new}</span>`
+              : `<span class="src-badge src-old">${d.src_old}</span>`}</td>
+          </tr>
+        `).join("");
       }
 
       /* ── Step 3: フォーム ── */
