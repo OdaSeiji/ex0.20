@@ -32,23 +32,30 @@ $fields = [
 foreach ($rows as $d) {
     if (empty($d["die_id"])) continue;
 
+    // 送られてきた項目だけを保存する（インライン編集は1項目だけ送るため、
+    // 送られていない項目まで NULL で上書きすると、ほかの入力済みの項目が消えてしまう）
     $vals = [];
     foreach ($fields as $f) {
-        $v = $d[$f] ?? null;
+        if (!array_key_exists($f, $d)) continue;
+        $v = $d[$f];
         $vals[$f] = ($v === "" || $v === null) ? null : $v;
     }
+    if (!$vals && !empty($d["id"])) continue;
 
     if (!empty($d["id"])) {
         // UPDATE
-        $sets   = implode(", ", array_map(fn($f) => "$f = ?", $fields));
+        $sets   = implode(", ", array_map(fn($f) => "$f = ?", array_keys($vals)));
         $params = array_values($vals);
         $params[] = $d["id"];
         $pdo->prepare("UPDATE t_die_handover_progress SET $sets WHERE id = ?")
             ->execute($params);
+    } elseif (!$vals) {
+        // 項目なしの INSERT（行だけ作る）
+        $pdo->prepare("INSERT INTO t_die_handover_progress (die_id) VALUES (?)")->execute([$d["die_id"]]);
     } else {
         // INSERT
-        $cols   = implode(", ", $fields);
-        $places = implode(", ", array_fill(0, count($fields), "?"));
+        $cols   = implode(", ", array_keys($vals));
+        $places = implode(", ", array_fill(0, count($vals), "?"));
         $params = array_merge([$d["die_id"]], array_values($vals));
         $pdo->prepare("INSERT INTO t_die_handover_progress (die_id, $cols) VALUES (?, $places)")
             ->execute($params);

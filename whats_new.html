@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-10-01 (最新) -->
+      <!-- 2026-10-02 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-02</span>
+        </div>
+        <div class="entry-title" data-key="er_title">金型引き継ぎ進捗：セルを直接入力すると、ほかの項目が消える不具合を修正</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="er_purpose">一覧のセルで日付を直接入力して保存すると、同じ型のほかの項目（入力済みの日付・書類番号・メモ・フラグなど）が空になってしまっていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="er_content">一覧のセルで直接入力したときは、入力した項目だけを保存するように修正した。2か所目を入力しても、1か所目が消えなくなる。「選択を編集」の画面からの保存は、これまでどおり。修正前に直接入力で消えてしまった項目は、元に戻っていない（取り戻せるか確認中）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_handover_progress.html'">die_handover_progress.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-01 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -535,6 +553,9 @@
           eq_title: "品質評価入力の工程名「時効」を「硬度」に変更",
           eq_purpose: "硬度の画面の呼び方と合わせるため。",
           eq_content: "NG 入力の工程ボタン、工程の欄、NG の一覧、QC の注意書き、一覧の列見出しの表示を「時効」から「硬度」に変更（ベトナム語は Độ cứng）。表示だけの変更で、記録の中身は変わらない。",
+          er_title: "金型引き継ぎ進捗：セルを直接入力すると、ほかの項目が消える不具合を修正",
+          er_purpose: "一覧のセルで日付を直接入力して保存すると、同じ型のほかの項目（入力済みの日付・書類番号・メモ・フラグなど）が空になってしまっていたため。",
+          er_content: "一覧のセルで直接入力したときは、入力した項目だけを保存するように修正した。2か所目を入力しても、1か所目が消えなくなる。「選択を編集」の画面からの保存は、これまでどおり。修正前に直接入力で消えてしまった項目は、元に戻っていない（取り戻せるか確認中）。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -608,6 +629,9 @@
           eq_title: "Đổi tên công đoạn \"Hóa già\" thành \"Độ cứng\" trong nhập đánh giá chất lượng",
           eq_purpose: "Để thống nhất với cách gọi của màn hình độ cứng.",
           eq_content: "Đổi hiển thị ở nút công đoạn khi nhập NG, ô công đoạn, danh sách NG, ghi chú QC và tiêu đề cột danh sách từ \"Hóa già\" thành \"Độ cứng\". Chỉ đổi hiển thị, nội dung dữ liệu không đổi.",
+          er_title: "Tiến độ bàn giao khuôn: sửa lỗi khi nhập trực tiếp vào ô thì các mục khác bị mất",
+          er_purpose: "Vì khi nhập ngày trực tiếp vào ô trong danh sách và lưu, các mục khác của cùng khuôn (ngày đã nhập, số tài liệu, ghi chú, cờ…) bị xóa trống.",
+          er_content: "Sửa để khi nhập trực tiếp vào ô thì chỉ lưu mục đã nhập. Nhập ô thứ hai cũng không làm mất ô thứ nhất. Lưu từ màn hình \"Sửa mục đã chọn\" vẫn như trước. Các mục đã bị mất do nhập trực tiếp trước khi sửa chưa được khôi phục (đang kiểm tra có lấy lại được không).",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",
