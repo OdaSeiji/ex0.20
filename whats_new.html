@@ -85,7 +85,78 @@
         </div>
       </div>
 
-      <!-- 2026-10-02 (最新) -->
+      <!-- 2026-10-03 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="fd_title">トップメニュー：「生産管理」を「生産指示」に名称変更</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fd_purpose">画面の役割に合った名前にするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fd_content">📦 生産管理の中の「生産管理」（発注書の登録・実績・梱包状況の管理）を「生産指示」に変更し、画面の見出しもそろえた。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+          <a class="file-link" onclick="location.href='order_sheet.html'">order_sheet.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="fc_title">ビレット在庫更新を ex0.20 に移植（9インチ VN の 6000mm を追加）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fc_purpose">ex0.11 の CheckBillet を ex0.20 で使えるようにし、9インチ VN ビレットの長さ 6000mm も記録できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fc_content">サイズ（9/12/14インチ）・調査日・担当者（operator）を選び、材質（6061・6063・6N01A）× 長さの本数を入力する。9インチは Dubai（1200・600）と VN（1200・600・6000）。前回の本数をうすく表示する。一覧の行、または記録がある日付を選ぶと修正として開く（同じ日の記録を重複させない）。削除は当面、旧画面で行う。保存先は今までと同じ t_checkbillet（6000mm の列を追加）なので、ex0.11 の生産計画からもそのまま読める。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='billet_check.html'">billet_check.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="fb_title">材質「A6N01」を「6N01A」にまとめた</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fb_purpose">6N01 と 6N01A は同じ材質で、昔の入力ミスで2つに分かれていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fb_content">A6N01 になっていた品番（JA8378）を 6N01A に変更した。ビレット在庫の記録の 6N01 の本数も 6N01A に足した（生産計画の在庫に 6N01 の分が入っていなかった）。品番マスタの材質の選択肢から A6N01 を外し、CSV で A6N01 と書いてあっても 6N01A として登録する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='production_number.html'">production_number.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="fa_title">押出指示書：ベトナム語の名前を「Tạo phiếu đùn」に変更</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fa_purpose">現場のベトナム人スタッフにとって分かりやすい名前にするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fa_content">トップメニューと押出指示書の画面のベトナム語の名前を「Tạo chỉ thị ép」から「Tạo phiếu đùn」に、メニューの説明を「Tạo và in phiếu đùn」に変更した（日本語は変更なし）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-02 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -717,6 +788,18 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fd_title: "トップメニュー：「生産管理」を「生産指示」に名称変更",
+          fd_purpose: "画面の役割に合った名前にするため。",
+          fd_content: "📦 生産管理の中の「生産管理」（発注書の登録・実績・梱包状況の管理）を「生産指示」に変更し、画面の見出しもそろえた。",
+          fc_title: "ビレット在庫更新を ex0.20 に移植（9インチ VN の 6000mm を追加）",
+          fc_purpose: "ex0.11 の CheckBillet を ex0.20 で使えるようにし、9インチ VN ビレットの長さ 6000mm も記録できるようにするため。",
+          fc_content: "サイズ（9/12/14インチ）・調査日・担当者（operator）を選び、材質（6061・6063・6N01A）× 長さの本数を入力する。9インチは Dubai（1200・600）と VN（1200・600・6000）。前回の本数をうすく表示する。一覧の行、または記録がある日付を選ぶと修正として開く（同じ日の記録を重複させない）。削除は当面、旧画面で行う。保存先は今までと同じ t_checkbillet（6000mm の列を追加）なので、ex0.11 の生産計画からもそのまま読める。",
+          fb_title: "材質「A6N01」を「6N01A」にまとめた",
+          fb_purpose: "6N01 と 6N01A は同じ材質で、昔の入力ミスで2つに分かれていたため。",
+          fb_content: "A6N01 になっていた品番（JA8378）を 6N01A に変更した。ビレット在庫の記録の 6N01 の本数も 6N01A に足した（生産計画の在庫に 6N01 の分が入っていなかった）。品番マスタの材質の選択肢から A6N01 を外し、CSV で A6N01 と書いてあっても 6N01A として登録する。",
+          fa_title: "押出指示書：ベトナム語の名前を「Tạo phiếu đùn」に変更",
+          fa_purpose: "現場のベトナム人スタッフにとって分かりやすい名前にするため。",
+          fa_content: "トップメニューと押出指示書の画面のベトナム語の名前を「Tạo chỉ thị ép」から「Tạo phiếu đùn」に、メニューの説明を「Tạo và in phiếu đùn」に変更した（日本語は変更なし）。",
           ea_title: "押出波形の実測値を押出日報へワンクリック転記",
           ea_purpose: "「ラム速度・圧力・温度」欄の手入力の手間と入力ミスを減らすため。",
           ea_content: "「ラム速度・圧力・温度」の右の🍓ボタンから押出波形モーダルを開き、日付・金型番号で対象ビレットを自動特定（一致しない場合は候補から選択）。行をクリックするとNo.1〜5の空いている行へ自動転記する（1000mm付近まで到達していれば1000mm値、届いていなければ400mm値＋200mm値）。各行に個別クリアボタンも追加。",
@@ -807,16 +890,28 @@
           ev_content: "Xác định trước các lần ép sẽ hiển thị (tối đa 400, ngày ép mới nhất trước), rồi chỉ tổng hợp lỗi, giá, đóng gói… cho các lần đó. Các lần ép và số liệu hiển thị giống như trước khi sửa. Các lần ép có cùng ngày ép và giờ bắt đầu trước đây có thể đổi thứ tự mỗi lần mở; nay cố định để lần đăng ký mới hơn nằm trên.",
           ew_title: "Menu chính: đổi tên mục công đoạn đùn, bỏ \"Nạp phôi\"",
           ew_purpose: "Để menu công đoạn đùn khớp với tên gọi tại xưởng và các màn hình thực sự được dùng.",
-          ew_content: "Đổi \"Tạo chỉ thị ép\" thành \"Phiếu chỉ thị ép\" (mô tả: Tạo và in phiếu chỉ thị ép), đổi \"Nhập báo cáo ngày (Press)\" thành \"Nhập báo cáo đùn hằng ngày\" và bỏ dấu đang thử nghiệm. Bỏ \"Nạp phôi\" không còn dùng khỏi menu.",
-          ex_title: "Phiếu chỉ thị ép: ghi lại phiếu được tạo ở ex0.20 hay màn hình cũ",
-          ex_purpose: "Giống như kết quả ép, để phân biệt phiếu chỉ thị ép được tạo ở màn hình nào.",
-          ex_content: "Thêm \"Nguồn nhập\" vào phiếu chỉ thị ép. Lưu mới (kể cả sao chép) ở màn hình tạo chỉ thị ép của ex0.20 là 1, tạo ở màn hình cũ là 0. Sửa sau đó thì giá trị không đổi. Các phiếu trước đây đều là 0.",
-          ez_title: "Phiếu chỉ thị ép: thêm \"Danh sách đã nhập\"",
-          ez_purpose: "Để xem nhanh phiếu chỉ thị ép được tạo ở màn hình mới hay màn hình cũ.",
-          ez_content: "Thêm nút \"Danh sách đã nhập\" bên phải tiêu đề. Bấm vào sẽ hiện modal 30 phiếu chỉ thị ép mới nhất của tất cả khuôn, theo thứ tự nhập. Các cột: Ngày KH, Ngày nhập, Số máy, Mã khuôn, Loại ép, SL billet, Nguồn nhập. Nguồn nhập hiển thị bằng nhãn: tạo ở ex0.20 là \"Mới\" (xanh lá), tạo ở màn hình cũ là \"Cũ\" (xám).",
-          ey_title: "Phiếu chỉ thị ép, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
+          ew_content: "Đổi \"Tạo chỉ thị ép\" thành \"Tạo phiếu đùn\" (mô tả: Tạo và in phiếu đùn), đổi \"Nhập báo cáo ngày (Press)\" thành \"Nhập báo cáo đùn hằng ngày\" và bỏ dấu đang thử nghiệm. Bỏ \"Nạp phôi\" không còn dùng khỏi menu.",
+          ex_title: "Tạo phiếu đùn: ghi lại phiếu được tạo ở ex0.20 hay màn hình cũ",
+          ex_purpose: "Giống như kết quả ép, để phân biệt phiếu đùn được tạo ở màn hình nào.",
+          ex_content: "Thêm \"Nguồn nhập\" vào phiếu đùn. Lưu mới (kể cả sao chép) ở màn hình tạo phiếu đùn của ex0.20 là 1, tạo ở màn hình cũ là 0. Sửa sau đó thì giá trị không đổi. Các phiếu trước đây đều là 0.",
+          ez_title: "Tạo phiếu đùn: thêm \"Danh sách đã nhập\"",
+          ez_purpose: "Để xem nhanh phiếu đùn được tạo ở màn hình mới hay màn hình cũ.",
+          ez_content: "Thêm nút \"Danh sách đã nhập\" bên phải tiêu đề. Bấm vào sẽ hiện modal 30 phiếu đùn mới nhất của tất cả khuôn, theo thứ tự nhập. Các cột: Ngày KH, Ngày nhập, Số máy, Mã khuôn, Loại ép, SL billet, Nguồn nhập. Nguồn nhập hiển thị bằng nhãn: tạo ở ex0.20 là \"Mới\" (xanh lá), tạo ở màn hình cũ là \"Cũ\" (xám).",
+          ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
-          ey_content: "Đổi tiêu đề tiếng Nhật của màn hình chỉ thị ép và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt của màn hình báo cáo ngày đổi thành \"🏭 Nhập báo cáo đùn hằng ngày\" (màn hình chỉ thị ép vẫn là \"Tạo chỉ thị ép\", giống menu chính).",
+          ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fd_title: "Menu chính: đổi tên \"Quản lý sản xuất\" thành \"Chỉ thị sản xuất\"",
+          fd_purpose: "Để tên phù hợp với vai trò của màn hình.",
+          fd_content: "Đổi mục \"Quản lý sản xuất\" (đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói) trong nhóm 📦 Quản lý sản xuất thành \"Chỉ thị sản xuất\", tiêu đề màn hình cũng đổi theo.",
+          fc_title: "Chuyển màn hình cập nhật tồn kho billet sang ex0.20 (thêm 6000mm cho billet VN 9 inch)",
+          fc_purpose: "Để dùng CheckBillet của ex0.11 trên ex0.20, và ghi được billet VN 9 inch dài 6000mm.",
+          fc_content: "Chọn cỡ (9/12/14 inch), ngày kiểm, người kiểm (operator), rồi nhập số lượng theo vật liệu (6061, 6063, 6N01A) × chiều dài. 9 inch có Dubai (1200, 600) và VN (1200, 600, 6000). Số lượng lần trước hiển thị mờ. Bấm dòng trong danh sách hoặc chọn ngày đã có dữ liệu thì mở để sửa (không tạo trùng trong cùng ngày). Tạm thời xóa ở màn hình cũ. Dữ liệu lưu vào t_checkbillet như trước (thêm cột 6000mm) nên kế hoạch ép của ex0.11 vẫn đọc được.",
+          fb_title: "Gộp vật liệu \"A6N01\" vào \"6N01A\"",
+          fb_purpose: "6N01 và 6N01A là cùng một vật liệu, trước đây bị nhập nhầm thành 2 loại.",
+          fb_content: "Đổi mã SP đang là A6N01 (JA8378) thành 6N01A. Số lượng 6N01 trong dữ liệu tồn kho billet cũng được cộng vào 6N01A (trước đây kế hoạch ép không tính phần 6N01). Bỏ A6N01 khỏi lựa chọn vật liệu ở màn hình mã SP; khi nhập CSV có ghi A6N01 cũng đăng ký là 6N01A.",
+          fa_title: "Phiếu chỉ thị ép: đổi tên tiếng Việt thành \"Tạo phiếu đùn\"",
+          fa_purpose: "Để tên dễ hiểu hơn với nhân viên Việt Nam tại xưởng.",
+          fa_content: "Đổi tên tiếng Việt ở menu chính và màn hình từ \"Tạo chỉ thị ép\" thành \"Tạo phiếu đùn\", mô tả menu thành \"Tạo và in phiếu đùn\" (tiếng Nhật không đổi).",
           ea_title: "Chuyển giá trị dạng sóng ép đùn vào phiếu ép hàng ngày chỉ bằng 1 cú click",
           ea_purpose: "Giảm công sức nhập tay và sai sót ở mục \"Tốc độ/Áp suất/Nhiệt độ Ram\".",
           ea_content: "Từ nút 🍓 bên phải mục \"Tốc độ/Áp suất/Nhiệt độ Ram\", mở modal dạng sóng ép đùn, tự động xác định billet theo ngày và mã khuôn (nếu không khớp thì chọn từ danh sách gợi ý). Click vào một dòng sẽ tự động điền vào dòng trống đầu tiên trong No.1〜5 (dùng giá trị tại 1000mm nếu gần đạt tới, ngược lại dùng giá trị 400mm + 200mm). Đã thêm nút xóa riêng cho từng dòng.",

@@ -15,7 +15,7 @@
 | 人の記録 | 担当者などは必ず m_staff の id で保存する。名前の直書きや独自の番号は使わない |
 | サンプル名 | H/E/A/B/M などの呼び名は、列名やキーに使わない（表示は現場のルールのまま） |
 | コミット | ユーザーが「コミット、プッシュ」と言ったときだけ。プッシュの前に fetch/pull する（ユーザーが documents/memo.md を直接編集するため） |
-| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `fa`**（`ey_content` の行の後ろに ja・vi それぞれ追加） |
+| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `fe`**（`ey_content` の行の後ろ（fa〜fd の前）に ja・vi それぞれ追加） |
 | 文字コード | 日本語を含む SQL は UTF-8 のファイルにして `mysql --default-character-set=utf8mb4 ... < file.sql` で流す。日本語を含む Python スクリプトは先頭に `# -*- coding: utf-8 -*-` を書いてファイルから実行する |
 | 確認方法 | PHP は `/c/xampp/php/php.exe -l`。JS は `<script>` を取り出して `node --check` |
 
@@ -44,6 +44,12 @@
 
 - 押出指示書の見出しを「押出指示書」に、押出日報入力の見出しを「🏭 押出日報入力」に変更（更新履歴 ey）
 - 押出指示書に「入力済みリスト」ボタンとモーダルを追加（更新履歴 ez）。全金型の最新30件を入力順に表示し、入力元を「新／旧」のバッジで示す。API は `php/press_directive/get_recent_directives.php`（新規）。DB 変更なし
+- ベトナム語の名前「Tạo chỉ thị ép」→「Tạo phiếu đùn」（更新履歴 fa）
+- 10/3：材質 A6N01 を 6N01A にまとめた。品番 JA8378 と、t_checkbillet の 6N01 の本数（**本番も実行済み**。バックアップ t_checkbillet_bak_20261003 は移植完了後に削除）。作業記録 2026-10-03_billet_material_6n01.md（更新履歴 fb）
+- 10/3：空のテーブル m_checkbillet を削除（本番は以前に削除済み）。2026-10-03_drop_m_checkbillet.md
+- 10/3：**ビレット在庫更新**（billet_check.html、ex0.11 CheckBilletV4 の移植）。t_checkbillet をそのまま使い、9インチ VN の 6000mm の列を3つ追加（**本番も実行済み**）。担当者は role=operator だけ。削除は当面ex0.11 で。2026-10-03_checkbillet_6000.md（更新履歴 fc）
+- 10/3：トップメニュー「生産管理」→「生産指示」（更新履歴 fd）
+- 次の課題：生産計画（exd11 PressPlanV12）の移植。①金型一覧②計画作成から。ビレット在庫を計画でどう使うか（VN・長さ）はユーザー検討中
 
 ---
 

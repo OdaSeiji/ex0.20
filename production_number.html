@@ -376,7 +376,6 @@
               <option value="1">A6061</option>
               <option value="2">A6063</option>
               <option value="3">A6N01A</option>
-              <option value="4">A6N01</option>
             </select>
           </div>
           <div class="form-group">
@@ -1328,7 +1327,7 @@
       /* ════════════════════════════
          CSV インポート
       ════════════════════════════ */
-      const MATERIAL_MAP = {"A6061": 1, "A6063": 2, "A6N01A": 3, "A6N01": 4};
+      const MATERIAL_MAP = {"A6061": 1, "A6063": 2, "A6N01A": 3, "A6N01": 3}; // A6N01 は 6N01A と同じ（昔の入力ミス）。id 4 は使わない
 
       let importRows = [];
 

@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Billet Check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Roboto Mono", "Segoe UI", monospace;
+        background: #f0f2f5;
+        padding: 20px;
+      }
+
+      .container { max-width: 1200px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px 24px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 18px 22px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        margin-bottom: 16px;
+      }
+
+      table { width: 100%; border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 7px 10px; border-bottom: 1px solid #eee; text-align: left; }
+      th { color: #777; font-size: 11px; }
+      tr.selectable { cursor: pointer; }
+      tr.selectable:hover td { background: #f7f9ff; }
+      tr.selected td { background: #e8f1ff; font-weight: bold; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+      input[type="date"], select {
+        padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 15px; font-family: inherit;
+      }
+
+      /* 太さ・日付・担当者 */
+      .head-row { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+      .head-item { display: flex; align-items: center; gap: 8px; }
+      .head-label { font-size: 12px; font-weight: bold; color: #1565c0; }
+      .size-btns { display: flex; gap: 6px; }
+      .size-btn {
+        padding: 7px 18px; border: 1px solid #1565c0; background: #fff; color: #1565c0;
+        border-radius: 5px; cursor: pointer; font-size: 15px; font-weight: bold; font-family: inherit;
+      }
+      .size-btn.active { background: #1565c0; color: #fff; }
+      .edit-badge { background: #e65100; color: #fff; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+
+      /* 本数の入力（材質×長さ） */
+      .grid-table { width: auto; }
+      .grid-table th, .grid-table td { border-bottom: none; padding: 4px 3px; text-align: center; }
+      .grid-table thead th { font-size: 13px; color: #555; }
+      .grid-table thead th.vn { color: #2e7d32; }
+      .grid-table thead th.normal { color: #1565c0; }
+      .grid-table thead tr.group th { font-size: 12px; padding-bottom: 0; }
+      .grid-table tbody th { font-size: 15px; color: #333; text-align: right; padding-right: 8px; }
+      .grid-table .sep { border-left: 2px solid #c8e6c9; }
+      .qty {
+        width: 72px; padding: 6px 6px; border: 1px solid #ccc; border-radius: 5px;
+        font-size: 17px; font-family: inherit; text-align: right;
+      }
+      .qty.empty { background: #fff8e1; border-color: #ffb300; }
+      .qty::placeholder { color: #bbb; }
+      .grid-note { font-size: 12px; color: #999; margin-top: 8px; }
+
+      .btn-row { display: flex; gap: 10px; margin-top: 16px; align-items: center; }
+      .btn-save { background: #1565c0; color: #fff; padding: 9px 24px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-save:disabled { background: #90a4ae; cursor: default; }
+      .btn-update { background: #e65100; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-update:disabled { background: #90a4ae; cursor: default; }
+      .btn-cancel { background: #9e9e9e; color: #fff; padding: 9px 20px; border: none; border-radius: 5px; cursor: pointer; }
+      .btn-delete { background: #fff; color: #c62828; border: 1px solid #c62828; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-left: auto; }
+      .btn-delete:disabled { color: #bbb; border-color: #ddd; cursor: not-allowed; }
+
+      /* 記録の一覧 */
+      .list-title { font-size: 14px; font-weight: bold; color: #1565c0; margin-bottom: 8px; }
+      .list-scroll { max-height: 420px; overflow-y: auto; }
+      .list-scroll thead th { position: sticky; top: 0; background: #fff; }
+      .list-scroll th.vn { color: #2e7d32; }
+      /* 一覧は列が多いので、横の余白を詰める */
+      .list-scroll table { width: auto; }
+      .list-scroll th, .list-scroll td { padding: 5px 5px; white-space: nowrap; }
+      .list-scroll th.num { white-space: normal; }
+      .empty-note { color: #999; text-align: center; padding: 16px; }
+
+      #toast {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      }
+      #toast.show { opacity: 1; }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <h1 data-key="title">ビレット在庫更新</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <!-- サイズ・調査日・担当者 -->
+      <div class="card">
+        <div class="head-row">
+          <div class="head-item">
+            <span class="head-label" data-key="lbl_size">サイズ</span>
+            <div class="size-btns" id="sizeBtns"></div>
+          </div>
+          <div class="head-item">
+            <span class="head-label" data-key="lbl_check_at">調査日</span>
+            <input type="date" id="fCheckAt" onchange="onKeyChange()" />
+          </div>
+          <div class="head-item">
+            <span class="head-label" data-key="lbl_staff">担当者</span>
+            <select id="fStaff" onchange="onStaffChange()"></select>
+          </div>
+          <span class="edit-badge" id="editBadge" style="display:none;" data-key="edit_badge">修正中</span>
+        </div>
+      </div>
+
+      <!-- 本数 -->
+      <div class="card">
+        <table class="grid-table">
+          <thead id="gridHead"></thead>
+          <tbody id="gridBody"></tbody>
+        </table>
+        <div class="grid-note" data-key="grid_note">うすい数字は前回の本数です。0 本のときも 0 を入れてください。</div>
+        <div class="btn-row">
+          <button class="btn-cancel" onclick="resetForm()" data-key="btn_clear">クリア</button>
+          <button class="btn-save" id="saveBtn" onclick="save()" data-key="btn_save" disabled>保存</button>
+          <button class="btn-update" id="updateBtn" onclick="save()" data-key="btn_update" style="display:none;" disabled>更新する</button>
+          <!-- 削除は当面、旧画面（ex0.11 CheckBilletV4）で行う。ex0.21 のログインで削除できる人を限ってから有効にする -->
+          <button class="btn-delete" id="deleteBtn" data-key="btn_delete" style="display:none;" disabled title="削除は旧画面（ex0.11）で行ってください">削除</button>
+        </div>
+      </div>
+
+      <!-- 記録の一覧 -->
+      <div class="card">
+        <div class="list-title" data-key="list_title">これまでの在庫更新（新しい順に60件）</div>
+        <div class="list-scroll">
+          <table>
+            <thead id="listHead"></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          title: "ビレット在庫更新",
+          lbl_size: "サイズ", lbl_check_at: "調査日", lbl_staff: "担当者",
+          edit_badge: "修正中", inch: "インチ",
+          col_material: "材質", col_normal: "Dubai", col_vn: "VN",
+          grid_note: "うすい数字は前回の本数です。0 本のときも 0 を入れてください。",
+          btn_clear: "クリア", btn_save: "保存", btn_update: "更新する", btn_delete: "削除",
+          list_title: "これまでの在庫更新（新しい順に60件）",
+          col_date: "調査日", col_staff: "担当者",
+          empty_list: "記録がありません",
+          select_staff: "（選択）",
+          msg_saved: "保存しました", msg_updated: "更新しました",
+          msg_loaded: "修正用に読み込みました", msg_same_day: "この日の記録があるので、修正として開きました",
+        },
+        vi: {
+          title: "Cập nhật tồn kho billet",
+          lbl_size: "Cỡ", lbl_check_at: "Ngày kiểm", lbl_staff: "Người kiểm",
+          edit_badge: "Đang sửa", inch: "inch",
+          col_material: "Vật liệu", col_normal: "Dubai", col_vn: "VN",
+          grid_note: "Số mờ là số lượng lần trước. Nếu 0 cây thì cũng nhập 0.",
+          btn_clear: "Xóa", btn_save: "Lưu", btn_update: "Cập nhật", btn_delete: "Xóa bản ghi",
+          list_title: "Các lần cập nhật tồn kho (60 lần mới nhất)",
+          col_date: "Ngày kiểm", col_staff: "Người kiểm",
+          empty_list: "Chưa có dữ liệu",
+          select_staff: "(Chọn)",
+          msg_saved: "Đã lưu", msg_updated: "Đã cập nhật",
+          msg_loaded: "Đã mở để sửa", msg_same_day: "Ngày này đã có dữ liệu, đã mở để sửa",
+        },
+      };
+
+      function currentLang() {
+        try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; }
+      }
+      function t(k) { return dict[currentLang()][k]; }
+
+      function setLang(lang) {
+        try { localStorage.setItem("lang", lang); } catch (e) {}
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        renderSizeBtns();
+        renderStaff();
+        renderList();
+      }
+
+      function showToast(msg, ok = true) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.style.background = ok ? "#323232" : "#c62828";
+        el.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => el.classList.remove("show"), 2500);
+      }
+
+      function today() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      }
+
+      /* ── 状態 ── */
+      let init = { sizes: [], staff: [], columns: [], size9Id: 1 };
+      let sizeId = null;
+      let listRows = [];
+      let editingId = null;
+
+      // 表示する列：9インチはふつう＋VN、12・14インチはふつうだけ
+      function visibleColumns() {
+        return init.columns.filter((c) => !c.vn || sizeId === init.size9Id);
+      }
+      const MATERIALS = ["6061", "6063", "6N01A"];
+
+      /* ── 太さ ── */
+      function renderSizeBtns() {
+        document.getElementById("sizeBtns").innerHTML = init.sizes.map((s) =>
+          `<button class="size-btn ${s.id === sizeId ? "active" : ""}" onclick="selectSize(${s.id})">${s.billet_size} ${t("inch")}</button>`
+        ).join("");
+      }
+
+      async function selectSize(id) {
+        if (id === sizeId) return;
+        sizeId = id;
+        try { localStorage.setItem("billetCheckSize", String(id)); } catch (e) {}
+        editingId = null;
+        renderSizeBtns();
+        renderGrid();
+        await loadList();
+        openSameDayIfExists();
+      }
+
+      /* ── 担当者（前回選んだ人を覚えておく） ── */
+      function renderStaff(extra) {
+        const sel = document.getElementById("fStaff");
+        const cur = sel.value;
+        const list = [...init.staff];
+        if (extra && !list.some((s) => String(s.id) === String(extra.id))) list.push(extra); // 退職した人の記録を開いたとき
+        sel.innerHTML = `<option value="0">${t("select_staff")}</option>` +
+          list.map((s) => `<option value="${s.id}">${s.staff_name}</option>`).join("");
+        sel.value = cur || "0";
+      }
+      function onStaffChange() {
+        const v = document.getElementById("fStaff").value;
+        if (!editingId) { try { localStorage.setItem("billetCheckStaff", v); } catch (e) {} }
+        checkSave();
+      }
+
+      /* ── 本数の入力欄 ── */
+      function renderGrid() {
+        const cols = visibleColumns();
+        const normal = cols.filter((c) => !c.vn);
+        const vn = cols.filter((c) => c.vn);
+        const lengths = (arr) => [...new Set(arr.map((c) => c.length))];
+        const nl = lengths(normal), vl = lengths(vn);
+
+        let head = `<tr class="group"><th></th><th class="normal" colspan="${nl.length}">${t("col_normal")}</th>`;
+        if (vl.length) head += `<th class="vn sep" colspan="${vl.length}">${t("col_vn")}</th>`;
+        head += `</tr>`;
+        head += `<tr><th>${t("col_material")}</th>` +
+          nl.map((l) => `<th>${l}</th>`).join("") +
+          vl.map((l, i) => `<th class="vn ${i === 0 ? "sep" : ""}">${l}</th>`).join("") + `</tr>`;
+        document.getElementById("gridHead").innerHTML = head;
+
+        // 入力の順番：材質ごとに横へ（Tab で右、行の最後で次の材質）
+        document.getElementById("gridBody").innerHTML = MATERIALS.map((m) => {
+          const cell = (c, sep) => `<td class="${sep ? "sep" : ""}"><input class="qty empty" type="number" min="0" step="1" inputmode="numeric" data-key-col="${c.key}" oninput="onQtyInput(this)" /></td>`;
+          return `<tr><th>${m}</th>` +
+            nl.map((l) => cell(normal.find((c) => c.material === m && c.length === l), false)).join("") +
+            vl.map((l, i) => cell(vn.find((c) => c.material === m && c.length === l), i === 0)).join("") + `</tr>`;
+        }).join("");
+        setPlaceholders();
+        checkSave();
+      }
+
+      function qtyInputs() { return [...document.querySelectorAll("#gridBody .qty")]; }
+
+      function onQtyInput(el) {
+        el.classList.toggle("empty", el.value === "");
+        checkSave();
+      }
+
+      // 前回（いちばん新しい記録）の本数を、うすい数字で出す
+      function setPlaceholders() {
+        const last = listRows.find((r) => r.id !== editingId);
+        qtyInputs().forEach((el) => {
+          const v = last ? last[el.dataset.keyCol] : null;
+          el.placeholder = v === null || v === undefined ? "" : v;
+        });
+      }
+
+      function checkSave() {
+        const ok = document.getElementById("fCheckAt").value !== "" &&
+          document.getElementById("fStaff").value !== "0" &&
+          sizeId !== null &&
+          qtyInputs().every((el) => /^\d+$/.test(el.value));
+        document.getElementById("saveBtn").disabled = !ok;
+        document.getElementById("updateBtn").disabled = !ok;
+      }
+
+      /* ── 記録の一覧 ── */
+      async function loadList() {
+        const res = await fetch(`./php/billet_check/get_list.php?size_id=${sizeId}`);
+        listRows = await res.json();
+        renderList();
+        setPlaceholders();
+      }
+
+      function renderList() {
+        if (sizeId === null) return;
+        const cols = visibleColumns();
+        document.getElementById("listHead").innerHTML = `<tr><th>${t("col_date")}</th><th>${t("col_staff")}</th>` +
+          cols.map((c) => `<th class="num ${c.vn ? "vn" : ""}">${c.material}<br>${c.length} ${c.vn ? t("col_vn") : t("col_normal")}</th>`).join("") + `</tr>`;
+        const body = document.getElementById("listBody");
+        if (!listRows.length) {
+          body.innerHTML = `<tr><td colspan="${cols.length + 2}" class="empty-note">${t("empty_list")}</td></tr>`;
+          return;
+        }
+        body.innerHTML = listRows.map((r) => `
+          <tr class="selectable ${r.id === editingId ? "selected" : ""}" onclick="openRecord(${r.id}, false)">
+            <td>${r.check_at}</td>
+            <td>${r.staff_name ?? "-"}</td>
+            ${cols.map((c) => `<td class="num">${r[c.key] ?? "-"}</td>`).join("")}
+          </tr>`).join("");
+      }
+
+      /* ── 修正：一覧の行、または同じ日の記録を開く ── */
+      function openRecord(id, sameDay) {
+        const r = listRows.find((x) => x.id === id);
+        if (!r) return;
+        editingId = id;
+        document.getElementById("fCheckAt").value = r.check_at;
+        renderStaff({ id: r.staff_id, staff_name: r.staff_name ?? "" });
+        document.getElementById("fStaff").value = String(r.staff_id ?? 0);
+        qtyInputs().forEach((el) => {
+          const v = r[el.dataset.keyCol];
+          el.value = v === null || v === undefined ? "" : v;
+          el.classList.toggle("empty", el.value === "");
+        });
+        setEditMode(true);
+        setPlaceholders();
+        renderList();
+        checkSave();
+        showToast(t(sameDay ? "msg_same_day" : "msg_loaded"));
+      }
+
+      // 新規入力中に、同じ日・同じ太さの記録が既にあれば修正として開く（重複を作らない）
+      function openSameDayIfExists() {
+        if (editingId) return;
+        const d = document.getElementById("fCheckAt").value;
+        const r = listRows.find((x) => x.check_at === d);
+        if (r) openRecord(r.id, true);
+      }
+
+      function onKeyChange() {
+        if (editingId) {
+          // 修正中に日付を変えたら、その日の記録に切り替える（無ければ新規入力に戻す）
+          const d = document.getElementById("fCheckAt").value;
+          const r = listRows.find((x) => x.check_at === d);
+          if (r) { openRecord(r.id, true); return; }
+          resetForm(false);
+          document.getElementById("fCheckAt").value = d;
+          return;
+        }
+        openSameDayIfExists();
+        checkSave();
+      }
+
+      function setEditMode(on) {
+        document.getElementById("editBadge").style.display = on ? "" : "none";
+        document.getElementById("saveBtn").style.display = on ? "none" : "";
+        document.getElementById("updateBtn").style.display = on ? "" : "none";
+        document.getElementById("deleteBtn").style.display = on ? "" : "none";
+      }
+
+      function resetForm(resetDate = true) {
+        editingId = null;
+        setEditMode(false);
+        if (resetDate) document.getElementById("fCheckAt").value = today();
+        renderStaff();
+        let staff = "0";
+        try { staff = localStorage.getItem("billetCheckStaff") || "0"; } catch (e) {}
+        document.getElementById("fStaff").value = init.staff.some((s) => String(s.id) === staff) ? staff : "0";
+        qtyInputs().forEach((el) => { el.value = ""; el.classList.add("empty"); });
+        setPlaceholders();
+        renderList();
+        checkSave();
+        if (resetDate) openSameDayIfExists();
+      }
+
+      /* ── 保存 ── */
+      async function save() {
+        const values = {};
+        qtyInputs().forEach((el) => { values[el.dataset.keyCol] = el.value; });
+        const res = await fetch("./php/billet_check/save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: editingId,
+            staff_id: document.getElementById("fStaff").value,
+            check_at: document.getElementById("fCheckAt").value,
+            billet_size_id: sizeId,
+            values,
+          }),
+        });
+        const result = await res.json();
+        if (!result.ok) { showToast(result.message || "error", false); return; }
+        showToast(t(editingId ? "msg_updated" : "msg_saved"));
+        await loadList();
+        openRecord(result.id, false);
+      }
+
+
+      /* ── 起動 ── */
+      (async () => {
+        const res = await fetch("./php/billet_check/get_init.php");
+        init = await res.json();
+        let saved = null;
+        try { saved = Number(localStorage.getItem("billetCheckSize")); } catch (e) {}
+        sizeId = init.sizes.some((s) => s.id === saved) ? saved : init.sizes[0].id;
+        document.getElementById("fCheckAt").value = today();
+        setLang(currentLang());
+        renderGrid();
+        await loadList();
+        resetForm();
+      })();
+    </script>
+  </body>
+</html>

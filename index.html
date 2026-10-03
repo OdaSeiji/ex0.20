@@ -484,8 +484,13 @@
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'order_sheet.html'">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="order_sheet_title">生産管理</div>
+          <div class="menu-title" data-key="order_sheet_title">生産指示</div>
           <div class="menu-desc" data-key="order_sheet_desc">発注書の登録・実績・梱包状況の管理</div>
+        </div>
+        <div class="menu-card" onclick="location.href = 'billet_check.html'">
+          <img class="menu-icon" src="./img/table.svg" alt="" />
+          <div class="menu-title" data-key="billet_check_title">ビレット在庫更新</div>
+          <div class="menu-desc" data-key="billet_check_desc">サイズごとに、材質・長さ別のビレットの在庫本数を記録</div>
         </div>
       </div>
     </div>
@@ -625,8 +630,10 @@
           ram_log_title: "（試作）押出波形",
           ram_log_desc: "ラム位置ごとの圧力・速度・出口温度を表示",
           section_production: "📦 生産管理",
-          order_sheet_title: "生産管理",
+          order_sheet_title: "生産指示",
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
+          billet_check_title: "ビレット在庫更新",
+          billet_check_desc: "サイズごとに、材質・長さ別のビレットの在庫本数を記録",
           press_directive_title: "押出指示書",
           press_directive_desc: "押出指示書の作成、印刷",
           unpacked_rack_title: "未梱包ラック一覧",
@@ -723,10 +730,12 @@
           ram_log_title: "（Thử nghiệm）Dạng sóng ép đùn",
           ram_log_desc: "Hiển thị áp suất/tốc độ/nhiệt độ đầu ra theo vị trí Ram",
           section_production: "📦 Quản lý sản xuất",
-          order_sheet_title: "Quản lý sản xuất",
+          order_sheet_title: "Chỉ thị sản xuất",
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
-          press_directive_title: "Tạo chỉ thị ép",
-          press_directive_desc: "Tạo và in phiếu chỉ thị ép",
+          billet_check_title: "Cập nhật tồn kho billet",
+          billet_check_desc: "Ghi số lượng billet tồn kho theo cỡ, vật liệu và chiều dài",
+          press_directive_title: "Tạo phiếu đùn",
+          press_directive_desc: "Tạo và in phiếu đùn",
           unpacked_rack_title: "Danh sách giá chưa đóng gói",
           quality_summary_title: "Tổng hợp chất lượng",
           quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
