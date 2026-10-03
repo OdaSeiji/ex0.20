@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- アルミの直接押出の原理図（断面）。右からステムがダミーブロックごとビレットを押し、
+       左のダイスの穴から押出材が左へ出てくる -->
+  <defs>
+    <linearGradient id="exWall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#4f8cc4" />
+      <stop offset="1"   stop-color="#1d4f7a" />
+    </linearGradient>
+    <linearGradient id="exSteel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#77818a" />
+      <stop offset="0.3"  stop-color="#ffffff" />
+      <stop offset="0.6"  stop-color="#b9c2ca" />
+      <stop offset="1"    stop-color="#5c656d" />
+    </linearGradient>
+    <linearGradient id="exHot" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0"   stop-color="#d84315" />
+      <stop offset="0.6" stop-color="#ff7a1a" />
+      <stop offset="1"   stop-color="#ffb74d" />
+    </linearGradient>
+  </defs>
+
+  <!-- コンテナ（上下の厚い壁） -->
+  <rect x="8" y="2.6" width="11.4" height="4.6" rx="0.6" fill="url(#exWall)" />
+  <rect x="8" y="16.8" width="11.4" height="4.6" rx="0.6" fill="url(#exWall)" />
+
+  <!-- ビレット（加熱。ダイスに近いほど流れが絞られる） -->
+  <path d="M17 7.2 H8 L8 7.2 Q7.6 10.4 7 10.6 V13.4 Q7.6 13.6 8 16.8 H17 Z" fill="url(#exHot)" />
+
+  <!-- ダミーブロック -->
+  <rect x="17" y="7.2" width="1.3" height="9.6" fill="#3a434b" />
+  <!-- ステム（右から押す） -->
+  <rect x="18.3" y="9.4" width="5.3" height="5.2" fill="url(#exSteel)" stroke="#525c66" stroke-width="0.3" />
+
+  <!-- ダイス（穴の開いた板） -->
+  <rect x="5.6" y="2.6" width="2" height="7.9" fill="#3a434b" />
+  <rect x="5.6" y="13.5" width="2" height="7.9" fill="#3a434b" />
+
+  <!-- 押出材（銀色、左へ出てくる） -->
+  <rect x="0.4" y="10.5" width="7.2" height="3" fill="url(#exSteel)" stroke="#525c66" stroke-width="0.3" />
+
+  <!-- 出てくる向きの矢印 -->
+  <path d="M5 6.4 H1.2 M2.5 5.1 L1.2 6.4 L2.5 7.7" fill="none" stroke="#ff7a1a" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

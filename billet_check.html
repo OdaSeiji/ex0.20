@@ -123,7 +123,7 @@
     <div class="container">
 
       <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
         <h1 data-key="title">ビレット在庫更新</h1>
         <div class="lang-wrap">
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
@@ -185,6 +185,7 @@
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る",
           title: "ビレット在庫更新",
           lbl_size: "サイズ", lbl_check_at: "調査日", lbl_staff: "担当者",
           edit_badge: "修正中", inch: "インチ",
@@ -199,6 +200,7 @@
           msg_loaded: "修正用に読み込みました", msg_same_day: "この日の記録があるので、修正として開きました",
         },
         vi: {
+          btn_back_menu: "← Về menu",
           title: "Cập nhật tồn kho billet",
           lbl_size: "Cỡ", lbl_check_at: "Ngày kiểm", lbl_staff: "Người kiểm",
           edit_badge: "Đang sửa", inch: "inch",

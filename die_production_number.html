@@ -134,7 +134,7 @@
     <div class="container">
 
       <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
         <h1 data-key="title">金型－品番 紐づけ</h1>
         <div class="lang-wrap">
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
@@ -211,6 +211,7 @@
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る",
           title: "金型－品番 紐づけ",
           step1_title: "金型選択",
           step2_title: "この金型が作れる品番",
@@ -225,6 +226,7 @@
           loading: "読み込み中...", empty_overview: "該当する金型がありません",
         },
         vi: {
+          btn_back_menu: "← Về menu",
           title: "Liên kết Khuôn – Mã SP",
           step1_title: "Chọn khuôn",
           step2_title: "Mã SP mà khuôn này có thể sản xuất",

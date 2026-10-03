@@ -258,7 +258,7 @@
     <h1 data-key="title">金型輸出・輸入・固定資産登録</h1>
 
     <div class="toolbar">
-      <button class="btn btn-back" onclick="location.href='index.html'">← 戻る</button>
+      <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
       <button class="btn btn-import" onclick="openImportModal()" data-key="btn_import" disabled>📂 CSV インポート</button>
       <button class="btn btn-edit" id="editBtn" onclick="enterEditMode()" disabled
         data-key="btn_edit">✏️ チェックのみ編集</button>
@@ -357,6 +357,7 @@
       ============================================================ */
       const dict = {
         ja: {
+          btn_back: "← 戻る",
           title:           "金型輸出・輸入・固定資産登録",
           col_die:         "型番",
           col_pn:          "品番",
@@ -381,6 +382,7 @@
           tip_wildcard:    "ワイルドカード使用可\n* ：任意の文字列\n? ：任意の1文字\n例）A12*　*123　A??B",
         },
         vi: {
+          btn_back: "← Quay lại",
           title:           "Danh sách tiếp nhận & bàn giao khuôn NK",
           col_die:         "Mã khuôn",
           col_pn:          "Mã sản phẩm",

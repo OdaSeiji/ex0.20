@@ -231,12 +231,23 @@
         font-weight: bold;
       }
 
+      /* 見出しの絵文字（言語切替で文字だけ書き換わるよう span の外に置く） */
+      .accordion-emoji {
+        display: inline-block;
+        width: 28px;            /* 画像アイコンと同じ幅にして、見出しの文字の始まりをそろえる */
+        text-align: center;
+        font-size: 24px;
+        line-height: 1;
+        vertical-align: -0.2em;
+        margin-right: 8px;
+      }
+
       /* 絵文字の代わりに画像アイコンを使う見出し（言語切替で文字だけ書き換わるよう span の外に置く） */
       .accordion-icon {
-        width: 1.25em;
-        height: 1.25em;
-        vertical-align: -0.3em;
-        margin-right: 0.25em;
+        width: 28px;            /* 絵の線が細いので、絵文字（24px）より少し大きくしてつり合いを取る */
+        height: 28px;
+        vertical-align: -0.45em;
+        margin-right: 8px;
       }
 
       .accordion.open {
@@ -354,7 +365,7 @@
     </div>
 
     <!-- 🏭 押出工程 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_press">🏭 押出工程</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/extrusion_press.svg" alt="" /><span data-key="section_press">押出工程</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'press_daily_report.html'">
@@ -398,7 +409,7 @@
     </div>
 
     <!-- 🧰 金型メンテナンス -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_maintenance">🧰 金型メンテナンス</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/hollow_die.svg" alt="" /><span data-key="section_maintenance">金型メンテナンス</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'DieMaitenanceV3.html'">
@@ -415,7 +426,7 @@
     </div>
 
     <!-- 📊 金型進捗管理 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_progress">📊 金型進捗管理</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📊</span><span data-key="section_progress">金型進捗管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_progress_list.html'">
@@ -447,7 +458,7 @@
     </div>
 
     <!-- 📈 実績 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_report">📈 実績</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📈</span><span data-key="section_report">実績</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_startup_report.html'">
@@ -479,7 +490,7 @@
     </div>
 
     <!-- 📦 生産管理 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_production">📦 生産管理</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📦</span><span data-key="section_production">生産管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'order_sheet.html'">
@@ -487,8 +498,15 @@
           <div class="menu-title" data-key="order_sheet_title">生産指示</div>
           <div class="menu-desc" data-key="order_sheet_desc">発注書の登録・実績・梱包状況の管理</div>
         </div>
+      </div>
+    </div>
+
+    <!-- ビレット -->
+    <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/billet.svg" alt="" /><span data-key="section_billet">ビレット</span></div>
+    <div class="accordion-content">
+      <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'billet_check.html'">
-          <img class="menu-icon" src="./img/table.svg" alt="" />
+          <img class="menu-icon" src="./img/billet.svg" alt="" />
           <div class="menu-title" data-key="billet_check_title">ビレット在庫更新</div>
           <div class="menu-desc" data-key="billet_check_desc">サイズごとに、材質・長さ別のビレットの在庫本数を記録</div>
         </div>
@@ -496,7 +514,7 @@
     </div>
 
     <!-- ⚙️ 各種設定 -->
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_register">🚢 金型輸出、部品輸出</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">🚢</span><span data-key="section_register">金型輸出、部品輸出</span></div>
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="location.href = 'die_import.html'">
@@ -512,7 +530,7 @@
       </div>
     </div>
 
-    <div class="accordion" onclick="toggleAccordion(this)"><span data-key="section_settings">⚙️ 各種設定</span></div>
+    <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">⚙️</span><span data-key="section_settings">各種設定</span></div>
     <div class="accordion-content">
       <div class="menu-row fixed3">
         <div class="menu-card" onclick="location.href = 'die_handover_progress.html'">
@@ -594,12 +612,12 @@
         ja: {
           title: "トップメニュー",
           whats_new_btn: "📋 更新履歴",
-          section_press: "🏭 押出工程",
+          section_press: "押出工程",
           section_quality: "品質",
-          section_maintenance: "🧰 金型メンテナンス",
-          section_progress: "📊 金型進捗管理",
-          section_register: "🚢 金型輸出、部品輸出",
-          section_settings: "⚙️ 各種設定",
+          section_maintenance: "金型メンテナンス",
+          section_progress: "金型進捗管理",
+          section_register: "金型輸出、部品輸出",
+          section_settings: "各種設定",
           dashboard_title: "📊 測定ダッシュボード（押出〇）",
 
           billet_title: "ビレット投入",
@@ -618,7 +636,7 @@
           issue_desc: "NG診断が承認された金型の一覧",
           handover_title: "金型輸入固定資産登録",
           handover_desc: "書類・検査・到着・資産化の進捗管理",
-          section_report: "📈 実績",
+          section_report: "実績",
           startup_report_title: "金型立上実績",
           startup_report_desc: "到着・型検・移管・試押の月別集計",
           machine_report_title: "設備稼働実績",
@@ -629,7 +647,8 @@
           aging_rack_report_desc: "日別の使用ラック数と解放ラック数",
           ram_log_title: "（試作）押出波形",
           ram_log_desc: "ラム位置ごとの圧力・速度・出口温度を表示",
-          section_production: "📦 生産管理",
+          section_production: "生産管理",
+          section_billet: "ビレット",
           order_sheet_title: "生産指示",
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
           billet_check_title: "ビレット在庫更新",
@@ -693,12 +712,12 @@
         vi: {
           title: "Menu Chính",
           whats_new_btn: "📋 Cập nhật",
-          section_press: "🏭 Quy trình ép đùn",
+          section_press: "Quy trình ép đùn",
           section_quality: "Chất lượng",
-          section_maintenance: "🧰 Bảo trì khuôn",
-          section_progress: "📊 Tiến độ khuôn",
-          section_register: "🚢 Xuất khuôn, xuất linh kiện",
-          section_settings: "⚙️ Cài đặt chung",
+          section_maintenance: "Bảo trì khuôn",
+          section_progress: "Tiến độ khuôn",
+          section_register: "Xuất khuôn, xuất linh kiện",
+          section_settings: "Cài đặt chung",
           dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
 
           billet_title: "Nạp Billet",
@@ -718,7 +737,7 @@
           issue_desc: "Danh sách khuôn có chẩn đoán NG đã được phê duyệt",
           handover_title: "Danh sách tiếp nhận & bàn giao khuôn NK",
           handover_desc: "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
-          section_report: "📈 Thực tế",
+          section_report: "Thực tế",
           startup_report_title: "Báo cáo thực tế khởi động khuôn",
           startup_report_desc: "Tổng hợp theo tháng: đến, KT, bàn giao, thử ép",
           machine_report_title: "Báo cáo hoạt động máy",
@@ -729,7 +748,8 @@
           aging_rack_report_desc: "Số giá sử dụng và giải phóng theo ngày",
           ram_log_title: "（Thử nghiệm）Dạng sóng ép đùn",
           ram_log_desc: "Hiển thị áp suất/tốc độ/nhiệt độ đầu ra theo vị trí Ram",
-          section_production: "📦 Quản lý sản xuất",
+          section_production: "Quản lý sản xuất",
+          section_billet: "Billet",
           order_sheet_title: "Chỉ thị sản xuất",
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
           billet_check_title: "Cập nhật tồn kho billet",

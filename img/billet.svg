@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- アルミのビレット（丸棒）。斜めに置いて枠いっぱいに使う。銀色のグラデーションで金属感、左下は切断面 -->
+  <defs>
+    <!-- 胴：上から光が当たった円柱の陰影 -->
+    <linearGradient id="billetBody" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"    stop-color="#77818a" />
+      <stop offset="0.15" stop-color="#d6dde3" />
+      <stop offset="0.30" stop-color="#ffffff" />
+      <stop offset="0.47" stop-color="#c2cad1" />
+      <stop offset="0.78" stop-color="#8b959e" />
+      <stop offset="1"    stop-color="#59626a" />
+    </linearGradient>
+    <!-- 切断面：少し明るく、のこぎりの切り目のような同心円 -->
+    <radialGradient id="billetFace" cx="0.42" cy="0.36" r="0.75">
+      <stop offset="0"   stop-color="#f6f8fa" />
+      <stop offset="0.6" stop-color="#ccd4da" />
+      <stop offset="1"   stop-color="#8e98a1" />
+    </radialGradient>
+  </defs>
+
+  <g transform="rotate(-35 12 12)">
+    <!-- 胴（右端は丸く） -->
+    <path d="M3.5 7 H20.6 A1.9 5 0 0 1 20.6 17 H3.5 Z"
+          fill="url(#billetBody)" stroke="#525c66" stroke-width="0.5" stroke-linejoin="round" />
+    <!-- 胴のつや（細いハイライト） -->
+    <path d="M4.6 8.7 H20.2" stroke="#ffffff" stroke-width="0.5" stroke-linecap="round" opacity="0.9" />
+
+    <!-- 切断面 -->
+    <ellipse cx="3.5" cy="12" rx="2.2" ry="5" fill="url(#billetFace)" stroke="#525c66" stroke-width="0.5" />
+    <ellipse cx="3.5" cy="12" rx="1.45" ry="3.3" fill="none" stroke="#9ca6af" stroke-width="0.35" />
+    <ellipse cx="3.5" cy="12" rx="0.7" ry="1.6" fill="none" stroke="#9ca6af" stroke-width="0.35" />
+  </g>
+</svg>

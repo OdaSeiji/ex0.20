@@ -228,7 +228,7 @@
     <h1 data-key="title">🔍 Issue 進捗管理</h1>
 
     <div class="toolbar">
-      <button class="btn-back" onclick="location.href='index.html'">← メニューへ戻る</button>
+      <button class="btn-back" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
       <span class="filter-label" data-key="filter_label">フェーズ絞り込み：</span>
       <select class="phase-filter" onchange="applyFilter()">
         <option value="">すべて</option>
@@ -296,6 +296,7 @@
     <script>
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る",
           title:           "🔍 Issue 進捗管理",
           filter_label:    "フェーズ絞り込み：",
           filter_ng_watch: "様子を見る",
@@ -316,6 +317,7 @@
           no_data:         "該当データなし",
         },
         vi: {
+          btn_back_menu: "← Về menu",
           title:           "🔍 Quản lý tiến độ Issue",
           filter_label:    "Lọc theo giai đoạn：",
           filter_ng_watch: "Theo dõi",

@@ -332,7 +332,7 @@
 
       <!-- ヘッダー -->
       <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
         <h1 data-key="title">品番管理</h1>
         <div class="lang-wrap">
           <button class="lang-btn" onclick="setLang('ja')">日本語</button>
@@ -612,6 +612,7 @@
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る",
           title: "品番管理",
           btn_new: "＋ 新規登録",
           btn_cat_mgr: "🗂 カテゴリ管理",
@@ -649,6 +650,7 @@
           btn_import: "📂 CSV インポート",
         },
         vi: {
+          btn_back_menu: "← Về menu",
           title: "Quản lý mã sản phẩm",
           btn_new: "＋ Thêm mới",
           btn_cat_mgr: "🗂 Quản lý danh mục",

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- ホローダイス（ポートホールダイス）の雄型を斜め上から見た図。
+       円盤の厚み、4つのポート（穴）とブリッジ、手前に出ているマンドレル -->
+  <defs>
+    <!-- 型の正面：鋼の円盤 -->
+    <radialGradient id="dieFace" cx="0.38" cy="0.3" r="0.85">
+      <stop offset="0"    stop-color="#ffffff" />
+      <stop offset="0.45" stop-color="#c8d0d7" />
+      <stop offset="0.85" stop-color="#939da6" />
+      <stop offset="1"    stop-color="#6a737b" />
+    </radialGradient>
+    <!-- 型の側面（厚み） -->
+    <linearGradient id="dieSide" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"    stop-color="#5c656d" />
+      <stop offset="0.35" stop-color="#b3bcc4" />
+      <stop offset="0.6"  stop-color="#8d979f" />
+      <stop offset="1"    stop-color="#4f5860" />
+    </linearGradient>
+    <!-- ポート：奥へ深い穴 -->
+    <radialGradient id="diePort" cx="0.5" cy="0.5" r="0.6">
+      <stop offset="0"   stop-color="#2f3840" />
+      <stop offset="1"   stop-color="#5a646d" />
+    </radialGradient>
+    <!-- マンドレル：上の面と手前の面 -->
+    <linearGradient id="dieMandrelTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0"   stop-color="#ffffff" />
+      <stop offset="1"   stop-color="#b8c1c8" />
+    </linearGradient>
+    <linearGradient id="dieMandrelFront" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#8d979f" />
+      <stop offset="1"   stop-color="#5c656d" />
+    </linearGradient>
+  </defs>
+
+  <!-- 全体を少し傾ける -->
+  <g transform="rotate(-12 12 12)">
+    <!-- 側面（厚み）：奥にある下の円と、それをつなぐ帯 -->
+    <ellipse cx="12" cy="14" rx="10.5" ry="7.14" fill="#4f5860" />
+    <rect x="1.5" y="10.6" width="21" height="3.4" fill="url(#dieSide)" />
+    <path d="M1.5 14 A10.5 7.14 0 0 0 22.5 14" fill="none" stroke="#3f4850" stroke-width="0.4" />
+
+    <!-- 正面（円を縦につぶして、斜めから見た形にする） -->
+    <g transform="translate(12 10.6) scale(1 0.68) translate(-12 -12)">
+      <circle cx="12" cy="12" r="10.5" fill="url(#dieFace)" stroke="#525c66" stroke-width="0.6" />
+      <!-- 外周のボルト穴 -->
+      <g fill="#525c66">
+        <circle cx="12" cy="2.6" r="0.6" />
+        <circle cx="21.4" cy="12" r="0.6" />
+        <circle cx="12" cy="21.4" r="0.6" />
+        <circle cx="2.6" cy="12" r="0.6" />
+      </g>
+      <!-- ポート（ドーナツ形の穴を、ブリッジで4つに分ける） -->
+      <path fill-rule="evenodd" fill="url(#diePort)"
+            d="M12 3.8 A8.2 8.2 0 1 1 11.99 3.8 Z M12 7.6 A4.4 4.4 0 1 0 12.01 7.6 Z" />
+      <!-- ブリッジ（斜め十字） -->
+      <g stroke="#b3bcc4" stroke-width="2.5">
+        <path d="M5.8 5.8 L18.2 18.2" />
+        <path d="M18.2 5.8 L5.8 18.2" />
+      </g>
+      <g stroke="#525c66" stroke-width="0.3" fill="none" opacity="0.6">
+        <circle cx="12" cy="12" r="8.2" />
+        <circle cx="12" cy="12" r="4.4" />
+      </g>
+    </g>
+
+    <!-- マンドレル（手前に出ている四角い芯）：根元は正面の上、上の面は少し浮いて見える -->
+    <!-- 手前の面 -->
+    <path d="M8.9 12.6 H15.1 V9.4 H8.9 Z" fill="url(#dieMandrelFront)" stroke="#525c66" stroke-width="0.35" stroke-linejoin="round" />
+    <!-- 上の面 -->
+    <path d="M8.9 9.4 H15.1 V5.3 H8.9 Z" fill="url(#dieMandrelTop)" stroke="#525c66" stroke-width="0.35" stroke-linejoin="round" />
+    <rect x="10.3" y="6.3" width="3.4" height="2.1" rx="0.3" fill="none" stroke="#8d979f" stroke-width="0.3" />
+  </g>
+</svg>

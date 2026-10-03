@@ -91,6 +91,65 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-03</span>
         </div>
+        <div class="entry-title" data-key="fg_title">押出日報入力：生産指示書の選択を高速化、品番で絞り込み</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fg_purpose">生産指示書の選択画面が開くまでに時間がかかり、選んだ金型と関係ない発注書から探す必要があったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fg_content">「選択」で開く指示書選択の表示を約38秒から約0.05秒に短縮した（OK数・梱包済み数を、表示する発注書の分だけ集計するように変更）。「品番で絞り込む」を追加し、選んだ押出指示書の品番（無ければ金型に紐づく品番すべて）の発注書を、納期に関係なく新しい順に5件表示する。チェックを外すと、今までどおり納期の月で表示する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="ff_title">トップメニュー：「ビレット」を独立、見出しのアイコンを大きく、新しいアイコン</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ff_purpose">メニューを見つけやすくし、アルミ押出の現場らしいアイコンにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ff_content">「ビレット在庫更新」を生産管理から新しい見出し「ビレット」に移した。見出しのアイコンを大きくし（絵文字 24px、画像 28px）、見出しの文字の始まりをそろえた。押出工程（直接押出の原理図：右からステムで押し、左へ押出材が出る）、金型メンテナンス（ホローダイスの雄型を斜めから見た図）、ビレット（アルミの丸棒）のアイコンを新しく作った。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='index.html'">index.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
+        <div class="entry-title" data-key="fe_title">「← メニューへ戻る」ボタンをベトナム語に対応</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fe_purpose">言語をベトナム語にしても、戻るボタンだけ日本語のままだったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fe_content">ベトナム語に切り替えられる9画面で、戻るボタンを「← Về menu」（引き継ぎ一覧は「← Quay lại」）と表示するようにした。重点管理の一覧を重点管理金型リストから開いたときの「← 重点管理リストへ戻る」も対応した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='billet_check.html'">billet_check.html</a>
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+          <a class="file-link" onclick="location.href='production_number.html'">production_number.html</a>
+          <a class="file-link" onclick="location.href='die_production_number.html'">die_production_number.html</a>
+          <a class="file-link" onclick="location.href='die_issue_progress.html'">die_issue_progress.html</a>
+          <a class="file-link" onclick="location.href='handover_list.html'">handover_list.html</a>
+          <a class="file-link" onclick="location.href='die_progress_list.html'">die_progress_list.html</a>
+          <a class="file-link" onclick="location.href='die_inspection.html'">die_inspection.html</a>
+          <a class="file-link" onclick="location.href='die_issue_list.html'">die_issue_list.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-03</span>
+        </div>
         <div class="entry-title" data-key="fd_title">トップメニュー：「生産管理」を「生産指示」に名称変更</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fd_purpose">画面の役割に合った名前にするため。</span>
@@ -788,6 +847,15 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fg_title: "押出日報入力：生産指示書の選択を高速化、品番で絞り込み",
+          fg_purpose: "生産指示書の選択画面が開くまでに時間がかかり、選んだ金型と関係ない発注書から探す必要があったため。",
+          fg_content: "「選択」で開く指示書選択の表示を約38秒から約0.05秒に短縮した（OK数・梱包済み数を、表示する発注書の分だけ集計するように変更）。「品番で絞り込む」を追加し、選んだ押出指示書の品番（無ければ金型に紐づく品番すべて）の発注書を、納期に関係なく新しい順に5件表示する。チェックを外すと、今までどおり納期の月で表示する。",
+          ff_title: "トップメニュー：「ビレット」を独立、見出しのアイコンを大きく、新しいアイコン",
+          ff_purpose: "メニューを見つけやすくし、アルミ押出の現場らしいアイコンにするため。",
+          ff_content: "「ビレット在庫更新」を生産管理から新しい見出し「ビレット」に移した。見出しのアイコンを大きくし（絵文字 24px、画像 28px）、見出しの文字の始まりをそろえた。押出工程（直接押出の原理図：右からステムで押し、左へ押出材が出る）、金型メンテナンス（ホローダイスの雄型を斜めから見た図）、ビレット（アルミの丸棒）のアイコンを新しく作った。",
+          fe_title: "「← メニューへ戻る」ボタンをベトナム語に対応",
+          fe_purpose: "言語をベトナム語にしても、戻るボタンだけ日本語のままだったため。",
+          fe_content: "ベトナム語に切り替えられる9画面で、戻るボタンを「← Về menu」（引き継ぎ一覧は「← Quay lại」）と表示するようにした。重点管理の一覧を重点管理金型リストから開いたときの「← 重点管理リストへ戻る」も対応した。",
           fd_title: "トップメニュー：「生産管理」を「生産指示」に名称変更",
           fd_purpose: "画面の役割に合った名前にするため。",
           fd_content: "📦 生産管理の中の「生産管理」（発注書の登録・実績・梱包状況の管理）を「生産指示」に変更し、画面の見出しもそろえた。",
@@ -900,6 +968,15 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fg_title: "Nhập báo cáo đùn hằng ngày: chọn phiếu sản xuất nhanh hơn, lọc theo mã SP",
+          fg_purpose: "Màn hình chọn phiếu mở rất chậm, và phải tìm trong các phiếu không liên quan đến khuôn đã chọn.",
+          fg_content: "Thời gian mở màn hình chọn phiếu giảm từ khoảng 38 giây xuống khoảng 0,05 giây (chỉ tính số OK và số đã đóng gói cho các phiếu được hiển thị). Thêm \"Lọc theo mã SP\": hiển thị 5 phiếu mới nhất của mã SP trong phiếu đùn đã chọn (nếu không có thì tất cả mã SP liên kết với khuôn), không phụ thuộc tháng giao. Bỏ chọn thì hiển thị theo tháng giao như trước.",
+          ff_title: "Menu chính: tách mục \"Billet\", biểu tượng tiêu đề to hơn, biểu tượng mới",
+          ff_purpose: "Để dễ tìm menu hơn và có biểu tượng đúng với xưởng ép đùn nhôm.",
+          ff_content: "Chuyển \"Cập nhật tồn kho billet\" từ Quản lý sản xuất sang tiêu đề mới \"Billet\". Biểu tượng tiêu đề to hơn (emoji 24px, hình 28px), căn thẳng chữ tiêu đề. Tạo biểu tượng mới cho Quy trình ép đùn (nguyên lý ép trực tiếp: ram đẩy từ phải, thanh nhôm ra bên trái), Bảo trì khuôn (khuôn đực của khuôn rỗng nhìn nghiêng) và Billet (thanh nhôm tròn).",
+          fe_title: "Nút \"← Về menu\" hiển thị tiếng Việt",
+          fe_purpose: "Khi chọn tiếng Việt, chỉ riêng nút quay lại vẫn là tiếng Nhật.",
+          fe_content: "Ở 9 màn hình có chuyển ngôn ngữ, nút quay lại hiển thị \"← Về menu\" (danh sách bàn giao là \"← Quay lại\"). Nút \"← Về danh sách khuôn quản lý trọng điểm\" khi mở từ danh sách trọng điểm cũng đã được dịch.",
           fd_title: "Menu chính: đổi tên \"Quản lý sản xuất\" thành \"Chỉ thị sản xuất\"",
           fd_purpose: "Để tên phù hợp với vai trò của màn hình.",
           fd_content: "Đổi mục \"Quản lý sản xuất\" (đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói) trong nhóm 📦 Quản lý sản xuất thành \"Chỉ thị sản xuất\", tiêu đề màn hình cũng đổi theo.",

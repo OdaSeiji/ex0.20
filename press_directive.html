@@ -217,7 +217,7 @@
     <div class="container">
 
       <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
         <h1 data-key="title">押出指示書</h1>
         <button class="list-btn" onclick="openRecentDialog()" data-key="btn_recent">入力済みリスト</button>
         <div class="lang-wrap">
@@ -470,6 +470,7 @@
       /* ── 多言語辞書 ── */
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る",
           title: "押出指示書",
           hb_die_number: "型番", hb_die_size: "金型サイズ", hb_product: "品番", hb_unit_weight: "単重", hb_work_length: "押出長さ",
           ph_die_search: "型番で検索/選択",
@@ -497,6 +498,7 @@
           src_new: "新", src_old: "旧", btn_close: "閉じる", recent_empty: "データなし",
         },
         vi: {
+          btn_back_menu: "← Về menu",
           title: "Tạo phiếu đùn",
           hb_die_number: "Mã khuôn", hb_die_size: "Cỡ khuôn", hb_product: "Mã SP", hb_unit_weight: "Khối lượng/m", hb_work_length: "Dài đùn",
           ph_die_search: "Tìm/chọn theo mã khuôn",

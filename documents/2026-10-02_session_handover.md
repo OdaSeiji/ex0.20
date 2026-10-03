@@ -15,7 +15,7 @@
 | 人の記録 | 担当者などは必ず m_staff の id で保存する。名前の直書きや独自の番号は使わない |
 | サンプル名 | H/E/A/B/M などの呼び名は、列名やキーに使わない（表示は現場のルールのまま） |
 | コミット | ユーザーが「コミット、プッシュ」と言ったときだけ。プッシュの前に fetch/pull する（ユーザーが documents/memo.md を直接編集するため） |
-| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `fe`**（`ey_content` の行の後ろ（fa〜fd の前）に ja・vi それぞれ追加） |
+| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `fh`**（`ey_content` の行の後ろ（fe〜fg の前）に ja・vi それぞれ追加） |
 | 文字コード | 日本語を含む SQL は UTF-8 のファイルにして `mysql --default-character-set=utf8mb4 ... < file.sql` で流す。日本語を含む Python スクリプトは先頭に `# -*- coding: utf-8 -*-` を書いてファイルから実行する |
 | 確認方法 | PHP は `/c/xampp/php/php.exe -l`。JS は `<script>` を取り出して `node --check` |
 
@@ -49,6 +49,8 @@
 - 10/3：空のテーブル m_checkbillet を削除（本番は以前に削除済み）。2026-10-03_drop_m_checkbillet.md
 - 10/3：**ビレット在庫更新**（billet_check.html、ex0.11 CheckBilletV4 の移植）。t_checkbillet をそのまま使い、9インチ VN の 6000mm の列を3つ追加（**本番も実行済み**）。担当者は role=operator だけ。削除は当面ex0.11 で。2026-10-03_checkbillet_6000.md（更新履歴 fc）
 - 10/3：トップメニュー「生産管理」→「生産指示」（更新履歴 fd）
+- 10/3：戻るボタンのベトナム語（9画面、更新履歴 fe）。トップメニューに「ビレット」見出し、見出しアイコンを大きく、アイコン3つ（img/billet.svg・extrusion_press.svg・hollow_die.svg。ホローダイスはユーザー評価50点、現場の写真があれば描き直す）（ff）
+- 10/3：押出日報の生産指示書の選択を高速化（約38秒→0.05秒）、品番で絞り込み（5件）（fg）
 - 次の課題：生産計画（exd11 PressPlanV12）の移植。①金型一覧②計画作成から。ビレット在庫を計画でどう使うか（VN・長さ）はユーザー検討中
 
 ---

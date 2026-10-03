@@ -170,7 +170,7 @@
     <div class="container">
       <!-- 戻るボタン -->
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-        <button id="backBtn"
+        <button id="backBtn" data-key="btn_back_menu"
           style="background:#2b6ca3;color:white;padding:8px 16px;border:none;border-radius:5px;cursor:pointer;">
           ← メニューへ戻る
         </button>
@@ -206,6 +206,7 @@
       /* 多言語辞書 */
       const dict = {
         ja: {
+          btn_back_menu: "← メニューへ戻る", btn_back_watch: "← 重点管理リストへ戻る",
           title: "🛠 テーマ一覧",
           col_die: "金型番号",
           col_title: "テーマ",
@@ -216,6 +217,7 @@
           col_action: "操作",
         },
         vi: {
+          btn_back_menu: "← Về menu", btn_back_watch: "← Về danh sách khuôn quản lý trọng điểm",
           title: "🛠 Danh sách chủ đề",
           col_die: "Mã khuôn",
           col_title: "Chủ đề",
@@ -246,7 +248,8 @@
         setLang(saved);
 
         if (filterDieId) {
-          document.getElementById("backBtn").textContent = "← 重点管理リストへ戻る";
+          document.getElementById("backBtn").dataset.key = "btn_back_watch";
+          document.getElementById("backBtn").textContent = dict[saved].btn_back_watch;
           document.getElementById("backBtn").onclick = () => location.href = "die_watch.html";
           const badge = document.getElementById("filterBadge");
           badge.textContent = filterDieNo ? `金型: ${filterDieNo}` : `die_id: ${filterDieId}`;

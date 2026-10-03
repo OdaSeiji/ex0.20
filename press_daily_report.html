@@ -669,7 +669,12 @@
   <div class="modal-overlay" id="directiveModal" style="display:none;" onclick="if(event.target===this) closeDirectiveModal()">
     <div class="modal-box">
       <h2 data-key="modal_directive_title">📑 指示書選択</h2>
-      <div class="inline-pair" style="margin-bottom:10px;">
+      <label style="display:flex; align-items:center; gap:6px; margin-bottom:8px; font-size:13px; cursor:pointer;">
+        <input type="checkbox" id="directiveByPn" checked onchange="onDirectiveByPnChange()" />
+        <span data-key="lbl_filter_by_pn">品番で絞り込む</span>
+        <span id="directivePnLabel" class="mono" style="color:#1565c0; font-weight:bold;"></span>
+      </label>
+      <div class="inline-pair" id="directiveMonthRow" style="margin-bottom:10px;">
         <button type="button" class="btn btn-back" onclick="shiftDirectiveMonth(-1)">◀</button>
         <span id="directiveMonthLabel" class="mono" style="min-width:80px; text-align:center; font-weight:bold;"></span>
         <button type="button" class="btn btn-back" onclick="shiftDirectiveMonth(1)">▶</button>
@@ -788,6 +793,7 @@
         lbl_waveform_target: (dieName, machine) => `対象: ${dieName}（${machine}号機）`,
         dieOption: (dieName, machine) => `${dieName}（${machine}号機）`,
         lbl_delivery_month: "（納期基準）",
+        lbl_filter_by_pn: "品番で絞り込む", lbl_no_pn: "（品番が分からないため、納期の月で表示）",
         lbl_washed: "洗浄済み", opt_no: "No", opt_yes: "Yes",
         lbl_press_type: "プレス種別", lbl_machine: "設備番号",
         lbl_billet_size: "ビレットサイズ", lbl_billet_length: "ビレット長さ",
@@ -856,6 +862,7 @@
         lbl_waveform_target: (dieName, machine) => `Đối tượng: ${dieName}（Máy ${machine}）`,
         dieOption: (dieName, machine) => `${dieName}（Máy ${machine}）`,
         lbl_delivery_month: "（theo ngày giao）",
+        lbl_filter_by_pn: "Lọc theo mã SP", lbl_no_pn: "(Không xác định được mã SP, hiển thị theo tháng giao)",
         lbl_washed: "Đã ngâm", opt_no: "No", opt_yes: "Yes",
         lbl_press_type: "Kiểu đùn", lbl_machine: "Số máy",
         lbl_billet_size: "Size billet", lbl_billet_length: "Chiều dài Billet",
@@ -1070,11 +1077,41 @@
       return v ? v.slice(0, 7) : new Date().toISOString().slice(0, 7);
     }
 
+    // 品番で絞り込むときは、押出指示書の品番（無ければ金型に紐づく品番すべて）の発注書を納期に関係なく出す。
+    // 絞り込まないとき、または品番が分からないときは、納期の月で出す。
+    let loadedKey = null;
+    function directiveLoadKey(month) {
+      const byPn = document.getElementById("directiveByPn").checked;
+      return byPn
+        ? `pn:${document.getElementById("press-directive__select").value}:${document.getElementById("die__select").value}:${month}`
+        : `month:${month}`;
+    }
+
     async function loadOrderSheets(month) {
-      const res = await fetch("./php/press_daily_report/get_ordersheets.php?month=" + encodeURIComponent(month));
-      orderSheets = await res.json();
+      const byPn = document.getElementById("directiveByPn").checked;
+      const params = new URLSearchParams({ month });
+      if (byPn) {
+        params.set("by_pn", "1");
+        params.set("directive_id", document.getElementById("press-directive__select").value);
+        params.set("die_id", document.getElementById("die__select").value);
+      }
+      const res = await fetch("./php/press_daily_report/get_ordersheets.php?" + params.toString());
+      const data = await res.json();
+      orderSheets = data.rows;
       loadedMonth = month;
+      loadedKey = directiveLoadKey(month);
       document.getElementById("directiveMonthLabel").textContent = month;
+      // 品番で絞り込めたときは月の切り替えを隠す
+      const t = dict[currentLang] ?? dict.ja;
+      document.getElementById("directivePnLabel").textContent =
+        data.by_pn ? data.production_numbers.join(", ") : (byPn ? (t.lbl_no_pn ?? "") : "");
+      document.getElementById("directiveMonthRow").style.display = data.by_pn ? "none" : "";
+    }
+
+    async function onDirectiveByPnChange() {
+      await loadOrderSheets(directiveMonth);
+      renderDirectiveTable();
+      document.getElementById("directiveSearch").focus();
     }
 
     async function shiftDirectiveMonth(diff) {
@@ -1090,7 +1127,7 @@
 
     async function openDirectiveModal() {
       if (!directiveMonth) directiveMonth = initialDirectiveMonth();
-      if (loadedMonth !== directiveMonth) await loadOrderSheets(directiveMonth);
+      if (loadedKey !== directiveLoadKey(directiveMonth)) await loadOrderSheets(directiveMonth);
       document.getElementById("directiveSearch").value = "";
       renderDirectiveTable();
       document.getElementById("directiveModal").style.display = "flex";
