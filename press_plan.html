@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Press Plan</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: "Roboto Mono", "Segoe UI", monospace;
+        background: #f0f2f5;
+        padding: 16px;
+      }
+
+      /* 3列（金型一覧・計画の作成・計画の一覧）。1920px の画面に収まる幅 */
+      .container { max-width: 1880px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+      }
+      .back-btn {
+        background: #2b6ca3; color: #fff;
+        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
+        white-space: nowrap;
+      }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn {
+        padding: 6px 12px; border: 1px solid #0078d4;
+        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
+      }
+
+      .columns { display: grid; grid-template-columns: max-content 560px minmax(0, 1fr); gap: 12px; align-items: start; }
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        min-width: 0;
+      }
+      .mid-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+      .card-title {
+        font-size: 14px; font-weight: bold; color: #1565c0;
+        margin-bottom: 8px; border-bottom: 2px solid #e8f1ff; padding-bottom: 6px;
+        display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      }
+
+      table { width: 100%; border-collapse: collapse; font-size: 12px; }
+      th, td { padding: 4px 5px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
+      th { color: #777; font-size: 11px; background: #fff; position: sticky; top: 0; z-index: 1; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .scroll { overflow: auto; }
+      tr.selectable { cursor: pointer; }
+      tr.selectable:hover td { filter: brightness(0.96); }
+
+      input[type="text"], input[type="date"], input[type="number"], select {
+        padding: 5px 7px; border: 1px solid #ccc; border-radius: 4px;
+        font-size: 13px; font-family: inherit;
+      }
+      .required { background: #fff8e1; border-color: #ffb300 !important; }
+
+      /* 金型一覧の色分け */
+      tr.st-nitriding td { background: #ffcdd2; }
+      tr.st-fixing td    { background: #ffe0b2; }
+      tr.st-nopress td   { background: #fff9c4; }
+      tr.in-plan td      { color: #1565c0; font-weight: bold; }
+      .legend { display: flex; gap: 14px; font-size: 11px; color: #555; margin-top: 8px; flex-wrap: wrap; }
+      .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border: 1px solid #aaa; margin-right: 4px; vertical-align: -2px; }
+      .legend .lg-nitriding::before { background: #ffcdd2; }
+      .legend .lg-fixing::before    { background: #ffe0b2; }
+      .legend .lg-nopress::before   { background: #fff9c4; }
+      .pn-list { font-size: 11px; color: #555; }
+      .add-table .pn-select { display: block; margin-top: 2px; width: 100%; font-size: 11px; padding: 1px 2px; }
+      /* 金型の状態のバッジ */
+      .st-badge { display: inline-block; padding: 1px 7px; border-radius: 9px; font-size: 11px; color: #fff; line-height: 1.5; }
+      .st-legend { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+      /* 計画の作成 */
+      .form-row { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+      .form-label { font-size: 12px; font-weight: bold; color: #1565c0; }
+      .add-table input[type="text"], .add-table input[type="number"], .add-table select { padding: 3px 4px; font-size: 12px; }
+      .add-table .w-ord { width: 46px; }
+      .add-table .w-qty { width: 56px; text-align: right; }
+      .add-table { table-layout: fixed; }
+      .add-table td { overflow: hidden; text-overflow: ellipsis; }
+      .add-table .w-note { width: 100%; }
+      .add-table input, .add-table select { max-width: 100%; }
+      .del-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 15px; }
+      .btn-row { display: flex; gap: 10px; margin-top: 12px; align-items: center; }
+      .btn-save { background: #1565c0; color: #fff; padding: 8px 22px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-save:disabled, .btn-update:disabled { background: #90a4ae; cursor: default; }
+      .btn-update { background: #e65100; color: #fff; padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-cancel { background: #9e9e9e; color: #fff; padding: 8px 18px; border: none; border-radius: 5px; cursor: pointer; }
+      .edit-badge { background: #e65100; color: #fff; padding: 3px 10px; border-radius: 4px; font-size: 12px; }
+      .hint { font-size: 11px; color: #999; }
+      .empty-note { color: #999; text-align: center; padding: 14px; white-space: normal; }
+      .billet-table td.size-cell { font-weight: bold; color: #1565c0; vertical-align: top; border-right: 1px solid #eee; }
+      .billet-table td.order-need { color: #c62828; font-weight: bold; }
+      .billet-table tr.size-first td { border-top: 2px solid #e0e0e0; }
+
+      /* 計画の一覧：選んだ行と同じ日の行を号機ごとの色で */
+      tr.same-date.m1 td { background: #e3f2fd; }
+      tr.same-date.m2 td { background: #e8f5e9; }
+      tr.same-date.m3 td { background: #fff3e0; }
+      tr.same-date.m4 td { background: #f3e5f5; }
+      tr.selected td { font-weight: bold; outline: 2px solid #1565c0; outline-offset: -2px; }
+
+      .row-del { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
+      .row-del:hover { color: #fff; background: #c62828; border-radius: 3px; }
+      dialog#deleteDialog {
+        border: none; border-radius: 10px; padding: 20px 24px; margin: auto;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 14px; min-width: 320px;
+      }
+      dialog#deleteDialog::backdrop { background: rgba(0,0,0,0.4); }
+      dialog#deleteDialog .dlg-target { margin: 10px 0; padding: 8px 10px; background: #f5f5f5; border-radius: 6px; font-size: 13px; }
+      dialog#deleteDialog .dlg-error { color: #c62828; font-size: 12px; min-height: 16px; margin-top: 6px; }
+      dialog#deleteDialog .dlg-btn-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+      dialog#deleteDialog button { padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; }
+      dialog#deleteDialog .dlg-cancel { background: #9e9e9e; color: #fff; }
+      dialog#deleteDialog .dlg-delete { background: #c62828; color: #fff; }
+
+      #toast {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
+        <h1 data-key="title">押出計画</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <div class="columns">
+        <!-- ① 金型一覧 -->
+        <div class="card">
+          <div class="card-title">
+            <span data-key="die_list_title">金型一覧</span>
+            <input type="text" id="dieSearch" data-key-placeholder="ph_die_search" placeholder="型番・品番で検索" oninput="onDieSearch()" style="flex:1; min-width:160px;" />
+          </div>
+          <div class="scroll" id="dieScroll" style="height: 575px;"><!-- 約20行分（見出し＋行 27.5px × 20） -->
+            <table style="width:auto;">
+              <thead><tr id="dieHead"></tr></thead>
+              <tbody id="dieBody"></tbody>
+            </table>
+          </div>
+          <div class="legend">
+            <span class="lg-nitriding" data-key="lg_nitriding">窒化が必要</span>
+            <span class="lg-fixing" data-key="lg_fixing">修理中</span>
+            <span class="lg-nopress" data-key="lg_nopress">洗浄が必要</span>
+            <span class="hint" style="margin-left:auto;" data-key="hint_click_die">行をクリックすると計画に追加</span>
+          </div>
+          <div class="st-legend" id="statusLegend"></div>
+        </div>
+
+        <!-- ② 計画の作成・修正 ／ ビレットの在庫と発注の目安（中央は2枚のカード） -->
+        <div class="mid-col">
+        <div class="card">
+          <div class="card-title">
+            <span id="planFormTitle" data-key="plan_new_title">計画の作成</span>
+            <span class="edit-badge" id="editBadge" style="display:none;" data-key="edit_badge">修正中</span>
+          </div>
+          <div class="form-row">
+            <span class="form-label" data-key="lbl_plan_date">押出日</span>
+            <input type="date" id="fPlanDate" onchange="checkForm()" />
+            <span class="form-label" data-key="lbl_machine">号機</span>
+            <select id="fMachine" onchange="checkForm()">
+              <option value="0">-</option><option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
+            </select>
+          </div>
+          <table class="add-table">
+            <thead><tr id="addHead"></tr></thead>
+            <tbody id="addBody"></tbody>
+          </table>
+          <div class="btn-row">
+            <button class="btn-cancel" onclick="resetForm()" data-key="btn_clear">クリア</button>
+            <button class="btn-save" id="saveBtn" onclick="savePlans()" data-key="btn_save" disabled>保存</button>
+            <button class="btn-update" id="updateBtn" onclick="updatePlan()" data-key="btn_update" style="display:none;" disabled>更新する</button>
+          </div>
+          <div class="hint" style="margin-top:8px;" data-key="hint_form">左の金型一覧から型を選び、押出日と号機を決めて保存します。右の計画の行をクリックすると修正できます。</div>
+        </div>
+
+        <!-- ビレットの在庫と発注の目安（期間は右の計画の一覧と同じ） -->
+        <div class="card">
+          <div class="card-title">
+            <span data-key="billet_title">ビレットの在庫と発注の目安</span>
+            <span class="hint" data-key="billet_note">（Dubai のみ。期間は右の一覧と同じ）</span>
+          </div>
+          <table class="billet-table">
+            <thead><tr id="billetHead"></tr></thead>
+            <tbody id="billetBody"></tbody>
+          </table>
+          <div class="hint" style="margin-top:6px;" data-key="billet_hint">発注＝（計画 − 在庫）を 7 本単位に切り上げ。計画の太さ・長さは、その品番を最後に押したときのビレット。</div>
+        </div>
+        </div>
+
+        <!-- ③ 計画の一覧 -->
+        <div class="card">
+          <div class="card-title">
+            <span data-key="plan_list_title">計画の一覧</span>
+            <input type="date" id="fStart" onchange="loadPlans()" /> →
+            <input type="date" id="fEnd" onchange="loadPlans()" />
+            <input type="text" id="fDie" data-key-placeholder="ph_die" placeholder="型番" oninput="onPlanFilter()" style="width:110px;" />
+            <select id="fListMachine" onchange="loadPlans()">
+              <option value="0" data-key="all_machines">全号機</option><option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
+            </select>
+          </div>
+          <div class="scroll" style="height: calc(100vh - 170px);">
+            <table>
+              <thead><tr id="planHead"></tr></thead>
+              <tbody id="planBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <dialog id="deleteDialog">
+      <div data-key="dlg_confirm">この計画を削除しますか？</div>
+      <div class="dlg-target" id="deleteTarget"></div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span data-key="lbl_passcode">パスコード</span>
+        <input type="password" id="deletePasscode" autocomplete="off" inputmode="numeric" style="width:100px;"
+               onkeydown="if (event.key === 'Enter') { event.preventDefault(); confirmDelete(); }" />
+      </div>
+      <div class="dlg-error" id="deleteError"></div>
+      <div class="dlg-btn-row">
+        <button class="dlg-cancel" onclick="document.getElementById('deleteDialog').close()" data-key="dlg_cancel">キャンセル</button>
+        <button class="dlg-delete" onclick="confirmDelete()" data-key="dlg_delete">削除する</button>
+      </div>
+    </dialog>
+
+    <div id="toast"></div>
+
+    <script>
+      /* ── 多言語辞書 ── */
+      const dict = {
+        ja: {
+          btn_back_menu: "← メニューへ戻る", title: "押出計画",
+          die_list_title: "金型一覧", ph_die_search: "型番・品番で検索",
+          col_die: "型番", col_pn: "品番", col_status: "状態", col_press_after_wash: "Press",
+          col_nit_len: "Len", col_wash_after_nit: "Wash", col_dia: "径", col_ok_rate: "良品率",
+          col_max_billet: "あと本数",
+          tip_press_after_wash: "最後の洗浄のあとの押出回数", tip_nit_len: "最後の窒化のあとの押出長さ（km）",
+          tip_wash_after_nit: "最後の窒化のあとの洗浄回数", tip_max_billet: "次の窒化までに押せるビレット本数（最後の量産のビレットで計算）",
+          lbl_tank: "タンク", lg_nitriding: "窒化が必要", lg_fixing: "修理中", lg_nopress: "洗浄が必要", hint_click_die: "行をクリックすると計画に追加",
+          plan_new_title: "計画の作成", plan_edit_title: "計画の修正", edit_badge: "修正中",
+          lbl_plan_date: "押出日", lbl_machine: "号機",
+          col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考",
+          tip_nitride: "金型を窒素雰囲気の中で加熱するかどうか",
+          nitride_yes: "Yes", nitride_no: "No",
+          btn_clear: "クリア", btn_save: "保存", btn_update: "更新する",
+          hint_form: "左の金型一覧から型を選び、押出日と号機を決めて保存します。右の計画の行をクリックすると修正できます。",
+          empty_add: "左の金型一覧から型を選んでください",
+          plan_list_title: "計画の一覧", ph_die: "型番", all_machines: "全号機",
+          col_date: "押出日", col_mc: "号機", empty_plans: "計画がありません", empty_dies: "該当する金型がありません",
+          msg_saved: "保存しました", msg_updated: "更新しました", msg_already: "この型はもう追加されています",
+          msg_loaded: "修正用に読み込みました",
+          billet_title: "ビレットの在庫と発注の目安", billet_note: "（Dubai のみ。期間は右の一覧と同じ）",
+          billet_hint: "発注＝（計画 − 在庫）を 7 本単位に切り上げ。計画の太さ・長さは、その品番を最後に押したときのビレット。",
+          col_size: "サイズ", col_material: "材質", col_length: "長さ", col_stock: "在庫", col_used: "実績", col_plan: "計画", col_order: "発注",
+          tip_stock_at: "在庫の調査日",
+          dlg_confirm: "この計画を削除しますか？", lbl_passcode: "パスコード", dlg_cancel: "キャンセル", dlg_delete: "削除する",
+          msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除",
+        },
+        vi: {
+          btn_back_menu: "← Về menu", title: "Kế hoạch ép đùn",
+          die_list_title: "Danh sách khuôn", ph_die_search: "Tìm theo mã khuôn / mã SP",
+          col_die: "Mã khuôn", col_pn: "Mã SP", col_status: "Trạng thái", col_press_after_wash: "Press",
+          col_nit_len: "Len", col_wash_after_nit: "Wash", col_dia: "Đ.kính", col_ok_rate: "Tỷ lệ OK",
+          col_max_billet: "Billet còn",
+          tip_press_after_wash: "Số lần ép sau lần rửa cuối", tip_nit_len: "Chiều dài ép sau lần thấm nitơ cuối (km)",
+          tip_wash_after_nit: "Số lần rửa sau lần thấm nitơ cuối", tip_max_billet: "Số billet còn ép được trước lần thấm nitơ tiếp theo (tính theo billet của lần ép hàng loạt cuối)",
+          lbl_tank: "Bể", lg_nitriding: "Cần thấm nitơ", lg_fixing: "Đang sửa", lg_nopress: "Cần rửa", hint_click_die: "Bấm vào dòng để thêm vào kế hoạch",
+          plan_new_title: "Tạo kế hoạch", plan_edit_title: "Sửa kế hoạch", edit_badge: "Đang sửa",
+          lbl_plan_date: "Ngày ép", lbl_machine: "Máy",
+          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú",
+          tip_nitride: "Có gia nhiệt khuôn trong môi trường khí nitơ hay không",
+          nitride_yes: "Yes", nitride_no: "No",
+          btn_clear: "Xóa", btn_save: "Lưu", btn_update: "Cập nhật",
+          hint_form: "Chọn khuôn ở danh sách bên trái, chọn ngày ép và máy rồi lưu. Bấm vào dòng kế hoạch bên phải để sửa.",
+          empty_add: "Hãy chọn khuôn ở danh sách bên trái",
+          plan_list_title: "Danh sách kế hoạch", ph_die: "Mã khuôn", all_machines: "Tất cả máy",
+          col_date: "Ngày ép", col_mc: "Máy", empty_plans: "Chưa có kế hoạch", empty_dies: "Không có khuôn phù hợp",
+          msg_saved: "Đã lưu", msg_updated: "Đã cập nhật", msg_already: "Khuôn này đã được thêm",
+          msg_loaded: "Đã mở để sửa",
+          billet_title: "Tồn kho billet và lượng cần đặt", billet_note: "(Chỉ Dubai. Khoảng thời gian giống danh sách bên phải)",
+          billet_hint: "Đặt hàng = (Kế hoạch − Tồn) làm tròn lên bội số 7. Cỡ và chiều dài billet của kế hoạch lấy theo lần ép cuối của mã SP đó.",
+          col_size: "Cỡ", col_material: "Vật liệu", col_length: "Dài", col_stock: "Tồn HT", col_used: "Thực tế", col_plan: "Kế hoạch", col_order: "Order",
+          tip_stock_at: "Ngày kiểm kê",
+          dlg_confirm: "Xóa kế hoạch này?", lbl_passcode: "Mã xác nhận", dlg_cancel: "Hủy", dlg_delete: "Xóa",
+          msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa",
+        },
+      };
+      function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
+      function t(k) { return dict[currentLang()][k] ?? dict.ja[k] ?? k; }
+      function setLang(lang) {
+        try { localStorage.setItem("lang", lang); } catch (e) {}
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        document.querySelectorAll("[data-key-placeholder]").forEach((el) => {
+          const k = el.getAttribute("data-key-placeholder");
+          if (dict[lang][k] !== undefined) el.placeholder = dict[lang][k];
+        });
+        renderDies(); renderAdd(); renderPlans(); renderBillet();
+        document.getElementById("planFormTitle").textContent = t(editingId ? "plan_edit_title" : "plan_new_title");
+      }
+
+      function showToast(msg, ok = true) {
+        const el = document.getElementById("toast");
+        el.textContent = msg;
+        el.style.background = ok ? "#323232" : "#c62828";
+        el.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => el.classList.remove("show"), 2500);
+      }
+      function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+      function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+      const SHIFTS = [{ id: 4, label: "HC" }, { id: 1, label: "1" }, { id: 2, label: "2" }, { id: 3, label: "3" }];
+      const shiftLabel = (id) => (SHIFTS.find((s) => s.id === Number(id)) || {}).label ?? "-";
+
+      /* ── 状態 ── */
+      let dies = [];
+      let addRows = [];      // 計画に追加する行（新規）
+      let plans = [];
+      let editingId = null;  // 修正中の計画の id
+      let selectedPlanId = null;
+
+      /* ── ① 金型一覧 ── */
+      // 色分け（exd11 PressPlanV12 の決まり。赤＞橙＞黄の順）
+      function dieClass(r) {
+        const len = Number(r.nit_len_km) || 0, dia = Number(r.die_diamater) || 0, no = r.die_number || "";
+        const nitriding =
+          (len > 3 && dia <= 260) || (len > 2.5 && dia >= 300) || Number(r.wash_after_nit) >= 5 ||
+          (no.startsWith("XLA25") && len > 2.5) || (/^CP96..T-/.test(no) && len > 2);
+        if (nitriding) return "st-nitriding";
+        const st = Number(r.die_status_id);
+        if ([7, 8, 9].includes(st)) return "st-fixing";
+        const days = r.status_at ? (Date.now() - new Date(r.status_at.replace(" ", "T")).getTime()) / 86400000 : 0;
+        const nopress = Number(r.press_after_wash) >= 2 || [3, 31, 32].includes(st) ||
+          (st === 10 && Number(r.press_after_wash) === 0 && days >= 360);
+        return nopress ? "st-nopress" : "";
+      }
+
+      // 状態の色（m_die_status の id ごと）
+      const STATUS_COLORS = {
+        10: "#757575",                          // On rack
+        4: "#1565c0",                           // Washing
+        1: "#00897b",                           // Measuring
+        2: "#2e7d32",                           // OK
+        3: "#c62828", 31: "#c62828", 32: "#c62828", // NG
+        7: "#ef6c00", 9: "#ef6c00",             // Grinding / Wire cutting
+        8: "#6a1b9a",                           // Nitriding
+        11: "#37474f",                          // Press
+        5: "#5c6bc0", 6: "#0288d1",             // Shot / Clean
+      };
+      function statusBadge(id, text, tip = "") {
+        if (!id) return "-";
+        return `<span class="st-badge" style="background:${STATUS_COLORS[id] ?? "#9e9e9e"}" title="${esc(tip)}">${esc(text)}</span>`;
+      }
+      // バッジにマウスを乗せたときの説明：状態になった日時と、洗浄タンクの番号
+      function statusTip(r) {
+        return [r.status_at, r.tank ? `${t("lbl_tank")} No.${r.tank}` : ""].filter(Boolean).join("  ");
+      }
+      // 凡例：一覧に出ている状態だけ（タンク番号は除いた名前で）
+      function renderStatusLegend() {
+        const seen = new Map();
+        dies.forEach((r) => {
+          if (r.die_status_id && !seen.has(r.die_status_id)) seen.set(r.die_status_id, r.status_name);
+        });
+        const order = [10, 4, 1, 2, 3, 31, 32, 7, 9, 8, 11, 5, 6];
+        document.getElementById("statusLegend").innerHTML = [...seen.entries()]
+          .sort((a, b) => {
+            const ia = order.indexOf(a[0]), ib = order.indexOf(b[0]);
+            return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+          })
+          .map(([id, name]) => statusBadge(id, name)).join("");
+      }
+
+      async function loadDies() {
+        const q = document.getElementById("dieSearch").value.trim();
+        const res = await fetch("./php/press_plan/get_dies.php?q=" + encodeURIComponent(q));
+        dies = await res.json();
+        renderDies();
+        renderStatusLegend();
+      }
+      function onDieSearch() {
+        clearTimeout(onDieSearch.timer);
+        onDieSearch.timer = setTimeout(loadDies, 300);
+      }
+
+      function renderDies() {
+        document.getElementById("dieHead").innerHTML = `
+          <th>${t("col_die")}</th><th>${t("col_status")}</th>
+          <th class="num" title="${t("tip_press_after_wash")}">${t("col_press_after_wash")}</th>
+          <th class="num" title="${t("tip_nit_len")}">${t("col_nit_len")}</th>
+          <th class="num" title="${t("tip_wash_after_nit")}">${t("col_wash_after_nit")}</th>
+          <th class="num">${t("col_dia")}</th><th class="num">${t("col_ok_rate")}</th>
+          <th class="num" title="${t("tip_max_billet")}">${t("col_max_billet")}</th>`;
+        const body = document.getElementById("dieBody");
+        if (!dies.length) { body.innerHTML = `<tr><td colspan="8" class="empty-note">${t("empty_dies")}</td></tr>`; return; }
+        const inPlan = new Set(addRows.map((a) => a.dies_id));
+        body.innerHTML = dies.map((r, i) => `
+          <tr class="selectable ${dieClass(r)} ${inPlan.has(r.dies_id) ? "in-plan" : ""}" onclick="addDie(${i})">
+            <td>${esc(r.die_number)}</td>
+            <td>${statusBadge(r.die_status_id, r.status_name, statusTip(r))}</td>
+            <td class="num">${r.press_after_wash}</td>
+            <td class="num">${Number(r.nit_len_km).toFixed(2)}</td>
+            <td class="num">${r.wash_after_nit}</td>
+            <td class="num">${r.die_diamater ?? "-"}</td>
+            <td class="num">${r.ok_rate != null ? Math.round(Number(r.ok_rate)) + "%" : "-"}</td>
+            <td class="num">${r.max_billet != null ? `${r.max_billet} <span class="hint">(${r.mp_billet_length}/${r.mp_billet_size}in)</span>` : "-"}</td>
+          </tr>`).join("");
+      }
+
+      /* ── ② 計画の作成・修正 ── */
+      function addDie(i) {
+        const d = dies[i];
+        if (editingId) {
+          // 修正中は、選んだ型に差し替える
+          const row = addRows[0];
+          row.dies_id = d.dies_id; row.die_number = d.die_number; row.products = d.products;
+          row.production_number_id = d.products.length ? d.products[0].id : 0;
+          renderAdd(); renderDies(); checkForm();
+          return;
+        }
+        if (addRows.some((a) => a.dies_id === d.dies_id)) { showToast(t("msg_already"), false); return; }
+        addRows.push({
+          dies_id: d.dies_id, die_number: d.die_number, products: d.products,
+          production_number_id: d.products.length ? d.products[0].id : 0,
+          shift_id: 4, ordinal: String(addRows.length + 1), quantity: "", nitride_use: 0, note: "",
+        });
+        renderAdd(); renderDies(); checkForm();
+      }
+
+      function renderAdd() {
+        document.getElementById("addHead").innerHTML = `
+          <th style="width:130px">${t("col_die")}</th><th style="width:50px">${t("col_shift")}</th><th style="width:46px">${t("col_ordinal")}</th>
+          <th class="num" style="width:58px">${t("col_qty")}</th><th style="width:54px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
+        const body = document.getElementById("addBody");
+        if (!addRows.length) { body.innerHTML = `<tr><td colspan="7" class="empty-note">${t("empty_add")}</td></tr>`; return; }
+        body.innerHTML = addRows.map((r, i) => `
+          <tr>
+            <td title="${esc(r.products.find((p) => p.id === r.production_number_id)?.production_number ?? "")}">${esc(r.die_number)}${r.products.length > 1
+              ? `<select class="pn-select" onchange="setAdd(${i}, 'production_number_id', Number(this.value))">${r.products.map((p) => `<option value="${p.id}" ${p.id === r.production_number_id ? "selected" : ""}>${esc(p.production_number)}</option>`).join("")}</select>`
+              : ""}</td>
+            <td><select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
+            <td><input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
+            <td><input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
+            <td><select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></td>
+            <td><input type="text" class="w-note" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></td>
+            <td>${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</td>
+          </tr>`).join("");
+      }
+      function setAdd(i, key, value) { addRows[i][key] = value; checkForm(); }
+      function removeAdd(i) { addRows.splice(i, 1); renderAdd(); renderDies(); checkForm(); }
+
+      function checkForm() {
+        const dateEl = document.getElementById("fPlanDate"), mcEl = document.getElementById("fMachine");
+        dateEl.classList.toggle("required", !dateEl.value);
+        mcEl.classList.toggle("required", mcEl.value === "0");
+        const ok = dateEl.value && mcEl.value !== "0" && addRows.length > 0 &&
+          addRows.every((r) => r.production_number_id > 0 && /^\d+$/.test(String(r.quantity)));
+        document.getElementById("saveBtn").disabled = !ok;
+        document.getElementById("updateBtn").disabled = !ok;
+      }
+
+      function setEditMode(on) {
+        document.getElementById("editBadge").style.display = on ? "" : "none";
+        document.getElementById("saveBtn").style.display = on ? "none" : "";
+        document.getElementById("updateBtn").style.display = on ? "" : "none";
+        document.getElementById("planFormTitle").textContent = t(on ? "plan_edit_title" : "plan_new_title");
+      }
+
+      function resetForm() {
+        editingId = null; selectedPlanId = null;
+        addRows = [];
+        setEditMode(false);
+        renderAdd(); renderDies(); renderPlans(); checkForm();
+      }
+
+      async function savePlans() {
+        const body = {
+          plan_date: document.getElementById("fPlanDate").value,
+          press_machine: Number(document.getElementById("fMachine").value),
+          rows: addRows.map(({ products, die_number, ...r }) => r),
+        };
+        const res = await fetch("./php/press_plan/save_plans.php", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+        });
+        const result = await res.json();
+        if (!result.ok) { showToast(result.message || "error", false); return; }
+        showToast(t("msg_saved"));
+        addRows = [];
+        renderAdd(); renderDies(); checkForm();
+        await loadPlans();
+      }
+
+      async function updatePlan() {
+        const { products, die_number, ...r } = addRows[0];
+        const body = { ...r, id: editingId, plan_date: document.getElementById("fPlanDate").value, press_machine: Number(document.getElementById("fMachine").value) };
+        const res = await fetch("./php/press_plan/update_plan.php", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+        });
+        const result = await res.json();
+        if (!result.ok) { showToast(result.message || "error", false); return; }
+        showToast(t("msg_updated"));
+        await loadPlans();
+      }
+
+      /* ── ビレットの在庫と発注の目安 ── */
+      let billetRows = [];
+      async function loadBillet() {
+        const p = new URLSearchParams({ start: document.getElementById("fStart").value, end: document.getElementById("fEnd").value });
+        const res = await fetch("./php/press_plan/get_billet_summary.php?" + p.toString());
+        billetRows = (await res.json()).rows;
+        renderBillet();
+      }
+      function renderBillet() {
+        document.getElementById("billetHead").innerHTML = `
+          <th>${t("col_size")}</th><th>${t("col_material")}</th><th class="num">${t("col_length")}</th>
+          <th class="num">${t("col_stock")}</th><th class="num">${t("col_used")}</th>
+          <th class="num">${t("col_plan")}</th><th class="num">${t("col_order")}</th>`;
+        const perSize = {};
+        billetRows.forEach((r) => { perSize[r.size] = (perSize[r.size] || 0) + 1; });
+        let prev = null;
+        document.getElementById("billetBody").innerHTML = billetRows.map((r) => {
+          const first = r.size !== prev; prev = r.size;
+          const sizeCell = first
+            ? `<td class="size-cell" rowspan="${perSize[r.size]}" title="${t("tip_stock_at")}: ${r.stock_at ?? "-"}">${r.size}in<br><span class="hint">${r.stock_at ?? "-"}</span></td>`
+            : "";
+          return `<tr class="${first ? "size-first" : ""}">${sizeCell}
+            <td>${r.material}</td><td class="num">${r.length}</td>
+            <td class="num">${r.stock ?? "-"}</td><td class="num">${r.used}</td><td class="num">${r.plan}</td>
+            <td class="num ${r.order > 0 ? "order-need" : ""}">${r.order}</td></tr>`;
+        }).join("");
+      }
+
+      /* ── ③ 計画の一覧 ── */
+      async function loadPlans() {
+        const p = new URLSearchParams({
+          start: document.getElementById("fStart").value,
+          end: document.getElementById("fEnd").value,
+          die: document.getElementById("fDie").value.trim(),
+          machine: document.getElementById("fListMachine").value,
+        });
+        const res = await fetch("./php/press_plan/get_plans.php?" + p.toString());
+        plans = await res.json();
+        renderPlans();
+        loadBillet();
+      }
+      function onPlanFilter() {
+        clearTimeout(onPlanFilter.timer);
+        onPlanFilter.timer = setTimeout(loadPlans, 300);
+      }
+
+      function renderPlans() {
+        document.getElementById("planHead").innerHTML = `
+          <th>${t("col_date")}</th><th>${t("col_mc")}</th><th>${t("col_pn")}</th><th>${t("col_die")}</th>
+          <th>${t("col_shift")}</th><th>${t("col_ordinal")}</th><th class="num">${t("col_qty")}</th>
+          <th title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th></th>`;
+        const body = document.getElementById("planBody");
+        if (!plans.length) { body.innerHTML = `<tr><td colspan="10" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
+        const sel = plans.find((p) => p.id === selectedPlanId);
+        body.innerHTML = plans.map((p) => {
+          const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
+          return `
+          <tr class="selectable ${cls} ${p.id === selectedPlanId ? "selected" : ""}" onclick="openPlan(${p.id})">
+            <td>${p.plan_date}</td><td>${p.press_machine}</td>
+            <td>${esc(p.production_number ?? "-")}</td><td>${esc(p.die_number ?? "-")}</td>
+            <td>${shiftLabel(p.shift_id)}</td><td>${esc(p.ordinal ?? "")}</td>
+            <td class="num">${p.quantity}</td><td>${Number(p.nitride_use) === 1 ? "Yes" : "No"}</td>
+            <td>${esc(p.note ?? "")}</td>
+            <td><button class="row-del" title="${t("tip_delete")}" onclick="event.stopPropagation(); openDelete(${p.id})">✕</button></td>
+          </tr>`;
+        }).join("");
+      }
+
+      // 一覧の行をクリック：同じ日の計画を号機ごとの色で示し、中央に修正用に読み込む
+      function openPlan(id) {
+        const p = plans.find((x) => x.id === id);
+        if (!p) return;
+        selectedPlanId = id; editingId = id;
+        const die = dies.find((d) => d.dies_id === p.dies_id);
+        let products = die ? die.products : [];
+        if (!products.some((x) => x.id === p.production_number_id)) {
+          products = [...products, { id: p.production_number_id, production_number: p.production_number ?? "-" }];
+        }
+        addRows = [{
+          dies_id: p.dies_id, die_number: p.die_number ?? "-", products,
+          production_number_id: p.production_number_id, shift_id: Number(p.shift_id) || 4,
+          ordinal: p.ordinal ?? "", quantity: String(p.quantity ?? ""), nitride_use: Number(p.nitride_use) === 1 ? 1 : 0, note: p.note ?? "",
+        }];
+        document.getElementById("fPlanDate").value = p.plan_date;
+        document.getElementById("fMachine").value = String(p.press_machine);
+        setEditMode(true);
+        renderAdd(); renderDies(); renderPlans(); checkForm();
+        showToast(t("msg_loaded"));
+      }
+
+      /* ── 削除（パスコードはサーバー側で確かめる） ── */
+      let deletingId = null;
+      function openDelete(id) {
+        const p = plans.find((x) => x.id === id);
+        if (!p) return;
+        deletingId = id;
+        document.getElementById("deleteTarget").textContent =
+          `${p.plan_date}  No.${p.press_machine}  ${p.die_number ?? "-"}  ${shiftLabel(p.shift_id)}  ${t("col_qty")} ${p.quantity}`;
+        document.getElementById("deletePasscode").value = "";
+        document.getElementById("deleteError").textContent = "";
+        document.getElementById("deleteDialog").showModal();
+        document.getElementById("deletePasscode").focus();
+      }
+
+      async function confirmDelete() {
+        const res = await fetch("./php/press_plan/delete_plan.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: deletingId, passcode: document.getElementById("deletePasscode").value }),
+        });
+        const result = await res.json();
+        if (!result.ok) {
+          document.getElementById("deleteError").textContent = result.code === "passcode" ? t("err_passcode") : "error";
+          document.getElementById("deletePasscode").select();
+          return;
+        }
+        document.getElementById("deleteDialog").close();
+        if (editingId === deletingId) resetForm();
+        showToast(t("msg_deleted"));
+        await loadPlans();
+      }
+
+      /* ── 起動 ── */
+      (async () => {
+        const today = new Date();
+        const end = new Date(); end.setDate(end.getDate() + 10);
+        document.getElementById("fStart").value = ymd(today);
+        document.getElementById("fEnd").value = ymd(end);
+        setLang(currentLang());
+        checkForm();
+        await Promise.all([loadDies(), loadPlans()]);
+      })();
+    </script>
+  </body>
+</html>

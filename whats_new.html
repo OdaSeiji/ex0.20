@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-10-03 (最新) -->
+      <!-- 2026-10-04 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-04</span>
+        </div>
+        <div class="entry-title" data-key="fh_title">押出計画を ex0.20 に移植</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fh_purpose">ex0.11 の PressPlan（押出計画）を ex0.20 で使えるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fh_content">トップメニューの 📦 生産管理に「押出計画」を追加。ex0.11 と同じ3列で、左に金型一覧（状態のバッジ、Press＝洗浄後の押出回数・Len＝窒化後の押出長さ・Wash＝窒化後の洗浄回数・径・良品率・次の窒化まで押せるビレット本数、窒化が必要／修理中／洗浄が必要の色分け）、中央に計画の作成・修正（押出日・号機・直・順番・本数・窒素加熱・備考）とビレットの在庫と発注の目安、右に計画の一覧（期間・型番・号機で絞り込み、パスコードで削除）。ex0.11 からの主な変更：修理中・洗浄が必要の色分けが表示されなかった不具合と、洗浄後の押出回数が 0/1 しか出なかった不具合を修正。計画を修正できるようにした。Max Billet の文字を梱包メモに保存しない。ビレットの表で計画が二重に数えられることがあった不具合を修正。保存先は今までと同じ t_press_plan。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-03 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -847,6 +865,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fh_title: "押出計画を ex0.20 に移植",
+          fh_purpose: "ex0.11 の PressPlan（押出計画）を ex0.20 で使えるようにするため。",
+          fh_content: "トップメニューの 📦 生産管理に「押出計画」を追加。ex0.11 と同じ3列で、左に金型一覧（状態のバッジ、Press＝洗浄後の押出回数・Len＝窒化後の押出長さ・Wash＝窒化後の洗浄回数・径・良品率・次の窒化まで押せるビレット本数、窒化が必要／修理中／洗浄が必要の色分け）、中央に計画の作成・修正（押出日・号機・直・順番・本数・窒素加熱・備考）とビレットの在庫と発注の目安、右に計画の一覧（期間・型番・号機で絞り込み、パスコードで削除）。ex0.11 からの主な変更：修理中・洗浄が必要の色分けが表示されなかった不具合と、洗浄後の押出回数が 0/1 しか出なかった不具合を修正。計画を修正できるようにした。Max Billet の文字を梱包メモに保存しない。ビレットの表で計画が二重に数えられることがあった不具合を修正。保存先は今までと同じ t_press_plan。",
           fg_title: "押出日報入力：生産指示書の選択を高速化、品番で絞り込み",
           fg_purpose: "生産指示書の選択画面が開くまでに時間がかかり、選んだ金型と関係ない発注書から探す必要があったため。",
           fg_content: "「選択」で開く指示書選択の表示を約38秒から約0.05秒に短縮した（OK数・梱包済み数を、表示する発注書の分だけ集計するように変更）。「品番で絞り込む」を追加し、選んだ押出指示書の品番（無ければ金型に紐づく品番すべて）の発注書を、納期に関係なく新しい順に5件表示する。チェックを外すと、今までどおり納期の月で表示する。",
@@ -968,6 +989,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fh_title: "Chuyển màn hình kế hoạch ép đùn sang ex0.20",
+          fh_purpose: "Để dùng PressPlan (kế hoạch ép đùn) của ex0.11 trên ex0.20.",
+          fh_content: "Thêm \"Kế hoạch ép đùn\" vào nhóm 📦 Quản lý sản xuất ở menu chính. Bố cục 3 cột như ex0.11: bên trái là danh sách khuôn (nhãn trạng thái, Press = số lần ép sau rửa, Len = chiều dài ép sau thấm nitơ, Wash = số lần rửa sau thấm nitơ, đường kính, tỷ lệ OK, số billet còn ép được; tô màu cần thấm nitơ / đang sửa / cần rửa), ở giữa là tạo và sửa kế hoạch (ngày ép, máy, ca, Stt, số lượng, gia nhiệt N2, ghi chú) và bảng tồn kho billet / lượng cần đặt, bên phải là danh sách kế hoạch (lọc theo thời gian, mã khuôn, máy; xóa bằng mã xác nhận). Thay đổi chính so với ex0.11: sửa lỗi không hiển thị màu đang sửa / cần rửa và lỗi số lần ép sau rửa chỉ là 0/1; sửa được kế hoạch; không lưu chữ Max Billet vào ghi chú đóng gói; sửa lỗi kế hoạch bị tính hai lần trong bảng billet. Dữ liệu vẫn lưu vào t_press_plan.",
           fg_title: "Nhập báo cáo đùn hằng ngày: chọn phiếu sản xuất nhanh hơn, lọc theo mã SP",
           fg_purpose: "Màn hình chọn phiếu mở rất chậm, và phải tìm trong các phiếu không liên quan đến khuôn đã chọn.",
           fg_content: "Thời gian mở màn hình chọn phiếu giảm từ khoảng 38 giây xuống khoảng 0,05 giây (chỉ tính số OK và số đã đóng gói cho các phiếu được hiển thị). Thêm \"Lọc theo mã SP\": hiển thị 5 phiếu mới nhất của mã SP trong phiếu đùn đã chọn (nếu không có thì tất cả mã SP liên kết với khuôn), không phụ thuộc tháng giao. Bỏ chọn thì hiển thị theo tháng giao như trước.",
