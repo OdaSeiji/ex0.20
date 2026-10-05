@@ -35,6 +35,8 @@
 |---|---|---|
 | `m_press_time_standard` の作成と、号機 1〜4 の行の追加 | 実行済み（2026-10-05） | 実行済み（2026-10-05） |
 
+※ 本番では最初 `CREATE TABLE` だけが実行され、号機の行が無いため画面に号機が出なかった。`INSERT` を実行して解決（2026-10-05）。
+
 SQL は `2026-10-05_press_time_standard.sql`（日本語のコメントを含むため UTF-8。mysql コマンドなら `--default-character-set=utf8mb4`、phpMyAdmin ならそのまま貼り付け）。
 
 ```sql

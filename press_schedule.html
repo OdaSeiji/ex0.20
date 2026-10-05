@@ -186,7 +186,7 @@
                   if (r.nitride_use) notes.unshift(t("nitride"));
                   const short = r.actual_billets != null && r.actual_billets < r.plan_billets;
                   return `<tr>
-                    <td>${esc(r.die_number)}</td>
+                    <td>${["", "〇", "◎", "●"][r.pressing_type_id] ?? ""} ${esc(r.die_number)}</td>
                     <td>${r.spares.map((s) => esc(s.die_number)).join("<br>")}</td>
                     <td class="num">${r.billet_length ?? ""}${r.billet_origin ? ` (${["", "Dubai", "VN"][r.billet_origin]})` : ""}</td>
                     <td class="num">${r.plan_billets}</td>

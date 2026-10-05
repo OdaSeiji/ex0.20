@@ -41,7 +41,8 @@
         background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
       }
 
-      .columns { display: grid; grid-template-columns: max-content 600px minmax(0, 1fr); gap: 12px; align-items: start; }
+      /* 左は固定幅（データを読み込んでも幅が変わらない）。中身 535px ＋ スクロールバー ＋ 余白 */
+      .columns { display: grid; grid-template-columns: 600px 600px minmax(0, 1fr); gap: 12px; align-items: start; }
       .card {
         background: #fff;
         border-radius: 10px;
@@ -59,6 +60,7 @@
       table { width: 100%; border-collapse: collapse; font-size: 12px; }
       th, td { padding: 4px 5px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
       th { color: #777; font-size: 11px; background: #fff; position: sticky; top: 0; z-index: 1; }
+      td.c { text-align: center; }
       .num { text-align: right; font-variant-numeric: tabular-nums; }
       .scroll { overflow: auto; }
       tr.selectable { cursor: pointer; }
@@ -269,7 +271,7 @@
           lbl_tank: "タンク", lg_nitriding: "窒化が必要", lg_fixing: "修理中", lg_nopress: "洗浄が必要", hint_click_die: "行をクリックすると計画に追加",
           plan_new_title: "計画の作成", plan_edit_title: "計画の修正", edit_badge: "修正中",
           lbl_plan_date: "押出日", lbl_machine: "号機",
-          col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考", col_billet: "ビレット", origin_0: "未定", origin_1: "Dubai", origin_2: "VN",
+          col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考", col_billet: "ビレット", col_ptype: "種別", tip_ptype: "プレス種別（〇 試押 ／ ◎ 量試 ／ ● 量産）", origin_0: "未定", origin_1: "Dubai", origin_2: "VN",
           ph_len: "長さ", tip_billet: "ビレットの種類と長さ(mm)。長さが空なら押出指示書の長さを使う",
           tip_nitride: "金型を窒素雰囲気の中で加熱するかどうか",
           nitride_yes: "Yes", nitride_no: "No",
@@ -298,7 +300,7 @@
           lbl_tank: "Bể", lg_nitriding: "Cần thấm nitơ", lg_fixing: "Đang sửa", lg_nopress: "Cần rửa", hint_click_die: "Bấm vào dòng để thêm vào kế hoạch",
           plan_new_title: "Tạo kế hoạch", plan_edit_title: "Sửa kế hoạch", edit_badge: "Đang sửa",
           lbl_plan_date: "Ngày ép", lbl_machine: "Máy",
-          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú", col_billet: "Billet", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
+          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú", col_billet: "Billet", col_ptype: "Loại", tip_ptype: "Loại ép (〇 ép thử / ◎ thử hàng loạt / ● hàng loạt)", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
           ph_len: "Dài", tip_billet: "Loại billet và chiều dài (mm). Để trống chiều dài thì dùng theo phiếu đùn",
           tip_nitride: "Có gia nhiệt khuôn trong môi trường khí nitơ hay không",
           nitride_yes: "Yes", nitride_no: "No",
@@ -349,6 +351,9 @@
         const o = Number(origin) ? t(`origin_${origin}`) : "";
         return [len || "", o ? `(${o})` : ""].filter(Boolean).join(" ");
       }
+
+      const PTYPES = [{ id: 3, label: "●" }, { id: 2, label: "◎" }, { id: 1, label: "〇" }];   // m_pressing_type
+      const ptypeLabel = (id) => (PTYPES.find((x) => x.id === Number(id)) || {}).label ?? "-";
 
       const SHIFTS = [{ id: 4, label: "HC" }, { id: 1, label: "1" }, { id: 2, label: "2" }, { id: 3, label: "3" }];
       const shiftLabel = (id) => (SHIFTS.find((s) => s.id === Number(id)) || {}).label ?? "-";
@@ -462,22 +467,23 @@
         addRows.push({
           dies_id: d.dies_id, die_number: d.die_number, products: d.products,
           production_number_id: d.products.length ? d.products[0].id : 0,
-          shift_id: 4, ordinal: String(addRows.length + 1), quantity: "", billet_origin: 0, billet_length: "", nitride_use: 0, note: "",
+          shift_id: 4, ordinal: String(addRows.length + 1), quantity: "", pressing_type_id: 3, billet_origin: 0, billet_length: "", nitride_use: 0, note: "",
         });
         renderAdd(); renderDies(); checkForm();
       }
 
       function renderAdd() {
         document.getElementById("addHead").innerHTML = `
-          <th style="width:130px">${t("col_die")}</th><th style="width:50px">${t("col_shift")}</th><th style="width:46px">${t("col_ordinal")}</th>
-          <th class="num" style="width:58px">${t("col_qty")}</th><th style="width:116px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:54px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
+          <th style="width:112px">${t("col_die")}</th><th style="width:44px" title="${t("tip_ptype")}">${t("col_ptype")}</th><th style="width:46px">${t("col_shift")}</th><th style="width:42px">${t("col_ordinal")}</th>
+          <th class="num" style="width:54px">${t("col_qty")}</th><th style="width:110px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:48px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
         const body = document.getElementById("addBody");
-        if (!addRows.length) { body.innerHTML = `<tr><td colspan="8" class="empty-note">${t("empty_add")}</td></tr>`; return; }
+        if (!addRows.length) { body.innerHTML = `<tr><td colspan="9" class="empty-note">${t("empty_add")}</td></tr>`; return; }
         body.innerHTML = addRows.map((r, i) => `
           <tr>
             <td title="${esc(r.products.find((p) => p.id === r.production_number_id)?.production_number ?? "")}">${esc(r.die_number)}${r.products.length > 1
               ? `<select class="pn-select" onchange="setAdd(${i}, 'production_number_id', Number(this.value))">${r.products.map((p) => `<option value="${p.id}" ${p.id === r.production_number_id ? "selected" : ""}>${esc(p.production_number)}</option>`).join("")}</select>`
               : ""}</td>
+            <td><select onchange="setAdd(${i}, 'pressing_type_id', Number(this.value))">${PTYPES.map((x) => `<option value="${x.id}" ${x.id === Number(r.pressing_type_id) ? "selected" : ""}>${x.label}</option>`).join("")}</select></td>
             <td><select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
             <td><input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
             <td><input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
@@ -594,19 +600,19 @@
 
       function renderPlans() {
         document.getElementById("planHead").innerHTML = `
-          <th>${t("col_date")}</th><th>${t("col_mc")}</th><th>${t("col_pn")}</th><th>${t("col_die")}</th>
+          <th>${t("col_date")}</th><th>${t("col_mc")}</th><th>${t("col_pn")}</th><th>${t("col_die")}</th><th title="${t("tip_ptype")}">${t("col_ptype")}</th>
           <th>${t("col_shift")}</th><th>${t("col_ordinal")}</th><th class="num">${t("col_qty")}</th>
           <th title="${t("tip_billet")}">${t("col_billet")}</th>
           <th title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th></th>`;
         const body = document.getElementById("planBody");
-        if (!plans.length) { body.innerHTML = `<tr><td colspan="11" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
+        if (!plans.length) { body.innerHTML = `<tr><td colspan="12" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
         const sel = plans.find((p) => p.id === selectedPlanId);
         body.innerHTML = plans.map((p) => {
           const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
           return `
           <tr class="selectable ${cls} ${p.id === selectedPlanId ? "selected" : ""}" onclick="openPlan(${p.id})">
             <td>${p.plan_date}</td><td>${p.press_machine}</td>
-            <td>${esc(p.production_number ?? "-")}</td><td>${esc(p.die_number ?? "-")}</td>
+            <td>${esc(p.production_number ?? "-")}</td><td>${esc(p.die_number ?? "-")}</td><td class="c">${ptypeLabel(p.pressing_type_id)}</td>
             <td>${shiftLabel(p.shift_id)}</td><td>${esc(p.ordinal ?? "")}</td>
             <td class="num">${p.quantity}</td><td>${esc(billetLabel(p.billet_length, p.billet_origin))}</td><td>${Number(p.nitride_use) === 1 ? "Yes" : "No"}</td>
             <td>${esc(p.note ?? "")}</td>
@@ -629,7 +635,7 @@
           dies_id: p.dies_id, die_number: p.die_number ?? "-", products,
           production_number_id: p.production_number_id, shift_id: Number(p.shift_id) || 4,
           ordinal: p.ordinal ?? "", quantity: String(p.quantity ?? ""),
-          billet_origin: Number(p.billet_origin) || 0, billet_length: p.billet_length != null ? String(p.billet_length) : "", nitride_use: Number(p.nitride_use) === 1 ? 1 : 0, note: p.note ?? "",
+          pressing_type_id: Number(p.pressing_type_id) || 3, billet_origin: Number(p.billet_origin) || 0, billet_length: p.billet_length != null ? String(p.billet_length) : "", nitride_use: Number(p.nitride_use) === 1 ? 1 : 0, note: p.note ?? "",
         }];
         document.getElementById("fPlanDate").value = p.plan_date;
         document.getElementById("fMachine").value = String(p.press_machine);

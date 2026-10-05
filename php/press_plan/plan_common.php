@@ -2,6 +2,7 @@
 // 計画1行の値を確かめて、t_press_plan に入れる形にする。問題があれば文字列（エラーの説明）を返す
 const PLAN_SHIFTS = [4, 1, 2, 3];   // 4 = HC
 const BILLET_ORIGINS = [0, 1, 2];   // 0=未定 1=Dubai 2=VN
+const PRESSING_TYPES = [1, 2, 3];   // m_pressing_type 1=〇試押 2=◎量試 3=●量産
 // 計画の削除のパスコード（テスト運用のため。ex0.21 のログインができたら、削除できる人で制限する）
 const PLAN_DELETE_PASSCODE = "1031";
 
@@ -16,6 +17,8 @@ function normalizePlanRow(array $r)
     if (!in_array($shift, PLAN_SHIFTS, true)) return "直が正しくありません";
     if (!preg_match('/^\d+$/', $qty)) return "本数は 0 以上の整数で入れてください";
     if (mb_strlen($ord) > 11) return "順番が長すぎます";
+    $ptype = (int)($r["pressing_type_id"] ?? 3);
+    if (!in_array($ptype, PRESSING_TYPES, true)) return "プレス種別が正しくありません";
     $origin = (int)($r["billet_origin"] ?? 0);
     if (!in_array($origin, BILLET_ORIGINS, true)) return "ビレットの種類が正しくありません";
     $len = trim((string)($r["billet_length"] ?? ""));
@@ -26,6 +29,7 @@ function normalizePlanRow(array $r)
         "shift_id"             => $shift,
         "ordinal"              => $ord === "" ? null : $ord,
         "quantity"             => (int)$qty,
+        "pressing_type_id"     => $ptype,
         "billet_origin"        => $origin,
         "billet_length"        => $len === "" ? null : (int)$len,
         "nitride_use"          => ((int)($r["nitride_use"] ?? 0)) === 1 ? 1 : 0,

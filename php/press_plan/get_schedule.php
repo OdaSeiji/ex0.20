@@ -67,7 +67,7 @@ $st = $pdo->prepare("
             FROM t_press_directive d LEFT JOIN m_nbn nb ON nb.id = d.nbn_id
         ) x WHERE rn = 1
     )
-    SELECT pl.id, pl.dies_id, md.die_number, md.hole, pl.ordinal, pl.quantity, pl.nitride_use, pl.note, pl.billet_origin,
+    SELECT pl.id, pl.dies_id, md.die_number, md.hole, pl.ordinal, pl.quantity, pl.pressing_type_id, pl.nitride_use, pl.note, pl.billet_origin,
            ld.ram_speed, COALESCE(pl.billet_length, ld.billet_length) AS billet_length, ld.nbn
     FROM t_press_plan pl
     LEFT JOIN m_dies md ON md.id = pl.dies_id
@@ -170,6 +170,7 @@ foreach ($mains as $p) {
         "nitride_use"    => (int)$p["nitride_use"],
         "billet_length"  => $p["billet_length"] !== null ? (int)$p["billet_length"] : null,
         "billet_origin"  => (int)$p["billet_origin"],
+        "pressing_type_id" => (int)$p["pressing_type_id"],
         "ram_speed"      => $p["ram_speed"] !== null ? (float)$p["ram_speed"] : null,
         "nbn"            => $p["nbn"],
         "plan_billets"   => $q,

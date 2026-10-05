@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-05</span>
         </div>
+        <div class="entry-title" data-key="fl_title">押出計画：プレス種別（〇・◎・●）を選べるように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fl_purpose">これまで計画は全部「●（量産）」で保存され、試押・量試は備考の「TEST」で区別していたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fl_content">中央の計画の表に「種別」（● 量産・◎ 量試・〇 試押、最初は●）を追加し、右の一覧とスケジュール表（型番の前）にも表示。左の金型一覧の幅を固定し、データを読み込んでも画面の幅が変わらないようにした。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+          <a class="file-link" onclick="location.href='press_schedule.html'">press_schedule.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
         <div class="entry-title" data-key="fk_title">押出計画：ビレットの種類と長さ、スケジュール表のボタン</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fk_purpose">現場の計画表のように、計画の段階でビレットの種類（VN／Dubai）と長さを決められるようにするため。</span>
@@ -917,6 +935,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fl_title: "押出計画：プレス種別（〇・◎・●）を選べるように",
+          fl_purpose: "これまで計画は全部「●（量産）」で保存され、試押・量試は備考の「TEST」で区別していたため。",
+          fl_content: "中央の計画の表に「種別」（● 量産・◎ 量試・〇 試押、最初は●）を追加し、右の一覧とスケジュール表（型番の前）にも表示。左の金型一覧の幅を固定し、データを読み込んでも画面の幅が変わらないようにした。",
           fk_title: "押出計画：ビレットの種類と長さ、スケジュール表のボタン",
           fk_purpose: "現場の計画表のように、計画の段階でビレットの種類（VN／Dubai）と長さを決められるようにするため。",
           fk_content: "中央の計画の表に「ビレット」の欄を追加し、種類（未定／Dubai／VN）と長さ（mm）を入れられるようにした。長さが空なら押出指示書の長さを使う。右の一覧には「1120 (VN)」の形で表示。右の一覧の上に「スケジュール表」ボタンを追加。",
@@ -1050,6 +1071,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fl_title: "Kế hoạch ép đùn: chọn được loại ép (〇 / ◎ / ●)",
+          fl_purpose: "Trước đây mọi kế hoạch đều lưu là \"● (hàng loạt)\", ép thử và thử hàng loạt chỉ phân biệt bằng chữ \"TEST\" trong ghi chú.",
+          fl_content: "Thêm cột \"Loại\" (● hàng loạt, ◎ thử hàng loạt, 〇 ép thử; mặc định ●) vào bảng kế hoạch ở giữa, hiển thị cả ở danh sách bên phải và lịch ép (trước mã khuôn). Cố định độ rộng danh sách khuôn bên trái để màn hình không bị đổi khi tải dữ liệu.",
           fk_title: "Kế hoạch ép đùn: loại và chiều dài billet, nút lịch ép",
           fk_purpose: "Để quyết định loại billet (VN / Dubai) và chiều dài ngay khi lập kế hoạch, giống bảng kế hoạch của xưởng.",
           fk_content: "Thêm cột \"Billet\" vào bảng kế hoạch ở giữa để nhập loại (Chưa định / Dubai / VN) và chiều dài (mm). Để trống chiều dài thì dùng theo phiếu đùn. Danh sách bên phải hiển thị dạng \"1120 (VN)\". Thêm nút \"Lịch ép\" phía trên danh sách bên phải.",

@@ -17,7 +17,7 @@ if ($err) {
 $stmt = $pdo->prepare("
     UPDATE t_press_plan SET
         dies_id = :dies_id, production_number_id = :production_number_id, shift_id = :shift_id, ordinal = :ordinal,
-        quantity = :quantity, billet_origin = :billet_origin, billet_length = :billet_length, nitride_use = :nitride_use, note = :note, plan_date = :plan_date, press_machine = :press_machine
+        quantity = :quantity, pressing_type_id = :pressing_type_id, billet_origin = :billet_origin, billet_length = :billet_length, nitride_use = :nitride_use, note = :note, plan_date = :plan_date, press_machine = :press_machine
     WHERE id = :id
 ");
 $stmt->execute($n + [":plan_date" => $body["plan_date"], ":press_machine" => (int)$body["press_machine"], ":id" => $id]);
