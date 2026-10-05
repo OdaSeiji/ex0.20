@@ -88,6 +88,24 @@
       <!-- 2026-10-05 (最新) -->
       <div class="entry">
         <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
+        <div class="entry-title" data-key="fr_title">押出日報の入力確認（BETA）を新設</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fr_purpose">ある号機・ある日の押出日報が、すべて入力されているかを目で確認できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fr_content">押出日報入力の「📅 入力の確認」から開く。号機を選ぶと1週間分を1日1行で、6:00〜21:00 の時間の帯に押出の記録と PLC の稼働を並べて表示する。記録のすき間（10分以上）を赤い斜線で示し、記録の合計時間と 8時間に対する割合・押出の回数・すき間の合計を出す。帯にマウスを乗せると型番・時刻・ビレット本数・入力元が出る。サンプル版。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_coverage.html'">press_coverage.html</a>
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-05</span>
         </div>
@@ -1021,6 +1039,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fr_title: "押出日報の入力確認（BETA）を新設",
+          fr_purpose: "ある号機・ある日の押出日報が、すべて入力されているかを目で確認できるようにするため。",
+          fr_content: "押出日報入力の「📅 入力の確認」から開く。号機を選ぶと1週間分を1日1行で、6:00〜21:00 の時間の帯に押出の記録と PLC の稼働を並べて表示する。記録のすき間（10分以上）を赤い斜線で示し、記録の合計時間と 8時間に対する割合・押出の回数・すき間の合計を出す。帯にマウスを乗せると型番・時刻・ビレット本数・入力元が出る。サンプル版。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1172,6 +1193,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fr_title: "Tạo màn hình kiểm tra nhập báo cáo đùn (BETA)",
+          fr_purpose: "Để kiểm tra bằng mắt xem báo cáo đùn của một máy trong một ngày đã được nhập đầy đủ chưa.",
+          fr_content: "Mở từ nút \"📅 Kiểm tra nhập\" trong nhập báo cáo đùn. Chọn máy thì hiển thị 1 tuần, mỗi ngày 1 dòng, dải thời gian 6:00–21:00 gồm bản ghi đùn và thời gian chạy của PLC. Khoảng trống bản ghi (từ 10 phút) hiển thị gạch chéo đỏ; hiển thị tổng thời gian bản ghi, tỷ lệ so với 8 giờ, số lần đùn và tổng khoảng trống. Di chuột lên dải để xem mã khuôn, giờ, số billet và nguồn nhập. Bản thử nghiệm.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

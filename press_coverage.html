@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Press Report Coverage</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: "Roboto Mono", "Segoe UI", monospace; background: #f0f2f5; padding: 16px; }
+      .container { max-width: 1500px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff; border-radius: 10px; padding: 12px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap;
+      }
+      .back-btn { background: #2b6ca3; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .beta { background: #ff9800; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+      .ctrl { display: flex; align-items: center; gap: 8px; }
+      .ctrl select, .ctrl input { padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+      .ctrl button { padding: 6px 10px; border: 1px solid #2b6ca3; background: #fff; color: #2b6ca3; border-radius: 5px; cursor: pointer; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn { padding: 6px 12px; border: 1px solid #0078d4; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+
+      .card { background: #fff; border-radius: 10px; padding: 14px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+      .legend { display: flex; gap: 16px; font-size: 12px; color: #555; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+      .legend i { display: inline-block; width: 22px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+
+      /* 1日＝1行。左に日付、まん中に時間の帯（6:00〜21:00）、右に合計 */
+      .day { display: grid; grid-template-columns: 110px 1fr 170px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+      .day-label { font-size: 13px; font-weight: bold; }
+      .day-label .dow { font-weight: normal; color: #888; margin-left: 4px; }
+      .day-label.sun { color: #c62828; } .day-label.sat { color: #1565c0; }
+      .timeline { position: relative; }
+      .lane { position: relative; height: 24px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 3px; }
+      .lane + .lane { margin-top: 3px; }
+      .lane-name { position: absolute; left: -44px; top: 4px; font-size: 10px; color: #999; width: 40px; text-align: right; }
+      .hour-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #eee; }
+      .block {
+        position: absolute; top: 2px; bottom: 2px; border-radius: 3px; font-size: 10px; line-height: 18px;
+        color: #fff; padding: 0 3px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; cursor: default;
+      }
+      .block.rec { background: #1565c0; }
+      .block.rec.alt { background: #42a5f5; }
+      .block.rec.old { background: #78909c; }
+      .block.plc { background: #9e9e9e; }
+      .block.plc.idle { background: #e0e0e0; color: #777; }
+      .gap { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, #ffcdd2, #ffcdd2 4px, #fff 4px, #fff 8px); }
+      .axis { position: relative; height: 16px; margin-bottom: 2px; }
+      .axis span { position: absolute; transform: translateX(-50%); font-size: 10px; color: #888; }
+      .sum { font-size: 12px; line-height: 1.5; }
+      .sum b { font-size: 14px; }
+      .sum .ok { color: #2e7d32; } .sum .ng { color: #c62828; }
+      .empty-day { font-size: 12px; color: #bbb; padding-left: 4px; line-height: 24px; }
+      .hint { font-size: 12px; color: #888; margin-top: 10px; line-height: 1.7; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='press_daily_report.html'" data-key="btn_back">← 押出日報入力へ戻る</button>
+        <h1 data-key="title">押出日報の入力確認</h1>
+        <span class="beta">BETA</span>
+        <div class="ctrl">
+          <select id="fMachine" onchange="load()">
+            <option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
+          </select>
+          <button onclick="shiftWeek(-7)">◀</button>
+          <input type="date" id="fStart" onchange="load()" />
+          <span id="endLabel"></span>
+          <button onclick="shiftWeek(7)">▶</button>
+        </div>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="legend">
+          <span><i style="background:#1565c0"></i><span data-key="lg_record">押出の記録（押出日報）</span></span>
+          <span><i style="background:#9e9e9e"></i><span data-key="lg_plc">PLC の稼働（ビレットあり）</span></span>
+          <span><i style="background:#e0e0e0"></i><span data-key="lg_plc_idle">PLC の稼働（ビレットなし）</span></span>
+          <span><i style="background:repeating-linear-gradient(45deg,#ffcdd2,#ffcdd2 4px,#fff 4px,#fff 8px)"></i><span data-key="lg_gap">記録のすき間（10分以上）</span></span>
+        </div>
+        <div class="day" style="border-bottom:none; padding:0;">
+          <div></div><div class="axis" id="axis" style="margin-left:44px;"></div><div></div>
+        </div>
+        <div id="days"></div>
+        <div class="hint" data-key="hint">8時間（480分）を基準に、押出の記録の合計時間を出しています。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。</div>
+      </div>
+    </div>
+
+    <script>
+      const dict = {
+        ja: {
+          btn_back: "← 押出日報入力へ戻る", title: "押出日報の入力確認",
+          lg_record: "押出の記録（押出日報）", lg_plc: "PLC の稼働（ビレットあり）", lg_plc_idle: "PLC の稼働（ビレットなし）",
+          lg_gap: "記録のすき間（10分以上）", lane_rec: "記録", lane_plc: "PLC",
+          sum_total: "記録", sum_gap: "すき間", sum_count: "押出", times: "回", no_record: "記録なし",
+          dow: ["日", "月", "火", "水", "木", "金", "土"],
+          tip_billets: "ビレット", tip_src_old: "旧画面で入力", tip_src_new: "ex0.20 で入力",
+          hint: "8時間（480分）を基準に、押出の記録の合計時間を出しています。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。",
+        },
+        vi: {
+          btn_back: "← Về nhập báo cáo đùn", title: "Kiểm tra nhập báo cáo đùn",
+          lg_record: "Bản ghi đùn (báo cáo đùn)", lg_plc: "PLC chạy (có billet)", lg_plc_idle: "PLC chạy (không billet)",
+          lg_gap: "Khoảng trống (từ 10 phút)", lane_rec: "Ghi", lane_plc: "PLC",
+          sum_total: "Ghi", sum_gap: "Trống", sum_count: "Đùn", times: "lần", no_record: "Không có bản ghi",
+          dow: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+          tip_billets: "Billet", tip_src_old: "Nhập ở màn hình cũ", tip_src_new: "Nhập ở ex0.20",
+          hint: "Tổng thời gian bản ghi đùn so với chuẩn 8 giờ (480 phút). Di chuột lên dải để xem mã khuôn, giờ và số billet. PLC chỉ hiển thị cho máy / thời gian có log PLC.",
+        },
+      };
+      function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
+      function t(k) { return dict[currentLang()][k] ?? dict.ja[k] ?? k; }
+      function setLang(lang) {
+        try { localStorage.setItem("lang", lang); } catch (e) {}
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (typeof dict[lang][k] === "string") el.textContent = dict[lang][k];
+        });
+        render();
+      }
+      function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+      function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+      function addDays(s, n) { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() + n); return ymd(d); }
+      const hm = (m) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
+
+      const DAY_FROM = 6 * 60, DAY_TO = 21 * 60, SPAN = DAY_TO - DAY_FROM;   // 6:00〜21:00
+      const BASE_MIN = 480;   // 8時間
+      const GAP_MIN = 10;     // これ以上のすき間を表示
+      const DAYS = 7;
+      const toMin = (s) => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
+      const pct = (m) => ((Math.min(Math.max(m, DAY_FROM), DAY_TO) - DAY_FROM) / SPAN * 100);
+
+      let presses = [];   // 押出の記録
+      let plc = {};       // 日付 → PLC のセッション
+
+      async function load() {
+        const machine = document.getElementById("fMachine").value;
+        const start = document.getElementById("fStart").value;
+        document.getElementById("endLabel").textContent = `〜 ${addDays(start, DAYS - 1)}`;
+        try { localStorage.setItem("coverageMachine", machine); } catch (e) {}
+        const [rec, ...plcDays] = await Promise.all([
+          fetch(`./php/press_daily_report/get_coverage.php?machine=${machine}&start=${start}&days=${DAYS}`).then((r) => r.json()),
+          ...Array.from({ length: DAYS }, (_, i) =>
+            fetch(`./php/press_daily_report/get_plc_sessions.php?date=${addDays(start, i)}`).then((r) => r.json()).catch(() => [])),
+        ]);
+        presses = rec;
+        plc = {};
+        plcDays.forEach((list, i) => { plc[addDays(start, i)] = (list || []).filter((s) => String(s.machine) === machine); });
+        render();
+      }
+
+      function shiftWeek(n) {
+        const el = document.getElementById("fStart");
+        el.value = addDays(el.value, n);
+        load();
+      }
+
+      function render() {
+        // 時間の目盛り
+        let axis = "";
+        for (let h = 6; h <= 21; h++) axis += `<span style="left:${pct(h * 60)}%">${h}:00</span>`;
+        document.getElementById("axis").innerHTML = axis;
+
+        const start = document.getElementById("fStart").value;
+        if (!start) return;
+        const hourLines = Array.from({ length: 14 }, (_, i) => `<div class="hour-line" style="left:${pct((7 + i) * 60)}%"></div>`).join("");
+        let html = "";
+        for (let i = 0; i < DAYS; i++) {
+          const date = addDays(start, i);
+          const dow = new Date(date + "T00:00:00").getDay();
+          const recs = presses.filter((p) => p.press_date_at === date && p.start_at && p.finish_at);
+
+          // 押出の記録の帯（続けて同じ色にならないよう交互に色を変える）
+          let total = 0;
+          const recBlocks = recs.map((p, k) => {
+            const s = toMin(p.start_at), e = toMin(p.finish_at);
+            total += Math.max(e - s, 0);
+            const tip = `${p.pressing_type ?? ""} ${p.die_number ?? ""}  ${p.start_at}–${p.finish_at}  ${t("tip_billets")} ${p.billets ?? "-"}  (${Number(p.entry_source) === 1 ? t("tip_src_new") : t("tip_src_old")})`;
+            const cls = k % 2 ? "alt" : "";
+            return `<div class="block rec ${cls}" style="left:${pct(s)}%; width:${pct(e) - pct(s)}%" title="${esc(tip)}">${esc(p.die_number ?? "")}</div>`;
+          }).join("");
+
+          // すき間（最初の押出から最後の押出までの間で、記録が無いところ）
+          let gapHtml = "", gapTotal = 0;
+          const sorted = recs.map((p) => [toMin(p.start_at), toMin(p.finish_at)]).sort((a, b) => a[0] - b[0]);
+          let cursor = sorted.length ? sorted[0][1] : null;
+          sorted.slice(1).forEach(([s, e]) => {
+            if (s - cursor >= GAP_MIN) {
+              gapTotal += s - cursor;
+              gapHtml += `<div class="gap" style="left:${pct(cursor)}%; width:${pct(s) - pct(cursor)}%" title="${hm(cursor)}–${hm(s)}（${s - cursor}分）"></div>`;
+            }
+            cursor = Math.max(cursor, e);
+          });
+
+          // PLC の帯（日をまたぐセッションは、その日の 6:00〜21:00 に切る）
+          const sessions = plc[date] || [];
+          const plcBlocks = sessions.map((s) => {
+            const st = new Date(s.start_time.replace(" ", "T")), en = new Date(s.end_time.replace(" ", "T"));
+            const base = new Date(date + "T00:00:00");
+            const sm = (st - base) / 60000, em = (en - base) / 60000;
+            if (em <= DAY_FROM || sm >= DAY_TO) return "";
+            const idle = !(Number(s.billet_increase) > 0);
+            const tip = `PLC ${s.die_name ?? ""}  ${s.start_time.slice(11)}–${s.end_time.slice(11)}  ${t("tip_billets")} ${s.billet_increase}`;
+            return `<div class="block plc ${idle ? "idle" : ""}" style="left:${pct(sm)}%; width:${pct(em) - pct(sm)}%" title="${esc(tip)}">${esc(s.die_name ?? "")}</div>`;
+          }).join("");
+
+          const ratio = Math.round(total / BASE_MIN * 100);
+          html += `
+            <div class="day">
+              <div class="day-label ${dow === 0 ? "sun" : dow === 6 ? "sat" : ""}">${date.slice(5)}<span class="dow">(${t("dow")[dow]})</span></div>
+              <div class="timeline" style="margin-left:44px;">
+                <div class="lane"><span class="lane-name">${t("lane_rec")}</span>${hourLines}${gapHtml}${recBlocks || `<span class="empty-day">${t("no_record")}</span>`}</div>
+                <div class="lane"><span class="lane-name">${t("lane_plc")}</span>${hourLines}${plcBlocks}</div>
+              </div>
+              <div class="sum">
+                ${recs.length ? `${t("sum_total")} <b class="${total >= BASE_MIN ? "ok" : "ng"}">${hm(total)}</b>（${ratio}%）<br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}` : `<span class="empty-day">${t("no_record")}</span>`}
+              </div>
+            </div>`;
+        }
+        document.getElementById("days").innerHTML = html;
+      }
+
+      (async () => {
+        const q = new URLSearchParams(location.search);
+        let mc = q.get("machine");
+        if (!["1", "2", "3", "4"].includes(mc)) { try { mc = localStorage.getItem("coverageMachine"); } catch (e) {} }
+        if (["1", "2", "3", "4"].includes(mc)) document.getElementById("fMachine").value = mc;
+        document.getElementById("fStart").value = /^\d{4}-\d{2}-\d{2}$/.test(q.get("start") || "") ? q.get("start") : addDays(ymd(new Date()), -(DAYS - 1));
+        setLang(currentLang());
+        await load();
+      })();
+    </script>
+  </body>
+</html>

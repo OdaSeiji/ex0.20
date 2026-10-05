@@ -209,6 +209,7 @@
     <button id="btnJa" onclick="setLang('ja')">日本語</button>
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
     <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-back" onclick="openCoverage()" data-key="btn_coverage">📅 入力の確認</button>
   </div>
 
   <h1 data-key="title">🏭 押出日報入力</h1>
@@ -773,7 +774,7 @@
       ja: {
         title: "🏭 押出日報入力",
         card_press_report: "押出日報",
-        btn_back: "← 戻る",
+        btn_back: "← 戻る", btn_coverage: "📅 入力の確認",
         lbl_directive: "生産指示書", lbl_date: "日付", lbl_die: "金型番号",
         btn_select: "選択",
         modal_directive_title: "📑 指示書選択", ph_directive_search: "発注書番号・品番で検索…",
@@ -842,7 +843,7 @@
       vi: {
         title: "🏭 Nhập báo cáo đùn hằng ngày",
         card_press_report: "Báo cáo Đùn",
-        btn_back: "← Trở lại",
+        btn_back: "← Trở lại", btn_coverage: "📅 Kiểm tra nhập",
         lbl_directive: "CTSX", lbl_date: "Ngày", lbl_die: "Mã khuôn",
         btn_select: "Chọn",
         modal_directive_title: "📑 Chọn phiếu đùn", ph_directive_search: "Tìm theo số phiếu / mã SP…",
@@ -1063,6 +1064,12 @@
       const dd   = String(base.getDate()).padStart(2, "0");
       input.value = `${yyyy}-${mm}-${dd}`;
       input.dispatchEvent(new Event("change"));
+    }
+
+    /* 押出日報の入力確認（号機ごとの1週間の時間の帯）を、選んでいる号機で開く */
+    function openCoverage() {
+      const mc = document.getElementById("machine-number__select").value;
+      location.href = "press_coverage.html" + (["1", "2", "3", "4"].includes(mc) ? `?machine=${mc}` : "");
     }
 
     /* -------------------------
