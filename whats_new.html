@@ -91,6 +91,23 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-05</span>
         </div>
+        <div class="entry-title" data-key="fq_title">押出スケジュール表：エッチングの記録用紙を印刷</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fq_purpose">ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fq_content">スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_schedule.html'">press_schedule.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
         <div class="entry-title" data-key="fp_title">押出計画：入力元（新／旧）と更新日時を記録</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fp_purpose">押出実績・押出指示書と同じく、計画が ex0.20 と旧画面のどちらで作られたかを区別し、いつ修正したかを分かるようにするため。</span>
@@ -1004,6 +1021,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
+          fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
+          fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
           fp_title: "押出計画：入力元（新／旧）と更新日時を記録",
           fp_purpose: "押出実績・押出指示書と同じく、計画が ex0.20 と旧画面のどちらで作られたかを区別し、いつ修正したかを分かるようにするため。",
           fp_content: "押出計画に「入力元」を追加した。ex0.20 の押出計画で新しく保存すると 1（新）、旧画面で作ったものは 0（旧）になる。あとから直しても値は変わらない。これまでの計画はすべて旧。修正すると更新日時が自動で変わるようにした。右の一覧に入力元のバッジを表示し、マウスを乗せると作成日時と更新日時が出る。",
@@ -1152,6 +1172,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fq_title: "Lịch ép đùn: in phiếu Etching",
+          fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
+          fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
           fp_title: "Kế hoạch ép đùn: ghi nguồn nhập (Mới / Cũ) và thời gian cập nhật",
           fp_purpose: "Giống như kết quả ép và phiếu đùn, để phân biệt kế hoạch được tạo ở ex0.20 hay màn hình cũ, và biết đã sửa khi nào.",
           fp_content: "Thêm \"Nguồn nhập\" vào kế hoạch ép đùn. Lưu mới ở kế hoạch ép đùn của ex0.20 là 1 (Mới), tạo ở màn hình cũ là 0 (Cũ). Sửa sau đó thì giá trị không đổi. Các kế hoạch trước đây đều là Cũ. Khi sửa, thời gian cập nhật tự động thay đổi. Danh sách bên phải hiển thị nhãn nguồn nhập; di chuột lên để xem thời gian tạo và cập nhật.",

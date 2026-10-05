@@ -64,10 +64,11 @@ $st = $pdo->prepare("
             FROM t_press_directive d LEFT JOIN m_nbn nb ON nb.id = d.nbn_id
         ) x WHERE rn = 1
     )
-    SELECT pl.id, pl.dies_id, md.die_number, md.hole, pl.ordinal, pl.quantity, pl.pressing_type_id, pl.nitride_use, pl.note, pl.billet_origin,
+    SELECT pl.id, pl.dies_id, md.die_number, md.hole, pn.etcing_file_url, pl.ordinal, pl.quantity, pl.pressing_type_id, pl.nitride_use, pl.note, pl.billet_origin,
            ld.ram_speed, COALESCE(pl.billet_length, ld.billet_length) AS billet_length, ld.nbn
     FROM t_press_plan pl
     LEFT JOIN m_dies md ON md.id = pl.dies_id
+    LEFT JOIN m_production_numbers pn ON pn.id = pl.production_number_id
     LEFT JOIN last_dir ld ON ld.dies_id = pl.dies_id
     WHERE pl.plan_date = :date AND pl.press_machine = :mc
     ORDER BY pl.ordinal + 0, pl.ordinal, pl.id
@@ -170,6 +171,8 @@ foreach ($mains as $p) {
         "pressing_type_id" => (int)$p["pressing_type_id"],
         "ram_speed"      => $p["ram_speed"] !== null ? (float)$p["ram_speed"] : null,
         "nbn"            => $p["nbn"],
+        "hole"           => $p["hole"] !== null ? (int)$p["hole"] : null,
+        "etching_image"  => $p["etcing_file_url"] ?: null,   // エッチング用紙に載せる製品の写真（../EtchingPicture/）
         "plan_billets"   => $q,
         "plan_bars"      => $bars,
         "actual_billets" => $hasActual ? $actBillets : null,

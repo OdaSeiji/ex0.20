@@ -29,6 +29,7 @@
       .sheet-tools input[type="time"], .sheet-tools select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 13px; }
       .sheet-tools .day-lbl { font-weight: bold; color: #1565c0; }
       tr.lunch td { background: #fff3e0; font-weight: bold; }
+      .btn-etching { background: #fff; color: #455a64; border: 1px solid #455a64; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; white-space: nowrap; }
       .btn-print-one { background: #455a64; color: #fff; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
       .sheet-title { background: #29b6f6; color: #000; text-align: center; font-size: 24px; font-weight: bold; padding: 6px; border: 1px solid #333; border-bottom: none; }
       table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -81,7 +82,7 @@
       const dict = {
         ja: {
           btn_back_plan: "← 押出計画へ戻る", title: "押出スケジュール表", all_machines: "全号機", btn_print: "印刷",
-          btn_print_one: "No.{m} を印刷", machine: "号機", lbl_start: "開始", lbl_lunch: "昼休み（45分）", lbl_lunch_pos: "入れる位置",
+          btn_print_one: "No.{m} を印刷", col_etching: "エッチング用紙", btn_etching: "印刷", no_nbn: "nBn なし", machine: "号機", lbl_start: "開始", lbl_lunch: "昼休み（45分）", lbl_lunch_pos: "入れる位置",
           lunch_auto: "自動（12:00 にいちばん近い区切り）", lunch_after: "{die} のあと", lunch_row: "昼休み", msg_saved: "保存しました", col_main: "金型", col_spare: "予備の金型", col_billet: "ビレット", col_length: "長さ(mm)",
           col_plan: "計画", col_actual: "実績", col_bars_plan: "押出材（計画）", col_bars_actual: "押出材（実績）",
           col_minutes: "計画の時間（分）", col_timeline: "計画の時刻", col_start: "開始", col_end: "終了",
@@ -93,7 +94,7 @@
         },
         vi: {
           btn_back_plan: "← Về kế hoạch ép đùn", title: "Lịch ép đùn", all_machines: "Tất cả máy", btn_print: "In",
-          btn_print_one: "In máy {m}", machine: "MÁY", lbl_start: "Bắt đầu", lbl_lunch: "Nghỉ trưa (45 phút)", lbl_lunch_pos: "Vị trí",
+          btn_print_one: "In máy {m}", col_etching: "Phiếu Etching", btn_etching: "In", no_nbn: "Chưa có nBn", machine: "MÁY", lbl_start: "Bắt đầu", lbl_lunch: "Nghỉ trưa (45 phút)", lbl_lunch_pos: "Vị trí",
           lunch_auto: "Tự động (gần 12:00 nhất)", lunch_after: "Sau {die}", lunch_row: "NGHỈ TRƯA", msg_saved: "Đã lưu", col_main: "KHUÔN CHÍNH", col_spare: "KHUÔN DỰ BỊ", col_billet: "SỐ BILLET", col_length: "Chiều dài(mm)",
           col_plan: "KH", col_actual: "TT", col_bars_plan: "Số thanh (KH)", col_bars_actual: "Số thanh (TT)",
           col_minutes: "THỜI GIAN KH (phút)", col_timeline: "Timeline KH", col_start: "Start", col_end: "End",
@@ -168,6 +169,7 @@
                   <th colspan="2">${t("col_timeline")}</th>
                   <th rowspan="2">${t("col_actual_time")}</th>
                   <th rowspan="2">${t("col_note")}</th>
+                  <th rowspan="2" class="no-print">${t("col_etching")}</th>
                 </tr>
                 <tr>
                   <th>${t("col_length")}</th><th>${t("col_plan")}</th><th>${t("col_actual")}</th>
@@ -178,7 +180,7 @@
                 ${data.rows.map((r) => {
                   if (r.type === "lunch") {
                     return `<tr class="lunch"><td>${t("lunch_row")}</td><td></td><td></td><td></td><td></td><td></td><td></td>
-                      <td class="num">${r.minutes}</td><td class="c">${r.start}</td><td class="c">${r.end}</td><td></td><td></td></tr>`;
+                      <td class="num">${r.minutes}</td><td class="c">${r.start}</td><td class="c">${r.end}</td><td></td><td></td><td class="no-print"></td></tr>`;
                   }
                   const notes = [r.note, ...r.spares.map((s) => s.note)].filter(Boolean).map(esc);
                   if (r.nitride_use) notes.unshift(t("nitride"));
@@ -195,6 +197,9 @@
                     <td class="c">${r.start}</td><td class="c">${r.end}</td>
                     <td class="c actual">${r.actual_start ? `${r.actual_start}–${r.actual_finish}` : ""}</td>
                     <td class="note">${notes.join(" / ")}</td>
+                    <td class="c no-print">${r.plan_billets > 0 && r.nbn && r.hole
+                      ? `<button class="btn-etching" onclick="printEtching(${machine}, ${r.plan_id})">${t("btn_etching")}</button>`
+                      : `<span class="note">${t("no_nbn")}</span>`}</td>
                   </tr>`;
                 }).join("")}
                 <tr class="total">
@@ -204,7 +209,7 @@
                   <td class="sum">${sum("plan_bars")}</td>
                   <td class="sum">${hasActual ? sum("actual_bars") : ""}</td>
                   <td class="sum">${totalMinutes}</td>
-                  <td></td><td></td><td></td><td></td>
+                  <td></td><td></td><td></td><td></td><td class="no-print"></td>
                 </tr>
               </tbody>
             </table>
@@ -212,6 +217,97 @@
             <div class="info no-print">${t("info")}</div>
           </div>`;
         }).join("");
+      }
+
+      /* ── エッチング検査の記入用紙（BÁO CÁO ETCHING）。ex0.11 の押出計画「In Etching」と同じ用紙 ──
+         nBn はその型のいちばん新しい押出指示書。サンプル位置の名前は nBn の n で決まる：
+         1B: H・E、2B: H・A・B・E、3B: H・A・B・C・D・E、4B: H・A〜F・END、5B: H・A〜F・I・K・END（ex0.11 は 4B まで） */
+      function etchingLabel(i, n) {
+        const pairs = ["A", "B", "C", "D", "E", "F", "I", "K"].slice(0, 2 * (n - 1));
+        const cycle = ["H", ...pairs, n <= 3 ? "E" : "END"];
+        return `${Math.floor(i / (2 * n)) + 1}${cycle[i % (2 * n)]}`;
+      }
+      function etchingTable(min, max, n) {
+        let rows = "";
+        for (let i = min; i < max; i++) {
+          rows += `<tr${i % 2 === 0 ? ' style="background-color: rgb(228, 255, 140);"' : ""}>
+            <td style="width: 30px; font-size: 8px;">${etchingLabel(i, n)}</td>
+            <td style="width: 30px; font-size: 7px;">O</td><td style="width: 30px;"></td><td style="width: 30px;"></td><td style="width: 30px;"></td></tr>`;
+        }
+        const head = `<thead><tr><th style="width: 30px;">Vị trí</th><th style="width: 30px;">0:</th><th style="width: 30px;">1:</th><th style="width: 30px;">2:</th><th style="width: 30px;">3:</th></tr></thead>`;
+        return `<div style="width: 25%; height: 100%;"><table>${head}<tbody style="height: 90%; overflow: hidden;">${rows}</tbody></table></div>`;
+      }
+      function etchingPage(info, start) {
+        const { date, die, billets, n, m, hole, image } = info;
+        return `
+          <div style="width: 790px; height: 1100px; display: flex; flex-direction: row;">
+            <div style="width: 7%; height: 100%;"></div>
+            <div style="width: 97%; height: 100%; display: flex; flex-direction: column;">
+              <div style="width: 100%; height: 5%;"></div>
+              <div style="width: 100%; height: 2%; display: flex; border: none; flex-direction: row;">
+                <h3 style="width: 90%; height: 100%; border: none; padding: 0; margin: 0;">BÁO CÁO ETCHING</h3>
+                <div style="width: 10%;">${n}B${m}*${hole}</div>
+              </div>
+              <div style="width: 100%; height: 6%">
+                <table><tbody>
+                  <tr><td style="width: 80px;">Ngày đùn</td><td style="width: 80px;">${date}</td>
+                      <td style="width: 90px;">Mã khuôn</td><td style="width: 150px;">${esc(die)}</td>
+                      <td style="width: 50px;">Số billet</td><td style="width: 50px;">${billets}</td></tr>
+                  <tr><td>Ngày kiểm tra</td><td></td><td>Người kiểm tra</td><td></td>
+                      <td>Số SP</td><td>${billets * hole}</td></tr>
+                </tbody></table>
+                <div style="font-size: 10px">Quy cách đánh giá: Hàng đạt chỉ tiêu (O), bỏ hàng (X), hàng lỗi ghi mã của lỗi (ví dụ lỗi vết nứt: 320)</div>
+              </div>
+              <div style="width: 100%; height: 70%; display: flex">
+                ${[0, 1, 2, 3].map((k) => etchingTable(start + k * 50, start + (k + 1) * 50, n)).join("")}
+              </div>
+              <div style="display: flex; flex-direction: row;">
+                <div style="height: 150px; width: 300px">
+                  <table><tbody>
+                    <tr><td style="width: 60px;">Rack</td>${'<td style="width: 40px;"></td>'.repeat(6)}</tr>
+                    <tr><td style="width: 60px;">SL rút</td>${'<td style="width: 40px;"></td>'.repeat(6)}</tr>
+                  </tbody></table>
+                  <table><tbody><tr><td style="width: 318px;">Kỹ sư phụ trách: </td></tr></tbody></table>
+                  <table><tbody><tr><td style="width: 318px; height: 40px;">Chú ý: </td></tr></tbody></table>
+                  <table><tbody><tr>
+                    <td style="width: 80px;">311: Lỗi ăn mòn</td><td style="width: 80px;">319: Lỗi tạp chất</td>
+                    <td style="width: 80px;">320: lỗi vết nứt</td><td style="width: 80px;">351: lỗi khác</td>
+                  </tr></tbody></table>
+                </div>
+                <div style="height: 150px; width: 300px">
+                  <img src="${image}" alt="" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+          </div>`;
+      }
+      function printEtching(machine, planId) {
+        const sheet = sheets.find((s) => s.machine === machine);
+        const r = sheet && sheet.data.rows.find((x) => x.plan_id === planId);
+        if (!r) return;
+        const nm = /^(\d+)B(\d+)$/.exec(r.nbn || "");
+        if (!nm || !r.hole) return;
+        const info = {
+          date: document.getElementById("fDate").value, die: r.die_number, billets: r.plan_billets,
+          n: Number(nm[1]), m: Number(nm[2]), hole: r.hole,
+          image: new URL(`../EtchingPicture/${r.etching_image || "No_image.jpg"}`, location.href).href,
+        };
+        // 2ページ目は ex0.11 と同じ条件（本数 × 2 × m × 穴数 が 100 を超えるとき）
+        let html = etchingPage(info, 0);
+        if (info.billets * 2 * info.m * info.hole > 100) html += etchingPage(info, 200);
+        // ex0.11 の用紙は main.css（Segoe UI・9pt）の影響を受けていたので、同じ文字の大きさにする
+        const style = `<style>
+          * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+          body { margin: 4px; width: 790px; height: auto; display: flex; flex-direction: column; }
+          table { border-collapse: collapse; }
+          table td, table th { border: 1px solid black; margin: 0; font-size: 9pt; font-weight: normal; padding: 0 2px; }
+          h3 { font-size: 13pt; }
+          @media print { table tbody tr { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+        </style>`;
+        const w = window.open("", "", "width=1200,height=900,left=250,location=no");
+        w.document.write(`<!doctype html><html><head><meta charset="UTF-8"><title>Etching - Print View</title>${style}</head><body>${html}</body></html>`);
+        w.document.close();
+        setTimeout(() => w.print(), 500);   // 写真を読み込んでから印刷
       }
 
       // 日付・号機ごとの設定（開始の時刻・昼休み）を保存して、その号機を出し直す
