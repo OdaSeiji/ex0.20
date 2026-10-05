@@ -41,8 +41,22 @@
         background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
       }
 
-      /* 左は固定幅（データを読み込んでも幅が変わらない）。中身 535px ＋ スクロールバー ＋ 余白 */
-      .columns { display: grid; grid-template-columns: 600px 600px minmax(0, 1fr); gap: 12px; align-items: start; }
+      /* 左と中央は固定幅（データを読み込んでも幅が変わらない）。中身がはみ出す分は横にスクロール */
+      .columns {
+        display: grid; grid-template-columns: 450px 450px minmax(0, 1fr); gap: 12px; align-items: start;
+        grid-template-areas: "die plan list" "billet billet list";
+        grid-template-rows: 450px auto;   /* 上の段は金型一覧・計画の作成と同じ高さ（右の一覧に引き伸ばされない） */
+      }
+      .area-die { grid-area: die; }
+      .area-plan { grid-area: plan; }
+      .area-list { grid-area: list; }
+      .area-billet { grid-area: billet; }
+      .billet-scroll { height: 220px; overflow: auto; }   /* 高さ 1024px の画面に収まるように */
+      .hscroll { overflow-x: auto; }
+      /* 金型一覧と計画の作成は同じ高さ。中の表はカードの残りの高さでスクロール */
+      .card.fixed-h { height: 450px; display: flex; flex-direction: column; }
+      .card.fixed-h > .fill { flex: 1; min-height: 0; overflow: auto; }
+      .billet-table { min-width: 420px; }
       .card {
         background: #fff;
         border-radius: 10px;
@@ -50,7 +64,6 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         min-width: 0;
       }
-      .mid-col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
       .card-title {
         font-size: 14px; font-weight: bold; color: #1565c0;
         margin-bottom: 8px; border-bottom: 2px solid #e8f1ff; padding-bottom: 6px;
@@ -97,6 +110,12 @@
       .add-table .w-origin { width: 100%; }
       .add-table { table-layout: fixed; }
       .add-table td { overflow: hidden; text-overflow: ellipsis; }
+      /* 計画1件を2段で表示（上：型番・種別・直・順番・本数、下：ビレット・窒素加熱・備考） */
+      .add-table .fl { font-size: 10px; color: #888; font-weight: normal; line-height: 1.2; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* 入力欄の上の項目名 */
+      .add-table tr.pair-top td { border-bottom: none; padding-top: 6px; }
+      .add-table tr.pair-bottom td { padding-bottom: 6px; border-bottom: 2px solid #e0e0e0; }
+      .add-table tr.pair-odd td { background: #f8fafd; }
+      .add-table .die-cell { font-weight: bold; }
       .add-table .w-note { width: 100%; }
       .add-table input, .add-table select { max-width: 100%; }
       .del-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 15px; }
@@ -155,12 +174,12 @@
 
       <div class="columns">
         <!-- ① 金型一覧 -->
-        <div class="card">
+        <div class="card fixed-h area-die">
           <div class="card-title">
             <span data-key="die_list_title">金型一覧</span>
             <input type="text" id="dieSearch" data-key-placeholder="ph_die_search" placeholder="型番・品番で検索" oninput="onDieSearch()" style="flex:1; min-width:160px;" />
           </div>
-          <div class="scroll" id="dieScroll" style="height: 575px;"><!-- 約20行分（見出し＋行 27.5px × 20） -->
+          <div class="scroll fill" id="dieScroll">
             <table style="width:auto;">
               <thead><tr id="dieHead"></tr></thead>
               <tbody id="dieBody"></tbody>
@@ -175,9 +194,8 @@
           <div class="st-legend" id="statusLegend"></div>
         </div>
 
-        <!-- ② 計画の作成・修正 ／ ビレットの在庫と発注の目安（中央は2枚のカード） -->
-        <div class="mid-col">
-        <div class="card">
+        <!-- ② 計画の作成・修正 -->
+        <div class="card fixed-h area-plan">
           <div class="card-title">
             <span id="planFormTitle" data-key="plan_new_title">計画の作成</span>
             <span class="edit-badge" id="editBadge" style="display:none;" data-key="edit_badge">修正中</span>
@@ -190,10 +208,12 @@
               <option value="0">-</option><option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
             </select>
           </div>
-          <table class="add-table">
-            <thead><tr id="addHead"></tr></thead>
-            <tbody id="addBody"></tbody>
-          </table>
+          <div class="hscroll fill">
+            <table class="add-table">
+              <colgroup><col style="width:136px"><col style="width:46px"><col style="width:52px"><col style="width:50px"><col style="width:62px"><col style="width:26px"></colgroup>
+              <tbody id="addBody"></tbody>
+            </table>
+          </div>
           <div class="btn-row">
             <button class="btn-cancel" onclick="resetForm()" data-key="btn_clear">クリア</button>
             <button class="btn-save" id="saveBtn" onclick="savePlans()" data-key="btn_save" disabled>保存</button>
@@ -202,22 +222,8 @@
           <div class="hint" style="margin-top:8px;" data-key="hint_form">左の金型一覧から型を選び、押出日と号機を決めて保存します。右の計画の行をクリックすると修正できます。</div>
         </div>
 
-        <!-- ビレットの在庫と発注の目安（期間は右の計画の一覧と同じ） -->
-        <div class="card">
-          <div class="card-title">
-            <span data-key="billet_title">ビレットの在庫と発注の目安</span>
-            <span class="hint" data-key="billet_note">（Dubai のみ。期間は右の一覧と同じ）</span>
-          </div>
-          <table class="billet-table">
-            <thead><tr id="billetHead"></tr></thead>
-            <tbody id="billetBody"></tbody>
-          </table>
-          <div class="hint" style="margin-top:6px;" data-key="billet_hint">発注＝（計画 − 在庫）を 7 本単位に切り上げ。計画の太さ・長さは、その品番を最後に押したときのビレット。</div>
-        </div>
-        </div>
-
-        <!-- ③ 計画の一覧 -->
-        <div class="card">
+        <!-- ③ 計画の一覧（右、上下2段分） -->
+        <div class="card area-list">
           <div class="card-title">
             <span data-key="plan_list_title">計画の一覧</span>
             <input type="date" id="fStart" onchange="loadPlans()" /> →
@@ -234,6 +240,21 @@
               <tbody id="planBody"></tbody>
             </table>
           </div>
+        </div>
+
+        <!-- ④ ビレットの在庫と発注の目安（期間は右の計画の一覧と同じ）。左から中央までの2列分 -->
+        <div class="card area-billet">
+          <div class="card-title">
+            <span data-key="billet_title">ビレットの在庫と発注の目安</span>
+            <span class="hint" data-key="billet_note">（Dubai のみ。期間は右の一覧と同じ）</span>
+          </div>
+          <div class="billet-scroll">
+            <table class="billet-table">
+              <thead><tr id="billetHead"></tr></thead>
+              <tbody id="billetBody"></tbody>
+            </table>
+          </div>
+          <div class="hint" style="margin-top:6px;" data-key="billet_hint">発注＝（計画 − 在庫）を 7 本単位に切り上げ。計画の太さ・長さは、その品番を最後に押したときのビレット。</div>
         </div>
       </div>
     </div>
@@ -471,24 +492,25 @@
       }
 
       function renderAdd() {
-        document.getElementById("addHead").innerHTML = `
-          <th style="width:112px">${t("col_die")}</th><th style="width:44px" title="${t("tip_ptype")}">${t("col_ptype")}</th><th style="width:46px">${t("col_shift")}</th><th style="width:42px">${t("col_ordinal")}</th>
-          <th class="num" style="width:54px">${t("col_qty")}</th><th style="width:66px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:48px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
+        // 計画1件を2段で（上：型番 | 種別 | 直 | 順番 | 本数 | ✕、下：ビレット | 窒素加熱 | 備考）。各入力欄の上に項目名
+        const fl = (key, tip = "") => `<div class="fl"${tip ? ` title="${t(tip)}"` : ""}>${t(key)}</div>`;
         const body = document.getElementById("addBody");
-        if (!addRows.length) { body.innerHTML = `<tr><td colspan="9" class="empty-note">${t("empty_add")}</td></tr>`; return; }
+        if (!addRows.length) { body.innerHTML = `<tr><td colspan="6" class="empty-note">${t("empty_add")}</td></tr>`; return; }
         body.innerHTML = addRows.map((r, i) => `
-          <tr>
-            <td title="${esc(r.products.find((p) => p.id === r.production_number_id)?.production_number ?? "")}">${esc(r.die_number)}${r.products.length > 1
+          <tr class="pair-top ${i % 2 ? "pair-odd" : ""}">
+            <td class="die-cell" title="${esc(r.products.find((p) => p.id === r.production_number_id)?.production_number ?? "")}">${fl("col_die")}${esc(r.die_number)}${r.products.length > 1
               ? `<select class="pn-select" onchange="setAdd(${i}, 'production_number_id', Number(this.value))">${r.products.map((p) => `<option value="${p.id}" ${p.id === r.production_number_id ? "selected" : ""}>${esc(p.production_number)}</option>`).join("")}</select>`
               : ""}</td>
-            <td><select onchange="setAdd(${i}, 'pressing_type_id', Number(this.value))">${PTYPES.map((x) => `<option value="${x.id}" ${x.id === Number(r.pressing_type_id) ? "selected" : ""}>${x.label}</option>`).join("")}</select></td>
-            <td><select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
-            <td><input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
-            <td><input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
-            <td><select class="w-origin" onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select></td>
-            <td><select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></td>
-            <td><input type="text" class="w-note" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></td>
+            <td>${fl("col_ptype", "tip_ptype")}<select onchange="setAdd(${i}, 'pressing_type_id', Number(this.value))">${PTYPES.map((x) => `<option value="${x.id}" ${x.id === Number(r.pressing_type_id) ? "selected" : ""}>${x.label}</option>`).join("")}</select></td>
+            <td>${fl("col_shift")}<select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
+            <td>${fl("col_ordinal")}<input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
+            <td>${fl("col_qty")}<input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
             <td>${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</td>
+          </tr>
+          <tr class="pair-bottom ${i % 2 ? "pair-odd" : ""}">
+            <td>${fl("col_billet", "tip_billet")}<select class="w-origin" onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select></td>
+            <td colspan="2">${fl("col_nitride", "tip_nitride")}<select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></td>
+            <td colspan="3">${fl("col_note")}<input type="text" class="w-note" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></td>
           </tr>`).join("");
       }
       function setAdd(i, key, value) { addRows[i][key] = value; checkForm(); }
