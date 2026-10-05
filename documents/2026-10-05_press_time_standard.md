@@ -41,14 +41,14 @@ SQL は `2026-10-05_press_time_standard.sql`（日本語のコメントを含む
 
 ```sql
 CREATE TABLE m_press_time_standard (
-  press_machine     TINYINT  NOT NULL COMMENT '号機（1〜4）',
-  startup_sec       INT      NULL     COMMENT '金型交換直後の、自動運転までの時間（秒）',
-  billet_change_sec INT      NULL     COMMENT 'ビレットを交換する時間（秒）',
-  updated_at        DATETIME NULL     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日時',
-  updated_staff_id  INT      NULL     COMMENT '更新した人（m_staff.id）',
+  press_machine     TINYINT  NOT NULL COMMENT 'Press machine (1-4)',
+  startup_sec       INT      NULL     COMMENT 'Seconds from die change to automatic operation',
+  billet_change_sec INT      NULL     COMMENT 'Seconds to change a billet',
+  updated_at        DATETIME NULL     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
+  updated_staff_id  INT      NULL     COMMENT 'Updated by (m_staff.id)',
   PRIMARY KEY (press_machine),
   CONSTRAINT fk_press_time_standard_staff FOREIGN KEY (updated_staff_id) REFERENCES m_staff (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='押出時間の標準（号機ごと）';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Standard press time per machine';
 
 INSERT INTO m_press_time_standard (press_machine) VALUES (1), (2), (3), (4);
 ```
@@ -94,14 +94,14 @@ SQL は `2026-10-05_press_schedule_day.sql`。
 
 ```sql
 CREATE TABLE t_press_schedule_day (
-  plan_date           DATE     NOT NULL COMMENT '押出日',
-  press_machine       TINYINT  NOT NULL COMMENT '号機（1〜4）',
-  start_time          TIME     NULL     COMMENT '開始の時刻（NULL は 8:00）',
-  has_lunch           TINYINT  NOT NULL DEFAULT 0 COMMENT '昼休み 0=なし 1=あり（45分）',
-  lunch_after_plan_id INT      NULL     COMMENT '昼休みを入れる位置（この計画 t_press_plan.id のあと）。NULL は 12:00 にいちばん近い型の区切り',
-  updated_at          DATETIME NULL     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日時',
+  plan_date           DATE     NOT NULL COMMENT 'Press date',
+  press_machine       TINYINT  NOT NULL COMMENT 'Press machine (1-4)',
+  start_time          TIME     NULL     COMMENT 'Start time (NULL = 08:00)',
+  has_lunch           TINYINT  NOT NULL DEFAULT 0 COMMENT 'Lunch break 0=no 1=yes (45 min)',
+  lunch_after_plan_id INT      NULL     COMMENT 'Insert lunch after this plan (t_press_plan.id). NULL = die change nearest 12:00',
+  updated_at          DATETIME NULL     DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'Updated at',
   PRIMARY KEY (plan_date, press_machine)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='押出スケジュール表の日付・号機ごとの設定';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Press schedule settings per date and machine';
 ```
 
 ## そのほか Excel から分かったこと（未対応）
@@ -129,8 +129,8 @@ SQL は `2026-10-05_press_plan_billet.sql`。
 
 ```sql
 ALTER TABLE t_press_plan
-  ADD COLUMN billet_origin TINYINT NOT NULL DEFAULT 0 COMMENT 'ビレットの種類 0=未定 1=Dubai 2=VN' AFTER quantity,
-  ADD COLUMN billet_length INT     NULL              COMMENT 'ビレットの長さ(mm)。NULL は押出指示書の長さを使う' AFTER billet_origin;
+  ADD COLUMN billet_origin TINYINT NOT NULL DEFAULT 0 COMMENT 'Billet origin 0=undecided 1=Dubai 2=VN' AFTER quantity,
+  ADD COLUMN billet_length INT     NULL              COMMENT 'Billet length (mm). NULL = use press directive' AFTER billet_origin;
 ```
 
 確認用：
