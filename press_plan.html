@@ -94,9 +94,7 @@
       .add-table input[type="text"], .add-table input[type="number"], .add-table select { padding: 3px 4px; font-size: 12px; }
       .add-table .w-ord { width: 46px; }
       .add-table .w-qty { width: 56px; text-align: right; }
-      .add-table .billet-cell { display: flex; gap: 2px; }
-      .add-table .w-origin { width: 58px; }
-      .add-table .w-len { width: 52px; text-align: right; }
+      .add-table .w-origin { width: 100%; }
       .add-table { table-layout: fixed; }
       .add-table td { overflow: hidden; text-overflow: ellipsis; }
       .add-table .w-note { width: 100%; }
@@ -272,7 +270,7 @@
           plan_new_title: "計画の作成", plan_edit_title: "計画の修正", edit_badge: "修正中",
           lbl_plan_date: "押出日", lbl_machine: "号機",
           col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考", col_billet: "ビレット", col_ptype: "種別", tip_ptype: "プレス種別（〇 試押 ／ ◎ 量試 ／ ● 量産）", origin_0: "未定", origin_1: "Dubai", origin_2: "VN",
-          ph_len: "長さ", tip_billet: "ビレットの種類と長さ(mm)。長さが空なら押出指示書の長さを使う",
+          tip_billet: "ビレットの種類（長さは押出指示書の長さを使う）",
           tip_nitride: "金型を窒素雰囲気の中で加熱するかどうか",
           nitride_yes: "Yes", nitride_no: "No",
           btn_clear: "クリア", btn_save: "保存", btn_update: "更新する",
@@ -301,7 +299,7 @@
           plan_new_title: "Tạo kế hoạch", plan_edit_title: "Sửa kế hoạch", edit_badge: "Đang sửa",
           lbl_plan_date: "Ngày ép", lbl_machine: "Máy",
           col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú", col_billet: "Billet", col_ptype: "Loại", tip_ptype: "Loại ép (〇 ép thử / ◎ thử hàng loạt / ● hàng loạt)", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
-          ph_len: "Dài", tip_billet: "Loại billet và chiều dài (mm). Để trống chiều dài thì dùng theo phiếu đùn",
+          tip_billet: "Loại billet (chiều dài lấy theo phiếu đùn)",
           tip_nitride: "Có gia nhiệt khuôn trong môi trường khí nitơ hay không",
           nitride_yes: "Yes", nitride_no: "No",
           btn_clear: "Xóa", btn_save: "Lưu", btn_update: "Cập nhật",
@@ -475,7 +473,7 @@
       function renderAdd() {
         document.getElementById("addHead").innerHTML = `
           <th style="width:112px">${t("col_die")}</th><th style="width:44px" title="${t("tip_ptype")}">${t("col_ptype")}</th><th style="width:46px">${t("col_shift")}</th><th style="width:42px">${t("col_ordinal")}</th>
-          <th class="num" style="width:54px">${t("col_qty")}</th><th style="width:110px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:48px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
+          <th class="num" style="width:54px">${t("col_qty")}</th><th style="width:66px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:48px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
         const body = document.getElementById("addBody");
         if (!addRows.length) { body.innerHTML = `<tr><td colspan="9" class="empty-note">${t("empty_add")}</td></tr>`; return; }
         body.innerHTML = addRows.map((r, i) => `
@@ -487,10 +485,7 @@
             <td><select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
             <td><input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
             <td><input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
-            <td><div class="billet-cell">
-              <select class="w-origin" onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select>
-              <input type="number" min="1" step="1" class="w-len" placeholder="${t("ph_len")}" value="${esc(r.billet_length)}" oninput="setAdd(${i}, 'billet_length', this.value)" />
-            </div></td>
+            <td><select class="w-origin" onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select></td>
             <td><select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></td>
             <td><input type="text" class="w-note" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></td>
             <td>${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</td>
