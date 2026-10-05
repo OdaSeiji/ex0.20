@@ -1,10 +1,12 @@
 <?php
 // 押出のスケジュール表（日付・号機ごと）。現場の計画表（KHUÔN CHÍNH / DỰ BỊ / SỐ BILLET / THỜI GIAN / Timeline）と同じ形
 // - 並びは計画の「順番」（ordinal）。「5.1」のように小数のある行は、整数部が同じメインの行の予備の金型として横に並べる
-// - 時間 ＝ 自動運転までの時間 ＋ 本数 ×（ビレットの長さ ÷ ラム速度 ＋ ビレットの交換時間）
-//   ラム速度・nBn は、その型のいちばん新しい押出指示書。長さは計画で決めていればその値、無ければ押出指示書
-//   押出指示書が無い型は号機の「1本あたりの平均」
-//   標準時間（m_press_time_standard）が未設定なら、実績からの推定を使う
+// - 時間 ＝ 本数 × ビレット1本あたりの時間（現場の指示、2026-10-05。押出時間の標準 m_press_time_standard は使わない）
+//   1本あたりの時間：同じ号機で、同じ系統の型（CQ32T3-V03D → CQ32T3）を押した直近5回の押出の実績
+//   （押出の時間の合計 ÷ ビレット本数の合計。5回に満たなければある分だけ）。1回も無ければ、同じ号機の直近20回の押出
+//   「直近」はスケジュールの日より前の押出。時刻の無い押出・ビレット 0本の押出は除く
+//   押出の時間には型交換直後の手動の時間も含まれるが、別には足さない
+// - nBn は、その型のいちばん新しい押出指示書。長さは計画で決めていればその値、無ければ押出指示書（表示のみ）
 // - 押出材の本数 ＝ ビレット本数 ÷ n × m × 穴数（nBn：n 本のビレットで m 本の製品）
 // - 実績（TT）は、その日・その号機・その型（予備を含む）の押出（t_press）とラック（t_using_aging_rack）
 // - 開始の時刻と昼休み（45分）は、日付・号機ごとの設定（t_press_schedule_day）。
@@ -23,40 +25,35 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || $machine < 1 || $machine > 4)
     exit;
 }
 
-// 標準時間（未設定なら推定）と 1本あたりの平均
-$st = $pdo->prepare("SELECT startup_sec, billet_change_sec FROM m_press_time_standard WHERE press_machine = :mc");
-$st->execute([":mc" => $machine]);
-$std = $st->fetch() ?: ["startup_sec" => null, "billet_change_sec" => null];
+const HISTORY_DIE = 5;       // 同じ系統の型：直近5回
+const HISTORY_MACHINE = 20;  // 実績の無い型：同じ号機の直近20回
 
-$st = $pdo->prepare("
-    WITH x AS (
-        SELECT p.actual_billet_quantities AS q,
-               TIME_TO_SEC(TIMEDIFF(p.press_finish_at, p.press_start_at)) - p.actual_billet_quantities * p.billet_length / d.ram_speed AS over_sec
-        FROM t_press p JOIN t_press_directive d ON d.id = p.press_directive_id
-        WHERE p.press_machine_no = :mc AND p.press_date_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
-          AND d.ram_speed > 0 AND p.billet_length > 0 AND p.actual_billet_quantities >= 1 AND p.press_finish_at > p.press_start_at
-    )
-    SELECT (SUM(q * over_sec) - SUM(q) * SUM(over_sec) / COUNT(*)) / NULLIF(SUM(q * q) - SUM(q) * SUM(q) / COUNT(*), 0) AS change_sec,
-           SUM(over_sec) / COUNT(*) AS avg_over, SUM(q) / COUNT(*) AS avg_q
-    FROM x WHERE over_sec BETWEEN -600 AND 7200
+// 1本あたりの時間（秒）。押出の時間の合計 ÷ ビレット本数の合計
+$stFamily = $pdo->prepare("
+    SELECT COUNT(*) AS n, SUM(sec) / SUM(q) AS sec_per_billet
+    FROM (
+        SELECT TIME_TO_SEC(TIMEDIFF(p.press_finish_at, p.press_start_at)) AS sec, p.actual_billet_quantities AS q
+        FROM t_press p JOIN m_dies d ON d.id = p.dies_id
+        WHERE p.press_machine_no = :mc AND SUBSTRING_INDEX(d.die_number, '-V', 1) = :family
+          AND p.press_date_at < :date AND p.press_finish_at > p.press_start_at AND p.actual_billet_quantities > 0
+        ORDER BY p.press_date_at DESC, p.press_start_at DESC, p.id DESC
+        LIMIT " . HISTORY_DIE . "
+    ) x
 ");
-$st->execute([":mc" => $machine]);
-$e = $st->fetch();
-$hasEst = $e && $e["change_sec"] !== null;
-$estChange  = $hasEst ? (int)round($e["change_sec"]) : 0;
-$estStartup = $hasEst ? (int)round($e["avg_over"] - $e["change_sec"] * $e["avg_q"]) : 0;
-$usingEstimate = $std["startup_sec"] === null || $std["billet_change_sec"] === null;
-$startupSec = $std["startup_sec"] !== null ? (int)$std["startup_sec"] : $estStartup;
-$changeSec  = $std["billet_change_sec"] !== null ? (int)$std["billet_change_sec"] : $estChange;
-
 $st = $pdo->prepare("
-    SELECT SUM(TIME_TO_SEC(TIMEDIFF(press_finish_at, press_start_at))) / SUM(actual_billet_quantities)
-    FROM t_press
-    WHERE press_machine_no = :mc AND press_date_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
-      AND press_finish_at > press_start_at AND actual_billet_quantities > 0
+    SELECT COUNT(*) AS n, SUM(sec) / SUM(q) AS sec_per_billet
+    FROM (
+        SELECT TIME_TO_SEC(TIMEDIFF(press_finish_at, press_start_at)) AS sec, actual_billet_quantities AS q
+        FROM t_press
+        WHERE press_machine_no = :mc AND press_date_at < :date AND press_finish_at > press_start_at AND actual_billet_quantities > 0
+        ORDER BY press_date_at DESC, press_start_at DESC, id DESC
+        LIMIT " . HISTORY_MACHINE . "
+    ) x
 ");
-$st->execute([":mc" => $machine]);
-$avgSecPerBillet = (int)round((float)$st->fetchColumn());
+$st->execute([":mc" => $machine, ":date" => $date]);
+$m = $st->fetch();
+$machineSecPerBillet = ($m && (int)$m["n"] > 0) ? (float)$m["sec_per_billet"] : 0.0;
+$familyCache = [];
 
 // その日・その号機の計画と、型ごとのいちばん新しい押出指示書
 $st = $pdo->prepare("
@@ -129,16 +126,16 @@ foreach ($mains as $p) {
     $spareList = $ord !== null ? ($spares[$ord] ?? []) : [];
     $q = (int)$p["quantity"];
 
-    // 時間（秒）
-    $usingAverage = false;
-    if ($q <= 0) {
-        $sec = 0;
-    } elseif ((float)$p["ram_speed"] > 0 && (int)$p["billet_length"] > 0) {
-        $sec = $startupSec + $q * ((int)$p["billet_length"] / (float)$p["ram_speed"] + $changeSec);
-    } else {
-        $sec = $startupSec + $q * $avgSecPerBillet;
-        $usingAverage = true;
+    // 時間（秒）＝ 本数 × 1本あたりの時間（同じ系統の型の直近5回、無ければ号機の直近20回）
+    $family = preg_replace('/-V.*$/', '', (string)$p["die_number"]);
+    if (!isset($familyCache[$family])) {
+        $stFamily->execute([":mc" => $machine, ":family" => $family, ":date" => $date]);
+        $f = $stFamily->fetch();
+        $familyCache[$family] = ($f && (int)$f["n"] > 0) ? ["n" => (int)$f["n"], "sec" => (float)$f["sec_per_billet"]] : null;
     }
+    $hist = $familyCache[$family];
+    $secPerBillet = $hist ? $hist["sec"] : $machineSecPerBillet;
+    $sec = $q > 0 ? $q * $secPerBillet : 0;
     $min = (int)ceil($sec / 60);
 
     // 押出材の本数
@@ -180,7 +177,10 @@ foreach ($mains as $p) {
         "actual_start"   => $actStart,
         "actual_finish"  => $actFinish,
         "minutes"        => $min,
-        "using_average"  => $usingAverage,
+        "time_source"    => $hist ? "die" : "machine",   // die＝同じ系統の型の実績、machine＝号機の直近20回
+        "history_count"  => $hist ? $hist["n"] : 0,
+        "family"         => $family,
+        "sec_per_billet" => (int)round($secPerBillet),
     ];
 }
 
@@ -227,8 +227,5 @@ echo json_encode([
         "lunch_after_plan_id" => $day["lunch_after_plan_id"] !== null ? (int)$day["lunch_after_plan_id"] : null,
         "lunch_auto" => $lunchAuto,
     ],
-    "standard" => [
-        "startup_sec" => $startupSec, "billet_change_sec" => $changeSec,
-        "using_estimate" => $usingEstimate, "avg_sec_per_billet" => $avgSecPerBillet,
-    ],
+    "machine_sec_per_billet" => (int)round($machineSecPerBillet),
 ], JSON_UNESCAPED_UNICODE);

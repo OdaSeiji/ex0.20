@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-05</span>
         </div>
+        <div class="entry-title" data-key="fo_title">押出スケジュール表：時間を実績から計算、押出計画の計画の作成を狭く</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fo_purpose">現場の指示で、スケジュールの時間を過去の押出の実績から出すため。あわせて画面の幅を抑えるため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fo_content">計画の時間＝本数×ビレット1本あたりの時間。1本あたりの時間は、同じ号機で同じ系統の型（例：CQ32T3-V03D→CQ32T3）を押した直近5回の実績（押出の時間の合計÷ビレット本数の合計、5回未満ならある分だけ）、実績が無い型は同じ号機の直近20回の平均（「＊」で表示）。時間にマウスを乗せると何回分の実績かを表示。押出時間の標準は使わなくなったため、トップメニューから外した。押出計画の計画の作成は、順番・本数・ビレットの欄を狭くし、✕を2段目に移して、カードの幅を450pxから380pxにした。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_schedule.html'">press_schedule.html</a>
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
         <div class="entry-title" data-key="fn_title">押出計画：画面のレイアウトを変更</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fn_purpose">高さ 1024px・幅 1920px の画面に収まり、計画を確認しやすくするため。</span>
@@ -969,6 +987,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fo_title: "押出スケジュール表：時間を実績から計算、押出計画の計画の作成を狭く",
+          fo_purpose: "現場の指示で、スケジュールの時間を過去の押出の実績から出すため。あわせて画面の幅を抑えるため。",
+          fo_content: "計画の時間＝本数×ビレット1本あたりの時間。1本あたりの時間は、同じ号機で同じ系統の型（例：CQ32T3-V03D→CQ32T3）を押した直近5回の実績（押出の時間の合計÷ビレット本数の合計、5回未満ならある分だけ）、実績が無い型は同じ号機の直近20回の平均（「＊」で表示）。時間にマウスを乗せると何回分の実績かを表示。押出時間の標準は使わなくなったため、トップメニューから外した。押出計画の計画の作成は、順番・本数・ビレットの欄を狭くし、✕を2段目に移して、カードの幅を450pxから380pxにした。",
           fn_title: "押出計画：画面のレイアウトを変更",
           fn_purpose: "高さ 1024px・幅 1920px の画面に収まり、計画を確認しやすくするため。",
           fn_content: "金型一覧と計画の作成を幅 450px・同じ高さにそろえ、はみ出す分はカードの中でスクロール。ビレットの在庫と発注の目安を、左から中央までの2列分の幅で下に移し、高さを抑えて縦にスクロール。右の計画の一覧を広げた。計画の作成は1件を2段（上：型番・種別・直・順番・本数、下：ビレット・窒素加熱・備考）にして、各入力欄の上に項目名を表示。",
@@ -1111,6 +1132,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fo_title: "Lịch ép đùn: tính thời gian theo thực tế, thu hẹp phần tạo kế hoạch",
+          fo_purpose: "Theo chỉ thị của xưởng, tính thời gian trong lịch từ thực tế đùn trước đây; đồng thời giảm độ rộng màn hình.",
+          fo_content: "Thời gian kế hoạch = số billet × thời gian mỗi billet. Thời gian mỗi billet lấy từ thực tế 5 lần đùn gần nhất của cùng dòng khuôn (ví dụ CQ32T3-V03D → CQ32T3) trên cùng máy (tổng thời gian ÷ tổng số billet; ít hơn 5 lần thì dùng số lần có được); khuôn chưa có thực tế thì dùng trung bình 20 lần đùn gần nhất của máy (đánh dấu \"＊\"). Di chuột lên thời gian để xem dựa trên mấy lần thực tế. Không còn dùng thời gian đùn tiêu chuẩn nên đã bỏ khỏi menu chính. Phần tạo kế hoạch thu hẹp ô Stt, SL, billet, chuyển nút ✕ xuống dòng 2, độ rộng thẻ từ 450px còn 380px.",
           fn_title: "Kế hoạch ép đùn: thay đổi bố cục màn hình",
           fn_purpose: "Để vừa màn hình cao 1024px, rộng 1920px và dễ kiểm tra kế hoạch hơn.",
           fn_content: "Danh sách khuôn và phần tạo kế hoạch rộng 450px, cùng chiều cao; phần tràn thì cuộn trong thẻ. Bảng tồn kho billet / lượng cần đặt chuyển xuống dưới, rộng bằng 2 cột từ trái đến giữa, giảm chiều cao và cuộn dọc. Danh sách kế hoạch bên phải rộng hơn. Phần tạo kế hoạch hiển thị mỗi kế hoạch 2 dòng (trên: mã khuôn, loại, ca, Stt, SL; dưới: billet, N2, ghi chú), tên mục hiển thị phía trên mỗi ô nhập.",
