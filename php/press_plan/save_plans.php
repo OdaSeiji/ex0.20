@@ -22,8 +22,8 @@ if ($err) {
 try {
     $pdo->beginTransaction();
     $stmt = $pdo->prepare("
-        INSERT INTO t_press_plan (dies_id, production_number_id, shift_id, ordinal, quantity, nitride_use, note, plan_date, press_machine)
-        VALUES (:dies_id, :production_number_id, :shift_id, :ordinal, :quantity, :nitride_use, :note, :plan_date, :press_machine)
+        INSERT INTO t_press_plan (dies_id, production_number_id, shift_id, ordinal, quantity, billet_origin, billet_length, nitride_use, note, plan_date, press_machine)
+        VALUES (:dies_id, :production_number_id, :shift_id, :ordinal, :quantity, :billet_origin, :billet_length, :nitride_use, :note, :plan_date, :press_machine)
     ");
     foreach ($data as $d) {
         $stmt->execute($d + [":plan_date" => $body["plan_date"], ":press_machine" => (int)$body["press_machine"]]);

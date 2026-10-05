@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Press Schedule</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: "Roboto Mono", "Segoe UI", monospace; background: #f0f2f5; padding: 20px; }
+      .container { max-width: 1200px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff; border-radius: 10px; padding: 14px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap;
+      }
+      .back-btn { background: #2b6ca3; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn { padding: 6px 12px; border: 1px solid #0078d4; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+      .ctrl { display: flex; align-items: center; gap: 8px; }
+      .ctrl input, .ctrl select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; font-family: inherit; }
+      .btn-print { background: #455a64; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+
+      .sheet { background: #fff; border-radius: 10px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
+      .sheet-tools { display: flex; justify-content: flex-end; align-items: center; gap: 14px; margin-bottom: 6px; font-size: 13px; flex-wrap: wrap; }
+      .sheet-tools label { display: flex; align-items: center; gap: 6px; }
+      .sheet-tools input[type="time"], .sheet-tools select { padding: 4px 6px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 13px; }
+      .sheet-tools .day-lbl { font-weight: bold; color: #1565c0; }
+      tr.lunch td { background: #fff3e0; font-weight: bold; }
+      .btn-print-one { background: #455a64; color: #fff; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+      .sheet-title { background: #29b6f6; color: #000; text-align: center; font-size: 24px; font-weight: bold; padding: 6px; border: 1px solid #333; border-bottom: none; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; }
+      th, td { border: 1px solid #333; padding: 4px 6px; }
+      th { font-size: 13px; background: #fff; }
+      td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+      td.c { text-align: center; }
+      td.actual { color: #1565c0; }
+      td.short { color: #c62828; font-weight: bold; }   /* 実績が計画より少ない */
+      tr.total td { border: none; }
+      tr.total td.sum { background: #ffeb3b; border: 1px solid #333; text-align: center; font-weight: bold; }
+      .note { font-size: 12px; color: #555; }
+      .avg-mark { color: #e65100; font-weight: bold; }
+      .info { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.7; }
+      .warn { font-size: 12px; color: #e65100; margin-bottom: 8px; }
+      .empty-note { color: #999; text-align: center; padding: 20px; }
+
+      @media print {
+        body { background: #fff; padding: 0; }
+        .page-header { display: none; }
+        .sheet { box-shadow: none; padding: 0; margin-bottom: 0; page-break-after: always; }
+        .sheet:last-child { page-break-after: auto; }
+        .no-print { display: none; }
+        body.print-one .sheet:not(.print-target) { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='press_plan.html'" data-key="btn_back_plan">← 押出計画へ戻る</button>
+        <h1 data-key="title">押出スケジュール表</h1>
+        <div class="ctrl">
+          <input type="date" id="fDate" onchange="load()" />
+          <select id="fMachine" onchange="load()">
+            <option value="0" data-key="all_machines">全号機</option>
+            <option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
+          </select>
+          <button class="btn-print" onclick="window.print()" data-key="btn_print">印刷</button>
+        </div>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+      <div id="sheets"></div>
+    </div>
+
+    <script>
+      const dict = {
+        ja: {
+          btn_back_plan: "← 押出計画へ戻る", title: "押出スケジュール表", all_machines: "全号機", btn_print: "印刷",
+          btn_print_one: "No.{m} を印刷", machine: "号機", lbl_start: "開始", lbl_lunch: "昼休み（45分）", lbl_lunch_pos: "入れる位置",
+          lunch_auto: "自動（12:00 にいちばん近い区切り）", lunch_after: "{die} のあと", lunch_row: "昼休み", msg_saved: "保存しました", col_main: "金型", col_spare: "予備の金型", col_billet: "ビレット", col_length: "長さ(mm)",
+          col_plan: "計画", col_actual: "実績", col_bars_plan: "押出材（計画）", col_bars_actual: "押出材（実績）",
+          col_minutes: "計画の時間（分）", col_timeline: "計画の時刻", col_start: "開始", col_end: "終了",
+          col_actual_time: "実績の時刻", col_note: "備考", empty: "この日の計画はありません",
+          avg_note: "＊ 押出指示書が無いため、1本あたりの平均（{sec}秒）で計算しています",
+          est_warn: "押出時間の標準が未設定のため、実績からの推定（自動運転まで {startup}秒・ビレット交換 {change}秒）で計算しています。各種設定 →「押出時間の標準」で決めてください。",
+          info: "時間 ＝ 自動運転までの時間 ＋ 本数 ×（ビレットの長さ ÷ ラム速度 ＋ ビレットの交換時間）。開始の時刻（最初は 8:00）から計画の順番に足しています。昼休みは 45分。ラム速度・長さ・nBn は、その型のいちばん新しい押出指示書。押出材（計画）＝ ビレット本数 ÷ n × m × 穴数。",
+          nitride: "窒素加熱",
+        },
+        vi: {
+          btn_back_plan: "← Về kế hoạch ép đùn", title: "Lịch ép đùn", all_machines: "Tất cả máy", btn_print: "In",
+          btn_print_one: "In máy {m}", machine: "MÁY", lbl_start: "Bắt đầu", lbl_lunch: "Nghỉ trưa (45 phút)", lbl_lunch_pos: "Vị trí",
+          lunch_auto: "Tự động (gần 12:00 nhất)", lunch_after: "Sau {die}", lunch_row: "NGHỈ TRƯA", msg_saved: "Đã lưu", col_main: "KHUÔN CHÍNH", col_spare: "KHUÔN DỰ BỊ", col_billet: "SỐ BILLET", col_length: "Chiều dài(mm)",
+          col_plan: "KH", col_actual: "TT", col_bars_plan: "Số thanh (KH)", col_bars_actual: "Số thanh (TT)",
+          col_minutes: "THỜI GIAN KH (phút)", col_timeline: "Timeline KH", col_start: "Start", col_end: "End",
+          col_actual_time: "Thời gian TT", col_note: "Ghi chú", empty: "Ngày này chưa có kế hoạch",
+          avg_note: "＊ Khuôn chưa có phiếu đùn nên tính theo thời gian trung bình mỗi billet ({sec} giây)",
+          est_warn: "Chưa đặt thời gian ép tiêu chuẩn nên đang tính theo ước tính từ thực tế (đến chạy tự động {startup} giây, thay billet {change} giây). Hãy đặt ở Cài đặt chung → \"Thời gian ép tiêu chuẩn\".",
+          info: "Thời gian = thời gian đến chạy tự động + số billet × (chiều dài billet ÷ tốc độ ram + thời gian thay billet). Cộng dần từ giờ bắt đầu (mặc định 8:00) theo thứ tự kế hoạch. Nghỉ trưa 45 phút. Tốc độ ram, chiều dài, nBn lấy từ phiếu đùn mới nhất của khuôn. Số thanh (KH) = số billet ÷ n × m × số lỗ.",
+          nitride: "N2",
+        },
+      };
+      function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
+      function t(k) { return dict[currentLang()][k] ?? dict.ja[k] ?? k; }
+      function setLang(lang) {
+        try { localStorage.setItem("lang", lang); } catch (e) {}
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        render();
+      }
+      function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+      function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+      const dmy = (s) => { const [y, m, d] = s.split("-"); return `${d}/${m}/${y}`; };
+
+      let sheets = [];   // [{ machine, data }]
+
+      async function load() {
+        const date = document.getElementById("fDate").value;
+        const mc = Number(document.getElementById("fMachine").value);
+        const machines = mc ? [mc] : [1, 2, 3, 4];
+        const results = await Promise.all(machines.map(async (m) => {
+          const res = await fetch(`./php/press_plan/get_schedule.php?date=${date}&machine=${m}`);
+          return { machine: m, data: await res.json() };
+        }));
+        // 全号機のときは、計画のある号機だけ
+        sheets = mc ? results : results.filter((s) => s.data.rows.length);
+        if (!mc && !sheets.length) sheets = [{ machine: 0, data: { rows: [] } }];
+        render();
+      }
+
+      function render() {
+        const date = document.getElementById("fDate").value;
+        document.getElementById("sheets").innerHTML = sheets.map(({ machine, data }) => {
+          const title = `${dmy(date)}${machine ? ` (${t("machine")} ${machine})` : ""}`;
+          if (!data.rows.length) {
+            return `<div class="sheet"><div class="sheet-title">${title}</div><div class="empty-note" style="border:1px solid #333;">${t("empty")}</div></div>`;
+          }
+          const sd = data.standard;
+          const plans = data.rows.filter((r) => r.type === "plan");
+          const usesAvg = plans.some((r) => r.using_average);
+          const sum = (k) => plans.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+          const totalMinutes = data.rows.reduce((a, r) => a + (Number(r.minutes) || 0), 0);   // 昼休みを含む（Excel と同じ）
+          const hasActual = plans.some((r) => r.actual_billets != null);
+          return `<div class="sheet" data-machine="${machine}">
+            <div class="sheet-tools no-print">
+              <label><span class="day-lbl">${t("lbl_start")}</span><input type="time" value="${data.day.start_time}" onchange="saveDay(${machine}, { start_time: this.value })" /></label>
+              <label><input type="checkbox" ${data.day.has_lunch ? "checked" : ""} onchange="saveDay(${machine}, { has_lunch: this.checked ? 1 : 0 })" /><span class="day-lbl">${t("lbl_lunch")}</span></label>
+              ${data.day.has_lunch ? `<label>${t("lbl_lunch_pos")}
+                <select onchange="saveDay(${machine}, { lunch_after_plan_id: Number(this.value) })">
+                  <option value="0" ${data.day.lunch_auto ? "selected" : ""}>${t("lunch_auto")}</option>
+                  ${plans.map((r) => `<option value="${r.plan_id}" ${!data.day.lunch_auto && r.plan_id === data.day.lunch_after_plan_id ? "selected" : ""}>${t("lunch_after").replace("{die}", esc(r.die_number))}</option>`).join("")}
+                </select></label>` : ""}
+              <button class="btn-print-one" onclick="printOne(${machine})">${t("btn_print_one").replace("{m}", machine)}</button>
+            </div>
+            ${sd.using_estimate ? `<div class="warn no-print">${t("est_warn").replace("{startup}", sd.startup_sec).replace("{change}", sd.billet_change_sec)}</div>` : ""}
+            <div class="sheet-title">${title}</div>
+            <table>
+              <thead>
+                <tr>
+                  <th rowspan="2">${t("col_main")}</th><th rowspan="2">${t("col_spare")}</th>
+                  <th colspan="3">${t("col_billet")}</th>
+                  <th rowspan="2">${t("col_bars_plan")}</th><th rowspan="2">${t("col_bars_actual")}</th>
+                  <th rowspan="2">${t("col_minutes")}</th>
+                  <th colspan="2">${t("col_timeline")}</th>
+                  <th rowspan="2">${t("col_actual_time")}</th>
+                  <th rowspan="2">${t("col_note")}</th>
+                </tr>
+                <tr>
+                  <th>${t("col_length")}</th><th>${t("col_plan")}</th><th>${t("col_actual")}</th>
+                  <th>${t("col_start")}</th><th>${t("col_end")}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.rows.map((r) => {
+                  if (r.type === "lunch") {
+                    return `<tr class="lunch"><td>${t("lunch_row")}</td><td></td><td></td><td></td><td></td><td></td><td></td>
+                      <td class="num">${r.minutes}</td><td class="c">${r.start}</td><td class="c">${r.end}</td><td></td><td></td></tr>`;
+                  }
+                  const notes = [r.note, ...r.spares.map((s) => s.note)].filter(Boolean).map(esc);
+                  if (r.nitride_use) notes.unshift(t("nitride"));
+                  const short = r.actual_billets != null && r.actual_billets < r.plan_billets;
+                  return `<tr>
+                    <td>${esc(r.die_number)}</td>
+                    <td>${r.spares.map((s) => esc(s.die_number)).join("<br>")}</td>
+                    <td class="num">${r.billet_length ?? ""}${r.billet_origin ? ` (${["", "Dubai", "VN"][r.billet_origin]})` : ""}</td>
+                    <td class="num">${r.plan_billets}</td>
+                    <td class="num actual ${short ? "short" : ""}">${r.actual_billets ?? ""}</td>
+                    <td class="num">${r.plan_bars ?? ""}</td>
+                    <td class="num actual">${r.actual_bars ?? ""}</td>
+                    <td class="num">${r.minutes}${r.using_average ? ` <span class="avg-mark">＊</span>` : ""}</td>
+                    <td class="c">${r.start}</td><td class="c">${r.end}</td>
+                    <td class="c actual">${r.actual_start ? `${r.actual_start}–${r.actual_finish}` : ""}</td>
+                    <td class="note">${notes.join(" / ")}</td>
+                  </tr>`;
+                }).join("")}
+                <tr class="total">
+                  <td></td><td></td><td></td>
+                  <td class="sum">${sum("plan_billets")}</td>
+                  <td class="sum">${hasActual ? sum("actual_billets") : ""}</td>
+                  <td class="sum">${sum("plan_bars")}</td>
+                  <td class="sum">${hasActual ? sum("actual_bars") : ""}</td>
+                  <td class="sum">${totalMinutes}</td>
+                  <td></td><td></td><td></td><td></td>
+                </tr>
+              </tbody>
+            </table>
+            ${usesAvg ? `<div class="info">${t("avg_note").replace("{sec}", sd.avg_sec_per_billet)}</div>` : ""}
+            <div class="info no-print">${t("info")}</div>
+          </div>`;
+        }).join("");
+      }
+
+      // 日付・号機ごとの設定（開始の時刻・昼休み）を保存して、その号機を出し直す
+      async function saveDay(machine, change) {
+        const sheet = sheets.find((x) => x.machine === machine);
+        const d = sheet.data.day;
+        const body = {
+          plan_date: document.getElementById("fDate").value, press_machine: machine,
+          start_time: d.start_time, has_lunch: d.has_lunch,
+          lunch_after_plan_id: d.lunch_auto ? 0 : (d.lunch_after_plan_id ?? 0),
+          ...change,
+        };
+        if (!/^\d{2}:\d{2}$/.test(body.start_time)) return;
+        await fetch("./php/press_plan/save_schedule_day.php", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+        });
+        const res = await fetch(`./php/press_plan/get_schedule.php?date=${body.plan_date}&machine=${machine}`);
+        sheet.data = await res.json();
+        render();
+      }
+
+      // その号機の表だけを印刷する
+      function printOne(machine) {
+        document.querySelectorAll(".sheet").forEach((el) => el.classList.toggle("print-target", el.dataset.machine === String(machine)));
+        document.body.classList.add("print-one");
+        window.print();
+        document.body.classList.remove("print-one");
+      }
+
+      (async () => {
+        const q = new URLSearchParams(location.search);
+        document.getElementById("fDate").value = /^\d{4}-\d{2}-\d{2}$/.test(q.get("date") || "") ? q.get("date") : ymd(new Date());
+        const m = q.get("machine");
+        if (["1", "2", "3", "4"].includes(m)) document.getElementById("fMachine").value = m;
+        setLang(currentLang());
+        await load();
+      })();
+    </script>
+  </body>
+</html>

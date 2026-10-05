@@ -15,7 +15,7 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start) || !preg_match('/^\d{4}-\d{2}-\
 $sql = "
     SELECT pl.id, pl.plan_date, pl.press_machine, pl.dies_id, d.die_number,
            pl.production_number_id, pn.production_number,
-           pl.shift_id, pl.ordinal, pl.quantity, pl.nitride_use, pl.note
+           pl.shift_id, pl.ordinal, pl.quantity, pl.billet_origin, pl.billet_length, pl.nitride_use, pl.note
     FROM t_press_plan pl
     LEFT JOIN m_dies d ON d.id = pl.dies_id
     LEFT JOIN m_production_numbers pn ON pn.id = pl.production_number_id

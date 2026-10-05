@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Press Time Standard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: "Roboto Mono", "Segoe UI", monospace; background: #f0f2f5; padding: 20px; }
+      .container { max-width: 1200px; margin: 0 auto; }
+
+      .page-header {
+        background: #fff; border-radius: 10px; padding: 16px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        display: flex; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+      }
+      .back-btn { background: #2b6ca3; color: #fff; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap; }
+      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
+      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
+      .lang-btn { padding: 6px 12px; border: 1px solid #0078d4; background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px; }
+
+      .card { background: #fff; border-radius: 10px; padding: 18px 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 16px; }
+      .card-title { font-size: 14px; font-weight: bold; color: #1565c0; margin-bottom: 10px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px; }
+
+      table { border-collapse: collapse; font-size: 13px; }
+      th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
+      th { color: #777; font-size: 11px; }
+      .num { text-align: right; font-variant-numeric: tabular-nums; }
+      .group-head th { color: #1565c0; font-size: 12px; text-align: center; border-bottom: 2px solid #e8f1ff; }
+      .ref { color: #888; font-size: 12px; }
+      .ref-cell { background: #fafafa; }
+
+      input[type="number"] { width: 90px; padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 15px; font-family: inherit; text-align: right; }
+      input.changed { background: #fff8e1; border-color: #ffb300; }
+      select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; font-family: inherit; }
+      select.required { background: #fff8e1; border-color: #ffb300; }
+      .min-note { color: #888; font-size: 11px; margin-left: 4px; }
+      .btn-save { background: #1565c0; color: #fff; padding: 6px 16px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+      .btn-save:disabled { background: #90a4ae; cursor: default; }
+      .btn-copy { background: #fff; color: #1565c0; border: 1px solid #1565c0; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+      .hint { font-size: 12px; color: #888; line-height: 1.7; }
+      .staff-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+      .staff-row .lbl { font-size: 12px; font-weight: bold; color: #1565c0; }
+
+      #toast {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background: #323232; color: #fff; padding: 10px 20px; border-radius: 6px;
+        font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      }
+      #toast.show { opacity: 1; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="page-header">
+        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
+        <h1 data-key="title">押出時間の標準</h1>
+        <div class="lang-wrap">
+          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title" data-key="card_title">号機ごとの標準時間（押出計画のスケジュールに使う）</div>
+        <div class="staff-row">
+          <span class="lbl" data-key="lbl_staff">更新する人</span>
+          <select id="fStaff" onchange="onStaffChange()"></select>
+        </div>
+        <table>
+          <thead>
+            <tr class="group-head">
+              <th></th>
+              <th colspan="2" data-key="grp_standard">標準（ここで決める）</th>
+              <th></th>
+              <th colspan="3" class="ref-cell" data-key="grp_ref">参考：直近1年の実績</th>
+              <th></th>
+            </tr>
+            <tr id="headRow"></tr>
+          </thead>
+          <tbody id="body"></tbody>
+        </table>
+        <div class="hint" style="margin-top:12px;" data-key="hint">
+          押出の時間 ＝ 自動運転までの時間 ＋ ビレット本数 ×（ビレットの長さ ÷ ラム速度 ＋ ビレットの交換時間）。ラム速度とビレットの長さは、その型のいちばん新しい押出指示書の値。押出指示書の無い型は、1本あたりの平均を使う。
+        </div>
+      </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+      const dict = {
+        ja: {
+          btn_back_menu: "← メニューへ戻る", title: "押出時間の標準",
+          card_title: "号機ごとの標準時間（押出計画のスケジュールに使う）",
+          lbl_staff: "更新する人", select_staff: "（選択）",
+          grp_standard: "標準（ここで決める）", grp_ref: "参考：直近1年の実績",
+          col_machine: "号機", col_startup: "金型交換直後の、自動運転までの時間（秒）", col_change: "ビレットを交換する時間（秒）",
+          col_updated: "更新", col_est_startup: "推定：自動運転まで", col_est_change: "推定：ビレット交換",
+          col_avg: "1本あたりの平均", btn_save: "保存", btn_copy: "推定値を入れる", minutes: "分", no_data: "実績なし",
+          tip_est: "押出全体の時間から「本数 × 長さ ÷ ラム速度」を引いた残りを、自動運転までの時間と本数 × ビレットの交換時間に当てはめた推定（押出 {n} 件）",
+          tip_avg: "押出指示書の無い型のスケジュールに使う（押出の時間の合計 ÷ ビレット本数の合計）",
+          hint: "押出の時間 ＝ 自動運転までの時間 ＋ ビレット本数 ×（ビレットの長さ ÷ ラム速度 ＋ ビレットの交換時間）。ラム速度とビレットの長さは、その型のいちばん新しい押出指示書の値。押出指示書の無い型は、1本あたりの平均を使う。",
+          msg_saved: "保存しました",
+        },
+        vi: {
+          btn_back_menu: "← Về menu", title: "Thời gian ép tiêu chuẩn",
+          card_title: "Thời gian tiêu chuẩn theo máy (dùng cho lịch ép trong kế hoạch ép đùn)",
+          lbl_staff: "Người cập nhật", select_staff: "(Chọn)",
+          grp_standard: "Tiêu chuẩn (đặt tại đây)", grp_ref: "Tham khảo: thực tế 1 năm gần nhất",
+          col_machine: "Máy", col_startup: "Thời gian từ khi thay khuôn đến khi chạy tự động (giây)", col_change: "Thời gian thay billet (giây)",
+          col_updated: "Cập nhật", col_est_startup: "Ước tính: đến chạy tự động", col_est_change: "Ước tính: thay billet",
+          col_avg: "Trung bình mỗi billet", btn_save: "Lưu", btn_copy: "Điền giá trị ước tính", minutes: "phút", no_data: "Không có dữ liệu",
+          tip_est: "Ước tính từ thời gian ép thực tế trừ đi (số billet × chiều dài ÷ tốc độ ram) ({n} lần ép)",
+          tip_avg: "Dùng cho khuôn chưa có phiếu đùn (tổng thời gian ép ÷ tổng số billet)",
+          hint: "Thời gian ép = thời gian đến chạy tự động + số billet × (chiều dài billet ÷ tốc độ ram + thời gian thay billet). Tốc độ ram và chiều dài billet lấy từ phiếu đùn mới nhất của khuôn. Khuôn chưa có phiếu đùn thì dùng thời gian trung bình mỗi billet.",
+          msg_saved: "Đã lưu",
+        },
+      };
+      function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
+      function t(k) { return dict[currentLang()][k] ?? dict.ja[k] ?? k; }
+      function setLang(lang) {
+        try { localStorage.setItem("lang", lang); } catch (e) {}
+        document.querySelectorAll("[data-key]").forEach((el) => {
+          const k = el.getAttribute("data-key");
+          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+        });
+        renderStaff(); render();
+      }
+      function showToast(msg, ok = true) {
+        const el = document.getElementById("toast");
+        el.textContent = msg; el.style.background = ok ? "#323232" : "#c62828";
+        el.classList.add("show");
+        clearTimeout(showToast.timer);
+        showToast.timer = setTimeout(() => el.classList.remove("show"), 2500);
+      }
+      function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+      const toMin = (sec) => (sec === null || sec === "" || isNaN(sec)) ? "" : `≈ ${(Number(sec) / 60).toFixed(1)} ${t("minutes")}`;
+
+      let rows = [], staff = [];
+
+      function renderStaff() {
+        const sel = document.getElementById("fStaff");
+        const cur = sel.value;
+        sel.innerHTML = `<option value="0">${t("select_staff")}</option>` + staff.map((s) => `<option value="${s.id}">${esc(s.staff_name)}</option>`).join("");
+        let saved = cur;
+        if (!saved) { try { saved = localStorage.getItem("pressTimeStaff") || "0"; } catch (e) { saved = "0"; } }
+        sel.value = staff.some((s) => String(s.id) === saved) ? saved : "0";
+        sel.classList.toggle("required", sel.value === "0");
+      }
+      function onStaffChange() {
+        const sel = document.getElementById("fStaff");
+        try { localStorage.setItem("pressTimeStaff", sel.value); } catch (e) {}
+        sel.classList.toggle("required", sel.value === "0");
+        rows.forEach((_, i) => checkRow(i));
+      }
+
+      function render() {
+        document.getElementById("headRow").innerHTML = `
+          <th>${t("col_machine")}</th><th>${t("col_startup")}</th><th>${t("col_change")}</th><th></th>
+          <th class="ref-cell" title="${t("tip_est").replace(/\s*[（(][^（(]*\{n\}[^）)]*[）)]/, "")}">${t("col_est_startup")}</th>
+          <th class="ref-cell">${t("col_est_change")}</th>
+          <th class="ref-cell" title="${t("tip_avg")}">${t("col_avg")}</th>
+          <th>${t("col_updated")}</th>`;
+        document.getElementById("body").innerHTML = rows.map((r, i) => {
+          const e = r.estimate;
+          const estTip = e ? t("tip_est").replace("{n}", e.n) : "";
+          return `<tr>
+            <td><b>No.${r.press_machine}</b></td>
+            <td><input type="number" min="0" step="1" id="st${i}" value="${r.startup_sec ?? ""}" oninput="checkRow(${i})" /><span class="min-note" id="stMin${i}">${toMin(r.startup_sec)}</span></td>
+            <td><input type="number" min="0" step="1" id="bc${i}" value="${r.billet_change_sec ?? ""}" oninput="checkRow(${i})" /></td>
+            <td><button class="btn-save" id="save${i}" onclick="saveRow(${i})" disabled>${t("btn_save")}</button></td>
+            <td class="ref-cell num ref" title="${estTip}">${e ? `${e.startup_sec} s <span class="min-note">${toMin(e.startup_sec)}</span>` : t("no_data")}</td>
+            <td class="ref-cell num ref" title="${estTip}">${e ? `${e.billet_change_sec} s` : t("no_data")}
+              ${e ? `<br><button class="btn-copy" onclick="copyEstimate(${i})">${t("btn_copy")}</button>` : ""}</td>
+            <td class="ref-cell num ref" title="${t("tip_avg")}">${r.avg_sec_per_billet != null ? `${r.avg_sec_per_billet} s` : t("no_data")}</td>
+            <td class="ref">${r.updated_at ? `${esc(r.updated_at)}<br>${esc(r.updated_staff_name ?? "")}` : "-"}</td>
+          </tr>`;
+        }).join("");
+      }
+
+      function checkRow(i) {
+        const r = rows[i];
+        const st = document.getElementById(`st${i}`), bc = document.getElementById(`bc${i}`);
+        st.classList.toggle("changed", st.value !== String(r.startup_sec ?? ""));
+        bc.classList.toggle("changed", bc.value !== String(r.billet_change_sec ?? ""));
+        document.getElementById(`stMin${i}`).textContent = toMin(st.value);
+        const valid = /^\d+$/.test(st.value) && /^\d+$/.test(bc.value);
+        const changed = st.classList.contains("changed") || bc.classList.contains("changed");
+        document.getElementById(`save${i}`).disabled = !(valid && changed && document.getElementById("fStaff").value !== "0");
+      }
+
+      function copyEstimate(i) {
+        const e = rows[i].estimate;
+        if (!e) return;
+        document.getElementById(`st${i}`).value = e.startup_sec;
+        document.getElementById(`bc${i}`).value = e.billet_change_sec;
+        checkRow(i);
+      }
+
+      async function saveRow(i) {
+        const res = await fetch("./php/press_time_standard/save.php", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            press_machine: rows[i].press_machine,
+            startup_sec: document.getElementById(`st${i}`).value,
+            billet_change_sec: document.getElementById(`bc${i}`).value,
+            staff_id: document.getElementById("fStaff").value,
+          }),
+        });
+        const result = await res.json();
+        if (!result.ok) { showToast(result.message || "error", false); return; }
+        showToast(t("msg_saved"));
+        await load();
+      }
+
+      async function load() {
+        const res = await fetch("./php/press_time_standard/get.php");
+        const data = await res.json();
+        rows = data.rows; staff = data.staff;
+        renderStaff(); render();
+      }
+
+      (async () => { setLang(currentLang()); await load(); })();
+    </script>
+  </body>
+</html>

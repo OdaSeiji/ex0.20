@@ -41,7 +41,7 @@
         background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
       }
 
-      .columns { display: grid; grid-template-columns: max-content 560px minmax(0, 1fr); gap: 12px; align-items: start; }
+      .columns { display: grid; grid-template-columns: max-content 600px minmax(0, 1fr); gap: 12px; align-items: start; }
       .card {
         background: #fff;
         border-radius: 10px;
@@ -92,6 +92,9 @@
       .add-table input[type="text"], .add-table input[type="number"], .add-table select { padding: 3px 4px; font-size: 12px; }
       .add-table .w-ord { width: 46px; }
       .add-table .w-qty { width: 56px; text-align: right; }
+      .add-table .billet-cell { display: flex; gap: 2px; }
+      .add-table .w-origin { width: 58px; }
+      .add-table .w-len { width: 52px; text-align: right; }
       .add-table { table-layout: fixed; }
       .add-table td { overflow: hidden; text-overflow: ellipsis; }
       .add-table .w-note { width: 100%; }
@@ -116,6 +119,7 @@
       tr.same-date.m4 td { background: #f3e5f5; }
       tr.selected td { font-weight: bold; outline: 2px solid #1565c0; outline-offset: -2px; }
 
+      .btn-schedule { margin-left: auto; background: #455a64; color: #fff; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
       .row-del { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
       .row-del:hover { color: #fff; background: #c62828; border-radius: 3px; }
       dialog#deleteDialog {
@@ -222,6 +226,7 @@
             <select id="fListMachine" onchange="loadPlans()">
               <option value="0" data-key="all_machines">全号機</option><option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
             </select>
+            <button class="btn-schedule" onclick="openSchedule()" data-key="btn_schedule">スケジュール表</button>
           </div>
           <div class="scroll" style="height: calc(100vh - 170px);">
             <table>
@@ -264,7 +269,8 @@
           lbl_tank: "タンク", lg_nitriding: "窒化が必要", lg_fixing: "修理中", lg_nopress: "洗浄が必要", hint_click_die: "行をクリックすると計画に追加",
           plan_new_title: "計画の作成", plan_edit_title: "計画の修正", edit_badge: "修正中",
           lbl_plan_date: "押出日", lbl_machine: "号機",
-          col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考",
+          col_shift: "直", col_ordinal: "順番", col_qty: "本数", col_nitride: "窒素加熱", col_note: "備考", col_billet: "ビレット", origin_0: "未定", origin_1: "Dubai", origin_2: "VN",
+          ph_len: "長さ", tip_billet: "ビレットの種類と長さ(mm)。長さが空なら押出指示書の長さを使う",
           tip_nitride: "金型を窒素雰囲気の中で加熱するかどうか",
           nitride_yes: "Yes", nitride_no: "No",
           btn_clear: "クリア", btn_save: "保存", btn_update: "更新する",
@@ -279,7 +285,7 @@
           col_size: "サイズ", col_material: "材質", col_length: "長さ", col_stock: "在庫", col_used: "実績", col_plan: "計画", col_order: "発注",
           tip_stock_at: "在庫の調査日",
           dlg_confirm: "この計画を削除しますか？", lbl_passcode: "パスコード", dlg_cancel: "キャンセル", dlg_delete: "削除する",
-          msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除",
+          msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除", btn_schedule: "スケジュール表",
         },
         vi: {
           btn_back_menu: "← Về menu", title: "Kế hoạch ép đùn",
@@ -292,7 +298,8 @@
           lbl_tank: "Bể", lg_nitriding: "Cần thấm nitơ", lg_fixing: "Đang sửa", lg_nopress: "Cần rửa", hint_click_die: "Bấm vào dòng để thêm vào kế hoạch",
           plan_new_title: "Tạo kế hoạch", plan_edit_title: "Sửa kế hoạch", edit_badge: "Đang sửa",
           lbl_plan_date: "Ngày ép", lbl_machine: "Máy",
-          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú",
+          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú", col_billet: "Billet", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
+          ph_len: "Dài", tip_billet: "Loại billet và chiều dài (mm). Để trống chiều dài thì dùng theo phiếu đùn",
           tip_nitride: "Có gia nhiệt khuôn trong môi trường khí nitơ hay không",
           nitride_yes: "Yes", nitride_no: "No",
           btn_clear: "Xóa", btn_save: "Lưu", btn_update: "Cập nhật",
@@ -307,7 +314,7 @@
           col_size: "Cỡ", col_material: "Vật liệu", col_length: "Dài", col_stock: "Tồn HT", col_used: "Thực tế", col_plan: "Kế hoạch", col_order: "Order",
           tip_stock_at: "Ngày kiểm kê",
           dlg_confirm: "Xóa kế hoạch này?", lbl_passcode: "Mã xác nhận", dlg_cancel: "Hủy", dlg_delete: "Xóa",
-          msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa",
+          msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa", btn_schedule: "Lịch ép",
         },
       };
       function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
@@ -336,6 +343,12 @@
       }
       function ymd(d) { return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
       function esc(s) { return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+      // ビレットの表示（例：1120 (VN)）
+      function billetLabel(len, origin) {
+        const o = Number(origin) ? t(`origin_${origin}`) : "";
+        return [len || "", o ? `(${o})` : ""].filter(Boolean).join(" ");
+      }
 
       const SHIFTS = [{ id: 4, label: "HC" }, { id: 1, label: "1" }, { id: 2, label: "2" }, { id: 3, label: "3" }];
       const shiftLabel = (id) => (SHIFTS.find((s) => s.id === Number(id)) || {}).label ?? "-";
@@ -449,7 +462,7 @@
         addRows.push({
           dies_id: d.dies_id, die_number: d.die_number, products: d.products,
           production_number_id: d.products.length ? d.products[0].id : 0,
-          shift_id: 4, ordinal: String(addRows.length + 1), quantity: "", nitride_use: 0, note: "",
+          shift_id: 4, ordinal: String(addRows.length + 1), quantity: "", billet_origin: 0, billet_length: "", nitride_use: 0, note: "",
         });
         renderAdd(); renderDies(); checkForm();
       }
@@ -457,9 +470,9 @@
       function renderAdd() {
         document.getElementById("addHead").innerHTML = `
           <th style="width:130px">${t("col_die")}</th><th style="width:50px">${t("col_shift")}</th><th style="width:46px">${t("col_ordinal")}</th>
-          <th class="num" style="width:58px">${t("col_qty")}</th><th style="width:54px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
+          <th class="num" style="width:58px">${t("col_qty")}</th><th style="width:116px" title="${t("tip_billet")}">${t("col_billet")}</th><th style="width:54px" title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th style="width:22px"></th>`;
         const body = document.getElementById("addBody");
-        if (!addRows.length) { body.innerHTML = `<tr><td colspan="7" class="empty-note">${t("empty_add")}</td></tr>`; return; }
+        if (!addRows.length) { body.innerHTML = `<tr><td colspan="8" class="empty-note">${t("empty_add")}</td></tr>`; return; }
         body.innerHTML = addRows.map((r, i) => `
           <tr>
             <td title="${esc(r.products.find((p) => p.id === r.production_number_id)?.production_number ?? "")}">${esc(r.die_number)}${r.products.length > 1
@@ -468,6 +481,10 @@
             <td><select onchange="setAdd(${i}, 'shift_id', Number(this.value))">${SHIFTS.map((s) => `<option value="${s.id}" ${s.id === r.shift_id ? "selected" : ""}>${s.label}</option>`).join("")}</select></td>
             <td><input type="text" class="w-ord" value="${esc(r.ordinal)}" oninput="setAdd(${i}, 'ordinal', this.value)" /></td>
             <td><input type="number" min="0" step="1" class="w-qty ${/^\d+$/.test(r.quantity) ? "" : "required"}" value="${esc(r.quantity)}" oninput="setAdd(${i}, 'quantity', this.value); this.classList.toggle('required', !/^\\d+$/.test(this.value))" /></td>
+            <td><div class="billet-cell">
+              <select class="w-origin" onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select>
+              <input type="number" min="1" step="1" class="w-len" placeholder="${t("ph_len")}" value="${esc(r.billet_length)}" oninput="setAdd(${i}, 'billet_length', this.value)" />
+            </div></td>
             <td><select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></td>
             <td><input type="text" class="w-note" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></td>
             <td>${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</td>
@@ -481,7 +498,7 @@
         dateEl.classList.toggle("required", !dateEl.value);
         mcEl.classList.toggle("required", mcEl.value === "0");
         const ok = dateEl.value && mcEl.value !== "0" && addRows.length > 0 &&
-          addRows.every((r) => r.production_number_id > 0 && /^\d+$/.test(String(r.quantity)));
+          addRows.every((r) => r.production_number_id > 0 && /^\d+$/.test(String(r.quantity)) && /^(|[1-9]\d*)$/.test(String(r.billet_length ?? "")));
         document.getElementById("saveBtn").disabled = !ok;
         document.getElementById("updateBtn").disabled = !ok;
       }
@@ -579,9 +596,10 @@
         document.getElementById("planHead").innerHTML = `
           <th>${t("col_date")}</th><th>${t("col_mc")}</th><th>${t("col_pn")}</th><th>${t("col_die")}</th>
           <th>${t("col_shift")}</th><th>${t("col_ordinal")}</th><th class="num">${t("col_qty")}</th>
+          <th title="${t("tip_billet")}">${t("col_billet")}</th>
           <th title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th></th>`;
         const body = document.getElementById("planBody");
-        if (!plans.length) { body.innerHTML = `<tr><td colspan="10" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
+        if (!plans.length) { body.innerHTML = `<tr><td colspan="11" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
         const sel = plans.find((p) => p.id === selectedPlanId);
         body.innerHTML = plans.map((p) => {
           const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
@@ -590,7 +608,7 @@
             <td>${p.plan_date}</td><td>${p.press_machine}</td>
             <td>${esc(p.production_number ?? "-")}</td><td>${esc(p.die_number ?? "-")}</td>
             <td>${shiftLabel(p.shift_id)}</td><td>${esc(p.ordinal ?? "")}</td>
-            <td class="num">${p.quantity}</td><td>${Number(p.nitride_use) === 1 ? "Yes" : "No"}</td>
+            <td class="num">${p.quantity}</td><td>${esc(billetLabel(p.billet_length, p.billet_origin))}</td><td>${Number(p.nitride_use) === 1 ? "Yes" : "No"}</td>
             <td>${esc(p.note ?? "")}</td>
             <td><button class="row-del" title="${t("tip_delete")}" onclick="event.stopPropagation(); openDelete(${p.id})">✕</button></td>
           </tr>`;
@@ -610,13 +628,22 @@
         addRows = [{
           dies_id: p.dies_id, die_number: p.die_number ?? "-", products,
           production_number_id: p.production_number_id, shift_id: Number(p.shift_id) || 4,
-          ordinal: p.ordinal ?? "", quantity: String(p.quantity ?? ""), nitride_use: Number(p.nitride_use) === 1 ? 1 : 0, note: p.note ?? "",
+          ordinal: p.ordinal ?? "", quantity: String(p.quantity ?? ""),
+          billet_origin: Number(p.billet_origin) || 0, billet_length: p.billet_length != null ? String(p.billet_length) : "", nitride_use: Number(p.nitride_use) === 1 ? 1 : 0, note: p.note ?? "",
         }];
         document.getElementById("fPlanDate").value = p.plan_date;
         document.getElementById("fMachine").value = String(p.press_machine);
         setEditMode(true);
         renderAdd(); renderDies(); renderPlans(); checkForm();
         showToast(t("msg_loaded"));
+      }
+
+      /* ── スケジュール表：選んだ計画の日（無ければ期間の始まり）と、選んだ号機で開く ── */
+      function openSchedule() {
+        const sel = plans.find((p) => p.id === selectedPlanId);
+        const date = sel ? sel.plan_date : document.getElementById("fStart").value;
+        const mc = sel ? sel.press_machine : document.getElementById("fListMachine").value;
+        window.open(`press_schedule.html?date=${date}&machine=${mc}`, "_blank");
       }
 
       /* ── 削除（パスコードはサーバー側で確かめる） ── */

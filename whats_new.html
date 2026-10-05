@@ -85,7 +85,59 @@
         </div>
       </div>
 
-      <!-- 2026-10-04 (最新) -->
+      <!-- 2026-10-05 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
+        <div class="entry-title" data-key="fk_title">押出計画：ビレットの種類と長さ、スケジュール表のボタン</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fk_purpose">現場の計画表のように、計画の段階でビレットの種類（VN／Dubai）と長さを決められるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fk_content">中央の計画の表に「ビレット」の欄を追加し、種類（未定／Dubai／VN）と長さ（mm）を入れられるようにした。長さが空なら押出指示書の長さを使う。右の一覧には「1120 (VN)」の形で表示。右の一覧の上に「スケジュール表」ボタンを追加。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
+        <div class="entry-title" data-key="fj_title">押出スケジュール表を新設</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fj_purpose">現場の要望で、何時から押し、どれくらいかかるかの1日の予定表を出すため（現場の Excel の計画表と同じ形）。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fj_content">押出計画の「スケジュール表」ボタンで開く。日付・号機ごとに、金型・予備の金型・ビレット（長さ・計画・実績）・押出材（計画・実績）・計画の時間・開始と終了・実績の時刻・備考を表示。時間＝自動運転までの時間＋本数×（長さ÷ラム速度＋ビレット交換時間）。押出指示書の無い型は1本あたりの平均で計算し「＊」で示す。押出材（計画）＝ビレット本数÷n×m×穴数。開始の時刻と昼休み（45分、位置は自動で12:00に近い型の区切り、選び直し可）を日付・号機ごとに保存。号機ごとに印刷できる。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_schedule.html'">press_schedule.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
+        <div class="entry-title" data-key="fi_title">押出時間の標準を新設</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fi_purpose">押出スケジュール表の時間を計算するため、号機ごとの標準の時間を決められるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fi_content">各種設定の5段目に追加。号機ごとに「金型交換直後の、自動運転までの時間（秒）」と「ビレットを交換する時間（秒）」を決めて保存する（更新した人と日時を記録）。参考として、直近1年の実績からの推定値と1本あたりの平均を表示し、「推定値を入れる」で入力欄に写せる。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_time_standard.html'">press_time_standard.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-04 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -865,6 +917,15 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fk_title: "押出計画：ビレットの種類と長さ、スケジュール表のボタン",
+          fk_purpose: "現場の計画表のように、計画の段階でビレットの種類（VN／Dubai）と長さを決められるようにするため。",
+          fk_content: "中央の計画の表に「ビレット」の欄を追加し、種類（未定／Dubai／VN）と長さ（mm）を入れられるようにした。長さが空なら押出指示書の長さを使う。右の一覧には「1120 (VN)」の形で表示。右の一覧の上に「スケジュール表」ボタンを追加。",
+          fj_title: "押出スケジュール表を新設",
+          fj_purpose: "現場の要望で、何時から押し、どれくらいかかるかの1日の予定表を出すため（現場の Excel の計画表と同じ形）。",
+          fj_content: "押出計画の「スケジュール表」ボタンで開く。日付・号機ごとに、金型・予備の金型・ビレット（長さ・計画・実績）・押出材（計画・実績）・計画の時間・開始と終了・実績の時刻・備考を表示。時間＝自動運転までの時間＋本数×（長さ÷ラム速度＋ビレット交換時間）。押出指示書の無い型は1本あたりの平均で計算し「＊」で示す。押出材（計画）＝ビレット本数÷n×m×穴数。開始の時刻と昼休み（45分、位置は自動で12:00に近い型の区切り、選び直し可）を日付・号機ごとに保存。号機ごとに印刷できる。",
+          fi_title: "押出時間の標準を新設",
+          fi_purpose: "押出スケジュール表の時間を計算するため、号機ごとの標準の時間を決められるようにするため。",
+          fi_content: "各種設定の5段目に追加。号機ごとに「金型交換直後の、自動運転までの時間（秒）」と「ビレットを交換する時間（秒）」を決めて保存する（更新した人と日時を記録）。参考として、直近1年の実績からの推定値と1本あたりの平均を表示し、「推定値を入れる」で入力欄に写せる。",
           fh_title: "押出計画を ex0.20 に移植",
           fh_purpose: "ex0.11 の PressPlan（押出計画）を ex0.20 で使えるようにするため。",
           fh_content: "トップメニューの 📦 生産管理に「押出計画」を追加。ex0.11 と同じ3列で、左に金型一覧（状態のバッジ、Press＝洗浄後の押出回数・Len＝窒化後の押出長さ・Wash＝窒化後の洗浄回数・径・良品率・次の窒化まで押せるビレット本数、窒化が必要／修理中／洗浄が必要の色分け）、中央に計画の作成・修正（押出日・号機・直・順番・本数・窒素加熱・備考）とビレットの在庫と発注の目安、右に計画の一覧（期間・型番・号機で絞り込み、パスコードで削除）。ex0.11 からの主な変更：修理中・洗浄が必要の色分けが表示されなかった不具合と、洗浄後の押出回数が 0/1 しか出なかった不具合を修正。計画を修正できるようにした。Max Billet の文字を梱包メモに保存しない。ビレットの表で計画が二重に数えられることがあった不具合を修正。保存先は今までと同じ t_press_plan。",
@@ -989,6 +1050,15 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fk_title: "Kế hoạch ép đùn: loại và chiều dài billet, nút lịch ép",
+          fk_purpose: "Để quyết định loại billet (VN / Dubai) và chiều dài ngay khi lập kế hoạch, giống bảng kế hoạch của xưởng.",
+          fk_content: "Thêm cột \"Billet\" vào bảng kế hoạch ở giữa để nhập loại (Chưa định / Dubai / VN) và chiều dài (mm). Để trống chiều dài thì dùng theo phiếu đùn. Danh sách bên phải hiển thị dạng \"1120 (VN)\". Thêm nút \"Lịch ép\" phía trên danh sách bên phải.",
+          fj_title: "Tạo lịch ép đùn",
+          fj_purpose: "Theo yêu cầu của xưởng, để có lịch trong ngày: ép từ mấy giờ và mất bao lâu (cùng dạng với bảng kế hoạch Excel của xưởng).",
+          fj_content: "Mở bằng nút \"Lịch ép\" trong kế hoạch ép đùn. Theo ngày và máy, hiển thị khuôn chính, khuôn dự bị, billet (chiều dài, KH, TT), số thanh (KH, TT), thời gian KH, bắt đầu và kết thúc, thời gian thực tế, ghi chú. Thời gian = thời gian đến chạy tự động + số billet × (chiều dài ÷ tốc độ ram + thời gian thay billet). Khuôn chưa có phiếu đùn thì tính theo trung bình mỗi billet và đánh dấu \"＊\". Số thanh (KH) = số billet ÷ n × m × số lỗ. Giờ bắt đầu và nghỉ trưa (45 phút, vị trí tự động gần 12:00, có thể chọn lại) được lưu theo ngày và máy. In được theo từng máy.",
+          fi_title: "Tạo thời gian ép tiêu chuẩn",
+          fi_purpose: "Để đặt thời gian tiêu chuẩn theo máy, dùng để tính thời gian trong lịch ép đùn.",
+          fi_content: "Thêm vào hàng thứ 5 của Cài đặt chung. Đặt và lưu cho từng máy \"thời gian từ khi thay khuôn đến khi chạy tự động (giây)\" và \"thời gian thay billet (giây)\" (ghi lại người và thời gian cập nhật). Tham khảo: giá trị ước tính từ thực tế 1 năm gần nhất và trung bình mỗi billet; nút \"Điền giá trị ước tính\" để chép vào ô nhập.",
           fh_title: "Chuyển màn hình kế hoạch ép đùn sang ex0.20",
           fh_purpose: "Để dùng PressPlan (kế hoạch ép đùn) của ex0.11 trên ex0.20.",
           fh_content: "Thêm \"Kế hoạch ép đùn\" vào nhóm 📦 Quản lý sản xuất ở menu chính. Bố cục 3 cột như ex0.11: bên trái là danh sách khuôn (nhãn trạng thái, Press = số lần ép sau rửa, Len = chiều dài ép sau thấm nitơ, Wash = số lần rửa sau thấm nitơ, đường kính, tỷ lệ OK, số billet còn ép được; tô màu cần thấm nitơ / đang sửa / cần rửa), ở giữa là tạo và sửa kế hoạch (ngày ép, máy, ca, Stt, số lượng, gia nhiệt N2, ghi chú) và bảng tồn kho billet / lượng cần đặt, bên phải là danh sách kế hoạch (lọc theo thời gian, mã khuôn, máy; xóa bằng mã xác nhận). Thay đổi chính so với ex0.11: sửa lỗi không hiển thị màu đang sửa / cần rửa và lỗi số lần ép sau rửa chỉ là 0/1; sửa được kế hoạch; không lưu chữ Max Billet vào ghi chú đóng gói; sửa lỗi kế hoạch bị tính hai lần trong bảng billet. Dữ liệu vẫn lưu vào t_press_plan.",
