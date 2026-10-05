@@ -1,5 +1,5 @@
 <?php
-// 計画の新規保存（複数行をまとめて）
+// 計画の新規保存（複数行をまとめて）。入力元は 1（ex0.20 押出計画）
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 require_once "plan_common.php";
@@ -22,8 +22,8 @@ if ($err) {
 try {
     $pdo->beginTransaction();
     $stmt = $pdo->prepare("
-        INSERT INTO t_press_plan (dies_id, production_number_id, shift_id, ordinal, quantity, pressing_type_id, billet_origin, billet_length, nitride_use, note, plan_date, press_machine)
-        VALUES (:dies_id, :production_number_id, :shift_id, :ordinal, :quantity, :pressing_type_id, :billet_origin, :billet_length, :nitride_use, :note, :plan_date, :press_machine)
+        INSERT INTO t_press_plan (dies_id, production_number_id, shift_id, ordinal, quantity, pressing_type_id, billet_origin, billet_length, nitride_use, note, plan_date, press_machine, entry_source)
+        VALUES (:dies_id, :production_number_id, :shift_id, :ordinal, :quantity, :pressing_type_id, :billet_origin, :billet_length, :nitride_use, :note, :plan_date, :press_machine, 1)
     ");
     foreach ($data as $d) {
         $stmt->execute($d + [":plan_date" => $body["plan_date"], ":press_machine" => (int)$body["press_machine"]]);

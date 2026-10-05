@@ -136,6 +136,9 @@
       tr.selected td { font-weight: bold; outline: 2px solid #1565c0; outline-offset: -2px; }
 
       .btn-schedule { margin-left: auto; background: #455a64; color: #fff; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
+      .src-badge { display: inline-block; padding: 0 6px; border-radius: 8px; font-size: 10px; font-weight: bold; }
+      .src-badge.src-new { background: #2e7d32; color: #fff; }
+      .src-badge.src-old { background: #e0e0e0; color: #666; }
       .row-del { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
       .row-del:hover { color: #fff; background: #c62828; border-radius: 3px; }
       dialog#deleteDialog {
@@ -298,7 +301,7 @@
           col_size: "サイズ", col_material: "材質", col_length: "長さ", col_stock: "在庫", col_used: "実績", col_plan: "計画", col_order: "発注",
           tip_stock_at: "在庫の調査日",
           dlg_confirm: "この計画を削除しますか？", lbl_passcode: "パスコード", dlg_cancel: "キャンセル", dlg_delete: "削除する",
-          msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除", btn_schedule: "スケジュール表",
+          msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除", btn_schedule: "スケジュール表", col_src: "入力元", src_new: "新", src_old: "旧", tip_src: "新＝ex0.20 の押出計画で作成、旧＝ex0.11 で作成", tip_created: "作成", tip_updated: "更新",
         },
         vi: {
           btn_back_menu: "← Về menu", title: "Kế hoạch ép đùn",
@@ -327,7 +330,7 @@
           col_size: "Cỡ", col_material: "Vật liệu", col_length: "Dài", col_stock: "Tồn HT", col_used: "Thực tế", col_plan: "Kế hoạch", col_order: "Order",
           tip_stock_at: "Ngày kiểm kê",
           dlg_confirm: "Xóa kế hoạch này?", lbl_passcode: "Mã xác nhận", dlg_cancel: "Hủy", dlg_delete: "Xóa",
-          msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa", btn_schedule: "Lịch đùn",
+          msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa", btn_schedule: "Lịch đùn", col_src: "Nguồn", src_new: "Mới", src_old: "Cũ", tip_src: "Mới = tạo ở kế hoạch ép đùn ex0.20, Cũ = tạo ở ex0.11", tip_created: "Tạo", tip_updated: "Cập nhật",
         },
       };
       function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
@@ -615,9 +618,9 @@
           <th>${t("col_date")}</th><th>${t("col_mc")}</th><th>${t("col_pn")}</th><th>${t("col_die")}</th><th title="${t("tip_ptype")}">${t("col_ptype")}</th>
           <th>${t("col_shift")}</th><th>${t("col_ordinal")}</th><th class="num">${t("col_qty")}</th>
           <th title="${t("tip_billet")}">${t("col_billet")}</th>
-          <th title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th></th>`;
+          <th title="${t("tip_nitride")}">${t("col_nitride")}</th><th>${t("col_note")}</th><th title="${t("tip_src")}">${t("col_src")}</th><th></th>`;
         const body = document.getElementById("planBody");
-        if (!plans.length) { body.innerHTML = `<tr><td colspan="12" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
+        if (!plans.length) { body.innerHTML = `<tr><td colspan="13" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
         const sel = plans.find((p) => p.id === selectedPlanId);
         body.innerHTML = plans.map((p) => {
           const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
@@ -628,6 +631,8 @@
             <td>${shiftLabel(p.shift_id)}</td><td>${esc(p.ordinal ?? "")}</td>
             <td class="num">${p.quantity}</td><td>${esc(billetLabel(p.billet_length, p.billet_origin))}</td><td>${Number(p.nitride_use) === 1 ? "Yes" : "No"}</td>
             <td>${esc(p.note ?? "")}</td>
+            <td title="${t("tip_created")} ${esc(p.created_at ?? "")}${p.update_at && p.update_at !== p.created_at ? ` / ${t("tip_updated")} ${esc(p.update_at)}` : ""}">${Number(p.entry_source) === 1
+              ? `<span class="src-badge src-new">${t("src_new")}</span>` : `<span class="src-badge src-old">${t("src_old")}</span>`}</td>
             <td><button class="row-del" title="${t("tip_delete")}" onclick="event.stopPropagation(); openDelete(${p.id})">✕</button></td>
           </tr>`;
         }).join("");

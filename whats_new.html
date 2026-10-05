@@ -91,6 +91,23 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-05</span>
         </div>
+        <div class="entry-title" data-key="fp_title">押出計画：入力元（新／旧）と更新日時を記録</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fp_purpose">押出実績・押出指示書と同じく、計画が ex0.20 と旧画面のどちらで作られたかを区別し、いつ修正したかを分かるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fp_content">押出計画に「入力元」を追加した。ex0.20 の押出計画で新しく保存すると 1（新）、旧画面で作ったものは 0（旧）になる。あとから直しても値は変わらない。これまでの計画はすべて旧。修正すると更新日時が自動で変わるようにした。右の一覧に入力元のバッジを表示し、マウスを乗せると作成日時と更新日時が出る。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-05</span>
+        </div>
         <div class="entry-title" data-key="fo_title">押出スケジュール表：時間を実績から計算、押出計画の計画の作成を狭く</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fo_purpose">現場の指示で、スケジュールの時間を過去の押出の実績から出すため。あわせて画面の幅を抑えるため。</span>
@@ -987,6 +1004,9 @@
           ey_title: "押出指示書・押出日報入力：画面の見出しをトップメニューにそろえた",
           ey_purpose: "トップメニューの名前と各画面の見出しを同じにするため。",
           ey_content: "押出指示書の見出しを「プレス指示作成」から「押出指示書」に、押出日報入力の見出しを「プレス日報入力」から「🏭 押出日報入力」に変更した。ベトナム語の見出しもトップメニューと同じにした。",
+          fp_title: "押出計画：入力元（新／旧）と更新日時を記録",
+          fp_purpose: "押出実績・押出指示書と同じく、計画が ex0.20 と旧画面のどちらで作られたかを区別し、いつ修正したかを分かるようにするため。",
+          fp_content: "押出計画に「入力元」を追加した。ex0.20 の押出計画で新しく保存すると 1（新）、旧画面で作ったものは 0（旧）になる。あとから直しても値は変わらない。これまでの計画はすべて旧。修正すると更新日時が自動で変わるようにした。右の一覧に入力元のバッジを表示し、マウスを乗せると作成日時と更新日時が出る。",
           fo_title: "押出スケジュール表：時間を実績から計算、押出計画の計画の作成を狭く",
           fo_purpose: "現場の指示で、スケジュールの時間を過去の押出の実績から出すため。あわせて画面の幅を抑えるため。",
           fo_content: "計画の時間＝本数×ビレット1本あたりの時間。1本あたりの時間は、同じ号機で同じ系統の型（例：CQ32T3-V03D→CQ32T3）を押した直近5回の実績（押出の時間の合計÷ビレット本数の合計、5回未満ならある分だけ）、実績が無い型は同じ号機の直近20回の平均（「＊」で表示）。時間にマウスを乗せると何回分の実績かを表示。押出時間の標準は使わなくなったため、トップメニューから外した。押出計画の計画の作成は、順番・本数・ビレットの欄を狭くし、✕を2段目に移して、カードの幅を450pxから380pxにした。",
@@ -1132,6 +1152,9 @@
           ey_title: "Tạo phiếu đùn, Nhập báo cáo đùn hằng ngày: thống nhất tiêu đề màn hình với menu chính",
           ey_purpose: "Để tên trên menu chính và tiêu đề của từng màn hình giống nhau.",
           ey_content: "Đổi tiêu đề tiếng Nhật của màn hình tạo phiếu đùn và màn hình nhập báo cáo đùn hằng ngày cho giống menu chính. Tiêu đề tiếng Việt cũng giống menu chính: \"Tạo phiếu đùn\" và \"🏭 Nhập báo cáo đùn hằng ngày\".",
+          fp_title: "Kế hoạch ép đùn: ghi nguồn nhập (Mới / Cũ) và thời gian cập nhật",
+          fp_purpose: "Giống như kết quả ép và phiếu đùn, để phân biệt kế hoạch được tạo ở ex0.20 hay màn hình cũ, và biết đã sửa khi nào.",
+          fp_content: "Thêm \"Nguồn nhập\" vào kế hoạch ép đùn. Lưu mới ở kế hoạch ép đùn của ex0.20 là 1 (Mới), tạo ở màn hình cũ là 0 (Cũ). Sửa sau đó thì giá trị không đổi. Các kế hoạch trước đây đều là Cũ. Khi sửa, thời gian cập nhật tự động thay đổi. Danh sách bên phải hiển thị nhãn nguồn nhập; di chuột lên để xem thời gian tạo và cập nhật.",
           fo_title: "Lịch ép đùn: tính thời gian theo thực tế, thu hẹp phần tạo kế hoạch",
           fo_purpose: "Theo chỉ thị của xưởng, tính thời gian trong lịch từ thực tế đùn trước đây; đồng thời giảm độ rộng màn hình.",
           fo_content: "Thời gian kế hoạch = số billet × thời gian mỗi billet. Thời gian mỗi billet lấy từ thực tế 5 lần đùn gần nhất của cùng dòng khuôn (ví dụ CQ32T3-V03D → CQ32T3) trên cùng máy (tổng thời gian ÷ tổng số billet; ít hơn 5 lần thì dùng số lần có được); khuôn chưa có thực tế thì dùng trung bình 20 lần đùn gần nhất của máy (đánh dấu \"＊\"). Di chuột lên thời gian để xem dựa trên mấy lần thực tế. Không còn dùng thời gian đùn tiêu chuẩn nên đã bỏ khỏi menu chính. Phần tạo kế hoạch thu hẹp ô Stt, SL, billet, chuyển nút ✕ xuống dòng 2, độ rộng thẻ từ 450px còn 380px.",
