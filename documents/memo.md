@@ -5816,3 +5816,13 @@ T3とTを管理したい。
 
 - 似たような表が2つある（t_die_handover と t_die_handover_progress）。到着日は引き継ぎ一覧（t_die_handover）を正にして表示を一本化したが、表そのものの整理は今後の課題。m_dies.arrival_at も含めて整理する（documents/2026-10-01_work_summary.md）。
 - 金型 到着日入力（die_arrival.html）は停止した。
+
+# 20261006
+
+品番登録画面に、今は、品番、材質、断面積、製品長さ
+だけだけど、時効処理、比重も入れる。
+
+<figure style="text-align:center;">
+  <img src="./img/20261006-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
