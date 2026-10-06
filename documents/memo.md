@@ -5825,4 +5825,23 @@ T3とTを管理したい。
 <figure style="text-align:center;">
   <img src="./img/20261006-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
+
+</figure>
+
+# 20261007
+
+試押時、切断本数の入力を、不要とする。
+
+<figure style="text-align:center;">
+  <img src="./img/20261007-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+
+</figure>
+
+時間入力は、4桁数字＋Enterキーで入力が出来るようにする。
+
+<figure style="text-align:center;">
+  <img src="./img/20261007-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+
 </figure>
