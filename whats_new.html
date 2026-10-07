@@ -91,6 +91,23 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-08</span>
         </div>
+        <div class="entry-title" data-key="fv_title">押出日報の入力確認：PLC の帯にポンプ停止（3分以上）を濃い色で表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fv_purpose">PLC が「稼働」と出ていても、実際にはポンプが止まっていた時間を見分けられるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fv_content">PLC のログで all_pump_on が 0 の時間が3分以上続いたところを、PLC の帯の上に濃いグレーで重ねて表示する（帯の外には描かない）。マウスを乗せると停止の時刻と長さが出る。日をまたぐ停止は日付も出す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_coverage.html'">press_coverage.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
         <div class="entry-title" data-key="fu_title">部品登録：Excel ファイルも取り込めるように</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fu_purpose">CSV に保存し直さなくても、Excel のまま部品の取り込みができるようにするため。</span>
@@ -1103,6 +1120,9 @@
           fu_title: "部品登録：Excel ファイルも取り込めるように",
           fu_purpose: "CSV に保存し直さなくても、Excel のまま部品の取り込みができるようにするため。",
           fu_content: "ファイル選択で .xlsx / .xlsm / .xls も選べるようにした。Excel はいちばん左のシートを読み、1行目の見出しは CSV と同じ（die_number, note2）。金型番号の確認や重複のスキップは今までと同じ。",
+          fv_title: "押出日報の入力確認：PLC の帯にポンプ停止（3分以上）を濃い色で表示",
+          fv_purpose: "PLC が「稼働」と出ていても、実際にはポンプが止まっていた時間を見分けられるようにするため。",
+          fv_content: "PLC のログで all_pump_on が 0 の時間が3分以上続いたところを、PLC の帯の上に濃いグレーで重ねて表示する（帯の外には描かない）。マウスを乗せると停止の時刻と長さが出る。日をまたぐ停止は日付も出す。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1266,6 +1286,9 @@
           fu_title: "Đăng ký linh kiện: cho phép nhập trực tiếp file Excel",
           fu_purpose: "Để nhập linh kiện từ file Excel mà không cần lưu lại thành CSV.",
           fu_content: "Có thể chọn file .xlsx / .xlsm / .xls. Đọc sheet ngoài cùng bên trái; dòng 1 là tiêu đề giống CSV (die_number, note2). Việc kiểm tra mã khuôn và bỏ qua trùng lặp vẫn như cũ.",
+          fv_title: "Kiểm tra nhập báo cáo đùn: hiển thị bơm dừng (từ 3 phút) màu đậm trên dải PLC",
+          fv_purpose: "Để phân biệt thời gian bơm thực tế đã dừng dù PLC hiển thị là \"chạy\".",
+          fv_content: "Khi log PLC có all_pump_on = 0 kéo dài từ 3 phút, hiển thị màu xám đậm chồng lên dải PLC (không vẽ ngoài dải). Di chuột lên để xem giờ và thời gian dừng. Nếu dừng qua ngày thì hiển thị cả ngày.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

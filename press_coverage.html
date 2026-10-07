@@ -47,6 +47,7 @@
       .block.rec.old { background: #78909c; }
       .block.plc { background: #9e9e9e; }
       .block.plc.idle { background: #e0e0e0; color: #777; }
+      .block.pump-off { background: #616161; border-radius: 0; padding: 0; z-index: 1; }
       .gap { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(45deg, #ffcdd2, #ffcdd2 4px, #fff 4px, #fff 8px); }
       .axis { position: relative; height: 16px; margin-bottom: 2px; }
       .axis span { position: absolute; transform: translateX(-50%); font-size: 10px; color: #888; }
@@ -83,6 +84,7 @@
           <span><i style="background:#1565c0"></i><span data-key="lg_record">押出の記録（押出日報）</span></span>
           <span><i style="background:#9e9e9e"></i><span data-key="lg_plc">PLC の稼働（ビレットあり）</span></span>
           <span><i style="background:#e0e0e0"></i><span data-key="lg_plc_idle">PLC の稼働（ビレットなし）</span></span>
+          <span><i style="background:#616161"></i><span data-key="lg_pump_off">ポンプ停止（3分以上）</span></span>
           <span><i style="background:repeating-linear-gradient(45deg,#ffcdd2,#ffcdd2 4px,#fff 4px,#fff 8px)"></i><span data-key="lg_gap">記録のすき間（10分以上）</span></span>
         </div>
         <div class="day" style="border-bottom:none; padding:0;">
@@ -97,7 +99,7 @@
       const dict = {
         ja: {
           btn_back: "← 押出日報入力へ戻る", title: "押出日報の入力確認",
-          lg_record: "押出の記録（押出日報）", lg_plc: "PLC の稼働（ビレットあり）", lg_plc_idle: "PLC の稼働（ビレットなし）",
+          lg_record: "押出の記録（押出日報）", lg_plc: "PLC の稼働（ビレットあり）", lg_plc_idle: "PLC の稼働（ビレットなし）", lg_pump_off: "ポンプ停止（3分以上）", tip_pump_off: "ポンプ停止", minutes: "分",
           lg_gap: "記録のすき間（10分以上）", lane_rec: "記録", lane_plc: "PLC",
           sum_total: "記録", sum_gap: "すき間", sum_count: "押出", times: "回", no_record: "記録なし",
           dow: ["日", "月", "火", "水", "木", "金", "土"],
@@ -106,7 +108,7 @@
         },
         vi: {
           btn_back: "← Về nhập báo cáo đùn", title: "Kiểm tra nhập báo cáo đùn",
-          lg_record: "Bản ghi đùn (báo cáo đùn)", lg_plc: "PLC chạy (có billet)", lg_plc_idle: "PLC chạy (không billet)",
+          lg_record: "Bản ghi đùn (báo cáo đùn)", lg_plc: "PLC chạy (có billet)", lg_plc_idle: "PLC chạy (không billet)", lg_pump_off: "Bơm dừng (từ 3 phút)", tip_pump_off: "Bơm dừng", minutes: "phút",
           lg_gap: "Khoảng trống (từ 10 phút)", lane_rec: "Ghi", lane_plc: "PLC",
           sum_total: "Ghi", sum_gap: "Trống", sum_count: "Đùn", times: "lần", no_record: "Không có bản ghi",
           dow: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
@@ -138,18 +140,21 @@
 
       let presses = [];   // 押出の記録
       let plc = {};       // 日付 → PLC のセッション
+      let pumpOff = [];   // ポンプ停止（all_pump_on = 0）が3分以上の時間
 
       async function load() {
         const machine = document.getElementById("fMachine").value;
         const start = document.getElementById("fStart").value;
         document.getElementById("endLabel").textContent = `〜 ${addDays(start, DAYS - 1)}`;
         try { localStorage.setItem("coverageMachine", machine); } catch (e) {}
-        const [rec, ...plcDays] = await Promise.all([
+        const [rec, off, ...plcDays] = await Promise.all([
           fetch(`./php/press_daily_report/get_coverage.php?machine=${machine}&start=${start}&days=${DAYS}`).then((r) => r.json()),
+          fetch(`./php/press_daily_report/get_pump_off.php?machine=${machine}&start=${start}&days=${DAYS}`).then((r) => r.json()).catch(() => []),
           ...Array.from({ length: DAYS }, (_, i) =>
             fetch(`./php/press_daily_report/get_plc_sessions.php?date=${addDays(start, i)}`).then((r) => r.json()).catch(() => [])),
         ]);
         presses = rec;
+        pumpOff = off || [];
         plc = {};
         plcDays.forEach((list, i) => { plc[addDays(start, i)] = (list || []).filter((s) => String(s.machine) === machine); });
         render();
@@ -210,13 +215,28 @@
             return `<div class="block plc ${idle ? "idle" : ""}" style="left:${pct(sm)}%; width:${pct(em) - pct(sm)}%" title="${esc(tip)}">${esc(s.die_name ?? "")}</div>`;
           }).join("");
 
+          // ポンプ停止（3分以上）は、PLC の帯と重なるところだけ暗い色で重ねる
+          const dayBase = new Date(date + "T00:00:00");
+          // ほかの日にかかる時刻は日付も出す
+          const offTime = (str) => str.slice(0, 10) === date ? str.slice(11, 16) : `${str.slice(5, 10)} ${str.slice(11, 16)}`;
+          const dtMin = (str) => (new Date(str.replace(" ", "T")) - dayBase) / 60000;
+          const offBlocks = pumpOff.map((o) => {
+            const os = dtMin(o.off_start), oe = dtMin(o.off_end);
+            return sessions.map((s) => {
+              const sm = Math.max(os, dtMin(s.start_time), DAY_FROM), em = Math.min(oe, dtMin(s.end_time), DAY_TO);
+              if (em <= sm) return "";
+              const tip = `${t("tip_pump_off")}  ${offTime(o.off_start)}–${offTime(o.off_end)}（${Math.round(oe - os)} ${t("minutes")}）`;
+              return `<div class="block pump-off" style="left:${pct(sm)}%; width:${pct(em) - pct(sm)}%" title="${esc(tip)}"></div>`;
+            }).join("");
+          }).join("");
+
           const ratio = Math.round(total / BASE_MIN * 100);
           html += `
             <div class="day">
               <div class="day-label ${dow === 0 ? "sun" : dow === 6 ? "sat" : ""}">${date.slice(5)}<span class="dow">(${t("dow")[dow]})</span></div>
               <div class="timeline" style="margin-left:44px;">
                 <div class="lane"><span class="lane-name">${t("lane_rec")}</span>${hourLines}${gapHtml}${recBlocks || `<span class="empty-day">${t("no_record")}</span>`}</div>
-                <div class="lane"><span class="lane-name">${t("lane_plc")}</span>${hourLines}${plcBlocks}</div>
+                <div class="lane"><span class="lane-name">${t("lane_plc")}</span>${hourLines}${plcBlocks}${offBlocks}</div>
               </div>
               <div class="sum">
                 ${recs.length ? `${t("sum_total")} <b class="${total >= BASE_MIN ? "ok" : "ng"}">${hm(total)}</b>（${ratio}%）<br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}` : `<span class="empty-day">${t("no_record")}</span>`}
