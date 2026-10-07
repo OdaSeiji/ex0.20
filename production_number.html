@@ -312,7 +312,11 @@
       .import-preview { margin-top: 14px; overflow-x: auto; }
       .import-preview table { width: 100%; border-collapse: collapse; font-size: 13px; }
       .import-preview th { background: #e8f1ff; padding: 7px 10px; border-bottom: 2px solid #c5d8f5; text-align: left; white-space: nowrap; }
-      .import-preview td { padding: 7px 10px; border-bottom: 1px solid #eee; }
+      .import-preview td { padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
+      .import-preview tr.row-warn td { background: #fff8e1; }
+      .badge-warn { background: #ff9800; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
+      .warn-note { color: #e65100; font-size: 11px; margin-top: 3px; white-space: normal; }
+      .auto-note { color: #1565c0; font-size: 10px; }
 
       .badge-new   { display: inline-block; background: #e8f5e9; color: #2e7d32; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
       .badge-dup   { display: inline-block; background: #ffebee; color: #c62828; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
@@ -339,7 +343,7 @@
           <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
         </div>
         <button class="cat-mgr-btn" onclick="openCatMgr()" data-key="btn_cat_mgr">🗂 カテゴリ管理</button>
-        <button class="import-btn" onclick="openImportModal()" data-key="btn_import">📂 CSV インポート</button>
+        <button class="import-btn" onclick="openImportModal()" data-key="btn_import">📂 CSV・Excel インポート</button>
         <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
       </div>
 
@@ -565,7 +569,7 @@
     <div id="importModal" class="modal-overlay">
       <div class="modal-box" style="width:820px;">
         <div class="modal-header">
-          <h3>📂 品番 CSV インポート</h3>
+          <h3>📂 品番 CSV・Excel インポート</h3>
           <button class="modal-close" onclick="closeImportModal()">✕</button>
         </div>
 
@@ -575,9 +579,9 @@
              ondragleave="this.classList.remove('drag-over')"
              ondrop="handleImportDrop(event)"
              onclick="document.getElementById('importFileInput').click()">
-          <input type="file" id="importFileInput" accept=".csv,.tsv,.txt" onchange="handleImportFile(this.files[0])">
-          <div>CSVファイルをここにドロップ、またはクリックして選択</div>
-          <div style="font-size:12px;color:#888;margin-top:6px;">列：production_number, billet_material, production_length, cross_section_area</div>
+          <input type="file" id="importFileInput" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls" onchange="handleImportFile(this.files[0])">
+          <div>CSV または Excel のファイルをここにドロップ、またはクリックして選択</div>
+          <div style="font-size:12px;color:#888;margin-top:6px;">1行目は見出し：品番、材質、製品長、断面積、単重（kg/m）、時効処理（O / T5 / T6）<br>単重が空なら断面積 × 0.0027 で入れる。単重と断面積が ±3% を超えて合わない行は「警告」</div>
         </div>
 
         <!-- プレビュー -->
@@ -590,6 +594,8 @@
                   <th>材質</th>
                   <th>製品長 (m)</th>
                   <th>断面積 (mm²)</th>
+                  <th>単重 (kg/m)</th>
+                  <th>時効</th>
                   <th>状態</th>
                 </tr>
               </thead>
@@ -597,6 +603,9 @@
             </table>
           </div>
           <div class="import-summary" id="importSummary"></div>
+          <label id="importWarnRow" style="display:none; font-size:13px; margin-top:6px; cursor:pointer;">
+            <input type="checkbox" id="importIncludeWarn" onchange="updateImportButton()"> 警告のある行も登録する
+          </label>
         </div>
 
         <div class="import-actions">
@@ -608,6 +617,7 @@
 
     <div id="toast"></div>
 
+    <script src="./lib/xlsx.js"></script>
     <script>
       /* ── 多言語辞書 ── */
       const dict = {
@@ -647,7 +657,7 @@
           col_length: "製品長 (m)",
           col_action:  "操作",
           col_updated: "更新日",
-          btn_import: "📂 CSV インポート",
+          btn_import: "📂 CSV・Excel インポート",
         },
         vi: {
           btn_back_menu: "← Về menu",
@@ -685,7 +695,7 @@
           col_length: "Dài (m)",
           col_action:  "Thao tác",
           col_updated: "Ngày cập nhật",
-          btn_import: "📂 CSV Nhập",
+          btn_import: "📂 Nhập CSV・Excel",
         },
       };
 
@@ -1331,6 +1341,12 @@
       ════════════════════════════ */
       const MATERIAL_MAP = {"A6061": 1, "A6063": 2, "A6N01A": 3, "A6N01": 3}; // A6N01 は 6N01A と同じ（昔の入力ミス）。id 4 は使わない
 
+      // 時効処理（m_aging_type）
+      const AGING_MAP = {"O": 1, "T5": 2, "T6": 3};
+      // 単重（kg/m）＝ 断面積（mm²）× 0.0027（アルミの密度 2.70）。これから ±3% を超えたら警告
+      const WEIGHT_PER_AREA = 0.0027;
+      const WEIGHT_TOLERANCE = 0.03;
+
       let importRows = [];
 
       function openImportModal() {
@@ -1338,6 +1354,7 @@
         document.getElementById("importPreviewWrap").style.display = "none";
         document.getElementById("importFileInput").value = "";
         document.getElementById("importDropZone").classList.remove("drag-over");
+        document.getElementById("importIncludeWarn").checked = false;
         document.getElementById("importSubmitBtn").disabled = true;
         document.getElementById("importSubmitBtn").textContent = "登録 (0件)";
         document.getElementById("importModal").classList.add("open");
@@ -1354,54 +1371,93 @@
         if (file) handleImportFile(file);
       }
 
+      // CSV・TSV はテキストとして、Excel（.xlsx / .xls）は SheetJS（lib/xlsx.js）でいちばん左のシートを読む
       function handleImportFile(file) {
         if (!file) return;
+        const isExcel = /\.(xlsx|xlsm|xls)$/i.test(file.name);
         const reader = new FileReader();
         reader.onload = async (e) => {
-          const text = e.target.result;
-          const parsed = parseImportCSV(text);
-          if (!parsed.length) { showToast("CSVにデータが見つかりません", false); return; }
+          let table;
+          if (isExcel) {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            table = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+          } else {
+            const lines = e.target.result.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
+            const delim = lines.length && lines[0].includes("\t") ? "\t" : ",";
+            table = lines.map(l => l.split(delim).map(c => c.trim().replace(/^"|"$/g, "")));
+          }
+          const parsed = parseImportTable(table);
+          if (!parsed.length) { showToast("ファイルにデータが見つかりません（1行目に見出しが必要です）", false); return; }
           await processImportRows(parsed);
         };
-        reader.readAsText(file, "UTF-8");
+        if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file, "UTF-8");
       }
 
-      function parseImportCSV(text) {
-        const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
-        if (lines.length < 2) return [];
+      // 見出しは大文字・小文字、空白、カッコの中（単位など）を無視して比べる（例：「単重 (kg/m)」→「単重」）
+      const normHeader = (h) => String(h ?? "").toLowerCase().replace(/[（(][^）)]*[）)]/g, "").replace(/\s+/g, "");
 
-        const delim = lines[0].includes("\t") ? "\t" : ",";
-        const headers = lines[0].split(delim).map(h => h.trim().toLowerCase());
+      function parseImportTable(table) {
+        if (!table || table.length < 2) return [];
+        const headers = table[0].map(normHeader);
 
         const colMap = {
           production_number: ["production_number", "production_numbers", "pn", "品番"],
           billet_material:   ["billet_material", "material", "材質"],
-          production_length: ["production_length", "length", "製品長"],
+          production_length: ["production_length", "length", "製品長", "製品長さ"],
           cross_section_area:["cross_section_area", "area", "断面積"],
+          specific_weight:   ["specific_weight", "weight", "単重", "比重"],
+          aging:             ["aging", "aging_type", "時効", "時効処理"],
         };
 
         const idx = {};
         for (const [field, aliases] of Object.entries(colMap)) {
-          idx[field] = aliases.reduce((found, alias) => {
-            if (found >= 0) return found;
-            const i = headers.indexOf(alias);
-            return i >= 0 ? i : found;
-          }, -1);
+          idx[field] = aliases.map(normHeader).reduce((found, alias) => found >= 0 ? found : headers.indexOf(alias), -1);
         }
 
+        const get = (cols, field) => idx[field] >= 0 ? String(cols[idx[field]] ?? "").trim() : "";
         const rows = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(delim).map(c => c.trim().replace(/^"|"$/g, ""));
-          const pn = idx.production_number >= 0 ? cols[idx.production_number] ?? "" : "";
+        for (let i = 1; i < table.length; i++) {
+          const cols = table[i];
+          const pn = get(cols, "production_number");
           if (!pn) continue;
           rows.push({
             production_number: pn.toUpperCase(),
-            billet_material:   idx.billet_material   >= 0 ? cols[idx.billet_material]   ?? "" : "",
-            production_length: idx.production_length >= 0 ? cols[idx.production_length] ?? "" : "",
-            cross_section_area:idx.cross_section_area >= 0 ? cols[idx.cross_section_area] ?? "" : "",
+            billet_material:   get(cols, "billet_material"),
+            production_length: get(cols, "production_length").replace(/,/g, ""),
+            cross_section_area:get(cols, "cross_section_area").replace(/,/g, ""),
+            specific_weight:   get(cols, "specific_weight").replace(/,/g, ""),
+            aging:             get(cols, "aging").toUpperCase(),
           });
         }
         return rows;
+      }
+
+      // 単重と断面積の整合・時効処理の確認。問題があれば warnings に入れる
+      function checkImportRow(row) {
+        const warnings = [];
+        const area = parseFloat(row.cross_section_area);
+        let weight = row.specific_weight;
+        let weightAuto = false;
+        if (weight === "" && area > 0) {
+          weight = (area * WEIGHT_PER_AREA).toFixed(3);   // 単重が空なら断面積から計算
+          weightAuto = true;
+        } else if (weight !== "") {
+          const w = parseFloat(weight);
+          if (!(w > 0)) {
+            warnings.push("単重が数字ではありません");
+          } else if (area > 0) {
+            const ratio = w / (area * WEIGHT_PER_AREA);
+            if (Math.abs(ratio - 1) > WEIGHT_TOLERANCE) {
+              warnings.push(`単重と断面積が合いません（断面積からは ${(area * WEIGHT_PER_AREA).toFixed(3)} kg/m、差 ${((ratio - 1) * 100).toFixed(1)}%）`);
+            }
+          }
+        }
+        if (row.cross_section_area !== "" && !(area > 0)) warnings.push("断面積が数字ではありません");
+        const agingId = row.aging === "" ? 0 : (AGING_MAP[row.aging] ?? -1);
+        if (agingId < 0) warnings.push(`時効処理は O / T5 / T6 のどれかです（「${row.aging}」）`);
+        if (row.billet_material !== "" && !(MATERIAL_MAP[row.billet_material.toUpperCase()] > 0)) warnings.push(`材質が分かりません（「${row.billet_material}」）`);
+        return { weight, weightAuto, agingId: Math.max(agingId, 0), warnings };
       }
 
       async function processImportRows(parsed) {
@@ -1418,8 +1474,11 @@
 
         importRows = parsed.map(row => {
           const matId = MATERIAL_MAP[(row.billet_material ?? "").toUpperCase()] ?? 0;
-          const isDup  = dupMap[row.production_number] === true;
-          return { ...row, billet_material_id: matId, status: isDup ? "dup" : "new" };
+          const chk = checkImportRow(row);
+          let status = "new";
+          if (dupMap[row.production_number] === true) status = "dup";
+          else if (chk.warnings.length) status = "warn";
+          return { ...row, billet_material_id: matId, specific_weight: chk.weight, weight_auto: chk.weightAuto, aging_type_id: chk.agingId, warnings: chk.warnings, status };
         });
 
         renderImportPreview();
@@ -1428,21 +1487,24 @@
       function renderImportPreview() {
         const tbody = document.getElementById("importPreviewTbody");
         tbody.innerHTML = "";
-        let cntNew = 0, cntDup = 0;
+        let cntNew = 0, cntDup = 0, cntWarn = 0;
 
         importRows.forEach(row => {
-          const matLabel = row.billet_material || "—";
           let badgeHtml;
-          if (row.status === "new") { badgeHtml = '<span class="badge-new">新規</span>';  cntNew++; }
-          else                      { badgeHtml = '<span class="badge-dup">重複</span>';  cntDup++; }
+          if (row.status === "new")       { badgeHtml = '<span class="badge-new">新規</span>';  cntNew++; }
+          else if (row.status === "warn") { badgeHtml = '<span class="badge-warn">警告</span>'; cntWarn++; }
+          else                            { badgeHtml = '<span class="badge-dup">重複</span>';  cntDup++; }
 
           const tr = document.createElement("tr");
+          if (row.status === "warn") tr.className = "row-warn";
           tr.innerHTML = `
-            <td><strong>${row.production_number}</strong></td>
-            <td>${matLabel}</td>
-            <td>${row.production_length || "—"}</td>
-            <td>${row.cross_section_area || "—"}</td>
-            <td>${badgeHtml}</td>
+            <td><strong>${escapeHtml(row.production_number)}</strong></td>
+            <td>${escapeHtml(row.billet_material || "—")}</td>
+            <td>${escapeHtml(row.production_length || "—")}</td>
+            <td>${escapeHtml(row.cross_section_area || "—")}</td>
+            <td>${escapeHtml(row.specific_weight || "—")}${row.weight_auto ? ' <span class="auto-note">自動</span>' : ""}</td>
+            <td>${escapeHtml(row.aging || "—")}</td>
+            <td>${badgeHtml}${row.warnings.length ? `<div class="warn-note">${row.warnings.map(escapeHtml).join("<br>")}</div>` : ""}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -1450,24 +1512,39 @@
         const summary = document.getElementById("importSummary");
         summary.innerHTML =
           `<span><span class="badge-new">新規</span> ${cntNew}件</span>` +
+          (cntWarn ? `<span><span class="badge-warn">警告</span> ${cntWarn}件</span>` : "") +
           (cntDup ? `<span><span class="badge-dup">重複</span> ${cntDup}件（スキップ）</span>` : "");
+        document.getElementById("importWarnRow").style.display = cntWarn ? "" : "none";
 
-        const btn = document.getElementById("importSubmitBtn");
-        btn.disabled = cntNew === 0;
-        btn.textContent = `登録 (${cntNew}件)`;
-
+        updateImportButton();
         document.getElementById("importPreviewWrap").style.display = "";
       }
 
+      // 登録する行：新規。チェックを入れたときは警告の行も
+      function importTargets() {
+        const withWarn = document.getElementById("importIncludeWarn").checked;
+        return importRows.filter(r => r.status === "new" || (withWarn && r.status === "warn"));
+      }
+      function updateImportButton() {
+        const n = importTargets().length;
+        const btn = document.getElementById("importSubmitBtn");
+        btn.disabled = n === 0;
+        btn.textContent = `登録 (${n}件)`;
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+      }
+
       async function submitImport() {
-        const toInsert = importRows
-          .filter(r => r.status === "new")
-          .map(r => ({
-            production_number:  r.production_number,
-            billet_material_id: r.billet_material_id,
-            production_length:  r.production_length,
-            cross_section_area: r.cross_section_area,
-          }));
+        const toInsert = importTargets().map(r => ({
+          production_number:  r.production_number,
+          billet_material_id: r.billet_material_id,
+          production_length:  r.production_length,
+          cross_section_area: r.cross_section_area,
+          specific_weight:    r.specific_weight,
+          aging_type_id:      r.aging_type_id,
+        }));
 
         if (!toInsert.length) return;
 
@@ -1488,13 +1565,11 @@
             loadList();
           } else {
             showToast(result.message || "登録に失敗しました", false);
-            btn.disabled = false;
-            btn.textContent = `登録 (${toInsert.length}件)`;
+            updateImportButton();
           }
         } catch (_) {
           showToast("通信エラーが発生しました", false);
-          btn.disabled = false;
-          btn.textContent = `登録 (${toInsert.length}件)`;
+          updateImportButton();
         }
       }
 

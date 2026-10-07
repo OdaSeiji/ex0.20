@@ -85,7 +85,59 @@
         </div>
       </div>
 
-      <!-- 2026-10-05 (最新) -->
+      <!-- 2026-10-08 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
+        <div class="entry-title" data-key="fu_title">部品登録：Excel ファイルも取り込めるように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fu_purpose">CSV に保存し直さなくても、Excel のまま部品の取り込みができるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fu_content">ファイル選択で .xlsx / .xlsm / .xls も選べるようにした。Excel はいちばん左のシートを読み、1行目の見出しは CSV と同じ（die_number, note2）。金型番号の確認や重複のスキップは今までと同じ。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_part_import.html'">die_part_import.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
+        <div class="entry-title" data-key="ft_title">品番登録：一括取り込みに単重・時効処理を追加、Excel をそのまま読めるように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ft_purpose">品番を登録するときに単重と時効処理も一度に入れ、入力ミスに気づけるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ft_content">取り込みの列に「単重（kg/m）」と「時効処理（O / T5 / T6）」を追加した。単重と断面積が合っているか（断面積 × 0.0027 から ±3%）を確かめ、合わない行・時効処理や材質が分からない行は「警告」として表示する（チェックを入れたときだけ登録）。単重が空なら断面積から計算して入れる。Excel ファイル（いちばん左のシート）もそのまま読める。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='production_number.html'">production_number.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
+        <div class="entry-title" data-key="fs_title">押出日報入力：試押は切出本数 0 本も入力できるように、Enter で次の欄へ</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fs_purpose">試押で製品を切り出さなかったときも長さを記録できるようにし、時間の入力を速くするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fs_content">プレス種別が「〇（試押）」のときは、切出本数に 0 を入れても行を追加できるようにした。作業時間ログ・引き取り・切断の入力で、Enter を押すと時刻（例：0800 → 08:00）を確定して次の欄へ移り、最後は「追加」ボタンへ。ボタンで Enter を押すと行を追加する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-05 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -1042,6 +1094,15 @@
           fr_title: "押出日報の入力確認（BETA）を新設",
           fr_purpose: "ある号機・ある日の押出日報が、すべて入力されているかを目で確認できるようにするため。",
           fr_content: "押出日報入力の「📅 入力の確認」から開く。号機を選ぶと1週間分を1日1行で、6:00〜21:00 の時間の帯に押出の記録と PLC の稼働を並べて表示する。記録のすき間（10分以上）を赤い斜線で示し、記録の合計時間と 8時間に対する割合・押出の回数・すき間の合計を出す。帯にマウスを乗せると型番・時刻・ビレット本数・入力元が出る。サンプル版。",
+          fs_title: "押出日報入力：試押は切出本数 0 本も入力できるように、Enter で次の欄へ",
+          fs_purpose: "試押で製品を切り出さなかったときも長さを記録できるようにし、時間の入力を速くするため。",
+          fs_content: "プレス種別が「〇（試押）」のときは、切出本数に 0 を入れても行を追加できるようにした。作業時間ログ・引き取り・切断の入力で、Enter を押すと時刻（例：0800 → 08:00）を確定して次の欄へ移り、最後は「追加」ボタンへ。ボタンで Enter を押すと行を追加する。",
+          ft_title: "品番登録：一括取り込みに単重・時効処理を追加、Excel をそのまま読めるように",
+          ft_purpose: "品番を登録するときに単重と時効処理も一度に入れ、入力ミスに気づけるようにするため。",
+          ft_content: "取り込みの列に「単重（kg/m）」と「時効処理（O / T5 / T6）」を追加した。単重と断面積が合っているか（断面積 × 0.0027 から ±3%）を確かめ、合わない行・時効処理や材質が分からない行は「警告」として表示する（チェックを入れたときだけ登録）。単重が空なら断面積から計算して入れる。Excel ファイル（いちばん左のシート）もそのまま読める。",
+          fu_title: "部品登録：Excel ファイルも取り込めるように",
+          fu_purpose: "CSV に保存し直さなくても、Excel のまま部品の取り込みができるようにするため。",
+          fu_content: "ファイル選択で .xlsx / .xlsm / .xls も選べるようにした。Excel はいちばん左のシートを読み、1行目の見出しは CSV と同じ（die_number, note2）。金型番号の確認や重複のスキップは今までと同じ。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1196,6 +1257,15 @@
           fr_title: "Tạo màn hình kiểm tra nhập báo cáo đùn (BETA)",
           fr_purpose: "Để kiểm tra bằng mắt xem báo cáo đùn của một máy trong một ngày đã được nhập đầy đủ chưa.",
           fr_content: "Mở từ nút \"📅 Kiểm tra nhập\" trong nhập báo cáo đùn. Chọn máy thì hiển thị 1 tuần, mỗi ngày 1 dòng, dải thời gian 6:00–21:00 gồm bản ghi đùn và thời gian chạy của PLC. Khoảng trống bản ghi (từ 10 phút) hiển thị gạch chéo đỏ; hiển thị tổng thời gian bản ghi, tỷ lệ so với 8 giờ, số lần đùn và tổng khoảng trống. Di chuột lên dải để xem mã khuôn, giờ, số billet và nguồn nhập. Bản thử nghiệm.",
+          fs_title: "Nhập báo cáo đùn: ép thử cho phép số thanh cắt 0, Enter để sang ô tiếp theo",
+          fs_purpose: "Để ghi được chiều dài cả khi ép thử không cắt sản phẩm, và nhập thời gian nhanh hơn.",
+          fs_content: "Khi loại ép là \"〇 (ép thử)\", có thể thêm dòng với số thanh cắt là 0. Ở nhật ký thời gian làm việc, kéo và cắt: nhấn Enter sẽ xác nhận giờ (vd: 0800 → 08:00) và chuyển sang ô tiếp theo, cuối cùng là nút \"Thêm\". Nhấn Enter ở nút thì thêm dòng.",
+          ft_title: "Đăng ký mã sản phẩm: thêm trọng lượng đơn vị và xử lý hóa già vào nhập hàng loạt, đọc trực tiếp Excel",
+          ft_purpose: "Để khi đăng ký mã sản phẩm có thể nhập luôn trọng lượng đơn vị và xử lý hóa già, và phát hiện lỗi nhập.",
+          ft_content: "Thêm cột \"trọng lượng đơn vị (kg/m)\" và \"xử lý hóa già (O / T5 / T6)\". Kiểm tra trọng lượng đơn vị có khớp với diện tích mặt cắt không (diện tích × 0.0027, ±3%); dòng không khớp, hoặc không rõ hóa già / vật liệu sẽ hiển thị \"cảnh báo\" (chỉ đăng ký khi đánh dấu chọn). Nếu trọng lượng đơn vị trống thì tính từ diện tích. Đọc được trực tiếp file Excel (sheet ngoài cùng bên trái).",
+          fu_title: "Đăng ký linh kiện: cho phép nhập trực tiếp file Excel",
+          fu_purpose: "Để nhập linh kiện từ file Excel mà không cần lưu lại thành CSV.",
+          fu_content: "Có thể chọn file .xlsx / .xlsm / .xls. Đọc sheet ngoài cùng bên trái; dòng 1 là tiêu đề giống CSV (die_number, note2). Việc kiểm tra mã khuôn và bỏ qua trùng lặp vẫn như cũ.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

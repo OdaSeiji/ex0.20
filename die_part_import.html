@@ -152,12 +152,12 @@
 
       <!-- ① CSVアップロード -->
       <div class="upload-card">
-        <div class="card-title">① CSVアップロード</div>
+        <div class="card-title">① CSV・Excel アップロード</div>
         <div class="upload-row">
-          <input type="file" id="csvFile" accept=".csv" />
+          <input type="file" id="csvFile" accept=".csv,.xlsx,.xlsm,.xls" />
           <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
         </div>
-        <p class="csv-hint">ヘッダー: die_number, note2　|　die_number は m_dies に登録済みの金型番号のみ受け付けます</p>
+        <p class="csv-hint">CSV または Excel（いちばん左のシート）　|　ヘッダー: die_number, note2　|　die_number は m_dies に登録済みの金型番号のみ受け付けます</p>
         <div class="upload-result" id="uploadResult"></div>
       </div>
 
@@ -210,6 +210,7 @@
 
     <div id="toast"></div>
 
+    <script src="./lib/xlsx.js"></script>
     <script>
       function showToast(msg, ok = true) {
         const t = document.getElementById("toast");
@@ -224,7 +225,19 @@
         if (!file) { showToast("ファイルを選択してください", false); return; }
 
         const form = new FormData();
-        form.append("csv", file);
+        if (/\.(xlsx|xlsm|xls)$/i.test(file.name)) {
+          // Excel はいちばん左のシートを CSV に変えて送る（PHP 側は CSV のまま）
+          try {
+            const wb = XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: "array" });
+            const csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], { blankrows: false });
+            form.append("csv", new Blob([csv], { type: "text/csv" }), file.name.replace(/\.\w+$/, ".csv"));
+          } catch (e) {
+            showToast("Excel ファイルを読めませんでした", false);
+            return;
+          }
+        } else {
+          form.append("csv", file);
+        }
 
         const res    = await fetch("./php/die_import/upload_parts_csv.php", { method: "POST", body: form });
         const result = await res.json();

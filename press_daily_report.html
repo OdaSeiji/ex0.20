@@ -1368,6 +1368,35 @@
       }
     }
 
+    /* 作業時間ログ：Enter で次の欄へ進む（時刻の欄は 0800 → 08:00 に直してから）。
+       最後は「追加」ボタン。ボタンにフォーカスがあるときの Enter で「追加」する。
+       「追加」が押せない（時刻がおかしい など）ときは、その欄にとどまる */
+    function bindEnterNext(ids) {
+      ids.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.tagName === "BUTTON") {
+          // 「追加」ボタンで Enter：確実に1回だけ追加する（ブラウザの標準の動きに任せない）
+          el.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter") return;
+            e.preventDefault();
+            if (!el.disabled) el.click();
+          });
+          return;
+        }
+        el.addEventListener("keydown", (e) => {
+          if (e.key !== "Enter" || e.isComposing) return;
+          e.preventDefault();
+          if ((el.getAttribute("onblur") || "").includes("formatTimeField")) formatTimeField(el);
+          const next = document.getElementById(ids[i + 1]);
+          if (!next) return;
+          if (next.disabled) { if (el.select) el.select(); return; }
+          next.focus();
+          if (next.select) next.select();
+        });
+      });
+    }
+
     /* ストレッチ：小数点第1位までに整形（例 .8 → 0.8） */
     function formatStretchRatio(el) {
       const val = el.value.trim();
@@ -1640,14 +1669,18 @@
        定尺・数量登録（work-length__table）
        ex0.11 DailyReportV30の「新規レコード（Save）」モードを踏襲（ローカル積み上げ、AJAX未送信）。
     ------------------------- */
+    // 本数は 1 以上。試押（プレス種別 〇 = 1）のときだけ 0 本も許す（製品を切り出さないことがあるため）
     function checkWorkLengthInputs() {
       const lenOk = isPositiveInt(document.getElementById("length_exd").value);
-      const qtyOk = isPositiveInt(document.getElementById("quantity_cut").value);
+      const qty = document.getElementById("quantity_cut").value.trim();
+      const isTrial = document.getElementById("pressing-type__select").value === "1";
+      const qtyOk = isPositiveInt(qty) || (isTrial && /^0+$/.test(qty));
       document.getElementById("add_row__button").disabled = !(lenOk && qtyOk);
     }
 
     document.getElementById("length_exd").addEventListener("input", checkWorkLengthInputs);
     document.getElementById("quantity_cut").addEventListener("input", checkWorkLengthInputs);
+    document.getElementById("pressing-type__select").addEventListener("change", checkWorkLengthInputs);
 
     document.getElementById("length_exd").addEventListener("keydown", e => {
       if (e.key === "Enter") {
@@ -1750,7 +1783,8 @@
     }
 
     document.getElementById("add_row__button").addEventListener("click", function () {
-      appendWorkLengthRow(document.getElementById("length_exd").value, document.getElementById("quantity_cut").value);
+      const qty = document.getElementById("quantity_cut").value.trim();
+      appendWorkLengthRow(document.getElementById("length_exd").value, /^\d+$/.test(qty) ? String(Number(qty)) : qty);   // 「00」は「0」に
       document.getElementById("length_exd").value = "";
       document.getElementById("quantity_cut").value = "";
       document.getElementById("length_exd").focus();
@@ -2002,6 +2036,7 @@
         startEl.value = "";
         endEl.value = "";
         check();
+        no1El.focus();   // 続けて次の記録を入力できるように
       });
 
       function collect() {
@@ -2024,6 +2059,9 @@
     }
 
     const pullHandlers = makeRangeTimeTableHandlers("pull", "pull__table", "empty_pull");
+    bindEnterNext(["time_code", "time_start", "time_end", "add_time__button"]);
+    bindEnterNext(["pull_no1", "pull_no2", "pull_start", "pull_end", "add_pull__button"]);
+    bindEnterNext(["cut_no1", "cut_no2", "cut_start", "cut_end", "add_cut__button"]);
     const cutHandlers  = makeRangeTimeTableHandlers("cut", "cut__table", "empty_cut");
 
     /* -------------------------
