@@ -91,6 +91,57 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-08</span>
         </div>
+        <div class="entry-title" data-key="fy_title">生産指示：発注書の一覧が出なくなっていたのを直した</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fy_purpose">生産指示の画面で、発注書の一覧が表示されるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fy_content">一覧を出す SQL が何分たっても終わらず、表が出なくなっていた（MariaDB の最適化 split_materialized が、集計を発注書の行ごとに作り直していた）。SQL を発注書ごとにまとめてからつなぐ形に書き直し、この一覧ではその最適化をオフにした。約4,000件が1秒以内に出る。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='order_sheet.html'">order_sheet.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
+        <div class="entry-title" data-key="fx_title">品質評価入力：左の一覧を押出日で並べ替えられるように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fx_purpose">見たい押出を探しやすくするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fx_content">一覧の「押出日」の見出しをクリックすると、古い順（▲）と新しい順（▼）が切り替わる。何も押していないときは今までどおり（未完了は古い順、完了済みは新しい順）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
+        <div class="entry-title" data-key="fw_title">押出日報の入力確認：濃い色をポンプ停止から「押出なし（3分以上）」に変更</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fw_purpose">PLC の稼働の中で、実際に押出していない時間を見分けられるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fw_content">PLC の帯に濃いグレーで重ねるものを、all_pump_on = 0（ポンプ停止）から extruding = 0（押出していない）が3分以上続いた時間に変えた。マウスを乗せると時刻と長さが出る。ビレットの間がふつう5〜6分あるので、境目の時間は現場で見て見直す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_coverage.html'">press_coverage.html</a>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-08</span>
+        </div>
         <div class="entry-title" data-key="fv_title">押出日報の入力確認：PLC の帯にポンプ停止（3分以上）を濃い色で表示</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fv_purpose">PLC が「稼働」と出ていても、実際にはポンプが止まっていた時間を見分けられるようにするため。</span>
@@ -1123,6 +1174,15 @@
           fv_title: "押出日報の入力確認：PLC の帯にポンプ停止（3分以上）を濃い色で表示",
           fv_purpose: "PLC が「稼働」と出ていても、実際にはポンプが止まっていた時間を見分けられるようにするため。",
           fv_content: "PLC のログで all_pump_on が 0 の時間が3分以上続いたところを、PLC の帯の上に濃いグレーで重ねて表示する（帯の外には描かない）。マウスを乗せると停止の時刻と長さが出る。日をまたぐ停止は日付も出す。",
+          fw_title: "押出日報の入力確認：濃い色をポンプ停止から「押出なし（3分以上）」に変更",
+          fw_purpose: "PLC の稼働の中で、実際に押出していない時間を見分けられるようにするため。",
+          fw_content: "PLC の帯に濃いグレーで重ねるものを、all_pump_on = 0（ポンプ停止）から extruding = 0（押出していない）が3分以上続いた時間に変えた。マウスを乗せると時刻と長さが出る。ビレットの間がふつう5〜6分あるので、境目の時間は現場で見て見直す。",
+          fx_title: "品質評価入力：左の一覧を押出日で並べ替えられるように",
+          fx_purpose: "見たい押出を探しやすくするため。",
+          fx_content: "一覧の「押出日」の見出しをクリックすると、古い順（▲）と新しい順（▼）が切り替わる。何も押していないときは今までどおり（未完了は古い順、完了済みは新しい順）。",
+          fy_title: "生産指示：発注書の一覧が出なくなっていたのを直した",
+          fy_purpose: "生産指示の画面で、発注書の一覧が表示されるようにするため。",
+          fy_content: "一覧を出す SQL が何分たっても終わらず、表が出なくなっていた（MariaDB の最適化 split_materialized が、集計を発注書の行ごとに作り直していた）。SQL を発注書ごとにまとめてからつなぐ形に書き直し、この一覧ではその最適化をオフにした。約4,000件が1秒以内に出る。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1289,6 +1349,15 @@
           fv_title: "Kiểm tra nhập báo cáo đùn: hiển thị bơm dừng (từ 3 phút) màu đậm trên dải PLC",
           fv_purpose: "Để phân biệt thời gian bơm thực tế đã dừng dù PLC hiển thị là \"chạy\".",
           fv_content: "Khi log PLC có all_pump_on = 0 kéo dài từ 3 phút, hiển thị màu xám đậm chồng lên dải PLC (không vẽ ngoài dải). Di chuột lên để xem giờ và thời gian dừng. Nếu dừng qua ngày thì hiển thị cả ngày.",
+          fw_title: "Kiểm tra nhập báo cáo đùn: đổi màu đậm từ bơm dừng sang \"không đùn (từ 3 phút)\"",
+          fw_purpose: "Để phân biệt thời gian thực tế không đùn trong lúc PLC đang chạy.",
+          fw_content: "Phần màu xám đậm trên dải PLC đổi từ all_pump_on = 0 (bơm dừng) sang thời gian extruding = 0 (không đùn) kéo dài từ 3 phút. Di chuột lên để xem giờ và thời gian. Khoảng giữa các billet thường 5–6 phút nên sẽ xem lại ngưỡng thời gian tại hiện trường.",
+          fx_title: "Nhập đánh giá chất lượng: sắp xếp danh sách bên trái theo ngày ép",
+          fx_purpose: "Để dễ tìm lần ép muốn xem.",
+          fx_content: "Nhấn vào tiêu đề \"Ngày ép\" để đổi giữa cũ → mới (▲) và mới → cũ (▼). Nếu chưa nhấn thì như trước (chưa xong: cũ → mới, đã xong: mới → cũ).",
+          fy_title: "Chỉ thị sản xuất: sửa lỗi không hiển thị danh sách đơn đặt hàng",
+          fy_purpose: "Để danh sách đơn đặt hàng hiển thị lại ở màn hình chỉ thị sản xuất.",
+          fy_content: "SQL lấy danh sách chạy mãi không xong nên bảng không hiển thị (tối ưu split_materialized của MariaDB tạo lại phần tổng hợp cho từng đơn). Đã viết lại SQL để tổng hợp theo đơn trước rồi mới nối, và tắt tối ưu đó cho danh sách này. Khoảng 4.000 dòng hiển thị dưới 1 giây.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

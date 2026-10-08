@@ -49,6 +49,8 @@
     table { border-collapse: collapse; width: 100%; font-size: 12px; }
     th, td { padding: 4px 5px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
     th { background: #e8f1ff; font-size: 11px; position: sticky; top: 0; z-index: 1; }
+    th.sortable { cursor: pointer; user-select: none; }
+    th.sortable:hover { background: #d6e6ff; }
     td.mono { font-family: "Roboto Mono", monospace; }
     td.c { text-align: center; }
     td.r { text-align: right; }
@@ -170,7 +172,7 @@
         st_open: "未完了", st_done: "完了済み",
         list_hint: "※ 押出日が1か月より前の押出は、この一覧から消えます（旧画面 QualityReportV7 で扱います）。「あと◯日」は一覧から消えるまでの日数です。",
         placeholder: "← 左の一覧から押出を選んでください",
-        col_date: "押出日", col_machine: "号機", col_die: "型番", col_days: "経過", col_ng: "NG", col_left: "残り",
+        col_date: "押出日", sort_hint: "クリックで押出日の古い順／新しい順を切り替え", col_machine: "号機", col_die: "型番", col_days: "経過", col_ng: "NG", col_left: "残り",
         col_dim: "寸", col_etch: "エ", col_aging: "硬", col_qc: "QC",
         days_unit: "日", left_fmt: (n) => `あと${n}日`,
         empty: "該当する押出はありません",
@@ -211,7 +213,7 @@
         st_open: "Chưa xong", st_done: "Đã xong",
         list_hint: "※ Lần ép quá 1 tháng sẽ biến mất khỏi danh sách (xử lý ở màn hình cũ QualityReportV7). \"Còn ◯ ngày\" là số ngày trước khi biến mất.",
         placeholder: "← Chọn lần ép ở danh sách bên trái",
-        col_date: "Ngày ép", col_machine: "Máy", col_die: "Mã khuôn", col_days: "Đã qua", col_ng: "NG", col_left: "Còn",
+        col_date: "Ngày ép", sort_hint: "Nhấn để đổi thứ tự ngày ép cũ → mới / mới → cũ", col_machine: "Máy", col_die: "Mã khuôn", col_days: "Đã qua", col_ng: "NG", col_left: "Còn",
         col_dim: "KT", col_etch: "ET", col_aging: "ĐC", col_qc: "QC",
         days_unit: " ngày", left_fmt: (n) => `Còn ${n} ngày`,
         empty: "Không có lần ép phù hợp",
@@ -330,6 +332,7 @@
       showAllRacks: false, // NG の一覧を全ラック分表示
       editingNgId: null,
       process: 1,
+      dateSort: null,      // 押出日の並び "asc" / "desc"（null は既定：未完了は古い順、完了は新しい順）
     };
     let masters = { codes: [], inspectors: [] };
 
@@ -365,6 +368,14 @@
       selectPress(Number(tr.dataset.id));
     });
 
+    // 押出日の並び：選んでいなければ既定（未完了は古い順、完了は新しい順）
+    const currentDateSort = () => state.dateSort || (state.status === "done" ? "desc" : "asc");
+    document.getElementById("listHead").addEventListener("click", (e) => {
+      if (!e.target.closest("#sortDate")) return;
+      state.dateSort = currentDateSort() === "asc" ? "desc" : "asc";
+      renderList();
+    });
+
     const stepMark = (done, required = true) =>
       !required ? `<span class="st na">－</span>` : `<span class="st ${done ? "done" : "todo"}">${done ? "✅" : "⬜"}</span>`;
     const daysClass = (d) => d <= 3 ? "d0" : d <= 7 ? "d1" : "d2";
@@ -377,8 +388,10 @@
       });
       document.querySelectorAll("#statusSeg button").forEach(b => b.classList.toggle("active", b.dataset.status === state.status));
 
+      const dateOrder = currentDateSort();
       document.getElementById("listHead").innerHTML =
-        [t("col_date"), t("col_machine"), t("col_die"), t("col_days"), t("col_dim"), t("col_etch"), t("col_aging"), t("col_qc"), t("col_ng"), t("col_left")]
+        `<th class="sortable" id="sortDate" title="${t("sort_hint")}">${t("col_date")} ${dateOrder === "asc" ? "▲" : "▼"}</th>` +
+        [t("col_machine"), t("col_die"), t("col_days"), t("col_dim"), t("col_etch"), t("col_aging"), t("col_qc"), t("col_ng"), t("col_left")]
           .map(h => `<th>${h}</th>`).join("");
       const body = document.getElementById("listBody");
       if (!state.rows) return;
@@ -387,7 +400,9 @@
         return;
       }
       const isTest = state.type === TYPE_TEST;
-      body.innerHTML = state.rows.map(r => `
+      const key = (r) => `${r.press_date} ${r.press_start || ""} ${String(r.id).padStart(10, "0")}`;
+      const rows = [...state.rows].sort((a, b) => dateOrder === "asc" ? key(a).localeCompare(key(b)) : key(b).localeCompare(key(a)));
+      body.innerHTML = rows.map(r => `
         <tr class="pick ${r.id === state.pressId ? "selected" : ""}" data-id="${r.id}">
           <td class="mono">${r.press_date.slice(5)} <span style="color:#999">${esc(r.press_start || "")}</span></td>
           <td class="c">${r.machine}</td>
