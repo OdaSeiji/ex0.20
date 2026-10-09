@@ -5845,3 +5845,21 @@ T3とTを管理したい。
   <!-- <figcaption>測定進捗追加</figcaption> -->
 
 </figure>
+
+日付でソートしたい。
+
+<figure style="text-align:center;">
+  <img src="./img/20261007-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+
+</figure>
+
+# 2026/10/08
+
+order_sheet.html
+このページ何も出ない、値が返ってきているらしいのだが、、、
+
+http://10.163.50.17/ex0.20/press_daily_report.html
+
+以前のデータを読みだしたとき、
+添付ファイルを表示できない？
