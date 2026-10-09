@@ -5867,3 +5867,10 @@ http://10.163.50.17/ex0.20/press_daily_report.html
 # 2026/10/09
 
 型番登録画面もExcelファイルが読めるようになってほしい。
+
+下記、フィルターにALLの追加。
+
+<figure style="text-align:center;">
+  <img src="./img/20261009-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
