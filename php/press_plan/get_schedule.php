@@ -76,6 +76,16 @@ $st = $pdo->prepare("
 $st->execute([":date" => $date, ":mc" => $machine]);
 $plans = $st->fetchAll();
 
+// 押出材（計画）のもと：その型の前回の押出（この日より前で、ビレット本数と押出材の本数がどちらもあるもの）
+$stLast = $pdo->prepare("
+    SELECT p.press_date_at, p.actual_billet_quantities AS billets, x.bars
+    FROM t_press p
+    JOIN (SELECT r.t_press_id, SUM(r.work_quantity) AS bars FROM t_using_aging_rack r GROUP BY r.t_press_id) x ON x.t_press_id = p.id
+    WHERE p.dies_id = :die AND p.press_date_at < :date AND p.actual_billet_quantities > 0 AND x.bars > 0
+    ORDER BY p.press_date_at DESC, p.press_start_at DESC, p.id DESC
+    LIMIT 1
+");
+
 // 実績：型ごとのビレット本数・押出材の本数・時刻
 $st = $pdo->prepare("
     SELECT p.dies_id,
@@ -139,10 +149,17 @@ foreach ($mains as $p) {
     $sec = $q > 0 ? $q * $secPerBillet : 0;
     $min = (int)ceil($sec / 60);
 
-    // 押出材の本数
+    // 押出材（計画）＝ 計画のビレット本数 × 前回の押出の（押出材の本数 ÷ ビレット本数）
+    // 製品の長さで1本あたりの本数が変わるので、前回の実績を使う。メインの型に実績が無ければ予備の型の前回を使う
     $bars = null;
-    if ($p["nbn"] && preg_match('/^(\d+)B(\d+)$/', $p["nbn"], $nm) && (int)$p["hole"] > 0) {
-        $bars = (int)floor($q / (int)$nm[1] * (int)$nm[2] * (int)$p["hole"]);
+    $last = null;
+    foreach (array_merge([$p], $spareList) as $cand) {
+        $stLast->execute([":die" => (int)$cand["dies_id"], ":date" => $date]);
+        $last = $stLast->fetch() ?: null;
+        if ($last) break;
+    }
+    if ($last && $q > 0) {
+        $bars = (int)round($q * (int)$last["bars"] / (int)$last["billets"]);
     }
 
     // 実績（予備の型で押した分も足す）
@@ -175,6 +192,7 @@ foreach ($mains as $p) {
         "etching_image"  => $p["etcing_file_url"] ?: null,   // エッチング用紙に載せる製品の写真（../EtchingPicture/）
         "plan_billets"   => $q,
         "plan_bars"      => $bars,
+        "last_press"     => $last ? ["date" => $last["press_date_at"], "billets" => (int)$last["billets"], "bars" => (int)$last["bars"]] : null,
         "actual_billets" => $hasActual ? $actBillets : null,
         "actual_bars"    => $hasActual ? $actBars : null,
         "actual_start"   => $actStart,

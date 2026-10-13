@@ -89,7 +89,8 @@
           col_actual_time: "実績の時刻", col_note: "備考", empty: "この日の計画はありません",
           avg_note: "＊ 同じ号機で同じ系統の型の実績が無いため、号機の直近20回の平均（1本 {sec}秒）で計算しています",
           tip_time: "{family}：同じ号機の直近 {n} 回の実績、1本 {sec}秒",
-          info: "時間 ＝ 本数 × ビレット1本あたりの時間。1本あたりの時間は、同じ号機で同じ系統の型（例：CQ32T3-V03D → CQ32T3）を押した直近5回の実績（押出の時間の合計 ÷ ビレット本数の合計）。実績が無い型は号機の直近20回の平均。開始の時刻（最初は 8:00）から計画の順番に足し、昼休みは 45分。nBn は、その型のいちばん新しい押出指示書。押出材（計画）＝ ビレット本数 ÷ n × m × 穴数。",
+          tip_bars: "前回の押出 {date}：ビレット {billets} 本 → 押出材 {bars} 本", tip_bars_none: "この型の前回の押出がありません",
+          info: "時間 ＝ 本数 × ビレット1本あたりの時間。1本あたりの時間は、同じ号機で同じ系統の型（例：CQ32T3-V03D → CQ32T3）を押した直近5回の実績（押出の時間の合計 ÷ ビレット本数の合計）。実績が無い型は号機の直近20回の平均。開始の時刻（最初は 8:00）から計画の順番に足し、昼休みは 45分。nBn は、その型のいちばん新しい押出指示書。押出材（計画）＝ 計画のビレット本数 × その型の前回の押出の（押出材の本数 ÷ ビレット本数）。前回の押出が無い型は「—」。",
           nitride: "窒素加熱",
         },
         vi: {
@@ -101,7 +102,8 @@
           col_actual_time: "Thời gian TT", col_note: "Ghi chú", empty: "Ngày này chưa có kế hoạch",
           avg_note: "＊ Chưa có thực tế của cùng dòng khuôn trên máy này nên tính theo trung bình 20 lần đùn gần nhất của máy (mỗi billet {sec} giây)",
           tip_time: "{family}: thực tế {n} lần gần nhất trên cùng máy, mỗi billet {sec} giây",
-          info: "Thời gian = số billet × thời gian mỗi billet. Thời gian mỗi billet lấy từ thực tế 5 lần đùn gần nhất của cùng dòng khuôn (ví dụ CQ32T3-V03D → CQ32T3) trên cùng máy (tổng thời gian đùn ÷ tổng số billet). Khuôn chưa có thực tế thì dùng trung bình 20 lần đùn gần nhất của máy. Cộng dần từ giờ bắt đầu (mặc định 8:00) theo thứ tự kế hoạch, nghỉ trưa 45 phút. nBn lấy từ phiếu đùn mới nhất của khuôn. Số thanh (KH) = số billet ÷ n × m × số lỗ.",
+          tip_bars: "Lần đùn trước {date}: {billets} billet → {bars} thanh", tip_bars_none: "Khuôn này chưa có lần đùn trước",
+          info: "Thời gian = số billet × thời gian mỗi billet. Thời gian mỗi billet lấy từ thực tế 5 lần đùn gần nhất của cùng dòng khuôn (ví dụ CQ32T3-V03D → CQ32T3) trên cùng máy (tổng thời gian đùn ÷ tổng số billet). Khuôn chưa có thực tế thì dùng trung bình 20 lần đùn gần nhất của máy. Cộng dần từ giờ bắt đầu (mặc định 8:00) theo thứ tự kế hoạch, nghỉ trưa 45 phút. nBn lấy từ phiếu đùn mới nhất của khuôn. Số thanh (KH) = số billet KH × (số thanh ÷ số billet) của lần đùn trước của khuôn. Khuôn chưa đùn lần nào thì \"—\".",
           nitride: "N2",
         },
       };
@@ -191,7 +193,7 @@
                     <td class="num">${r.billet_length ?? ""}${r.billet_origin ? ` (${["", "Dubai", "VN"][r.billet_origin]})` : ""}</td>
                     <td class="num">${r.plan_billets}</td>
                     <td class="num actual ${short ? "short" : ""}">${r.actual_billets ?? ""}</td>
-                    <td class="num">${r.plan_bars ?? ""}</td>
+                    <td class="num" title="${r.last_press ? t("tip_bars").replace("{date}", r.last_press.date).replace("{billets}", r.last_press.billets).replace("{bars}", r.last_press.bars) : t("tip_bars_none")}">${r.plan_bars ?? (r.plan_billets > 0 ? "—" : "")}</td>
                     <td class="num actual">${r.actual_bars ?? ""}</td>
                     <td class="num" title="${r.time_source === "die" ? t("tip_time").replace("{family}", esc(r.family)).replace("{n}", r.history_count).replace("{sec}", r.sec_per_billet) : ""}">${r.minutes}${r.plan_billets > 0 && r.time_source === "machine" ? ` <span class="avg-mark">＊</span>` : ""}</td>
                     <td class="c">${r.start}</td><td class="c">${r.end}</td>

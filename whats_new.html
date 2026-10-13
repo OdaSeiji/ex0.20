@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-10-08 (最新) -->
+      <!-- 2026-10-13 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-13</span>
+        </div>
+        <div class="entry-title" data-key="fz_title">押出スケジュール表：押出材（計画）を前回の押出実績から計算</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="fz_purpose">押出材（計画）が実績とケタ違いになっていたため（現場の要望）。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="fz_content">押出材（計画）＝ 計画のビレット本数 ×（その型の前回の押出の押出材の本数 ÷ ビレット本数）に変えた。前の式（nBn から計算）はビレット1本で押出材1本ほどになり、実績と合っていなかった。数字にマウスを乗せると、もとにした押出の日付と本数が出る。前回の押出が無い型は「—」。製品の長さが前回と違うと合わないので、目安として使う。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_schedule.html'">press_schedule.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-08 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -1183,6 +1201,9 @@
           fy_title: "生産指示：発注書の一覧が出なくなっていたのを直した",
           fy_purpose: "生産指示の画面で、発注書の一覧が表示されるようにするため。",
           fy_content: "一覧を出す SQL が何分たっても終わらず、表が出なくなっていた（MariaDB の最適化 split_materialized が、集計を発注書の行ごとに作り直していた）。SQL を発注書ごとにまとめてからつなぐ形に書き直し、この一覧ではその最適化をオフにした。約4,000件が1秒以内に出る。",
+          fz_title: "押出スケジュール表：押出材（計画）を前回の押出実績から計算",
+          fz_purpose: "押出材（計画）が実績とケタ違いになっていたため（現場の要望）。",
+          fz_content: "押出材（計画）＝ 計画のビレット本数 ×（その型の前回の押出の押出材の本数 ÷ ビレット本数）に変えた。前の式（nBn から計算）はビレット1本で押出材1本ほどになり、実績と合っていなかった。数字にマウスを乗せると、もとにした押出の日付と本数が出る。前回の押出が無い型は「—」。製品の長さが前回と違うと合わないので、目安として使う。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1358,6 +1379,9 @@
           fy_title: "Chỉ thị sản xuất: sửa lỗi không hiển thị danh sách đơn đặt hàng",
           fy_purpose: "Để danh sách đơn đặt hàng hiển thị lại ở màn hình chỉ thị sản xuất.",
           fy_content: "SQL lấy danh sách chạy mãi không xong nên bảng không hiển thị (tối ưu split_materialized của MariaDB tạo lại phần tổng hợp cho từng đơn). Đã viết lại SQL để tổng hợp theo đơn trước rồi mới nối, và tắt tối ưu đó cho danh sách này. Khoảng 4.000 dòng hiển thị dưới 1 giây.",
+          fz_title: "Lịch đùn: tính số thanh (KH) từ thực tế lần đùn trước",
+          fz_purpose: "Vì số thanh (KH) chênh lệch rất lớn so với thực tế (yêu cầu từ hiện trường).",
+          fz_content: "Số thanh (KH) = số billet KH × (số thanh ÷ số billet của lần đùn trước của khuôn). Công thức cũ (tính từ nBn) cho khoảng 1 thanh mỗi billet, không khớp thực tế. Di chuột lên số để xem ngày và số lượng của lần đùn được dùng. Khuôn chưa đùn lần nào thì \"—\". Nếu chiều dài sản phẩm khác lần trước thì sẽ không khớp, chỉ dùng để tham khảo.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
