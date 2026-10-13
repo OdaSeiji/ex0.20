@@ -1,5 +1,5 @@
 <?php
-// 押出日報の入力確認：PLC で extruding が 0（押出していない）だった時間のうち、3分以上のものを返す
+// 押出日報の入力確認：PLC で press_mode（M310、自動運転）が 0（OFF）だった時間を返す。min_sec 秒より短いものは除く
 // ログは変化のあった時だけ記録されるので、終わりは「次のログの時刻」とする
 header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
@@ -7,7 +7,7 @@ require_once "../db.php";
 $machine = (int)($_GET["machine"] ?? 0);
 $start   = (string)($_GET["start"] ?? "");
 $days    = max(1, min(31, (int)($_GET["days"] ?? 7)));
-$minSec  = max(0, (int)($_GET["min_sec"] ?? 180));
+$minSec  = max(0, (int)($_GET["min_sec"] ?? 0));
 if ($machine < 1 || $machine > 4 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
     echo json_encode([]);
     exit;
@@ -21,17 +21,17 @@ $stmt = $pdo->prepare("
     SELECT DATE_FORMAT(MIN(date_time), '%Y-%m-%d %H:%i:%s') AS off_start,
            DATE_FORMAT(COALESCE(MAX(next_time), MAX(date_time)), '%Y-%m-%d %H:%i:%s') AS off_end
     FROM (
-        SELECT date_time, extruding,
+        SELECT date_time, press_mode,
                LEAD(date_time) OVER (ORDER BY date_time, id) AS next_time,
                SUM(chg) OVER (ORDER BY date_time, id) AS grp
         FROM (
-            SELECT id, date_time, extruding,
-                   CASE WHEN extruding <=> LAG(extruding) OVER (ORDER BY date_time, id) THEN 0 ELSE 1 END AS chg
+            SELECT id, date_time, press_mode,
+                   CASE WHEN press_mode <=> LAG(press_mode) OVER (ORDER BY date_time, id) THEN 0 ELSE 1 END AS chg
             FROM t_plc_web_log
             WHERE machine = :mc AND date_time >= :rf AND date_time < :to1
         ) a
     ) b
-    WHERE extruding = 0
+    WHERE press_mode = 0
     GROUP BY grp
     HAVING TIMESTAMPDIFF(SECOND, MIN(date_time), COALESCE(MAX(next_time), MAX(date_time))) >= :min_sec
        AND COALESCE(MAX(next_time), MAX(date_time)) > :from1
