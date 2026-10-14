@@ -349,8 +349,8 @@
 
     <!-- 🌐 多言語切替 -->
     <div class="lang-switch">
-      <button onclick=\"openPage('whats_new.html')\" style="min-width:auto; border-color:#2b6ca3; color:#2b6ca3;" data-key="whats_new_btn">📋 更新履歴</button>
-      <button onclick=\"openPage('../ex0.21/index.html')\" style="min-width:auto; border-color:#f0a000; color:#f0a000;">🧪 ex0.21（テスト版）へ</button>
+      <button onclick="openPage('whats_new.html')" style="min-width:auto; border-color:#2b6ca3; color:#2b6ca3;" data-key="whats_new_btn">📋 更新履歴</button>
+      <button onclick="openPage('../ex0.21/index.html')" style="min-width:auto; border-color:#f0a000; color:#f0a000;">🧪 ex0.21（テスト版）へ</button>
       <button id="openModeBtn" class="open-mode" onclick="toggleOpenMode()"></button>
       <button data-lang="ja" onclick="setLang('ja')">日本語</button>
       <button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button>
@@ -370,17 +370,17 @@
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/extrusion_press.svg" alt="" /><span data-key="section_press">押出工程</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('press_daily_report.html')\">
+        <div class="menu-card" onclick="openPage('press_daily_report.html')">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
           <div class="menu-title" data-key="daily_report_title">押出日報入力</div>
           <div class="menu-desc" data-key="daily_report_desc">押出日報入力画面</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('press_directive.html')\">
+        <div class="menu-card" onclick="openPage('press_directive.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="press_directive_title">押出指示書</div>
           <div class="menu-desc" data-key="press_directive_desc">押出指示書の作成、印刷</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('aging_rack_unpacked.html')\">
+        <div class="menu-card" onclick="openPage('aging_rack_unpacked.html')">
           <img class="menu-icon" src="./img/table.svg" alt="" />
           <div class="menu-title" data-key="unpacked_rack_title">未梱包ラック一覧</div>
           <div class="menu-desc" data-key="unpacked_rack_desc">押出済みでまだ梱包が終わっていない時効ラックと残本数</div>
@@ -392,17 +392,17 @@
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/caliper.svg" alt="" /><span data-key="section_quality">品質</span></div>
     <div class="accordion-content">
       <div class="menu-row fixed3">
-        <div class="menu-card" onclick=\"openPage('quality_summary.html')\">
+        <div class="menu-card" onclick="openPage('quality_summary.html')">
           <img class="menu-icon" src="./img/caliper.svg" alt="" />
           <div class="menu-title" data-key="quality_summary_title">品質サマリー</div>
           <div class="menu-desc" data-key="quality_summary_desc">押出ごとの本数・NG（コード別）・各工程のチェック日・生産性</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('quality_report.html')\">
+        <div class="menu-card" onclick="openPage('quality_report.html')">
           <img class="menu-icon" src="./img/register.svg" alt="" />
           <div class="menu-title" data-key="quality_report_title">品質評価入力</div>
           <div class="menu-desc" data-key="quality_report_desc">評価が完了していない押出を選び、ラックごとに不良コードと本数を記録</div>
         </div>
-        <div class="menu-card beta" onclick=\"openPage('sample_map_test.html')\">
+        <div class="menu-card beta" onclick="openPage('sample_map_test.html')">
           <img class="menu-icon" src="./img/table.svg" alt="" />
           <div class="menu-title" data-key="sample_map_title">（テスト）サンプル位置の図</div>
           <div class="menu-desc" data-key="sample_map_desc">押出材ごとの製品と、評価サンプルの位置（頭 T・継ぎ目・中央 M・尾 Z）を図で表示</div>
@@ -414,12 +414,12 @@
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/hollow_die.svg" alt="" /><span data-key="section_maintenance">金型メンテナンス</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('DieMaitenanceV3.html')\">
+        <div class="menu-card" onclick="openPage('DieMaitenanceV3.html')">
           <img class="menu-icon" src="./img/wrench.svg" alt="" />
           <div class="menu-title" data-key="maintenance_title">金型メンテナンス</div>
           <div class="menu-desc" data-key="maintenance_desc">金型メンテナンスに関するページ</div>
         </div>
-        <div class="menu-card beta" onclick=\"openPage('die_wash.html')\">
+        <div class="menu-card beta" onclick="openPage('die_wash.html')">
           <img class="menu-icon" src="./img/wrench.svg" alt="" />
           <div class="menu-title" data-key="die_wash_title">金型洗浄・棚入れ</div>
           <div class="menu-desc" data-key="die_wash_desc">プレス後 → 洗浄 → 棚入れ の工程管理</div>
@@ -431,27 +431,27 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📊</span><span data-key="section_progress">金型進捗管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('die_progress_list.html')\">
+        <div class="menu-card" onclick="openPage('die_progress_list.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="progress_title">金型進捗一覧</div>
           <div class="menu-desc" data-key="progress_desc">測定 → 診断 → 承認 → 修理 の進捗管理</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_issue_list.html')\">
+        <div class="menu-card" onclick="openPage('die_issue_list.html')">
           <img class="menu-icon" src="./img/warning.svg" alt="" />
           <div class="menu-title" data-key="issue_title">対策必要金型一覧</div>
           <div class="menu-desc" data-key="issue_desc">NG診断が承認された金型の一覧</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_watch.html')\">
+        <div class="menu-card" onclick="openPage('die_watch.html')">
           <img class="menu-icon" src="./img/warning.svg" alt="" />
           <div class="menu-title" data-key="watch_title">重点管理金型リスト</div>
           <div class="menu-desc" data-key="watch_desc">押出前を含む、重点管理が必要な金型の登録・管理</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_issue_progress.html')\">
+        <div class="menu-card" onclick="openPage('die_issue_progress.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="issue_progress_title">（暫定）金型進捗確認表</div>
           <div class="menu-desc" data-key="issue_progress_desc">Issue別の現在フェーズと停滞状況の一覧</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_condition_manage.html')\">
+        <div class="menu-card" onclick="openPage('die_condition_manage.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="condition_manage_title">（試作）金型コンディション管理</div>
           <div class="menu-desc" data-key="condition_manage_desc">CQ/CP96/MXS/MXQ/CXS/MGP/PS 対象、手動でTrial/MPT/MPを変更</div>
@@ -463,27 +463,27 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📈</span><span data-key="section_report">実績</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('die_startup_report.html')\">
+        <div class="menu-card" onclick="openPage('die_startup_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="startup_report_title">金型立上実績</div>
           <div class="menu-desc" data-key="startup_report_desc">到着・型検・移管・試押の月別集計</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('machine_report.html')\">
+        <div class="menu-card" onclick="openPage('machine_report.html')">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
           <div class="menu-title" data-key="machine_report_title">設備稼働実績</div>
           <div class="menu-desc" data-key="machine_report_desc">設備別・月別の稼働時間と押出回数</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('extrusion_quantity_report.html')\">
+        <div class="menu-card" onclick="openPage('extrusion_quantity_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="quantity_report_title">押出実績(t)</div>
           <div class="menu-desc" data-key="quantity_report_desc">押出種別・ビレットサイズ・製造工場別の月次投入重量</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('aging_rack_report.html')\">
+        <div class="menu-card" onclick="openPage('aging_rack_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="aging_rack_report_title">時効ラック使用・解放</div>
           <div class="menu-desc" data-key="aging_rack_report_desc">日別の使用ラック数と解放ラック数</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('press_ram_log_chart.html')\">
+        <div class="menu-card" onclick="openPage('press_ram_log_chart.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="ram_log_title">（試作）押出波形</div>
           <div class="menu-desc" data-key="ram_log_desc">ラム位置ごとの圧力・速度・出口温度を表示</div>
@@ -495,12 +495,12 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">📦</span><span data-key="section_production">生産管理</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('order_sheet.html')\">
+        <div class="menu-card" onclick="openPage('order_sheet.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="order_sheet_title">生産指示</div>
           <div class="menu-desc" data-key="order_sheet_desc">発注書の登録・実績・梱包状況の管理</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('press_plan.html')\">
+        <div class="menu-card" onclick="openPage('press_plan.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="press_plan_title">押出計画</div>
           <div class="menu-desc" data-key="press_plan_desc">押出日・号機ごとに、押す金型とビレット本数を計画</div>
@@ -512,7 +512,7 @@
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/billet.svg" alt="" /><span data-key="section_billet">ビレット</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('billet_check.html')\">
+        <div class="menu-card" onclick="openPage('billet_check.html')">
           <img class="menu-icon" src="./img/billet.svg" alt="" />
           <div class="menu-title" data-key="billet_check_title">ビレット在庫更新</div>
           <div class="menu-desc" data-key="billet_check_desc">サイズごとに、材質・長さ別のビレットの在庫本数を記録</div>
@@ -524,12 +524,12 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">🚢</span><span data-key="section_register">金型輸出、部品輸出</span></div>
     <div class="accordion-content">
       <div class="menu-row">
-        <div class="menu-card" onclick=\"openPage('die_import.html')\">
+        <div class="menu-card" onclick="openPage('die_import.html')">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
           <div class="menu-title" data-key="import_title">新規金型登録</div>
           <div class="menu-desc" data-key="import_desc">CSVから金型を一括登録</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_part_import.html')\">
+        <div class="menu-card" onclick="openPage('die_part_import.html')">
           <img class="menu-icon" src="./img/factory.svg" alt="" />
           <div class="menu-title" data-key="part_import_title">部品登録</div>
           <div class="menu-desc" data-key="part_import_desc">CSVから部品を一括登録</div>
@@ -540,43 +540,43 @@
     <div class="accordion" onclick="toggleAccordion(this)"><span class="accordion-emoji">⚙️</span><span data-key="section_settings">各種設定</span></div>
     <div class="accordion-content">
       <div class="menu-row fixed3">
-        <div class="menu-card" onclick=\"openPage('die_handover_progress.html')\">
+        <div class="menu-card" onclick="openPage('die_handover_progress.html')">
           <img class="menu-icon" src="./img/table.svg" alt="" />
           <div class="menu-title" data-key="handover_progress_title">金型進捗一覧</div>
           <div class="menu-desc" data-key="handover_progress_desc">型検・量産トライ・移管の進捗管理</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('handover_list.html')\">
+        <div class="menu-card" onclick="openPage('handover_list.html')">
           <img class="menu-icon" src="./img/register.svg" alt="" />
           <div class="menu-title" data-key="handover_title">金型輸入固定資産登録</div>
           <div class="menu-desc" data-key="handover_desc">書類・検査・到着・資産化の進捗管理</div>
         </div>
       </div>
       <div class="menu-row fixed3">
-        <div class="menu-card" onclick=\"openPage('production_number.html')\">
+        <div class="menu-card" onclick="openPage('production_number.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="pn_title">品番管理</div>
           <div class="menu-desc" data-key="pn_desc">品番の登録・編集・カテゴリ設定</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('die_register.html')\">
+        <div class="menu-card" onclick="openPage('die_register.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="die_register_title">金型管理</div>
           <div class="menu-desc" data-key="die_register_desc">金型の新規登録・編集・削除</div>
         </div>
-        <div class="menu-card" onclick=\"openPage('production_drawing.html')\">
+        <div class="menu-card" onclick="openPage('production_drawing.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="production_drawing_title">図面管理</div>
           <div class="menu-desc" data-key="production_drawing_desc">品番ごとの型材図面PDFを登録・閲覧</div>
         </div>
       </div>
       <div class="menu-row fixed3">
-        <div class="menu-card" onclick=\"openPage('die_production_number.html')\">
+        <div class="menu-card" onclick="openPage('die_production_number.html')">
           <img class="menu-icon" src="./img/link.svg" alt="" />
           <div class="menu-title" data-key="die_pn_title">金型－品番 紐づけ</div>
           <div class="menu-desc" data-key="die_pn_desc">金型ごとに作れる品番（長さ違い含む）を登録・管理</div>
         </div>
       </div>
       <div class="menu-row fixed3">
-        <div class="menu-card" onclick=\"openPage('staff_settings.html')\">
+        <div class="menu-card" onclick="openPage('staff_settings.html')">
           <img class="menu-icon" src="./img/person.svg" alt="" />
           <div class="menu-title" data-key="staff_title">スタッフ管理</div>
           <div class="menu-desc" data-key="staff_desc">スタッフのロール・パスワードの管理</div>
