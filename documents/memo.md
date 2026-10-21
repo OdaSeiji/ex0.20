@@ -5874,3 +5874,7 @@ http://10.163.50.17/ex0.20/press_daily_report.html
   <img src="./img/20261009-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/10/21
+
+押出日報入力添付ファイル無でも保存できるように。
