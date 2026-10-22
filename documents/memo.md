@@ -5881,3 +5881,12 @@ http://10.163.50.17/ex0.20/press_daily_report.html
 また、日報入力画面の下、一覧表、日付、入力日でソートできるようになってほしい。
 
 品番管理ページ、比重ではなく、単重。
+
+# 2026/10/23
+
+赤枠部に、移管情報の追加
+
+<figure style="text-align:center;">
+  <img src="./img/20261023-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
