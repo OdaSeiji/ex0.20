@@ -5890,3 +5890,23 @@ http://10.163.50.17/ex0.20/press_daily_report.html
   <img src="./img/20261023-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+以下、画面の追加
+
+- 粗さ測定記録
+- 硬さ測定記録
+- エッチング評価記録
+
+下記部分、削除
+
+<figure style="text-align:center;">
+  <img src="./img/20261023-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+日報の作成に工数がかかる。
+
+<figure style="text-align:center;">
+  <img src="./img/20261023-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
