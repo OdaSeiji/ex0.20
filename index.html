@@ -402,6 +402,21 @@
           <div class="menu-title" data-key="quality_report_title">品質評価入力</div>
           <div class="menu-desc" data-key="quality_report_desc">評価が完了していない押出を選び、ラックごとに不良コードと本数を記録</div>
         </div>
+        <div class="menu-card" onclick="openPage('hardness_record.html')">
+          <img class="menu-icon" src="./img/hardness_tester.svg" alt="" />
+          <div class="menu-title" data-key="hardness_record_title">硬度測定記録</div>
+          <div class="menu-desc" data-key="hardness_record_desc">押出を選び、サンプル位置ごとに硬度を入力（ex0.11 HardNess の移植）</div>
+        </div>
+        <div class="menu-card" onclick="openPage('roughness_record.html')">
+          <img class="menu-icon" src="./img/roughness.svg" alt="" />
+          <div class="menu-title" data-key="roughness_record_title">粗さ測定記録</div>
+          <div class="menu-desc" data-key="roughness_record_desc">押出を選び、サンプル位置ごとに Rz と型筋を入力（ex0.11 Measurement の移植）</div>
+        </div>
+        <div class="menu-card" onclick="openPage('etching_record.html')">
+          <img class="menu-icon" src="./img/etching.svg" alt="" />
+          <div class="menu-title" data-key="etching_record_title">エッチング評価記録</div>
+          <div class="menu-desc" data-key="etching_record_desc">押出を選び、サンプル位置ごとにエッチングの判定を押して入力。タブレット向け（ex0.11 Etching の移植）</div>
+        </div>
         <div class="menu-card beta" onclick="openPage('sample_map_test.html')">
           <img class="menu-icon" src="./img/table.svg" alt="" />
           <div class="menu-title" data-key="sample_map_title">（テスト）サンプル位置の図</div>
@@ -670,6 +685,12 @@
           quality_summary_desc: "押出ごとの本数・NG（コード別）・各工程のチェック日・生産性",
           quality_report_title: "品質評価入力",
           quality_report_desc: "評価が完了していない押出を選び、ラックごとに不良コードと本数を記録",
+          hardness_record_title: "硬度測定記録",
+          hardness_record_desc: "押出を選び、サンプル位置ごとに硬度を入力（ex0.11 HardNess の移植）",
+          roughness_record_title: "粗さ測定記録",
+          roughness_record_desc: "押出を選び、サンプル位置ごとに Rz と型筋を入力（ex0.11 Measurement の移植）",
+          etching_record_title: "エッチング評価記録",
+          etching_record_desc: "押出を選び、サンプル位置ごとにエッチングの判定を押して入力。タブレット向け（ex0.11 Etching の移植）",
           sample_map_title: "（テスト）サンプル位置の図",
           sample_map_desc: "押出材ごとの製品と、評価サンプルの位置（頭 T・継ぎ目・中央 M・尾 Z）を図で表示",
           unpacked_rack_desc: "押出済みでまだ梱包が終わっていない時効ラックと残本数",
@@ -774,6 +795,12 @@
           quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
           quality_report_title: "Nhập đánh giá chất lượng",
           quality_report_desc: "Chọn lần ép chưa đánh giá xong, ghi mã lỗi và số cây NG theo từng giá",
+          hardness_record_title: "Ghi kết quả đo độ cứng",
+          hardness_record_desc: "Chọn lần đùn, nhập độ cứng theo từng vị trí mẫu (chuyển từ HardNess của ex0.11)",
+          roughness_record_title: "Ghi kết quả đo độ nhám",
+          roughness_record_desc: "Chọn lần đùn, nhập Rz và dấu khuôn theo từng vị trí mẫu (chuyển từ Measurement của ex0.11)",
+          etching_record_title: "Ghi kết quả etching",
+          etching_record_desc: "Chọn lần đùn, bấm kết quả etching cho từng vị trí mẫu. Dùng cho máy tính bảng (chuyển từ Etching của ex0.11)",
           sample_map_title: "(Thử nghiệm) Sơ đồ vị trí mẫu",
           sample_map_desc: "Hiển thị bằng hình sản phẩm theo từng thanh ép và vị trí lấy mẫu đánh giá (đầu T, mối nối, giữa M, đuôi Z)",
           unpacked_rack_desc: "Giá hóa già đã ép nhưng chưa đóng gói xong và số cây còn lại",

@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Etching Record</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 16px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 8px 14px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 13px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 12px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; min-height: 36px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; white-space: nowrap; }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-main { background: #0078d4; color: #fff; }
+    .btn-sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .btn-big  { padding: 14px 24px; font-size: 16px; }
+    .status-msg { font-size: 14px; }
+    .status-msg.err { color: #c62828; font-weight: bold; }
+    .status-msg.ok  { color: #2e7d32; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card-header { background: #e8f1ff; padding: 10px 12px; font-size: 14px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card-body { padding: 12px; }
+
+    /* 左：押出の一覧 */
+    .left { width: 560px; flex-shrink: 0; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .filters input { padding: 8px 10px; border: 1px solid #aac4e8; border-radius: 6px; font-size: 15px; width: 160px; }
+    .seg { display: inline-flex; border: 1px solid #0078d4; border-radius: 6px; overflow: hidden; }
+    .seg button { padding: 8px 14px; border: none; background: #fff; color: #0078d4; font-size: 14px; font-weight: bold; cursor: pointer; }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+    .list-wrap { max-height: calc(100vh - 240px); overflow: auto; }
+    .hint { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.5; }
+
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { padding: 8px 5px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    th { background: #e8f1ff; font-size: 12px; position: sticky; top: 0; z-index: 1; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    td.c { text-align: center; }
+    td.r { text-align: right; }
+    tbody tr.pick { cursor: pointer; }
+    tbody tr.pick:hover td { background: #f0f8ff; }
+    tbody tr.selected td { background: #fff3cd !important; }
+    .empty { padding: 24px; text-align: center; color: #999; }
+    .ng-count { color: #c62828; font-weight: bold; }
+    .fin { display: inline-block; border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: bold; }
+    .fin-0 { background: #ffe0b2; color: #e65100; }
+    .fin-1 { background: #c8e6c9; color: #1b5e20; }
+    .fin-2 { background: #ffcdd2; color: #b71c1c; }
+    .fin-3 { background: #f8bbd0; color: #880e4f; }
+    .fin-4 { background: #fff59d; color: #6d5d00; }
+
+    /* 右：選んだ押出 */
+    .right { flex: 1; min-width: 0; }
+    .placeholder { padding: 40px; text-align: center; color: #999; }
+    .btn-to-list { display: none; }
+    .press-info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; margin-bottom: 12px; }
+    .press-info b { font-family: "Roboto Mono", monospace; font-size: 15px; }
+    .press-info .lbl { color: #777; font-size: 12px; margin-right: 4px; }
+    .warn { font-size: 13px; color: #e65100; margin-bottom: 10px; }
+    .save-state { font-size: 12px; font-weight: normal; }
+    .save-state.ok { color: #2e7d32; }
+    .save-state.busy { color: #777; }
+    .save-state.err { color: #c62828; font-weight: bold; }
+
+    .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px 16px; margin-bottom: 14px; }
+    .field label { display: block; color: #555; font-size: 12px; margin-bottom: 4px; }
+    .field input, .field select { width: 100%; padding: 9px 10px; border: 1px solid #aac4e8; border-radius: 6px; font-size: 15px; background: #fff; }
+    .field .row { display: flex; gap: 6px; }
+    .field.wide { grid-column: 1 / -1; }
+    .fin-seg { display: flex; flex-wrap: wrap; gap: 6px; }
+    .fin-seg button { flex: 1; min-width: 92px; padding: 10px 6px; border: 2px solid #ccd; border-radius: 6px; background: #fff; font-size: 14px; font-weight: bold; cursor: pointer; color: #555; }
+    .fin-seg button.active { border-color: #0078d4; background: #0078d4; color: #fff; }
+    .photo-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .photo-row img { height: 72px; border-radius: 6px; border: 1px solid #ccd; cursor: pointer; }
+    .photo-label { display: inline-block; }
+    .photo-label input { display: none; }
+
+    .sums { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; font-size: 13px; }
+    .sums span { background: #f5f5f5; border-radius: 6px; padding: 4px 10px; }
+    .sums b { font-family: "Roboto Mono", monospace; font-size: 15px; margin-left: 4px; }
+    .sums .hot { background: #ffebee; color: #c62828; }
+
+    .data-wrap { max-height: calc(100vh - 250px); overflow: auto; }
+    #dataTable { width: auto; }
+    #dataTable td { padding: 3px; }
+    #dataTable td.pos { font-family: "Roboto Mono", monospace; font-weight: bold; font-size: 15px; padding: 3px 10px; }
+    .cell { width: 84px; height: 46px; border: 1px solid #ccd; border-radius: 6px; background: #fafafa; font-size: 15px; font-weight: bold; cursor: pointer; color: #bbb; }
+    .cell.j1 { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .cell.j2 { background: #e53935; color: #fff; border-color: #c62828; }
+    .cell.j5 { background: #2e7d32; color: #fff; border-color: #1b5e20; }
+    .cell.saving { opacity: 0.5; }
+
+    /* 判定を選ぶ画面（タブレットで押しやすいように大きいボタン） */
+    .picker-back { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .picker-back.open { display: flex; }
+    .picker { background: #fff; border-radius: 12px; padding: 18px; width: min(520px, 94vw); box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .picker h3 { font-size: 18px; margin-bottom: 12px; }
+    .picker .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .picker button { padding: 16px 8px; border-radius: 8px; border: 2px solid #ccd; background: #fff; font-size: 17px; font-weight: bold; cursor: pointer; }
+    .picker button small { display: block; font-size: 12px; font-weight: normal; margin-top: 2px; }
+    .picker .p-ok { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; grid-column: 1 / -1; font-size: 20px; }
+    .picker .p-ng { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+    .picker .p-bh { background: #2e7d32; color: #fff; border-color: #1b5e20; }
+    .picker .p-blank { color: #777; }
+    .picker .p-cancel { grid-column: 1 / -1; background: #eceff1; color: #455a64; border-color: #cfd8dc; }
+    .picker button.current { outline: 3px solid #0078d4; outline-offset: 2px; }
+
+    /* 狭い画面（タブレットの縦向きなど）：一覧と記録を切り替えて出す */
+    @media (max-width: 1100px) {
+      .left { width: 100%; }
+      .layout.show-detail .left { display: none; }
+      .layout:not(.show-detail) .right { display: none; }
+      .btn-to-list { display: inline-block; }
+      .list-wrap { max-height: none; }
+      .data-wrap { max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🧪 エッチング評価記録</h1>
+  <div class="subtitle" data-key="subtitle">押出を選び、サンプル位置ごとにエッチングの判定を押して入れます。押すたびに保存されます。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div class="layout" id="layout">
+    <!-- 左：押出の一覧 -->
+    <div class="left card">
+      <div class="card-header"><span data-key="list_title">押出の一覧</span></div>
+      <div class="card-body">
+        <div class="filters">
+          <input type="text" id="fDie" data-ph="ph_die" placeholder="型番で検索" />
+          <div class="seg" id="statusSeg">
+            <button data-status="open" data-key="st_open">未完了</button>
+            <button data-status="done" data-key="st_done">完了</button>
+            <button data-status="all" data-key="st_all">すべて</button>
+          </div>
+        </div>
+        <div class="list-wrap">
+          <table>
+            <thead><tr id="listHead"></tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div class="hint" data-key="list_hint">※ 新しい押出から350件まで表示します（種別「〇」は出しません）。「NG」はどこかの回で NG になった位置の数です。</div>
+      </div>
+    </div>
+
+    <!-- 右：選んだ押出 -->
+    <div class="right" id="right">
+      <div class="card"><div class="placeholder" data-key="placeholder">← 左の一覧から押出を選んでください</div></div>
+    </div>
+  </div>
+
+  <!-- 判定を選ぶ画面 -->
+  <div class="picker-back" id="pickerBack">
+    <div class="picker">
+      <h3 id="pickerTitle"></h3>
+      <div class="grid" id="pickerGrid"></div>
+    </div>
+  </div>
+
+  <script src="./scr/sample_position.js"></script>
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title: "🧪 エッチング評価記録",
+        subtitle: "押出を選び、サンプル位置ごとにエッチングの判定を押して入れます。押すたびに保存されます。",
+        btn_back: "← 戻る", btn_to_list: "← 一覧へ",
+        list_title: "押出の一覧",
+        ph_die: "型番で検索",
+        st_all: "すべて", st_open: "未完了", st_done: "完了",
+        list_hint: "※ 新しい押出から350件まで表示します（種別「〇」は出しません）。「NG」はどこかの回で NG になった位置の数です。",
+        placeholder: "← 左の一覧から押出を選んでください",
+        col_date: "押出日", col_machine: "号機", col_die: "型番", col_type: "種別", col_billets: "ビレット",
+        col_records: "位置", col_ng: "NG", col_check: "実施日", col_finish: "状態",
+        empty: "該当する押出はありません",
+        info_date: "押出日", info_machine: "号機", info_die: "型番", info_pn: "品番", info_type: "種別",
+        info_billets: "ビレット", info_nbn: "nBn × 穴",
+        lbl_check_date: "エッチングの日", lbl_finish: "状態", lbl_staff: "担当者", lbl_check_staff: "確認者",
+        lbl_note: "メモ", lbl_photo: "写真", staff_none: "－－－",
+        fin0: "未完了", fin1: "完了", fin2: "製品を捨てた", fin3: "エッチングしない", fin4: "エッチング中",
+        btn_today: "今日", btn_photo: "📷 写真を撮る・選ぶ", no_photo: "写真なし",
+        role_operator: "作業者", role_inspector: "検査員", role_admin: "管理者",
+        start_title: "まだ記録がありません",
+        start_desc: "nBn {nbn}・穴 {hole}・ビレット {billets} 本から、{n} か所の位置を作ります。1回目（Lần 0）は全部 OK で作るので、NG の位置だけ押して変えてください。",
+        btn_start: "記録を始める（{n} か所）",
+        no_positions: "nBn・穴数・ビレット本数がそろわないため、位置を作れません。押出指示書の nBn を確認してください。",
+        col_pos: "位置", round: "Lần {n}",
+        sum_ng_pos: "NG の位置",
+        j_ok: "OK", j_ng: "NG", j_bh: "BH", j_blank: "空欄",
+        c311: "エッチング不良", c319: "不純物", c320: "溶着ライン", c351: "その他", c_none: "コードなし",
+        bh_desc: "製品を捨てた", blank_desc: "検査していない",
+        btn_cancel: "やめる",
+        saving: "保存中…", saved: "✓ 保存しました", save_err: "保存できませんでした",
+        err_future: "エッチングの日に未来の日付は入れられません",
+        uploading: "写真を送っています…",
+      },
+      vi: {
+        title: "🧪 Ghi kết quả etching",
+        subtitle: "Chọn lần đùn, bấm kết quả etching cho từng vị trí mẫu. Mỗi lần bấm sẽ được lưu ngay.",
+        btn_back: "← Quay lại", btn_to_list: "← Danh sách",
+        list_title: "Danh sách lần đùn",
+        ph_die: "Tìm mã khuôn",
+        st_all: "Tất cả", st_open: "Chưa HT", st_done: "Đã HT",
+        list_hint: "※ Hiển thị tối đa 350 lần đùn mới nhất (không hiện kiểu \"〇\"). \"NG\" là số vị trí bị NG ở một lần nào đó.",
+        placeholder: "← Chọn lần đùn ở danh sách bên trái",
+        col_date: "Ngày đùn", col_machine: "Máy", col_die: "Mã khuôn", col_type: "Kiểu", col_billets: "Billet",
+        col_records: "Vị trí", col_ng: "NG", col_check: "Ngày ngâm", col_finish: "Trạng thái",
+        empty: "Không có lần đùn phù hợp",
+        info_date: "Ngày đùn", info_machine: "Máy", info_die: "Mã khuôn", info_pn: "Mã SP", info_type: "Kiểu",
+        info_billets: "Billet", info_nbn: "nBn × lỗ",
+        lbl_check_date: "Ngày ngâm", lbl_finish: "Trạng thái", lbl_staff: "Người check", lbl_check_staff: "Xác nhận",
+        lbl_note: "Ghi chú", lbl_photo: "Ảnh", staff_none: "－－－",
+        fin0: "Chưa HT", fin1: "Đã HT", fin2: "Bỏ hàng", fin3: "Không ngâm", fin4: "Đang ngâm",
+        btn_today: "Hôm nay", btn_photo: "📷 Chụp / chọn ảnh", no_photo: "Chưa có ảnh",
+        role_operator: "Công nhân", role_inspector: "Kiểm tra", role_admin: "Quản lý",
+        start_title: "Chưa có dữ liệu",
+        start_desc: "Tạo {n} vị trí từ nBn {nbn}, lỗ {hole}, {billets} billet. Lần 0 được tạo sẵn là OK, chỉ cần bấm đổi các vị trí NG.",
+        btn_start: "Bắt đầu ghi ({n} vị trí)",
+        no_positions: "Thiếu nBn / số lỗ / số billet nên không tạo được vị trí. Hãy kiểm tra nBn trong phiếu đùn.",
+        col_pos: "Vị trí", round: "Lần {n}",
+        sum_ng_pos: "Vị trí NG",
+        j_ok: "OK", j_ng: "NG", j_bh: "BH", j_blank: "Trống",
+        c311: "Lỗi ăn mòn", c319: "Lỗi tạp chất", c320: "Lỗi vết nứt", c351: "Lỗi khác", c_none: "Không mã lỗi",
+        bh_desc: "Bỏ hàng", blank_desc: "Chưa kiểm tra",
+        btn_cancel: "Hủy",
+        saving: "Đang lưu…", saved: "✓ Đã lưu", save_err: "Không lưu được",
+        err_future: "Ngày ngâm không được là ngày trong tương lai",
+        uploading: "Đang gửi ảnh…",
+      },
+    };
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k];
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const v = dict[lang][el.dataset.key];
+        if (typeof v === "string") el.textContent = v;
+      });
+      document.querySelectorAll("[data-ph]").forEach(el => el.placeholder = dict[lang][el.dataset.ph]);
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      renderList();
+      renderRight();
+    }
+
+    /* =====================================================
+       共通
+    ===================================================== */
+    const API = "./php/etching_record/";
+    const PHOTO_URL = "../upload/Etching/";
+    const N_ROUNDS = 5;
+    // 判定 jug と不良コード code（php/etching_record/common.php と同じ値）
+    const JUG = { OK: 1, NG: 2, BLANK: 3, BH: 5 };
+    const CODES = [{ id: 11, code: "311", key: "c311" }, { id: 19, code: "319", key: "c319" }, { id: 20, code: "320", key: "c320" }, { id: 25, code: "351", key: "c351" }];
+    const NO_CODE = 33;
+    const codeText = (id) => (CODES.find(c => c.id === id) || {}).code || "";
+
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+
+    function showMsg(msg, isErr) {
+      const el = document.getElementById("statusMsg");
+      el.textContent = msg || "";
+      el.className = "status-msg " + (isErr ? "err" : "ok");
+      if (msg && !isErr) setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 3000);
+    }
+    async function getJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || res.statusText);
+      return data;
+    }
+    async function postJson(file, body) {
+      const res = await fetch(API + file, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || res.statusText);
+      return data;
+    }
+
+    // 右上の「保存中… / ✓ 保存しました」
+    let saveTimer = null;
+    function setSaveState(kind, msg) {
+      const el = document.getElementById("saveState");
+      if (!el) return;
+      clearTimeout(saveTimer);
+      el.className = "save-state " + kind;
+      el.textContent = msg || t(kind === "busy" ? "saving" : kind === "ok" ? "saved" : "save_err");
+      if (kind === "ok") saveTimer = setTimeout(() => { el.textContent = ""; }, 2500);
+    }
+
+    /* =====================================================
+       状態
+    ===================================================== */
+    const state = {
+      status: "open",
+      rows: null,
+      pressId: null,
+      press: null,
+      staff: [],
+      records: [],       // { id, position, rounds: [{ jug, code } × 5] }
+      picking: null,     // { ri, round }
+    };
+
+    /* =====================================================
+       左：一覧
+    ===================================================== */
+    let listSeq = 0;
+    async function loadList() {
+      const seq = ++listSeq;
+      const q = new URLSearchParams({ die: document.getElementById("fDie").value.trim(), status: state.status });
+      const data = await getJson(`${API}get_list.php?${q}`);
+      if (seq !== listSeq) return;
+      state.rows = data.rows;
+      renderList();
+    }
+
+    let dieTimer = null;
+    document.getElementById("fDie").addEventListener("input", () => {
+      clearTimeout(dieTimer);
+      dieTimer = setTimeout(() => loadList().catch(err => showMsg(err.message, true)), 300);
+    });
+    document.getElementById("statusSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      state.status = b.dataset.status;
+      loadList().catch(err => showMsg(err.message, true));
+    });
+    document.getElementById("listBody").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if (tr) selectPress(Number(tr.dataset.id));
+    });
+
+    function renderList() {
+      document.querySelectorAll("#statusSeg button").forEach(b => b.classList.toggle("active", b.dataset.status === state.status));
+      document.getElementById("listHead").innerHTML =
+        ["col_date", "col_machine", "col_die", "col_type", "col_billets", "col_records", "col_ng", "col_check", "col_finish"]
+          .map(k => `<th>${t(k)}</th>`).join("");
+      const body = document.getElementById("listBody");
+      if (!state.rows) return;
+      if (state.rows.length === 0) {
+        body.innerHTML = `<tr><td colspan="9" class="empty">${t("empty")}</td></tr>`;
+        return;
+      }
+      body.innerHTML = state.rows.map(r => `
+        <tr class="pick ${r.id === state.pressId ? "selected" : ""}" data-id="${r.id}">
+          <td class="mono">${esc(r.press_date.slice(2))}</td>
+          <td class="c">${r.machine ?? ""}</td>
+          <td class="mono">${esc(r.die_number)}</td>
+          <td class="c">${esc(r.pressing_type)}</td>
+          <td class="r mono">${r.billets ?? ""}</td>
+          <td class="r mono">${r.records || ""}</td>
+          <td class="r mono ${r.ng ? "ng-count" : ""}">${r.ng || ""}</td>
+          <td class="mono">${r.check_date ? esc(r.check_date.slice(5)) : ""}</td>
+          <td class="c"><span class="fin fin-${r.finish}">${t("fin" + r.finish)}</span></td>
+        </tr>`).join("");
+    }
+
+    /* =====================================================
+       右：選んだ押出
+    ===================================================== */
+    async function selectPress(id) {
+      showMsg("");
+      state.pressId = id;
+      renderList();
+      document.getElementById("layout").classList.add("show-detail");
+      window.scrollTo(0, 0);
+      await loadDetail();
+    }
+
+    async function loadDetail() {
+      try {
+        const data = await getJson(`${API}get_press.php?id=${state.pressId}`);
+        state.press = data.press;
+        state.staff = data.staff;
+        state.records = data.records;
+        renderRight();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    const positionsToCreate = () => {
+      const p = state.press;
+      return samplePositions(p.nbn, p.billets, p.hole);
+    };
+
+    function cellHtml(r, ri, k) {
+      const c = r.rounds[k];
+      const text = c.jug === JUG.OK ? t("j_ok")
+        : c.jug === JUG.NG ? (c.code !== NO_CODE ? codeText(c.code) : t("j_ng"))
+        : c.jug === JUG.BH ? t("j_bh") : "－";
+      return `<button class="cell j${c.jug}" data-ri="${ri}" data-round="${k}">${esc(text)}</button>`;
+    }
+
+    function renderSums() {
+      const el = document.getElementById("sums");
+      if (!el) return;
+      const count = (id) => state.records.reduce((n, r) => n + r.rounds.filter(c => c.jug === JUG.NG && c.code === id).length, 0);
+      const ngPos = state.records.filter(r => r.rounds.some(c => c.jug === JUG.NG)).length;
+      el.innerHTML = CODES.map(c => { const n = count(c.id); return `<span class="${n ? "hot" : ""}">${c.code} ${esc(t(c.key))}<b>${n}</b></span>`; }).join("")
+        + `<span class="${ngPos ? "hot" : ""}">${t("sum_ng_pos")}<b>${ngPos}</b></span>`;
+    }
+
+    function staffOptions(selected) {
+      const groups = ["operator", "inspector", "admin", null];
+      return `<option value="">${t("staff_none")}</option>` + groups.map(role => {
+        const list = state.staff.filter(s => (s.role ?? null) === role || (role === null && !["operator", "inspector", "admin"].includes(s.role)));
+        if (!list.length) return "";
+        const opts = list.map(s => `<option value="${s.id}" ${s.id === selected ? "selected" : ""}>${esc(s.name)}</option>`).join("");
+        return role ? `<optgroup label="${t("role_" + role)}">${opts}</optgroup>` : opts;
+      }).join("");
+    }
+
+    function renderRight() {
+      const right = document.getElementById("right");
+      const p = state.press;
+      if (!p) {
+        right.innerHTML = `<div class="card"><div class="placeholder">${t("placeholder")}</div></div>`;
+        return;
+      }
+      const info = (k, v) => `<span><span class="lbl">${t(k)}</span><b>${esc(v ?? "－")}</b></span>`;
+
+      let records;
+      if (state.records.length) {
+        const head = Array.from({ length: N_ROUNDS }, (_, k) => `<th>${t("round", { n: k })}</th>`).join("");
+        const body = state.records.map((r, ri) => `<tr><td class="pos">${esc(r.position)}</td>${r.rounds.map((_, k) => `<td>${cellHtml(r, ri, k)}</td>`).join("")}</tr>`).join("");
+        records = `
+          <div class="sums" id="sums"></div>
+          <div class="data-wrap"><table id="dataTable"><thead><tr><th>${t("col_pos")}</th>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+      } else {
+        const n = positionsToCreate().length;
+        records = n
+          ? `<div class="warn"><b>${t("start_title")}</b><br>${t("start_desc", { n, nbn: esc(p.nbn), hole: p.hole, billets: p.billets })}</div>
+             <button class="btn btn-main btn-big" id="btnStart">${t("btn_start", { n })}</button>`
+          : `<div class="warn">${t("no_positions")}</div>`;
+      }
+
+      right.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span><button class="btn btn-sub btn-to-list" id="btnToList" style="padding:4px 10px;margin-right:8px">${t("btn_to_list")}</button>${esc(p.die_number)}　${esc(p.press_date)}</span>
+            <span class="save-state" id="saveState"></span>
+          </div>
+          <div class="card-body">
+            <div class="press-info">
+              ${info("info_date", p.press_date)}${info("info_machine", p.machine)}${info("info_die", p.die_number)}
+              ${info("info_pn", p.production_number)}${info("info_type", p.pressing_type)}${info("info_billets", p.billets)}
+              ${info("info_nbn", p.nbn ? `${p.nbn} × ${p.hole ?? "?"}` : null)}
+            </div>
+
+            <div class="fields">
+              <div class="field wide"><label>${t("lbl_finish")}</label>
+                <div class="fin-seg" id="finSeg">${[0, 4, 1, 2, 3].map(f => `<button data-fin="${f}" class="${p.finish === f ? "active" : ""}">${t("fin" + f)}</button>`).join("")}</div>
+              </div>
+              <div class="field"><label>${t("lbl_check_date")}</label>
+                <div class="row"><input type="date" id="fCheckDate" value="${esc(p.check_date || "")}" max="${today()}" />
+                  <button class="btn btn-sub" id="btnToday">${t("btn_today")}</button></div>
+              </div>
+              <div class="field"><label>${t("lbl_staff")}</label><select id="fStaff">${staffOptions(p.staff_id)}</select></div>
+              <div class="field"><label>${t("lbl_check_staff")}</label><select id="fCheckStaff">${staffOptions(p.check_staff_id)}</select></div>
+              <div class="field"><label>${t("lbl_note")}</label><input type="text" id="fNote" value="${esc(p.note)}" maxlength="1000" /></div>
+              <div class="field wide"><label>${t("lbl_photo")}</label>
+                <div class="photo-row">
+                  ${p.photo ? `<img src="${PHOTO_URL}${encodeURIComponent(p.photo)}" id="photoThumb" alt="" />` : `<span style="color:#999">${t("no_photo")}</span>`}
+                  <label class="btn btn-sub photo-label">${t("btn_photo")}<input type="file" id="fPhoto" accept="image/*" capture="environment" /></label>
+                </div>
+              </div>
+            </div>
+
+            ${records}
+          </div>
+        </div>`;
+      renderSums();
+    }
+
+    /* ---------- 押出ごとの項目：変えたらすぐ保存 ---------- */
+    async function saveInfo() {
+      const p = state.press;
+      if (p.check_date && p.check_date > today()) return setSaveState("err", t("err_future"));
+      setSaveState("busy");
+      try {
+        await postJson("save_info.php", {
+          press_id: state.pressId, check_date: p.check_date || null, finish: p.finish,
+          staff_id: p.staff_id, check_staff_id: p.check_staff_id, note: p.note,
+        });
+        setSaveState("ok");
+        loadList().catch(() => {});
+      } catch (err) {
+        setSaveState("err", `${t("save_err")}：${err.message}`);
+      }
+    }
+
+    document.getElementById("right").addEventListener("change", (e) => {
+      const el = e.target, p = state.press;
+      if (el.id === "fCheckDate") { p.check_date = el.value; return saveInfo(); }
+      if (el.id === "fStaff") { p.staff_id = el.value ? Number(el.value) : null; return saveInfo(); }
+      if (el.id === "fCheckStaff") { p.check_staff_id = el.value ? Number(el.value) : null; return saveInfo(); }
+      if (el.id === "fNote") { p.note = el.value; return saveInfo(); }
+      if (el.id === "fPhoto" && el.files[0]) return uploadPhoto(el.files[0]);
+    });
+
+    document.getElementById("right").addEventListener("click", async (e) => {
+      const el = e.target.closest("button, img");
+      if (!el) return;
+      const p = state.press;
+      if (el.id === "btnToList") { document.getElementById("layout").classList.remove("show-detail"); return; }
+      if (el.id === "btnToday") { p.check_date = today(); document.getElementById("fCheckDate").value = p.check_date; return saveInfo(); }
+      if (el.dataset.fin !== undefined) {
+        p.finish = Number(el.dataset.fin);
+        document.querySelectorAll("#finSeg button").forEach(b => b.classList.toggle("active", b === el));
+        return saveInfo();
+      }
+      if (el.id === "photoThumb") return window.open(el.src, "_blank");
+      if (el.id === "btnStart") {
+        el.disabled = true;
+        try {
+          await postJson("create_rows.php", { press_id: state.pressId, positions: positionsToCreate() });
+          await loadDetail();
+          loadList().catch(() => {});
+          setSaveState("ok");
+        } catch (err) {
+          showMsg(err.message, true);
+          el.disabled = false;
+        }
+        return;
+      }
+      if (el.classList.contains("cell")) openPicker(Number(el.dataset.ri), Number(el.dataset.round));
+    });
+
+    /* ---------- 写真：タブレットのカメラの写真は大きいので、長い辺 1600px の JPEG に縮めて送る ---------- */
+    async function shrinkImage(file) {
+      try {
+        const img = await createImageBitmap(file);
+        const scale = Math.min(1, 1600 / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        return await new Promise(res => canvas.toBlob(b => res(b || file), "image/jpeg", 0.85));
+      } catch (e) {
+        return file;   // 縮められない形式はそのまま送る（サーバーで確かめる）
+      }
+    }
+    async function uploadPhoto(file) {
+      setSaveState("busy", t("uploading"));
+      try {
+        const fd = new FormData();
+        fd.append("press_id", state.pressId);
+        fd.append("photo", await shrinkImage(file), "photo.jpg");
+        const res = await fetch(API + "upload_photo.php", { method: "POST", body: fd });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || res.statusText);
+        state.press.photo = data.photo;
+        renderRight();
+        setSaveState("ok");
+      } catch (err) {
+        setSaveState("err", `${t("save_err")}：${err.message}`);
+      }
+    }
+
+    /* ---------- 判定を選ぶ画面 ---------- */
+    function openPicker(ri, round) {
+      state.picking = { ri, round };
+      const r = state.records[ri], cur = r.rounds[round];
+      const isCur = (jug, code) => cur.jug === jug && (jug !== JUG.NG || cur.code === code) ? "current" : "";
+      document.getElementById("pickerTitle").textContent = `${r.position}　${t("round", { n: round })}`;
+      document.getElementById("pickerGrid").innerHTML = `
+        <button class="p-ok ${isCur(JUG.OK)}" data-jug="${JUG.OK}" data-code="${NO_CODE}">${t("j_ok")}</button>
+        ${CODES.map(c => `<button class="p-ng ${isCur(JUG.NG, c.id)}" data-jug="${JUG.NG}" data-code="${c.id}">NG ${c.code}<small>${esc(t(c.key))}</small></button>`).join("")}
+        <button class="p-ng ${isCur(JUG.NG, NO_CODE)}" data-jug="${JUG.NG}" data-code="${NO_CODE}">NG<small>${t("c_none")}</small></button>
+        <button class="p-bh ${isCur(JUG.BH)}" data-jug="${JUG.BH}" data-code="${NO_CODE}">${t("j_bh")}<small>${t("bh_desc")}</small></button>
+        <button class="p-blank ${isCur(JUG.BLANK)}" data-jug="${JUG.BLANK}" data-code="${NO_CODE}">${t("j_blank")}<small>${t("blank_desc")}</small></button>
+        <button class="p-cancel" data-cancel="1">${t("btn_cancel")}</button>`;
+      document.getElementById("pickerBack").classList.add("open");
+    }
+    function closePicker() {
+      state.picking = null;
+      document.getElementById("pickerBack").classList.remove("open");
+    }
+    document.getElementById("pickerBack").addEventListener("click", (e) => {
+      if (e.target.id === "pickerBack") return closePicker();
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.cancel) return closePicker();
+      const { ri, round } = state.picking;
+      closePicker();
+      saveCell(ri, round, Number(b.dataset.jug), Number(b.dataset.code));
+    });
+
+    // 押したらすぐ画面を変えて保存する。保存できなかったら元に戻す
+    async function saveCell(ri, round, jug, code) {
+      const r = state.records[ri];
+      const before = { ...r.rounds[round] };
+      r.rounds[round] = { jug, code: jug === JUG.NG ? code : NO_CODE };
+      const td = document.querySelector(`.cell[data-ri="${ri}"][data-round="${round}"]`).parentElement;
+      td.innerHTML = cellHtml(r, ri, round);
+      td.firstChild.classList.add("saving");
+      renderSums();
+      setSaveState("busy");
+      try {
+        await postJson("save_cell.php", { press_id: state.pressId, id: r.id, round, jug, code: r.rounds[round].code });
+        td.firstChild.classList.remove("saving");
+        setSaveState("ok");
+        loadList().catch(() => {});
+      } catch (err) {
+        r.rounds[round] = before;
+        td.innerHTML = cellHtml(r, ri, round);
+        renderSums();
+        setSaveState("err", `${t("save_err")}：${err.message}`);
+      }
+    }
+
+    setLang(currentLang);
+    loadList().catch(err => showMsg(err.message, true));
+  </script>
+</body>
+</html>

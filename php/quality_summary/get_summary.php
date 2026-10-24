@@ -12,6 +12,7 @@ require_once "../db.php";
 //   - 集計に使っていない t_press_work_length_quantity / t_time_press の素の JOIN を削除（結果は同じ）
 //   - 号機をプレースホルダーでバインド（V9 は SQL に直接埋め込み）
 //   - 正味押出時間が0以下の押出は、生産性・サイクルタイム・総時間を空欄にする（V9 はマイナス値のまま計算）
+//   - 金型移管日（t_die_handover_progress.die_handover_at）を追加（V9 には無い）
 //
 // パラメータ（GET）: die_number（前方一致, 省略可）, machine（0=全号機）, from, to（押出日, 省略可）
 
@@ -108,13 +109,15 @@ SELECT
         WHEN {$weightKg} IS NULL OR {$weightKg} = 0 THEN NULL
         ELSE ROUND(NULLIF({$netSec} / 3600, 0), 2)
     END AS total_time,
-    t_press.special_note
+    t_press.special_note,
+    DATE_FORMAT(hp.die_handover_at, '%y-%m-%d') AS handover_d
 FROM t_press
 LEFT JOIN m_pressing_type ON t_press.pressing_type_id = m_pressing_type.id
 LEFT JOIN m_dies ON t_press.dies_id = m_dies.id
 LEFT JOIN m_die_production_number_variants v ON v.id = t_press.die_production_number_variant_id
 LEFT JOIN m_production_numbers mpn ON mpn.id = COALESCE(v.production_number_id, m_dies.production_number_id)
 LEFT JOIN t_press_sub ON t_press.id = t_press_sub.press_id
+LEFT JOIN t_die_handover_progress hp ON hp.die_id = t_press.dies_id
 LEFT JOIN (
     SELECT press_id, SUM(work_quantity) AS quantity
     FROM t_press_work_length_quantity

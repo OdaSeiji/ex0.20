@@ -193,7 +193,7 @@
         col_date: "押出日", col_die: "型番", col_pn: "品番", col_type: "種別", col_machine: "号機",
         col_pb: "計画ビレット数", col_ab: "実績ビレット数（ビレット情報の合計）", col_qty: "本数", col_ng: "NG", col_ok: "OK", col_per: "良品率",
         col_dim: "寸法", col_etching: "エッチング", col_aging: "時効", col_qc: "QC", col_packing: "梱包",
-        col_prod: "生産性（ton/h）", col_cycle: "サイクルタイム（秒/本）", col_weight: "総重量（t）", col_time: "正味押出時間（h）", col_note: "特記事項",
+        col_prod: "生産性（ton/h）", col_cycle: "サイクルタイム（秒/本）", col_handover: "金型移管日", col_weight: "総重量（t）", col_time: "正味押出時間（h）", col_note: "特記事項",
       },
       vi: {
         title: "🔍 Tổng hợp chất lượng",
@@ -210,7 +210,7 @@
         col_date: "Ngày ép", col_die: "Mã khuôn", col_pn: "Mã SP", col_type: "Kiểu", col_machine: "Máy",
         col_pb: "Số billet kế hoạch", col_ab: "Số billet thực tế (tổng thông tin billet)", col_qty: "Số cây", col_ng: "NG", col_ok: "OK", col_per: "Tỷ lệ đạt",
         col_dim: "Kích thước", col_etching: "Etching", col_aging: "Hóa già", col_qc: "QC", col_packing: "Đóng gói",
-        col_prod: "Năng suất (ton/h)", col_cycle: "Chu kỳ (giây/cây)", col_weight: "Tổng khối lượng (t)", col_time: "Thời gian ép thực (h)", col_note: "Ghi chú",
+        col_prod: "Năng suất (ton/h)", col_cycle: "Chu kỳ (giây/cây)", col_handover: "Ngày bàn giao khuôn", col_weight: "Tổng khối lượng (t)", col_time: "Thời gian ép thực (h)", col_note: "Ghi chú",
       },
     };
 
@@ -262,6 +262,7 @@
       ...NG_CODES.map(c => ({ key: "code_" + c, code: c, cls: "mono code", sum: true })),
       { key: "productivity",           head: "Productivity", label: "col_prod",    cls: "mono" },
       { key: "actual_cycletime",       head: "Cycle time",   label: "col_cycle",   cls: "mono" },
+      { key: "handover_d",             head: "Die_handover", label: "col_handover", cls: "mono center" },
       // hide: 表には出さない（生産性の合計計算と CSV には使う。特記事項は行クリックで表示）
       { key: "total_weight",           head: "Total weight", label: "col_weight",  sum: true, dec: 2, hide: true },
       { key: "total_time",             head: "Total time",   label: "col_time",    sum: true, dec: 2, hide: true },

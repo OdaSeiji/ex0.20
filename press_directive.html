@@ -894,10 +894,15 @@
         document.getElementById("figDialog").showModal();
       }
 
-      /* ── 指示書印刷: 別ファイル press_directive_print.html で表示・印刷する ── */
+      /* ── 指示書印刷: press_directive_print.html を見えない iframe で読み込み、すぐ印刷のダイアログを出す ── */
       function printDirective() {
         if (!editingId) return;
-        window.open(`./press_directive_print.html?id=${editingId}`, "_blank");
+        document.getElementById("printFrame")?.remove();
+        const frame = document.createElement("iframe");
+        frame.id = "printFrame";
+        frame.style.cssText = "position:fixed; right:0; bottom:0; width:0; height:0; border:0;";
+        frame.src = `./press_directive_print.html?id=${editingId}&autoprint=1`;
+        document.body.appendChild(frame);
       }
 
       async function deleteDirective(id) {
