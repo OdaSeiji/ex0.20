@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-25</span>
         </div>
+        <div class="entry-title" data-key="gr_title">スタッフ設定：社員番号・氏名・在籍状況・ロールを編集、更新日で並べ替え</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gr_purpose">ex0.11 を使わずに、社員の情報を直せるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gr_content">表の社員番号・氏名・ロール・在籍状況（在籍 / 退職と退職日）をその場で直せる。変えた行は黄色になり、その行の「保存」でまとめて保存する（パスワードは変えない）。社員番号がほかの人と重なると保存しない。見出しの「社員番号」「氏名」「更新日」を押すと並べ替え（もう一度押すと逆順。更新日は新しい順から）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='staff_settings.html'">staff_settings.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
         <div class="entry-title" data-key="gq_title">新規社員の登録（スタッフ設定から開く）</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gq_purpose">ex0.11 を使わずに、ex0.20 で新しい社員を登録できるようにするため。</span>
@@ -1557,6 +1575,9 @@
           gq_title: "新規社員の登録（スタッフ設定から開く）",
           gq_purpose: "ex0.11 を使わずに、ex0.20 で新しい社員を登録できるようにするため。",
           gq_content: "スタッフ設定の「＋ 新規社員の登録」から開く。ex0.11（StaffAndCode2）と同じく 社員番号・氏名・区分（Staff / Worker）・入社日 を入れ、ロールも選べる。社員番号は数字7桁が必須。社員番号が登録済みなら、入力中に知らせて登録させない。パスワードは空のまま（スタッフ設定の PW リセットで社員番号になる）。",
+          gr_title: "スタッフ設定：社員番号・氏名・在籍状況・ロールを編集、更新日で並べ替え",
+          gr_purpose: "ex0.11 を使わずに、社員の情報を直せるようにするため。",
+          gr_content: "表の社員番号・氏名・ロール・在籍状況（在籍 / 退職と退職日）をその場で直せる。変えた行は黄色になり、その行の「保存」でまとめて保存する（パスワードは変えない）。社員番号がほかの人と重なると保存しない。見出しの「社員番号」「氏名」「更新日」を押すと並べ替え（もう一度押すと逆順。更新日は新しい順から）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1786,6 +1807,9 @@
           gq_title: "Đăng ký nhân viên mới (mở từ Cài đặt nhân viên)",
           gq_purpose: "Để đăng ký nhân viên mới trên ex0.20 mà không cần dùng ex0.11.",
           gq_content: "Mở bằng nút \"＋ Đăng ký nhân viên mới\" trong Cài đặt nhân viên. Giống ex0.11 (StaffAndCode2): nhập mã nhân viên, họ tên, phân loại (Staff / Worker), ngày vào làm; có thể chọn vai trò. Mã nhân viên bắt buộc 7 chữ số. Nếu mã nhân viên đã tồn tại sẽ báo ngay khi nhập và không cho đăng ký. Mật khẩu để trống (PW reset trong Cài đặt nhân viên sẽ đặt bằng mã nhân viên).",
+          gr_title: "Cài đặt nhân viên: sửa mã NV, họ tên, tình trạng, vai trò; sắp xếp theo ngày cập nhật",
+          gr_purpose: "Để sửa thông tin nhân viên mà không cần dùng ex0.11.",
+          gr_content: "Có thể sửa trực tiếp mã nhân viên, họ tên, vai trò, tình trạng (đang làm / nghỉ việc và ngày nghỉ) trong bảng. Dòng đã sửa hiện màu vàng; bấm \"Lưu\" của dòng đó để lưu (không đổi mật khẩu). Không lưu nếu mã nhân viên trùng với người khác. Bấm tiêu đề \"Mã NV\", \"Họ tên\", \"Ngày cập nhật\" để sắp xếp (bấm lại để đảo ngược; ngày cập nhật bắt đầu từ mới nhất).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

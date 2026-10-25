@@ -21,7 +21,7 @@
       }
 
       .container {
-        max-width: 1060px;
+        max-width: 1200px;
         margin: 0 auto;
         background: #fff;
         border-radius: 10px;
@@ -101,6 +101,24 @@
       tr.inactive { opacity: 0.45; }
 
       td.upd { color: #777; font-size: 12px; white-space: nowrap; }
+      /* 編集できる欄 */
+      .cell-input {
+        padding: 5px 8px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 13px;
+      }
+      .cell-input.num { width: 90px; font-family: "Roboto Mono", monospace; }
+      .cell-input.name { width: 200px; }
+      .cell-input.leave { width: 130px; }
+      .status-cell { display: flex; gap: 6px; align-items: center; white-space: nowrap; }
+      .status-select { padding: 5px 6px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; }
+      tr.dirty td { background: #fffbe6; }
+      .save-role-btn:disabled { opacity: 0.35; cursor: default; }
+      /* 並べ替えできる見出し */
+      th.sortable { cursor: pointer; user-select: none; }
+      th.sortable:hover { color: #0078d4; }
+      th.sortable .arrow { color: #0078d4; margin-left: 3px; }
       .emp-num {
         font-family: "Roboto Mono", monospace;
         font-size: 13px;
@@ -196,14 +214,14 @@
       <table id="staffTable">
         <thead>
           <tr>
-            <th>社員番号</th>
-            <th>氏名</th>
+            <th class="sortable" data-sort="emp">社員番号<span class="arrow"></span></th>
+            <th class="sortable" data-sort="name">氏名<span class="arrow"></span></th>
             <th>ロール</th>
+            <th>在籍状況</th>
             <th>保存</th>
             <th>PW状態</th>
             <th>PW リセット</th>
-            <th>状態</th>
-            <th>更新日時</th>
+            <th class="sortable" data-sort="upd">更新日<span class="arrow"></span></th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -225,6 +243,20 @@
       ];
 
       let allData = [];
+      // 並べ替え：見出しを押すたびに 昇順 → 降順。何も選んでいなければ、在籍中を先に社員番号の順（サーバーの順）
+      let sortKey = null, sortDir = 1;
+      const SORTERS = {
+        emp:  (r) => Number(r.emploee_number ?? 0),
+        name: (r) => fold(r.staff_name),
+        upd:  (r) => r.updated_sort ?? "",
+      };
+      document.querySelector("#staffTable thead").addEventListener("click", (e) => {
+        const th = e.target.closest("th.sortable");
+        if (!th) return;
+        if (sortKey === th.dataset.sort) sortDir = -sortDir;
+        else { sortKey = th.dataset.sort; sortDir = th.dataset.sort === "upd" ? -1 : 1; }   // 更新日は新しい順から
+        applyFilter();
+      });
 
       function showToast(msg, ok = true) {
         const t = document.getElementById("toast");
@@ -245,6 +277,14 @@
         const q = fold(document.getElementById("nameFilter").value.trim());
         const filtered = (mode === "all" ? allData : allData.filter((r) => !r.leave_at))
           .filter((r) => !q || fold(r.staff_name).includes(q) || String(r.emploee_number ?? "").includes(q));
+
+        if (sortKey) {
+          const f = SORTERS[sortKey];
+          filtered.sort((a, b) => (f(a) > f(b) ? 1 : f(a) < f(b) ? -1 : 0) * sortDir);
+        }
+        document.querySelectorAll("th.sortable").forEach((th) => {
+          th.querySelector(".arrow").textContent = th.dataset.sort === sortKey ? (sortDir > 0 ? "▲" : "▼") : "";
+        });
 
         document.getElementById("countLabel").textContent =
           `${filtered.length} 名`;
@@ -269,53 +309,84 @@
           ? `<span class="badge pw-set">設定済</span>`
           : `<span class="badge pw-unset">未設定</span>`;
 
-        /* Status badge */
-        const statusBadge = isActive
-          ? `<span class="badge active">在籍</span>`
-          : `<span class="badge inactive-badge">退職</span>`;
-
         tr.innerHTML = `
-          <td class="emp-num">${row.emploee_number ?? "—"}</td>
-          <td>${row.staff_name ?? "—"}</td>
+          <td><input class="cell-input num" data-f="emploee_number" value="${esc(row.emploee_number)}" inputmode="numeric" maxlength="9" /></td>
+          <td><input class="cell-input name" data-f="staff_name" value="${esc(row.staff_name)}" maxlength="40" /></td>
           <td>
-            <select class="role-select">
+            <select class="role-select" data-f="role">
               ${options}
             </select>
           </td>
           <td>
-            <button class="save-role-btn" onclick="saveRole(this)">保存</button>
+            <div class="status-cell">
+              <select class="status-select" data-f="status">
+                <option value="active" ${isActive ? "selected" : ""}>在籍</option>
+                <option value="left" ${isActive ? "" : "selected"}>退職</option>
+              </select>
+              <input type="date" class="cell-input leave" data-f="leave_at" value="${esc(row.leave_at)}" title="退職日" style="${isActive ? "display:none" : ""}" />
+            </div>
+          </td>
+          <td>
+            <button class="save-role-btn" onclick="saveStaff(this)" disabled>保存</button>
           </td>
           <td class="pw-cell">${pwBadge}</td>
           <td>
             <button class="reset-btn" onclick="resetPassword(this)">リセット</button>
           </td>
-          <td>${statusBadge}</td>
           <td class="emp-num upd">${row.updated_at ?? "—"}</td>
         `;
 
         tbody.appendChild(tr);
       }
 
-      async function saveRole(btn) {
-        const tr   = btn.closest("tr");
-        const id   = tr.dataset.id;
-        const role = tr.querySelector(".role-select").value || null;
+      const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+      const todayStr = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 
+      // 行の今の入力の値
+      function rowValues(tr) {
+        const v = (f) => tr.querySelector(`[data-f="${f}"]`).value.trim();
+        const left = v("status") === "left";
+        return { emploee_number: v("emploee_number"), staff_name: v("staff_name"), role: v("role") || null, leave_at: left ? (v("leave_at") || null) : null, left };
+      }
+
+      // 編集：変えた行は黄色にして「保存」を押せるようにする。退職を選ぶと退職日の欄を出す（最初は今日）
+      document.querySelector("#staffTable tbody").addEventListener("input", onEdit);
+      document.querySelector("#staffTable tbody").addEventListener("change", onEdit);
+      function onEdit(e) {
+        const tr = e.target.closest("tr");
+        if (!tr || !e.target.dataset.f) return;
+        if (e.target.dataset.f === "status") {
+          const leave = tr.querySelector('[data-f="leave_at"]');
+          leave.style.display = e.target.value === "left" ? "" : "none";
+          if (e.target.value === "left" && !leave.value) leave.value = todayStr();
+        }
+        const row = allData.find((r) => String(r.id) === tr.dataset.id);
+        const now = rowValues(tr);
+        const dirty = now.emploee_number !== String(row.emploee_number ?? "") || now.staff_name !== (row.staff_name ?? "")
+          || (now.role ?? "") !== (row.role ?? "") || (now.leave_at ?? "") !== (row.leave_at ?? "");
+        tr.classList.toggle("dirty", dirty);
+        tr.querySelector(".save-role-btn").disabled = !dirty;
+      }
+
+      async function saveStaff(btn) {
+        const tr  = btn.closest("tr");
+        const now = rowValues(tr);
+        if (!/^\d{1,9}$/.test(now.emploee_number)) return showToast("社員番号は数字で入れてください", false);
+        if (now.staff_name.length < 2) return showToast("氏名を入れてください", false);
+        if (now.left && !now.leave_at) return showToast("退職日を入れてください", false);
+        btn.disabled = true;
         const res    = await fetch("./php/staff/update_staff.php", {
           method:  "POST",
           headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ action: "update_role", id, role }),
+          body:    JSON.stringify({ action: "update_staff", id: tr.dataset.id, ...now }),
         });
         const result = await res.json();
-
         if (result.status === "ok") {
-          showToast("ロールを保存しました");
-          /* sync allData */
-          const entry = allData.find((r) => String(r.id) === String(id));
-          if (entry) entry.role = role;
-          reloadList();   // 更新日時を出し直す
+          showToast(`${now.staff_name} を保存しました`);
+          reloadList();   // 更新日時を出し直す（在籍中のみの表示で退職にした人は消える）
         } else {
-          showToast("保存に失敗しました", false);
+          showToast(result.message || "保存に失敗しました", false);
+          btn.disabled = false;
         }
       }
 
@@ -323,6 +394,7 @@
         const tr     = btn.closest("tr");
         const id     = tr.dataset.id;
         const empNum = tr.dataset.empNum;
+        if (tr.classList.contains("dirty")) return showToast("先に「保存」してください（社員番号を変えているかもしれないため）", false);
 
         if (!confirm(`社員番号「${empNum}」をパスワードにリセットします。よろしいですか？`)) return;
 
