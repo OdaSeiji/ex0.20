@@ -126,9 +126,15 @@ foreach ($spares as $ord => $list) {
 usort($mains, fn($a, $b) => ((float)$a["ordinal"] <=> (float)$b["ordinal"]) ?: ($a["id"] <=> $b["id"]));
 
 // 日付・号機ごとの設定
-$st = $pdo->prepare("SELECT TIME_FORMAT(start_time, '%H:%i') AS start_time, has_lunch, lunch_after_plan_id FROM t_press_schedule_day WHERE plan_date = :date AND press_machine = :mc");
+$st = $pdo->prepare("SELECT TIME_FORMAT(start_time, '%H:%i') AS start_time, TIME_FORMAT(end_time, '%H:%i') AS end_time, has_lunch, lunch_after_plan_id FROM t_press_schedule_day WHERE plan_date = :date AND press_machine = :mc");
 $st->execute([":date" => $date, ":mc" => $machine]);
-$day = $st->fetch() ?: ["start_time" => null, "has_lunch" => 0, "lunch_after_plan_id" => null];
+$day = $st->fetch();
+if (!$day) {
+    // その日の設定が無ければ、持ち時間の入力と同じく前の週から引き継ぐ（php/operation_time/common.php）
+    require_once __DIR__ . "/../operation_time/common.php";
+    $inh = otResolveDay($pdo, $date, (int)$machine);
+    $day = ["start_time" => $inh["start"] ?? null, "end_time" => $inh["end"] ?? null, "has_lunch" => $inh["has_lunch"] ?? 0, "lunch_after_plan_id" => null];
+}
 $dayStart = $day["start_time"] ?: DAY_START;
 
 $rows = [];
@@ -244,7 +250,7 @@ $rows = $out;
 echo json_encode([
     "rows" => $rows,
     "day" => [
-        "start_time" => $dayStart, "has_lunch" => (int)$day["has_lunch"],
+        "start_time" => $dayStart, "end_time" => $day["end_time"], "has_lunch" => (int)$day["has_lunch"],
         "lunch_after_plan_id" => $day["lunch_after_plan_id"] !== null ? (int)$day["lunch_after_plan_id"] : null,
         "lunch_auto" => $lunchAuto,
     ],

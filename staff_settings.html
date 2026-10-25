@@ -21,7 +21,7 @@
       }
 
       .container {
-        max-width: 900px;
+        max-width: 1060px;
         margin: 0 auto;
         background: #fff;
         border-radius: 10px;
@@ -61,11 +61,20 @@
         font-size: 13px;
       }
       .filter-bar label { color: #555; }
-      .filter-bar select {
+      .filter-bar select, .filter-bar input {
         padding: 5px 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
         font-size: 13px;
+      }
+      .filter-bar input { width: 200px; }
+
+      /* 表だけを縦にスクロールさせ、画面（1920×1080）の中に収める。見出しの行は上に止まる */
+      .table-wrap {
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        border: 1px solid #e8e8e8;
+        border-radius: 6px;
       }
 
       /* Table */
@@ -87,9 +96,11 @@
         top: 0;
         z-index: 5;
       }
+      th, .badge, .reset-btn, .save-role-btn { white-space: nowrap; }
       tr:hover { background: #f7f9ff; }
       tr.inactive { opacity: 0.45; }
 
+      td.upd { color: #777; font-size: 12px; white-space: nowrap; }
       .emp-num {
         font-family: "Roboto Mono", monospace;
         font-size: 13px;
@@ -167,6 +178,7 @@
       <div class="top-bar">
         <button class="back-btn" onclick="location.href='index.html'">← メニューへ戻る</button>
         <h1>スタッフ設定</h1>
+        <button class="back-btn" style="margin-left:auto;background:#2e7d32" onclick="location.href='staff_register.html'">＋ 新規社員の登録</button>
       </div>
 
       <div class="filter-bar">
@@ -175,9 +187,12 @@
           <option value="active">在籍中のみ</option>
           <option value="all">全員</option>
         </select>
+        <label for="nameFilter">名前：</label>
+        <input type="search" id="nameFilter" placeholder="名前・社員番号で絞り込み" oninput="applyFilter()" />
         <span id="countLabel" style="color:#888;"></span>
       </div>
 
+      <div class="table-wrap">
       <table id="staffTable">
         <thead>
           <tr>
@@ -188,10 +203,12 @@
             <th>PW状態</th>
             <th>PW リセット</th>
             <th>状態</th>
+            <th>更新日時</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
+      </div>
     </div>
 
     <div id="toast"></div>
@@ -217,14 +234,17 @@
         setTimeout(() => t.classList.remove("show"), 2200);
       }
 
+      const fold = (s) => String(s ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase();
+
       function applyFilter() {
         const mode  = document.getElementById("filterSelect").value;
         const tbody = document.querySelector("#staffTable tbody");
         tbody.innerHTML = "";
 
-        const filtered = mode === "all"
-          ? allData
-          : allData.filter((r) => !r.leave_at);
+        // 名前の絞り込みは、大文字・小文字とベトナム語の声調記号を区別しない（"thuy" で "Thủy" も出る）。社員番号でも探せる
+        const q = fold(document.getElementById("nameFilter").value.trim());
+        const filtered = (mode === "all" ? allData : allData.filter((r) => !r.leave_at))
+          .filter((r) => !q || fold(r.staff_name).includes(q) || String(r.emploee_number ?? "").includes(q));
 
         document.getElementById("countLabel").textContent =
           `${filtered.length} 名`;
@@ -270,6 +290,7 @@
             <button class="reset-btn" onclick="resetPassword(this)">リセット</button>
           </td>
           <td>${statusBadge}</td>
+          <td class="emp-num upd">${row.updated_at ?? "—"}</td>
         `;
 
         tbody.appendChild(tr);
@@ -292,6 +313,7 @@
           /* sync allData */
           const entry = allData.find((r) => String(r.id) === String(id));
           if (entry) entry.role = role;
+          reloadList();   // 更新日時を出し直す
         } else {
           showToast("保存に失敗しました", false);
         }
@@ -323,19 +345,26 @@
           /* sync allData */
           const entry = allData.find((r) => String(r.id) === String(id));
           if (entry) entry.has_password = "1";
+          reloadList();   // 更新日時を出し直す
         } else {
           showToast("リセットに失敗しました", false);
         }
       }
 
-      /* Load */
-      fetch("./php/staff/get_staff_list.php")
-        .then((r) => r.json())
-        .then((data) => {
-          allData = data;
-          applyFilter();
-        })
-        .catch(() => showToast("データ取得に失敗しました", false));
+      /* Load（保存のあとも呼んで、更新日時を出し直す。絞り込みとスクロールの位置はそのまま） */
+      function reloadList() {
+        const wrap = document.querySelector(".table-wrap");
+        const top = wrap.scrollTop;
+        return fetch("./php/staff/get_staff_list.php")
+          .then((r) => r.json())
+          .then((data) => {
+            allData = data;
+            applyFilter();
+            wrap.scrollTop = top;
+          })
+          .catch(() => showToast("データ取得に失敗しました", false));
+      }
+      reloadList();
     </script>
   </body>
 </html>

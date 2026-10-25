@@ -189,12 +189,12 @@
 
       <!-- ① CSVアップロード -->
       <div class="upload-card">
-        <div class="card-title">① CSVアップロード</div>
+        <div class="card-title">① CSV・Excel アップロード</div>
         <div class="upload-row">
-          <input type="file" id="csvFile" accept=".csv" />
+          <input type="file" id="csvFile" accept=".csv,.xlsx,.xlsm,.xls" />
           <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
         </div>
-        <p class="csv-hint">列順: A列 = budget_id　B列 = die_number　C列 = production_number（1行目はヘッダーとしてスキップ）</p>
+        <p class="csv-hint">CSV または Excel（いちばん左のシート）　|　列順: A列 = budget_id　B列 = die_number　C列 = production_number（1行目はヘッダーとしてスキップ）</p>
         <div class="upload-result" id="uploadResult"></div>
       </div>
 
@@ -281,6 +281,7 @@
 
     <div id="toast"></div>
 
+    <script src="./lib/xlsx.js"></script>
     <script>
       /* ── マスタデータ ── */
       let masters = { production_numbers: [], diameters: [], billet_sizes: [], bolsters: [] };
@@ -336,13 +337,25 @@
         setTimeout(() => t.classList.remove("show"), 2500);
       }
 
-      /* ── CSVアップロード ── */
+      /* ── CSV・Excel アップロード ── */
       async function uploadCsv() {
         const file = document.getElementById("csvFile").files[0];
         if (!file) { showToast("ファイルを選択してください", false); return; }
 
         const form = new FormData();
-        form.append("csv", file);
+        if (/\.(xlsx|xlsm|xls)$/i.test(file.name)) {
+          // Excel はいちばん左のシートを CSV に変えて送る（PHP 側は CSV のまま。部品登録 die_part_import.html と同じ）
+          try {
+            const wb = XLSX.read(new Uint8Array(await file.arrayBuffer()), { type: "array" });
+            const csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], { blankrows: false });
+            form.append("csv", new Blob([csv], { type: "text/csv" }), file.name.replace(/\.\w+$/, ".csv"));
+          } catch (e) {
+            showToast("Excel ファイルを読めませんでした", false);
+            return;
+          }
+        } else {
+          form.append("csv", file);
+        }
 
         const res    = await fetch("./php/die_import/upload_csv.php", { method: "POST", body: form });
         const result = await res.json();

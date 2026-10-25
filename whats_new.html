@@ -85,7 +85,151 @@
         </div>
       </div>
 
-      <!-- 2026-10-24 (最新) -->
+      <!-- 2026-10-25 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gq_title">新規社員の登録（スタッフ設定から開く）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gq_purpose">ex0.11 を使わずに、ex0.20 で新しい社員を登録できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gq_content">スタッフ設定の「＋ 新規社員の登録」から開く。ex0.11（StaffAndCode2）と同じく 社員番号・氏名・区分（Staff / Worker）・入社日 を入れ、ロールも選べる。社員番号は数字7桁が必須。社員番号が登録済みなら、入力中に知らせて登録させない。パスワードは空のまま（スタッフ設定の PW リセットで社員番号になる）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='staff_register.html'">staff_register.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gp_title">スタッフ設定：名前で絞り込み、表を画面の中でスクロール、更新日時</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gp_purpose">人数が多くても、探す人をすぐ見つけられ、ページ全体をスクロールしなくて済むようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gp_content">「名前」の欄で、名前か社員番号の一部を入れると絞り込む（大文字・小文字とベトナム語の声調記号は区別しない。例：thuy で Thủy）。表は画面の高さ（1920×1080 の画面）に収まるようにし、右のスクロールバーで動かす。見出しの行は上に止まる。右端に「更新日時」（ロールの保存やパスワードのリセットをした日。yy-mm-dd）を出す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='staff_settings.html'">staff_settings.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="go_title">新規金型登録：Excel ファイルも取り込めるように</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="go_purpose">CSV に保存し直さなくても、Excel のまま金型を登録できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="go_content">取り込むファイルに Excel（.xlsx / .xlsm / .xls）も選べるようにした。いちばん左のシートを読み、列の並び（A = budget_id、B = die_number、C = production_number、1行目は見出し）は CSV と同じ。部品登録と同じ仕組み。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_import.html'">die_import.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gn_title">金型立上実績：過去の年度を月平均で表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gn_purpose">設備稼働実績と同じく、年数が増えても表が横に長くなりすぎないようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gn_content">4月始まりの年度で、過去の年度は「◯◯年度(月平均)」の1列にまとめ、今年度は月別に出す。列見出しの ▸ でその年度を月別に展開、▾ で戻す。「📆 月別に展開」で全部まとめて切り替え。右端の列は「合計」から「今年度平均」（進行中の当月を除く）に変えた。押出日が 0000-00-00 の試押は数えないようにした。グラフからは試押回数を外した（表には出す）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_startup_report.html'">die_startup_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gm_title">押出日報の入力確認：0:00〜24:00 を横スクロールで表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gm_purpose">6:00〜21:00 に入らない押出（朝早く・夜遅く）も確かめられるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gm_content">時間の帯を 0:00〜24:00 にし、横スクロールで見るようにした。横のスケールは前と同じで、最初は 6:00 から表示する。全部の日の帯が一緒にスクロールする。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_coverage.html'">press_coverage.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gl_title">稼働日報（押出日報から号機ごとの時間の使い方をまとめる）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gl_purpose">毎日の設備稼働の報告（号機ごとの 押出・段取り・停止・記録なし）を、手作業でなく押出日報から作るため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gl_content">日付を選ぶと、1〜3号機の縦棒の積み上げグラフ（Tan さんのメールと同じ形。押出・日報のコードごとの時間・記録なし、持ち時間の線）と、その右に号機ごとの表（持ち時間・日報の時間・内訳・金型数・押出の一覧・記録のすき間）を出す。コードは日報に入力されたまま出す（700 押出は数えない）。手入力の日報だけで集計する。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='operation_report.html'">operation_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gk_title">持ち時間（シフト）の入力（スケジュール表に終了の時刻も追加）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gk_purpose">稼働日報で、日報の時間が持ち時間を埋めているかを判断するため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gk_content">1週間×号機の表で、開始・終了・昼休みを入れる（入れるとすぐ保存）。月曜を入れると、その週の火〜日も同じ値になる（別の値にした日はそのまま）。何も入れていない週は前の週の値を引き継ぐ。持ち時間 ＝ 終了 − 開始 − 昼休み（45分）。押出スケジュール表と同じ設定（t_press_schedule_day）で、スケジュール表にも「終了」と「持ち時間」を出した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='operation_time.html'">operation_time.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-25 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-25</span>
+        </div>
+        <div class="entry-title" data-key="gj_title">品質評価入力：工程のボタンを同じ幅に</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gj_purpose">見た目をそろえるため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gj_content">「NG の入力」の工程のボタン（寸法・エッチング・硬度）で、右端のボタンの枠が横いっぱいに伸びていたのを直し、3つを同じ幅にした。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-24 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -1389,6 +1533,30 @@
           gi_title: "エッチング評価記録（ex0.11 EtchingV5 の移植・タブレット向け）",
           gi_purpose: "エッチングの評価を、紙を使わずタブレットで直接記録するため。",
           gi_content: "左の一覧で押出を選び、サンプル位置（nBn から作る）ごとに Lần 0〜4 の判定を大きなボタンで選ぶ（OK／NG 311・319・320・351／BH／空欄）。押すたびに保存されるので、作業の途中で置いても消えない。状態・エッチングの日・担当者・確認者・メモも変えたらすぐ保存。写真はタブレットのカメラで撮ってそのまま添付できる（縮めて送る）。画面が狭いときは、一覧と記録を切り替えて出す。",
+          gj_title: "品質評価入力：工程のボタンを同じ幅に",
+          gj_purpose: "見た目をそろえるため。",
+          gj_content: "「NG の入力」の工程のボタン（寸法・エッチング・硬度）で、右端のボタンの枠が横いっぱいに伸びていたのを直し、3つを同じ幅にした。",
+          gk_title: "持ち時間（シフト）の入力（スケジュール表に終了の時刻も追加）",
+          gk_purpose: "稼働日報で、日報の時間が持ち時間を埋めているかを判断するため。",
+          gk_content: "1週間×号機の表で、開始・終了・昼休みを入れる（入れるとすぐ保存）。月曜を入れると、その週の火〜日も同じ値になる（別の値にした日はそのまま）。何も入れていない週は前の週の値を引き継ぐ。持ち時間 ＝ 終了 − 開始 − 昼休み（45分）。押出スケジュール表と同じ設定（t_press_schedule_day）で、スケジュール表にも「終了」と「持ち時間」を出した。",
+          gl_title: "稼働日報（押出日報から号機ごとの時間の使い方をまとめる）",
+          gl_purpose: "毎日の設備稼働の報告（号機ごとの 押出・段取り・停止・記録なし）を、手作業でなく押出日報から作るため。",
+          gl_content: "日付を選ぶと、1〜3号機の縦棒の積み上げグラフ（Tan さんのメールと同じ形。押出・日報のコードごとの時間・記録なし、持ち時間の線）と、その右に号機ごとの表（持ち時間・日報の時間・内訳・金型数・押出の一覧・記録のすき間）を出す。コードは日報に入力されたまま出す（700 押出は数えない）。手入力の日報だけで集計する。",
+          gm_title: "押出日報の入力確認：0:00〜24:00 を横スクロールで表示",
+          gm_purpose: "6:00〜21:00 に入らない押出（朝早く・夜遅く）も確かめられるようにするため。",
+          gm_content: "時間の帯を 0:00〜24:00 にし、横スクロールで見るようにした。横のスケールは前と同じで、最初は 6:00 から表示する。全部の日の帯が一緒にスクロールする。",
+          gn_title: "金型立上実績：過去の年度を月平均で表示",
+          gn_purpose: "設備稼働実績と同じく、年数が増えても表が横に長くなりすぎないようにするため。",
+          gn_content: "4月始まりの年度で、過去の年度は「◯◯年度(月平均)」の1列にまとめ、今年度は月別に出す。列見出しの ▸ でその年度を月別に展開、▾ で戻す。「📆 月別に展開」で全部まとめて切り替え。右端の列は「合計」から「今年度平均」（進行中の当月を除く）に変えた。押出日が 0000-00-00 の試押は数えないようにした。グラフからは試押回数を外した（表には出す）。",
+          go_title: "新規金型登録：Excel ファイルも取り込めるように",
+          go_purpose: "CSV に保存し直さなくても、Excel のまま金型を登録できるようにするため。",
+          go_content: "取り込むファイルに Excel（.xlsx / .xlsm / .xls）も選べるようにした。いちばん左のシートを読み、列の並び（A = budget_id、B = die_number、C = production_number、1行目は見出し）は CSV と同じ。部品登録と同じ仕組み。",
+          gp_title: "スタッフ設定：名前で絞り込み、表を画面の中でスクロール、更新日時",
+          gp_purpose: "人数が多くても、探す人をすぐ見つけられ、ページ全体をスクロールしなくて済むようにするため。",
+          gp_content: "「名前」の欄で、名前か社員番号の一部を入れると絞り込む（大文字・小文字とベトナム語の声調記号は区別しない。例：thuy で Thủy）。表は画面の高さ（1920×1080 の画面）に収まるようにし、右のスクロールバーで動かす。見出しの行は上に止まる。右端に「更新日時」（ロールの保存やパスワードのリセットをした日。yy-mm-dd）を出す。",
+          gq_title: "新規社員の登録（スタッフ設定から開く）",
+          gq_purpose: "ex0.11 を使わずに、ex0.20 で新しい社員を登録できるようにするため。",
+          gq_content: "スタッフ設定の「＋ 新規社員の登録」から開く。ex0.11（StaffAndCode2）と同じく 社員番号・氏名・区分（Staff / Worker）・入社日 を入れ、ロールも選べる。社員番号は数字7桁が必須。社員番号が登録済みなら、入力中に知らせて登録させない。パスワードは空のまま（スタッフ設定の PW リセットで社員番号になる）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1594,6 +1762,30 @@
           gi_title: "Ghi kết quả etching (chuyển từ EtchingV5 của ex0.11, dùng cho máy tính bảng)",
           gi_purpose: "Để ghi kết quả etching trực tiếp trên máy tính bảng, không dùng giấy.",
           gi_content: "Chọn lần đùn ở danh sách bên trái, bấm nút lớn để chọn kết quả Lần 0〜4 cho từng vị trí mẫu (tạo từ nBn): OK / NG 311・319・320・351 / BH / Trống. Mỗi lần bấm được lưu ngay nên không mất dữ liệu khi đang làm dở. Trạng thái, ngày ngâm, người check, người xác nhận và ghi chú cũng lưu ngay khi đổi. Có thể chụp ảnh bằng camera máy tính bảng và đính kèm luôn (ảnh được thu nhỏ trước khi gửi). Khi màn hình hẹp, danh sách và bảng ghi được hiển thị luân phiên.",
+          gj_title: "Nhập đánh giá chất lượng: các nút công đoạn cùng độ rộng",
+          gj_purpose: "Để giao diện đồng đều.",
+          gj_content: "Sửa nút công đoạn (Kích thước / Etching / Độ cứng) trong phần \"Nhập NG\": khung của nút bên phải bị kéo dài hết chiều ngang, nay 3 nút có cùng độ rộng.",
+          gk_title: "Nhập thời gian khả dụng (thêm giờ kết thúc vào lịch đùn)",
+          gk_purpose: "Để báo cáo vận hành biết thời gian báo cáo đã lấp đầy thời gian khả dụng hay chưa.",
+          gk_content: "Nhập giờ bắt đầu, kết thúc và nghỉ trưa trên bảng tuần × máy (lưu ngay khi nhập). Nhập thứ Hai thì thứ Ba〜Chủ nhật của tuần đó cũng nhận cùng giá trị (ngày đã đặt khác giữ nguyên). Tuần chưa nhập gì sẽ kế thừa giá trị của tuần trước. Thời gian khả dụng = kết thúc − bắt đầu − nghỉ trưa (45 phút). Dùng chung thiết lập với lịch đùn (t_press_schedule_day); lịch đùn cũng hiển thị \"Kết thúc\" và \"Thời gian khả dụng\".",
+          gl_title: "Báo cáo vận hành (tổng hợp cách dùng thời gian của từng máy từ báo cáo đùn)",
+          gl_purpose: "Để lập báo cáo vận hành hằng ngày (đùn, chuẩn bị, dừng, không ghi theo từng máy) từ báo cáo đùn thay vì làm tay.",
+          gl_content: "Chọn ngày để xem biểu đồ cột chồng máy 1〜3 (cùng dạng với email của anh Tan) (đùn, thời gian theo từng mã trong báo cáo, không ghi, vạch thời gian khả dụng) và bảng từng máy (khả dụng, thời gian báo cáo, chi tiết, số khuôn, danh sách lần đùn, khoảng trống). Mã hiển thị đúng như đã nhập (không tính 700 Đùn). Chỉ tổng hợp từ báo cáo nhập tay.",
+          gm_title: "Kiểm tra nhập báo cáo đùn: hiển thị 0:00〜24:00 bằng cuộn ngang",
+          gm_purpose: "Để kiểm tra cả các lần đùn ngoài khung 6:00〜21:00 (sáng sớm, tối muộn).",
+          gm_content: "Khung thời gian đổi thành 0:00〜24:00, xem bằng cuộn ngang. Tỷ lệ ngang giữ như cũ, ban đầu hiển thị từ 6:00. Các ngày cuộn cùng nhau.",
+          gn_title: "Báo cáo khởi động khuôn: hiển thị các năm trước theo TB tháng",
+          gn_purpose: "Giống báo cáo hoạt động máy, để bảng không quá dài khi số năm tăng lên.",
+          gn_content: "Theo năm tài chính bắt đầu từ tháng 4: các năm trước gộp thành 1 cột \"Năm ◯◯ (TB tháng)\", năm nay hiển thị theo tháng. Bấm ▸ ở tiêu đề cột để xem năm đó theo tháng, ▾ để quay lại. \"📆 Xem theo tháng\" để chuyển tất cả. Cột cuối đổi từ \"Tổng\" sang \"TB năm nay\" (không tính tháng hiện tại). Không tính lần thử ép có ngày đùn 0000-00-00. Bỏ số lần thử ép khỏi biểu đồ (vẫn hiện trong bảng).",
+          go_title: "Đăng ký khuôn mới: nhập được cả file Excel",
+          go_purpose: "Để đăng ký khuôn trực tiếp từ Excel mà không cần lưu lại thành CSV.",
+          go_content: "Có thể chọn file Excel (.xlsx / .xlsm / .xls) để nhập. Đọc sheet đầu tiên bên trái; thứ tự cột giống CSV (A = budget_id, B = die_number, C = production_number, dòng 1 là tiêu đề). Cùng cách với đăng ký phụ kiện.",
+          gp_title: "Cài đặt nhân viên: lọc theo tên, cuộn bảng trong màn hình",
+          gp_purpose: "Để tìm nhanh người cần tìm khi có nhiều nhân viên, không phải cuộn cả trang.",
+          gp_content: "Nhập một phần tên hoặc mã nhân viên vào ô \"Tên\" để lọc (không phân biệt hoa thường và dấu tiếng Việt, ví dụ: thuy ra Thủy). Bảng vừa với chiều cao màn hình (1920×1080) và cuộn bằng thanh cuộn bên phải; dòng tiêu đề được giữ cố định. Thêm cột \"Ngày cập nhật\" (thời điểm lưu vai trò hoặc reset mật khẩu) ở bên phải.",
+          gq_title: "Đăng ký nhân viên mới (mở từ Cài đặt nhân viên)",
+          gq_purpose: "Để đăng ký nhân viên mới trên ex0.20 mà không cần dùng ex0.11.",
+          gq_content: "Mở bằng nút \"＋ Đăng ký nhân viên mới\" trong Cài đặt nhân viên. Giống ex0.11 (StaffAndCode2): nhập mã nhân viên, họ tên, phân loại (Staff / Worker), ngày vào làm; có thể chọn vai trò. Mã nhân viên bắt buộc 7 chữ số. Nếu mã nhân viên đã tồn tại sẽ báo ngay khi nhập và không cho đăng ký. Mật khẩu để trống (PW reset trong Cài đặt nhân viên sẽ đặt bằng mã nhân viên).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- 設備稼働実績（月ごとの設備別稼働時間の積み上げ。色は machine_report.html のグラフと同じ 設備1 青・設備2 緑・設備3 橙） -->
+  <!-- 1つ目の月 -->
+  <rect x="2.2" y="13.6" width="3.8" height="6.9" rx="0.5" fill="#1976d2" />
+  <rect x="2.2" y="10.4" width="3.8" height="2.7" rx="0.5" fill="#2e7d32" />
+  <rect x="2.2" y="6.6" width="3.8" height="3.3" rx="0.5" fill="#f57c00" />
+  <!-- 2つ目の月 -->
+  <rect x="7.5" y="12.4" width="3.8" height="8.1" rx="0.5" fill="#1976d2" />
+  <rect x="7.5" y="8.6" width="3.8" height="3.3" rx="0.5" fill="#2e7d32" />
+  <rect x="7.5" y="4.4" width="3.8" height="3.7" rx="0.5" fill="#f57c00" />
+  <!-- 3つ目の月 -->
+  <rect x="12.8" y="14.2" width="3.8" height="6.3" rx="0.5" fill="#1976d2" />
+  <rect x="12.8" y="11.6" width="3.8" height="2.1" rx="0.5" fill="#2e7d32" />
+  <rect x="12.8" y="8.2" width="3.8" height="2.9" rx="0.5" fill="#f57c00" />
+  <!-- 4つ目の月 -->
+  <rect x="18.1" y="11.8" width="3.8" height="8.7" rx="0.5" fill="#1976d2" />
+  <rect x="18.1" y="8.2" width="3.8" height="3.1" rx="0.5" fill="#2e7d32" />
+  <rect x="18.1" y="3" width="3.8" height="4.7" rx="0.5" fill="#f57c00" />
+  <!-- 床の線 -->
+  <rect x="1.2" y="21" width="21.6" height="1.1" rx="0.4" fill="#2b6ca3" />
+</svg>

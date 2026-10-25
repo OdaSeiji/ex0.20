@@ -94,7 +94,7 @@
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
   </div>
 
-  <h1 data-key="title">⚖️ 押出重量 実績レポート</h1>
+  <h1 data-key="title">⚖️ 押出投入(t) 実績レポート</h1>
   <div class="subtitle" data-key="subtitle">押出種別 × ビレットサイズ × 製造工場 別：月次投入重量（t）</div>
 
   <div class="toolbar">
@@ -169,7 +169,7 @@
     ===================================================== */
     const dict = {
       ja: {
-        title:      "⚖️ 押出重量 実績レポート",
+        title:      "⚖️ 押出投入(t) 実績レポート",
         subtitle:   "押出種別 × ビレットサイズ × 製造工場 別：月次投入重量（t）",
         btn_back:   "← 戻る",
         btn_csv:    "📥 CSV出力",
@@ -205,7 +205,7 @@
         title_avg_excl_current: "当年度(4月〜)の月平均。進行中の当月は除く",
       },
       vi: {
-        title:      "⚖️ Báo cáo trọng lượng ép",
+        title:      "⚖️ Báo cáo thực tế nạp phôi đùn (t)",
         subtitle:   "Theo Loại ép × Kích thước phôi × Nhà máy：Trọng lượng (t) theo tháng",
         btn_back:   "← Quay lại",
         btn_csv:    "📥 Xuất CSV",
@@ -833,7 +833,7 @@
       const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8;" });
       const a    = document.createElement("a");
       a.href     = URL.createObjectURL(blob);
-      a.download = `押出実績_統合_${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `押出投入実績_統合_${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
     }
 
@@ -872,7 +872,7 @@
         XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(aoa), sheetName);
       });
 
-      XLSX.writeFile(wb, `押出実績_${new Date().toISOString().slice(0,10)}.xlsx`);
+      XLSX.writeFile(wb, `押出投入実績_${new Date().toISOString().slice(0,10)}.xlsx`);
     }
 
     /* =====================================================

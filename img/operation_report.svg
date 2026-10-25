@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#2b6ca3">
+  <!-- 稼働日報（Tan さんのグラフ：号機ごとの縦棒の積み上げ＋持ち時間の線） -->
+  <!-- 1号機：押出・型交換・記録なし -->
+  <rect x="3" y="12" width="4.6" height="9" rx="0.6" />
+  <rect x="3" y="9.4" width="4.6" height="2" rx="0.5" opacity="0.6" />
+  <rect x="3" y="4.6" width="4.6" height="4.2" rx="0.5" opacity="0.3" />
+  <!-- 2号機 -->
+  <rect x="9.7" y="16.5" width="4.6" height="4.5" rx="0.6" />
+  <rect x="9.7" y="14.4" width="4.6" height="1.5" rx="0.5" opacity="0.6" />
+  <rect x="9.7" y="10" width="4.6" height="3.8" rx="0.5" opacity="0.3" />
+  <!-- 3号機 -->
+  <rect x="16.4" y="13.5" width="4.6" height="7.5" rx="0.6" />
+  <rect x="16.4" y="11" width="4.6" height="1.9" rx="0.5" opacity="0.6" />
+  <rect x="16.4" y="8" width="4.6" height="2.4" rx="0.5" opacity="0.3" />
+  <!-- 持ち時間の線 -->
+  <rect x="2.4" y="3.6" width="5.8" height="0.9" rx="0.3" />
+  <rect x="9.1" y="9" width="5.8" height="0.9" rx="0.3" />
+  <rect x="15.8" y="6.5" width="5.8" height="0.9" rx="0.3" />
+  <!-- 床の線 -->
+  <rect x="1.5" y="21.4" width="21" height="1.1" rx="0.4" />
+</svg>

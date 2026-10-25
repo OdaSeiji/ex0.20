@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Operation Time</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .toolbar input[type=date] { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .week-label { font-family: "Roboto Mono", monospace; font-weight: bold; }
+    .status-msg { font-size: 13px; }
+    .status-msg.err { color: #c62828; font-weight: bold; }
+    .status-msg.ok  { color: #2e7d32; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 12px; display: inline-block; }
+    table { border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid #dde3ea; padding: 6px 8px; vertical-align: middle; }
+    th { background: #e8f1ff; font-size: 12px; }
+    td.date { font-family: "Roboto Mono", monospace; font-weight: bold; white-space: nowrap; }
+    tr.sat td.date { color: #1565c0; }
+    tr.sun td.date { color: #c62828; }
+    tr.today td.date { background: #fff8e1; }
+
+    .cell { display: grid; grid-template-columns: auto auto; gap: 4px 8px; align-items: center; min-width: 250px; }
+    .cell input[type=time] { padding: 3px 6px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; font-family: "Roboto Mono", monospace; }
+    .cell .times { display: flex; align-items: center; gap: 4px; }
+    .cell label { font-size: 12px; color: #555; white-space: nowrap; }
+    .avail { font-family: "Roboto Mono", monospace; font-weight: bold; font-size: 15px; text-align: right; }
+    .avail.none { color: #bbb; font-weight: normal; font-size: 12px; }
+    .refs { font-size: 11px; color: #888; }
+    .refs .warn { color: #e65100; font-weight: bold; }
+    .x-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; }
+    td.unset { background: #fafafa; }
+    td.inherited { background: #f3f6fa; }
+    td.inherited input[type=time], td.inherited .avail { color: #8a9bb0; font-style: italic; }
+    .inh-tag { font-size: 10px; color: #8a9bb0; }
+    td.saved-flash { animation: flash 1.2s; }
+    @keyframes flash { from { background: #c8e6c9; } to { background: transparent; } }
+    .hint { font-size: 12px; color: #777; margin-top: 10px; line-height: 1.6; max-width: 960px; }
+    tfoot td { font-weight: bold; background: #f5f9ff; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">⏱ 持ち時間の入力</h1>
+  <div class="subtitle" data-key="subtitle">日付・号機ごとに、設備を動かす時間（開始〜終了）と昼休みを入れます。持ち時間 ＝ 終了 − 開始 − 昼休み（45分）。押出スケジュール表の「開始」「昼休み」と同じ設定です。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-sub" id="btnPrev" data-key="btn_prev">← 前の週</button>
+    <input type="date" id="fFrom" />
+    <button class="btn btn-sub" id="btnNext" data-key="btn_next">次の週 →</button>
+    <button class="btn btn-sub" id="btnThis" data-key="btn_this">今週</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div class="card">
+    <table>
+      <thead><tr id="head"></tr></thead>
+      <tbody id="body"></tbody>
+      <tfoot id="foot"></tfoot>
+    </table>
+  </div>
+  <div class="hint" data-key="hint">※ 月曜を入れると、その週の火〜日も同じ値になります（別の値にした日はそのまま）。週に何も入れていない号機は、前の週の値を引き継ぎます（青みがかった斜体。直すとその週に保存されます）。開始と終了の両方を入れると保存し、昼休みのチェックも変えるとすぐ保存します。× でその日の設定を消します。「計画」「日報」は、その日・号機の押出計画と日報の件数で、押出計画も日報も無い日は休み（持ち時間 0）として集計します。日報があるのに持ち時間が無い日は、オレンジで知らせます。</div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "⏱ 持ち時間の入力",
+        subtitle: "日付・号機ごとに、設備を動かす時間（開始〜終了）と昼休みを入れます。持ち時間 ＝ 終了 − 開始 − 昼休み（45分）。押出スケジュール表の「開始」「昼休み」と同じ設定です。",
+        btn_back: "← 戻る", btn_prev: "← 前の週", btn_next: "次の週 →", btn_this: "今週",
+        hint: "※ 月曜を入れると、その週の火〜日も同じ値になります（別の値にした日はそのまま）。週に何も入れていない号機は、前の週の値を引き継ぎます（青みがかった斜体。直すとその週に保存されます）。開始と終了の両方を入れると保存し、昼休みのチェックも変えるとすぐ保存します。× でその日の設定を消します。「計画」「日報」は、その日・号機の押出計画と日報の件数で、押出計画も日報も無い日は休み（持ち時間 0）として集計します。日報があるのに持ち時間が無い日は、オレンジで知らせます。",
+        col_date: "日付", machine: "{m}号機", lunch: "昼休み", copy_prev: "前日と同じ",
+        plans: "計画 {n}", presses: "日報 {n}", no_time: "持ち時間なし",
+        total: "週の合計",
+        wd: ["日", "月", "火", "水", "木", "金", "土"],
+        msg_saved: "保存しました", err_end: "終了は開始より後にしてください", clear_tip: "この日の設定を消す",
+        copy_none: "前日に設定がありません", inherited: "前の週から",
+      },
+      vi: {
+        title: "⏱ Nhập thời gian khả dụng",
+        subtitle: "Nhập giờ chạy máy (bắt đầu〜kết thúc) và nghỉ trưa cho từng ngày, từng máy. Thời gian khả dụng = kết thúc − bắt đầu − nghỉ trưa (45 phút). Dùng chung với \"Bắt đầu\", \"Nghỉ trưa\" của lịch đùn.",
+        btn_back: "← Quay lại", btn_prev: "← Tuần trước", btn_next: "Tuần sau →", btn_this: "Tuần này",
+        hint: "※ Khi nhập thứ Hai, các ngày thứ Ba〜Chủ nhật của tuần đó cũng nhận cùng giá trị (ngày đã đặt giá trị khác giữ nguyên). Máy chưa nhập gì trong tuần sẽ kế thừa giá trị của tuần trước (chữ nghiêng màu xanh nhạt; sửa thì được lưu vào tuần đó). Lưu khi đã nhập cả bắt đầu và kết thúc; nghỉ trưa lưu ngay khi đổi. Bấm × để xóa thiết lập ngày đó. \"KH\" và \"BC\" là số kế hoạch đùn và báo cáo ngày; ngày không có cả hai được tính là nghỉ (thời gian khả dụng 0). Ngày có báo cáo nhưng chưa có thời gian khả dụng sẽ hiện màu cam.",
+        col_date: "Ngày", machine: "Máy {m}", lunch: "Nghỉ trưa", copy_prev: "Giống hôm trước",
+        plans: "KH {n}", presses: "BC {n}", no_time: "Chưa có",
+        total: "Tổng tuần",
+        wd: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+        msg_saved: "Đã lưu", err_end: "Giờ kết thúc phải sau giờ bắt đầu", clear_tip: "Xóa thiết lập ngày này",
+        copy_none: "Hôm trước chưa có thiết lập", inherited: "Từ tuần trước",
+      },
+    };
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k];
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      render();
+    }
+
+    const API = "./php/operation_time/";
+    const MACHINES = [1, 2, 3];
+    const LUNCH_MIN = 45;
+    let days = [];
+
+    const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const toMin = (s) => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
+    const hm = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+    const available = (c) => c.start && c.end ? toMin(c.end) - toMin(c.start) - (c.has_lunch ? LUNCH_MIN : 0) : null;
+    function monday(d) { const x = new Date(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; }
+
+    function showMsg(msg, isErr) {
+      const el = document.getElementById("statusMsg");
+      el.textContent = msg || "";
+      el.className = "status-msg " + (isErr ? "err" : "ok");
+      if (msg && !isErr) setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 2500);
+    }
+
+    async function load() {
+      const res = await fetch(`${API}get_week.php?from=${document.getElementById("fFrom").value}`);
+      const data = await res.json();
+      if (!res.ok) return showMsg(data.error, true);
+      days = data.days;
+      document.getElementById("fFrom").value = data.monday;
+      render();
+    }
+
+    function render() {
+      document.getElementById("head").innerHTML = `<th>${t("col_date")}</th>` + MACHINES.map(m => `<th>${t("machine", { m })}</th>`).join("") + "<th></th>";
+      const todayStr = ymd(new Date());
+      document.getElementById("body").innerHTML = days.map((d, di) => {
+        const wd = new Date(d.date + "T00:00:00").getDay();
+        const cells = MACHINES.map(m => {
+          const c = d.machines[m];
+          const av = available(c);
+          const warn = c.presses > 0 && av === null;
+          return `<td class="${c.inherited ? "inherited" : c.has_row ? "" : "unset"}" data-di="${di}" data-m="${m}" title="${c.inherited ? `${t("inherited")} ${c.from}` : ""}">
+            <div class="cell">
+              <div class="times">
+                <input type="time" data-f="start" value="${c.start ?? ""}" /> 〜 <input type="time" data-f="end" value="${c.end ?? ""}" />
+                ${c.has_row || c.inherited ? `<button class="x-btn" data-clear="1" title="${t("clear_tip")}">×</button>` : ""}
+              </div>
+              <div class="avail ${av === null ? "none" : ""}">${av === null ? t("no_time") : hm(av)}</div>
+              <label><input type="checkbox" data-f="has_lunch" ${c.has_lunch ? "checked" : ""} /> ${t("lunch")}${c.inherited ? ` <span class="inh-tag">${t("inherited")}</span>` : ""}</label>
+              <div class="refs" style="text-align:right">${t("plans", { n: c.plans })}　<span class="${warn ? "warn" : ""}">${t("presses", { n: c.presses })}</span></div>
+            </div>
+          </td>`;
+        }).join("");
+        return `<tr class="${wd === 6 ? "sat" : wd === 0 ? "sun" : ""} ${d.date === todayStr ? "today" : ""}">
+          <td class="date">${d.date.slice(5)}（${t("wd")[wd]}）</td>${cells}
+          <td><button class="btn btn-sub" data-copy="${di}" ${di === 0 ? "disabled" : ""}>${t("copy_prev")}</button></td>
+        </tr>`;
+      }).join("");
+      const totals = MACHINES.map(m => days.reduce((a, d) => a + (available(d.machines[m]) ?? 0), 0));
+      document.getElementById("foot").innerHTML = days.length
+        ? `<tr><td>${t("total")}</td>${totals.map(v => `<td class="avail">${hm(v)}</td>`).join("")}<td></td></tr>` : "";
+    }
+
+    async function post(body) {
+      const res = await fetch(API + "save_day.php", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || res.statusText);
+    }
+
+    async function saveCell(di, m) {
+      const d = days[di], c = d.machines[m];
+      if (!c.start || !c.end) return render();
+      if (c.end <= c.start) { showMsg(t("err_end"), true); return; }
+      try {
+        await post({ date: d.date, machine: m, start: c.start, end: c.end, has_lunch: c.has_lunch });
+        await load();   // 月曜を直すと火〜日も変わり、引き継ぎの週はその週に書かれるので読み直す
+        document.querySelector(`td[data-di="${di}"][data-m="${m}"]`).classList.add("saved-flash");
+        showMsg(t("msg_saved"));
+      } catch (err) { showMsg(err.message, true); }
+    }
+
+    document.getElementById("body").addEventListener("change", (e) => {
+      const td = e.target.closest("td[data-di]");
+      if (!td || !e.target.dataset.f) return;
+      const di = Number(td.dataset.di), m = Number(td.dataset.m);
+      const c = days[di].machines[m];
+      const f = e.target.dataset.f;
+      c[f] = f === "has_lunch" ? (e.target.checked ? 1 : 0) : (e.target.value || null);
+      if (f === "has_lunch" && (!c.start || !c.end)) return render();
+      saveCell(di, m);
+    });
+
+    document.getElementById("body").addEventListener("click", async (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.dataset.clear) {
+        const td = b.closest("td[data-di]");
+        const di = Number(td.dataset.di), m = Number(td.dataset.m);
+        try {
+          await post({ date: days[di].date, machine: m, clear: true });
+          await load();
+          showMsg(t("msg_saved"));
+        } catch (err) { showMsg(err.message, true); }
+        return;
+      }
+      if (b.dataset.copy) {
+        const di = Number(b.dataset.copy);
+        const prev = days[di - 1];
+        const targets = MACHINES.filter(m => prev.machines[m].start && prev.machines[m].end);
+        if (!targets.length) return showMsg(t("copy_none"), true);
+        try {
+          for (const m of targets) {
+            const p = prev.machines[m];
+            await post({ date: days[di].date, machine: m, start: p.start, end: p.end, has_lunch: p.has_lunch });
+          }
+          await load();
+          showMsg(t("msg_saved"));
+        } catch (err) { showMsg(err.message, true); }
+      }
+    });
+
+    function shiftWeek(n) {
+      const d = new Date(document.getElementById("fFrom").value + "T00:00:00");
+      d.setDate(d.getDate() + 7 * n);
+      document.getElementById("fFrom").value = ymd(d);
+      load();
+    }
+    document.getElementById("btnPrev").onclick = () => shiftWeek(-1);
+    document.getElementById("btnNext").onclick = () => shiftWeek(1);
+    document.getElementById("btnThis").onclick = () => { document.getElementById("fFrom").value = ymd(monday(new Date())); load(); };
+    document.getElementById("fFrom").addEventListener("change", (e) => {
+      if (!e.target.value) return;
+      e.target.value = ymd(monday(new Date(e.target.value + "T00:00:00")));
+      load();
+    });
+
+    document.getElementById("fFrom").value = ymd(monday(new Date()));
+    setLang(currentLang);
+    load();
+  </script>
+</body>
+</html>

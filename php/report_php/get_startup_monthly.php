@@ -22,7 +22,7 @@ $sql = "
     GROUP BY DATE_FORMAT(die_handover_at, '%Y-%m')
     UNION ALL
     SELECT 'trial_press',             DATE_FORMAT(press_date_at,                '%Y-%m'), COUNT(*)
-    FROM t_press WHERE pressing_type_id = 1
+    FROM t_press WHERE pressing_type_id = 1 AND press_date_at >= '2000-01-01'   -- 押出日が 0000-00-00 の記録は数えない
     GROUP BY DATE_FORMAT(press_date_at, '%Y-%m')
     ORDER BY month, metric
 ";

@@ -81,7 +81,7 @@
       const dict = {
         ja: {
           btn_back_plan: "← 押出計画へ戻る", title: "押出スケジュール表", all_machines: "全号機", btn_print: "印刷",
-          btn_print_one: "No.{m} を印刷", machine: "号機", lbl_start: "開始", lbl_lunch: "昼休み（45分）", lbl_lunch_pos: "入れる位置",
+          btn_print_one: "No.{m} を印刷", machine: "号機", lbl_start: "開始", lbl_end: "終了", lbl_available: "持ち時間", err_end: "終了は開始より後にしてください", lbl_lunch: "昼休み（45分）", lbl_lunch_pos: "入れる位置",
           lunch_auto: "自動（12:00 にいちばん近い区切り）", lunch_after: "{die} のあと", lunch_row: "昼休み", msg_saved: "保存しました", col_main: "金型", col_spare: "予備の金型", col_billet: "ビレット", col_length: "長さ(mm)",
           col_plan: "計画", col_actual: "実績", col_bars_plan: "押出材（計画）", col_bars_actual: "押出材（実績）",
           col_minutes: "計画の時間（分）", col_timeline: "計画の時刻", col_start: "開始", col_end: "終了",
@@ -94,7 +94,7 @@
         },
         vi: {
           btn_back_plan: "← Về kế hoạch ép đùn", title: "Lịch ép đùn", all_machines: "Tất cả máy", btn_print: "In",
-          btn_print_one: "In máy {m}", machine: "MÁY", lbl_start: "Bắt đầu", lbl_lunch: "Nghỉ trưa (45 phút)", lbl_lunch_pos: "Vị trí",
+          btn_print_one: "In máy {m}", machine: "MÁY", lbl_start: "Bắt đầu", lbl_end: "Kết thúc", lbl_available: "Thời gian khả dụng", err_end: "Giờ kết thúc phải sau giờ bắt đầu", lbl_lunch: "Nghỉ trưa (45 phút)", lbl_lunch_pos: "Vị trí",
           lunch_auto: "Tự động (gần 12:00 nhất)", lunch_after: "Sau {die}", lunch_row: "NGHỈ TRƯA", msg_saved: "Đã lưu", col_main: "KHUÔN CHÍNH", col_spare: "KHUÔN DỰ BỊ", col_billet: "SỐ BILLET", col_length: "Chiều dài(mm)",
           col_plan: "KH", col_actual: "TT", col_bars_plan: "Số thanh (KH)", col_bars_actual: "Số thanh (TT)",
           col_minutes: "THỜI GIAN KH (phút)", col_timeline: "Timeline KH", col_start: "Start", col_end: "End",
@@ -151,6 +151,8 @@
           return `<div class="sheet" data-machine="${machine}">
             <div class="sheet-tools no-print">
               <label><span class="day-lbl">${t("lbl_start")}</span><input type="time" value="${data.day.start_time}" onchange="saveDay(${machine}, { start_time: this.value })" /></label>
+              <label><span class="day-lbl">${t("lbl_end")}</span><input type="time" value="${data.day.end_time ?? ""}" onchange="saveDay(${machine}, { end_time: this.value })" /></label>
+              <span class="day-lbl">${t("lbl_available")} ${availableText(data.day)}</span>
               <label><input type="checkbox" ${data.day.has_lunch ? "checked" : ""} onchange="saveDay(${machine}, { has_lunch: this.checked ? 1 : 0 })" /><span class="day-lbl">${t("lbl_lunch")}</span></label>
               ${data.day.has_lunch ? `<label>${t("lbl_lunch_pos")}
                 <select onchange="saveDay(${machine}, { lunch_after_plan_id: Number(this.value) })">
@@ -216,17 +218,35 @@
         }).join("");
       }
 
-      // 日付・号機ごとの設定（開始の時刻・昼休み）を保存して、その号機を出し直す
+      // 画面の上に数秒だけ出すメッセージ（ブラウザの確認ダイアログは使わない）
+      function alertMsg(msg) {
+        const el = document.createElement("div");
+        el.textContent = msg;
+        el.style.cssText = "position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#c62828;color:#fff;padding:8px 16px;border-radius:6px;font-weight:bold;z-index:999;";
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3000);
+      }
+
+      // 持ち時間 ＝ 終了 − 開始 − 昼休み（45分）。終了が無ければ「－」
+      function availableText(day) {
+        if (!day.end_time) return "－";
+        const min = (s) => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
+        const m = min(day.end_time) - min(day.start_time) - (day.has_lunch ? 45 : 0);
+        return `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+      }
+
+      // 日付・号機ごとの設定（開始・終了の時刻・昼休み）を保存して、その号機を出し直す
       async function saveDay(machine, change) {
         const sheet = sheets.find((x) => x.machine === machine);
         const d = sheet.data.day;
         const body = {
           plan_date: document.getElementById("fDate").value, press_machine: machine,
-          start_time: d.start_time, has_lunch: d.has_lunch,
+          start_time: d.start_time, end_time: d.end_time ?? "", has_lunch: d.has_lunch,
           lunch_after_plan_id: d.lunch_auto ? 0 : (d.lunch_after_plan_id ?? 0),
           ...change,
         };
         if (!/^\d{2}:\d{2}$/.test(body.start_time)) return;
+        if (body.end_time && body.end_time <= body.start_time) { alertMsg(t("err_end")); return render(); }
         await fetch("./php/press_plan/save_schedule_day.php", {
           method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
         });

@@ -28,15 +28,21 @@
       .legend { display: flex; gap: 16px; font-size: 12px; color: #555; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
       .legend i { display: inline-block; width: 22px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 
-      /* 1日＝1行。左に日付、まん中に時間の帯（6:00〜21:00）、右に合計 */
-      .day { display: grid; grid-template-columns: 110px 1fr 170px; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
-      .day-label { font-size: 13px; font-weight: bold; }
+      /* 1日＝1行。左に日付、まん中に時間の帯（0:00〜24:00、横スクロール）、右に合計
+         まん中だけを1つの横スクロールにして、全部の日の帯が一緒に動くようにする。行の高さは3列で同じにそろえる */
+      .board { display: grid; grid-template-columns: 150px 1fr 170px; gap: 10px; }
+      .col-head { height: 18px; }
+      .row { height: 68px; display: flex; align-items: center; border-bottom: 1px solid #eee; }
+      .scroller { overflow-x: auto; }
+      .inner { width: 160%; }   /* 24時間 ÷ 15時間：前（6:00〜21:00 が全幅）と同じ横のスケール */
+      .day-label { font-size: 13px; font-weight: bold; flex: 1; }
+      .lane-names { display: flex; flex-direction: column; gap: 3px; }
+      .lane-names span { height: 24px; line-height: 24px; font-size: 10px; color: #999; text-align: right; }
       .day-label .dow { font-weight: normal; color: #888; margin-left: 4px; }
       .day-label.sun { color: #c62828; } .day-label.sat { color: #1565c0; }
-      .timeline { position: relative; }
+      .timeline { position: relative; width: 100%; }
       .lane { position: relative; height: 24px; background: #fafafa; border: 1px solid #e0e0e0; border-radius: 3px; }
       .lane + .lane { margin-top: 3px; }
-      .lane-name { position: absolute; left: -44px; top: 4px; font-size: 10px; color: #999; width: 40px; text-align: right; }
       .hour-line { position: absolute; top: 0; bottom: 0; width: 1px; background: #eee; }
       .block {
         position: absolute; top: 2px; bottom: 2px; border-radius: 3px; font-size: 10px; line-height: 18px;
@@ -87,10 +93,11 @@
           <span><i style="background:#616161"></i><span data-key="lg_auto_off">自動運転 OFF（press_mode）</span></span>
           <span><i style="background:repeating-linear-gradient(45deg,#ffcdd2,#ffcdd2 4px,#fff 4px,#fff 8px)"></i><span data-key="lg_gap">記録のすき間（10分以上）</span></span>
         </div>
-        <div class="day" style="border-bottom:none; padding:0;">
-          <div></div><div class="axis" id="axis" style="margin-left:44px;"></div><div></div>
+        <div class="board">
+          <div><div class="col-head"></div><div id="labels"></div></div>
+          <div class="scroller" id="scroller"><div class="inner"><div class="axis col-head" id="axis"></div><div id="days"></div></div></div>
+          <div><div class="col-head"></div><div id="sums"></div></div>
         </div>
-        <div id="days"></div>
         <div class="hint" data-key="hint">8時間（480分）を基準に、押出の記録の合計時間を出しています。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。</div>
       </div>
     </div>
@@ -131,7 +138,8 @@
       function addDays(s, n) { const d = new Date(s + "T00:00:00"); d.setDate(d.getDate() + n); return ymd(d); }
       const hm = (m) => `${Math.floor(m / 60)}:${String(Math.round(m % 60)).padStart(2, "0")}`;
 
-      const DAY_FROM = 6 * 60, DAY_TO = 21 * 60, SPAN = DAY_TO - DAY_FROM;   // 6:00〜21:00
+      const DAY_FROM = 0, DAY_TO = 24 * 60, SPAN = DAY_TO - DAY_FROM;   // 0:00〜24:00（横スクロール。最初は 6:00 から見せる）
+      const VIEW_FROM = 6 * 60;
       const BASE_MIN = 480;   // 8時間
       const GAP_MIN = 10;     // これ以上のすき間を表示
       const DAYS = 7;
@@ -169,13 +177,13 @@
       function render() {
         // 時間の目盛り
         let axis = "";
-        for (let h = 6; h <= 21; h++) axis += `<span style="left:${pct(h * 60)}%">${h}:00</span>`;
+        for (let h = 0; h <= 24; h++) axis += `<span style="left:${pct(h * 60)}%">${h}:00</span>`;
         document.getElementById("axis").innerHTML = axis;
 
         const start = document.getElementById("fStart").value;
         if (!start) return;
-        const hourLines = Array.from({ length: 14 }, (_, i) => `<div class="hour-line" style="left:${pct((7 + i) * 60)}%"></div>`).join("");
-        let html = "";
+        const hourLines = Array.from({ length: 23 }, (_, i) => `<div class="hour-line" style="left:${pct((1 + i) * 60)}%"></div>`).join("");
+        let html = "", labels = "", sums = "";
         for (let i = 0; i < DAYS; i++) {
           const date = addDays(start, i);
           const dow = new Date(date + "T00:00:00").getDay();
@@ -203,7 +211,7 @@
             cursor = Math.max(cursor, e);
           });
 
-          // PLC の帯（日をまたぐセッションは、その日の 6:00〜21:00 に切る）
+          // PLC の帯（日をまたぐセッションは、その日の 0:00〜24:00 に切る）
           const sessions = plc[date] || [];
           const plcBlocks = sessions.map((s) => {
             const st = new Date(s.start_time.replace(" ", "T")), en = new Date(s.end_time.replace(" ", "T"));
@@ -231,19 +239,32 @@
           }).join("");
 
           const ratio = Math.round(total / BASE_MIN * 100);
-          html += `
-            <div class="day">
+          labels += `
+            <div class="row">
               <div class="day-label ${dow === 0 ? "sun" : dow === 6 ? "sat" : ""}">${date.slice(5)}<span class="dow">(${t("dow")[dow]})</span></div>
-              <div class="timeline" style="margin-left:44px;">
-                <div class="lane"><span class="lane-name">${t("lane_rec")}</span>${hourLines}${gapHtml}${recBlocks || `<span class="empty-day">${t("no_record")}</span>`}</div>
-                <div class="lane"><span class="lane-name">${t("lane_plc")}</span>${hourLines}${plcBlocks}${offBlocks}</div>
-              </div>
-              <div class="sum">
-                ${recs.length ? `${t("sum_total")} <b class="${total >= BASE_MIN ? "ok" : "ng"}">${hm(total)}</b>（${ratio}%）<br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}` : `<span class="empty-day">${t("no_record")}</span>`}
+              <div class="lane-names"><span>${t("lane_rec")}</span><span>${t("lane_plc")}</span></div>
+            </div>`;
+          html += `
+            <div class="row">
+              <div class="timeline">
+                <div class="lane">${hourLines}${gapHtml}${recBlocks || `<span class="empty-day">${t("no_record")}</span>`}</div>
+                <div class="lane">${hourLines}${plcBlocks}${offBlocks}</div>
               </div>
             </div>`;
+          sums += `
+            <div class="row"><div class="sum">
+              ${recs.length ? `${t("sum_total")} <b class="${total >= BASE_MIN ? "ok" : "ng"}">${hm(total)}</b>（${ratio}%）<br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}` : `<span class="empty-day">${t("no_record")}</span>`}
+            </div></div>`;
         }
+        document.getElementById("labels").innerHTML = labels;
         document.getElementById("days").innerHTML = html;
+        document.getElementById("sums").innerHTML = sums;
+        // 最初の表示は 6:00 から（前と同じ見え方）。そのあとはスクロールした位置のまま
+        const sc = document.getElementById("scroller");
+        if (!sc.dataset.scrolled) {
+          sc.scrollLeft = sc.scrollWidth * VIEW_FROM / SPAN;
+          sc.dataset.scrolled = "1";
+        }
       }
 
       (async () => {

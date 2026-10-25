@@ -97,6 +97,8 @@
 
     .form-grid { display: grid; grid-template-columns: auto 1fr; gap: 8px 10px; align-items: center; font-size: 13px; }
     .form-grid label { color: #555; font-size: 12px; }
+    /* 工程のボタン：枠を表示いっぱいに伸ばさず、3つを同じ幅にする */
+    #procSeg { justify-self: start; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; }
     .form-grid select, .form-grid input { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
     .code-row { display: flex; gap: 6px; }
     .code-row input { width: 70px; }

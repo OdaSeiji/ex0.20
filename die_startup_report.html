@@ -23,9 +23,11 @@
     .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
     .btn-back { background: #546e7a; color: #fff; }
     .btn-csv  { background: #217346; color: #fff; }
+    .btn-toggle { background: #8e5ec7; color: #fff; }
 
-    /* 年度フィルタ */
-    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    /* 年度フィルタ（年度を月別に展開しているときだけ使える） */
+    .filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; transition: opacity .2s; }
+    .filter-row.is-disabled { opacity: 0.45; }
     .filter-row label { font-size: 13px; color: #555; }
     .filter-row select {
       padding: 5px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px;
@@ -41,6 +43,12 @@
     th { background: #e8f1ff; text-align: center; font-size: 12px; position: sticky; top: 0; }
     th.label-col, td.label-col { text-align: left; font-weight: bold; min-width: 130px; background: #f5f5f5; position: sticky; left: 0; }
     td.total-col { font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+    th.col-fyavg, td.col-fyavg { background: #fff8e1; }
+    .fy-toggle-btn {
+      border: none; background: transparent; color: #8e5ec7; cursor: pointer;
+      font-size: 12px; font-weight: bold; padding: 0 2px; vertical-align: middle;
+    }
+    .fy-toggle-btn:hover { text-decoration: underline; }
     tr:hover td { background: #f0f8ff; }
     tr:hover td.label-col { background: #e8f1ff; }
 
@@ -65,11 +73,12 @@
   <div class="toolbar">
     <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
     <button class="btn btn-csv"  onclick="exportCSV()" data-key="btn_csv">📥 CSV出力</button>
+    <button class="btn btn-toggle" id="btnToggleView" onclick="toggleView()">📆 月別に展開</button>
   </div>
 
-  <div class="filter-row">
+  <div class="filter-row is-disabled" id="yearFilterRow">
     <label data-key="label_year">年度絞り込み：</label>
-    <select id="yearFilter" onchange="applyFilter()">
+    <select id="yearFilter" onchange="applyFilter()" disabled>
       <option value="" data-key="opt_all">全期間</option>
     </select>
   </div>
@@ -99,7 +108,13 @@
         label_year:  "年度絞り込み：",
         opt_all:     "全期間",
         chart_title: "📈 月別推移",
-        col_total:   "合計",
+        col_total:   "今年度平均",
+        fyLabel:     fy => `${String(fy % 100).padStart(2, "0")}年度(月平均)`,
+        btn_expand:   "📆 月別に展開",
+        btn_collapse: "📅 年度平均で表示",
+        title_expand:   "この年度を月別に展開",
+        title_collapse: "この年度を月平均に戻す",
+        title_avg_excl_current: "当年度(4月〜)の月平均。進行中の当月は除く",
         metrics: {
           arrival:       "金型到着数",
           parts_arrival: "金型部品到着数",
@@ -117,7 +132,13 @@
         label_year:  "Lọc theo năm：",
         opt_all:     "Tất cả",
         chart_title: "📈 Xu hướng theo tháng",
-        col_total:   "Tổng",
+        col_total:   "TB năm nay",
+        fyLabel:     fy => `Năm ${String(fy % 100).padStart(2, "0")}(TB tháng)`,
+        btn_expand:   "📆 Xem theo tháng",
+        btn_collapse: "📅 Xem TB năm",
+        title_expand:   "Xem chi tiết theo tháng của năm này",
+        title_collapse: "Quay lại TB tháng của năm này",
+        title_avg_excl_current: "TB tháng của năm tài chính hiện tại (từ tháng 4), không tính tháng hiện tại",
         metrics: {
           arrival:       "Số khuôn đến",
           parts_arrival: "Số phụ kiện đến",
@@ -141,6 +162,7 @@
       });
       document.getElementById("btnJa").classList.toggle("active", lang === "ja");
       document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      if (rawData) syncExpandState();
       if (rawData) renderAll(rawData);
     }
 
@@ -156,6 +178,7 @@
       const res = await fetch("./php/report_php/get_startup_monthly.php");
       rawData = await res.json();
       buildYearFilter(rawData.months);
+      syncExpandState();
       renderAll(rawData);
     }
 
@@ -183,39 +206,158 @@
     }
 
     /* =====================================================
+       年度平均表示 ⇔ 月別表示（設備稼働実績 machine_report.html と同じ）
+       （年度は4月始まり3月終わり。過去年度は月平均1列にまとめ、
+        当年度分は月別のまま表示する。年度平均の列は、その列の
+        ボタンから個別に月別展開／折りたたみができる）
+    ===================================================== */
+    let expandedFYs = new Set(); // 個別に「月別展開」した過去年度の集合
+
+    function fiscalYearOf(monthStr) {
+      const [y, m] = monthStr.split("-").map(Number);
+      return m >= 4 ? y : y - 1;
+    }
+
+    function currentFiscalYear() {
+      const now = new Date();
+      const m = now.getMonth() + 1;
+      return m >= 4 ? now.getFullYear() : now.getFullYear() - 1;
+    }
+
+    // 進行中の当月はそろっていないため、右端の「今年度平均」の計算から除く
+    function currentMonthStr() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+
+    // 「今年度平均」の対象月：当年度（4月〜）のうち、進行中の当月を除いた月（絞り込みに関わらず全体で計算）
+    function averageMonths() {
+      if (!rawData) return [];
+      const curFY     = currentFiscalYear();
+      const currentMo = currentMonthStr();
+      return rawData.months.filter(m => fiscalYearOf(m) === curFY && m !== currentMo);
+    }
+
+    function allPastFiscalYears() {
+      if (!rawData) return [];
+      const curFY = currentFiscalYear();
+      return [...new Set(rawData.months.map(fiscalYearOf))].filter(fy => fy < curFY).sort((a, b) => a - b);
+    }
+
+    function buildColumns(months, expandedFYs) {
+      const curFY = currentFiscalYear();
+      const byFY = new Map();
+      months.forEach(m => {
+        const fy = fiscalYearOf(m);
+        if (!byFY.has(fy)) byFY.set(fy, []);
+        byFY.get(fy).push(m);
+      });
+      const columns = [];
+      [...byFY.keys()].sort((a, b) => a - b).forEach(fy => {
+        const fyMonths = byFY.get(fy);
+        const isCurrent = fy === curFY;
+        if (!isCurrent && !expandedFYs.has(fy)) {
+          columns.push({ type: "fy-avg", key: "fy" + fy, fy, months: fyMonths });
+        } else {
+          fyMonths.forEach((m, i) => columns.push({
+            type: "month", key: m, month: m, fy,
+            // 手動で展開した年度だけ、先頭月に「折りたたむ」ボタンを出す
+            collapsible: !isCurrent && i === 0,
+          }));
+        }
+      });
+      return columns;
+    }
+
+    function columnLabel(col) {
+      const t = dict[currentLang];
+      return col.type === "month" ? col.month.slice(2).replace("-", "/") : t.fyLabel(col.fy);
+    }
+
+    // 年度平均の列は、12ではなく実際にある月数で割る（データの端の年度でも実態に合わせる）
+    function columnValue(mObj, col) {
+      if (col.type === "month") return mObj[col.month] ?? 0;
+      const sum = col.months.reduce((s, m) => s + (mObj[m] ?? 0), 0);
+      return sum / (col.months.length || 1);
+    }
+
+    function toggleFY(fy) {
+      if (expandedFYs.has(fy)) expandedFYs.delete(fy); else expandedFYs.add(fy);
+      syncExpandState();
+      if (rawData) renderAll(rawData);
+    }
+
+    // 年度絞り込みの有効/無効と、ツールバーのボタンの文言を、展開の状態に合わせる
+    function syncExpandState() {
+      const t           = dict[currentLang];
+      const pastFYs     = allPastFiscalYears();
+      const anyExpanded = expandedFYs.size > 0;
+      const allExpanded = pastFYs.length > 0 && pastFYs.every(fy => expandedFYs.has(fy));
+      const yearSel = document.getElementById("yearFilter");
+      yearSel.disabled = !anyExpanded;
+      document.getElementById("yearFilterRow").classList.toggle("is-disabled", !anyExpanded);
+      if (!anyExpanded) yearSel.value = "";
+      document.getElementById("btnToggleView").textContent = allExpanded ? t.btn_collapse : t.btn_expand;
+    }
+
+    // ツールバーの「月別に展開」：全年度をまとめて展開／折りたたみ
+    function toggleView() {
+      const pastFYs     = allPastFiscalYears();
+      const allExpanded = pastFYs.length > 0 && pastFYs.every(fy => expandedFYs.has(fy));
+      if (allExpanded) expandedFYs.clear(); else pastFYs.forEach(fy => expandedFYs.add(fy));
+      syncExpandState();
+      if (rawData) renderAll(rawData);
+    }
+
+    /* =====================================================
        描画
     ===================================================== */
     function renderAll(data) {
-      const months = filteredMonths();
-      renderTable(data, months);
-      renderChart(data, months);
+      const months  = filteredMonths();
+      const columns = buildColumns(months, expandedFYs);
+      renderTable(data, columns);
+      renderChart(data, columns);
     }
 
-    function renderTable(data, months) {
+    function renderTable(data, columns) {
       const t = dict[currentLang];
 
       // ヘッダー
       const head = document.getElementById("tableHead");
       head.innerHTML = `<th class="label-col">項目 / 年月</th>`;
-      months.forEach(m => head.innerHTML += `<th>${m.slice(2).replace("-", "/")}</th>`);
-      head.innerHTML += `<th>${t.col_total}</th>`;
+      columns.forEach(col => {
+        if (col.type === "fy-avg") {
+          head.innerHTML += `<th class="col-fyavg">` +
+            `<button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t.title_expand}">▸</button> ` +
+            `${columnLabel(col)}</th>`;
+        } else if (col.collapsible) {
+          head.innerHTML += `<th>` +
+            `<button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t.title_collapse}">▾</button> ` +
+            `${columnLabel(col)}</th>`;
+        } else {
+          head.innerHTML += `<th>${columnLabel(col)}</th>`;
+        }
+      });
+      head.innerHTML += `<th title="${t.title_avg_excl_current}">${t.col_total}</th>`;
 
       // 行
       const body = document.getElementById("tableBody");
       body.innerHTML = "";
+      const avgMonths = averageMonths();
 
       METRIC_KEYS.forEach(key => {
         const tr   = document.createElement("tr");
         const mObj = data.data[key] ?? {};
-        let total  = 0;
         let cells  = `<td class="label-col">${t.metrics[key]}</td>`;
-
-        months.forEach(m => {
-          const v = mObj[m] ?? 0;
-          total  += v;
-          cells  += `<td class="mono">${v > 0 ? v : ""}</td>`;
+        columns.forEach(col => {
+          const v = columnValue(mObj, col);
+          // 年度平均は小数になるので小数1桁、月はそのままの件数
+          const txt = v > 0 ? (col.type === "fy-avg" ? v.toFixed(1) : v) : "";
+          cells += `<td class="mono${col.type === "fy-avg" ? " col-fyavg" : ""}">${txt}</td>`;
         });
-        cells += `<td class="total-col">${total}</td>`;
+        // 右端は当年度（進行中の当月を除く）の月平均
+        const avg = avgMonths.reduce((s, m) => s + (mObj[m] ?? 0), 0) / (avgMonths.length || 1);
+        cells += `<td class="total-col">${avg.toFixed(1)}</td>`;
         tr.innerHTML = cells;
         body.appendChild(tr);
       });
@@ -226,15 +368,16 @@
     ===================================================== */
     let chartInstance = null;
 
-    function renderChart(data, months) {
+    function renderChart(data, columns) {
       const t      = dict[currentLang];
-      const labels = months.map(m => m.slice(2).replace("-", "/"));
+      const labels = columns.map(columnLabel);
 
-      const datasets = METRIC_KEYS.map((key, i) => {
+      // 試押回数は他の項目より桁が大きく、グラフが見にくくなるので表だけに出す（色は項目ごとに固定のまま）
+      const datasets = METRIC_KEYS.map((key, i) => ({ key, i })).filter(({ key }) => key !== "trial_press").map(({ key, i }) => {
         const mObj = data.data[key] ?? {};
         return {
           label:           t.metrics[key],
-          data:            months.map(m => mObj[m] ?? 0),
+          data:            columns.map(col => Math.round(columnValue(mObj, col) * 10) / 10),
           backgroundColor: CHART_COLORS[i] + "99",
           borderColor:     CHART_COLORS[i],
           borderWidth:     2,
@@ -248,7 +391,7 @@
       datasets.push({
         type:            "line",
         label:           t.diff_label,
-        data:            months.map(m => (handoverObj[m] ?? 0) - (arrivalObj[m] ?? 0)),
+        data:            columns.map(col => Math.round((columnValue(handoverObj, col) - columnValue(arrivalObj, col)) * 10) / 10),
         borderColor:     "#e53935",
         backgroundColor: "transparent",
         borderWidth:     2,
@@ -280,11 +423,12 @@
       const t      = dict[currentLang];
       const months = filteredMonths();
       const header = ["項目", ...months.map(m => m.slice(2).replace("-","/")), t.col_total];
+      const avgMonths = averageMonths();
       const rows   = METRIC_KEYS.map(key => {
         const mObj = rawData.data[key] ?? {};
-        let total  = 0;
-        const vals = months.map(m => { const v = mObj[m] ?? 0; total += v; return v; });
-        return [t.metrics[key], ...vals, total];
+        const vals = months.map(m => mObj[m] ?? 0);
+        const avg  = avgMonths.reduce((s, m) => s + (mObj[m] ?? 0), 0) / (avgMonths.length || 1);
+        return [t.metrics[key], ...vals, avg.toFixed(1)];
       });
 
       const escape = v => `"${String(v).replace(/"/g,'""')}"`;

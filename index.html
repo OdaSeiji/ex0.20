@@ -371,7 +371,7 @@
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="openPage('press_daily_report.html')">
-          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <img class="menu-icon" src="./img/press_daily_report.svg" alt="" />
           <div class="menu-title" data-key="daily_report_title">押出日報入力</div>
           <div class="menu-desc" data-key="daily_report_desc">押出日報入力画面</div>
         </div>
@@ -479,18 +479,23 @@
     <div class="accordion-content">
       <div class="menu-row">
         <div class="menu-card" onclick="openPage('die_startup_report.html')">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <img class="menu-icon" src="./img/die_startup_report.svg" alt="" />
           <div class="menu-title" data-key="startup_report_title">金型立上実績</div>
           <div class="menu-desc" data-key="startup_report_desc">到着・型検・移管・試押の月別集計</div>
         </div>
         <div class="menu-card" onclick="openPage('machine_report.html')">
-          <img class="menu-icon" src="./img/factory.svg" alt="" />
+          <img class="menu-icon" src="./img/machine_report.svg" alt="" />
           <div class="menu-title" data-key="machine_report_title">設備稼働実績</div>
           <div class="menu-desc" data-key="machine_report_desc">設備別・月別の稼働時間と押出回数</div>
         </div>
+        <div class="menu-card" onclick="openPage('operation_report.html')">
+          <img class="menu-icon" src="./img/operation_report.svg" alt="" />
+          <div class="menu-title" data-key="operation_report_title">稼働日報</div>
+          <div class="menu-desc" data-key="operation_report_desc">1日の号機ごとの時間の使い方（持ち時間・押出・停止コード・記録なし）を、押出日報からまとめる</div>
+        </div>
         <div class="menu-card" onclick="openPage('extrusion_quantity_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="quantity_report_title">押出実績(t)</div>
+          <div class="menu-title" data-key="quantity_report_title">押出投入実績(t)</div>
           <div class="menu-desc" data-key="quantity_report_desc">押出種別・ビレットサイズ・製造工場別の月次投入重量</div>
         </div>
         <div class="menu-card" onclick="openPage('aging_rack_report.html')">
@@ -519,6 +524,11 @@
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="press_plan_title">押出計画</div>
           <div class="menu-desc" data-key="press_plan_desc">押出日・号機ごとに、押す金型とビレット本数を計画</div>
+        </div>
+        <div class="menu-card" onclick="openPage('operation_time.html')">
+          <img class="menu-icon" src="./img/shift.svg" alt="" />
+          <div class="menu-title" data-key="operation_time_title">持ち時間の入力</div>
+          <div class="menu-desc" data-key="operation_time_desc">1週間×号機で、設備を動かす時間（開始〜終了）と昼休みを入れる</div>
         </div>
       </div>
     </div>
@@ -664,7 +674,9 @@
           startup_report_desc: "到着・型検・移管・試押の月別集計",
           machine_report_title: "設備稼働実績",
           machine_report_desc: "設備別・月別の稼働時間と押出回数",
-          quantity_report_title: "押出実績(t)",
+          operation_report_title: "稼働日報",
+          operation_report_desc: "1日の号機ごとの時間の使い方（持ち時間・押出・停止コード・記録なし）を、押出日報からまとめる",
+          quantity_report_title: "押出投入実績(t)",
           quantity_report_desc: "押出種別・ビレットサイズ・製造工場別の月次投入重量",
           aging_rack_report_title: "時効ラック使用・解放",
           aging_rack_report_desc: "日別の使用ラック数と解放ラック数",
@@ -675,6 +687,8 @@
           order_sheet_title: "生産指示",
           press_plan_title: "押出計画",
           press_plan_desc: "押出日・号機ごとに、押す金型とビレット本数を計画",
+          operation_time_title: "持ち時間の入力",
+          operation_time_desc: "1週間×号機で、設備を動かす時間（開始〜終了）と昼休みを入れる",
           order_sheet_desc: "発注書の登録・実績・梱包状況の管理",
           billet_check_title: "ビレット在庫更新",
           billet_check_desc: "サイズごとに、材質・長さ別のビレットの在庫本数を記録",
@@ -774,7 +788,9 @@
           startup_report_desc: "Tổng hợp theo tháng: đến, KT, bàn giao, thử ép",
           machine_report_title: "Báo cáo hoạt động máy",
           machine_report_desc: "Giờ hoạt động & số lần ép theo máy và tháng",
-          quantity_report_title: "Báo cáo trọng lượng ép",
+          operation_report_title: "Báo cáo vận hành",
+          operation_report_desc: "Cách sử dụng thời gian trong ngày của từng máy (khả dụng, đùn, mã dừng, không ghi), tổng hợp từ báo cáo đùn",
+          quantity_report_title: "Thực tế nạp phôi đùn (t)",
           quantity_report_desc: "Trọng lượng theo tháng: Loại ép, kích thước phôi, nhà máy",
           aging_rack_report_title: "Giá hóa già: SD / GP",
           aging_rack_report_desc: "Số giá sử dụng và giải phóng theo ngày",
@@ -785,6 +801,8 @@
           order_sheet_title: "Chỉ thị sản xuất",
           press_plan_title: "Kế hoạch ép đùn",
           press_plan_desc: "Lập kế hoạch khuôn và số billet theo ngày ép và máy",
+          operation_time_title: "Nhập thời gian khả dụng",
+          operation_time_desc: "Nhập giờ chạy máy (bắt đầu〜kết thúc) và nghỉ trưa theo tuần × máy",
           order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
           billet_check_title: "Cập nhật tồn kho billet",
           billet_check_desc: "Ghi số lượng billet tồn kho theo cỡ, vật liệu và chiều dài",

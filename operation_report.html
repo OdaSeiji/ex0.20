@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Operation Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --ink-3: #8a8984; --grid: #e6e5e0;
+      --s-extrude: #2a78d6; --s-norecord: #c9c8c2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: var(--ink); }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; max-width: 1100px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .toolbar input[type=date] { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
+    .status-msg { font-size: 13px; color: #c62828; font-weight: bold; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 16px; }
+    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 14px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card-body { padding: 12px 14px; }
+
+    /* グラフ */
+    .overview { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+    .chart-col { width: 560px; flex-shrink: 0; }
+    .sums-col { flex: 1; min-width: 320px; max-width: 460px; display: flex; flex-direction: column; gap: 8px; }
+    .chart-wrap { position: relative; background: var(--surface); border-radius: 6px; padding: 8px 4px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--ink-2); margin: 8px 0 0 44px; }
+    .legend span { display: inline-flex; align-items: center; gap: 5px; }
+    .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .legend i.line { width: 3px; height: 14px; border-radius: 1px; background: var(--ink); }
+    svg text { font-family: "Segoe UI", sans-serif; }
+    .tip { position: absolute; pointer-events: none; background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 6px 10px; font-size: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); white-space: nowrap; display: none; z-index: 10; }
+    .tip b { font-family: "Roboto Mono", monospace; }
+
+    /* 号機ごとの内訳 */
+    .machines { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
+    .sum-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .sum-note { font-size: 11px; color: var(--ink-2); margin: 2px 0 0; }
+    .sum-note.warn { color: #e65100; }
+    .sum-table th, .sum-table td { border: 1px solid #333; padding: 3px 8px; }
+    .sum-table th { background: #bfe3f5; text-align: center; font-size: 13px; }
+    .sum-table td.n { text-align: right; font-family: "Roboto Mono", monospace; width: 90px; }
+    .sum-table td.sub { padding-left: 20px; color: var(--ink-2); }
+    .sum-table tr.strong td { font-weight: bold; }
+    .sum-table tr.warn td { color: #c62828; font-weight: bold; }
+    .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    .note { font-size: 12px; color: var(--ink-2); margin-bottom: 8px; }
+    .note.warn { color: #e65100; }
+    details { margin-top: 6px; font-size: 12px; }
+    summary { cursor: pointer; color: #0055a5; font-weight: bold; margin-bottom: 4px; }
+    .list { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .list th, .list td { border-bottom: 1px solid #e0e0e0; padding: 3px 5px; text-align: left; white-space: nowrap; }
+    .list th { background: #f5f9ff; font-size: 11px; }
+    .list td.mono { font-family: "Roboto Mono", monospace; }
+    .list td.code { white-space: normal; color: var(--ink-2); }
+    .gap-row td { color: #c62828; }
+    .hint { font-size: 12px; color: #777; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📊 稼働日報</h1>
+  <div class="subtitle" data-key="subtitle">押出日報（手入力）だけで、号機ごとの1日の時間の使い方をまとめます。持ち時間は「持ち時間の入力」の 開始〜終了 − 昼休み。日報に入っていない時間は「記録なし」になります。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-sub" id="btnPrev" data-key="btn_prev">← 前の日</button>
+    <input type="date" id="fDate" />
+    <button class="btn btn-sub" id="btnNext" data-key="btn_next">次の日 →</button>
+    <button class="btn btn-sub" onclick="location.href='operation_time.html'" data-key="btn_time">⏱ 持ち時間の入力</button>
+    <button class="btn btn-sub" onclick="location.href='press_coverage.html'" data-key="btn_coverage">📅 入力の確認</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span id="chartTitle"></span></div>
+    <div class="card-body overview">
+      <div class="chart-col">
+        <div class="chart-wrap" id="chartWrap"><svg id="chart" width="560"></svg><div class="tip" id="tip"></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="sums-col" id="sums"></div>
+    </div>
+  </div>
+
+  <div class="machines" id="machines"></div>
+  <div class="hint" data-key="hint">※ コードは日報に入力されたまま出します（700 押出は押出の全時間なので数えません）。「押出」＝ 日報の時間 − コードの時間。「記録なし」＝ 持ち時間 − 開始〜終了の中の日報の時間。「時間外」は 開始〜終了 の外の日報の時間です。</div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "📊 稼働日報",
+        subtitle: "押出日報（手入力）だけで、号機ごとの1日の時間の使い方をまとめます。持ち時間は「持ち時間の入力」の 開始〜終了 − 昼休み。日報に入っていない時間は「記録なし」になります。",
+        btn_back: "← 戻る", btn_prev: "← 前の日", btn_next: "次の日 →", btn_time: "⏱ 持ち時間の入力", btn_coverage: "📅 入力の確認",
+        hint: "※ コードは日報に入力されたまま出します（700 押出は押出の全時間なので数えません）。「押出」＝ 日報の時間 − コードの時間。「記録なし」＝ 持ち時間 − 開始〜終了の中の日報の時間。「時間外」は 開始〜終了 の外の日報の時間です。",
+        chart_title: "{date} 押出機 1・2・3号機の稼働時間（時間）",
+        machine: "{m}号機", extrude: "押出", no_record: "記録なし", available: "持ち時間", outside: "時間外",
+        reported: "日報の時間", dies: "金型数", setting: "{s}〜{e}{lunch}", with_lunch: "（昼休み 45分）",
+        no_setting: "持ち時間が入っていません（「持ち時間の入力」で入れてください）",
+        no_press: "日報がありません", plans: "押出計画 {n} 件",
+        holiday: "休み（押出計画も日報もありません）", holiday_short: "休み", inherited: "前の週から引き継ぎ",
+        list: "押出の一覧（{n}件）", gaps: "記録のすき間（{n}か所）",
+        col_die: "型番", col_time: "時刻", col_min: "分", col_codes: "コード",
+        gap: "記録なし", hours: "時間", min: "分",
+      },
+      vi: {
+        title: "📊 Báo cáo vận hành",
+        subtitle: "Tổng hợp cách sử dụng thời gian trong ngày của từng máy, chỉ từ báo cáo đùn (nhập tay). Thời gian khả dụng = bắt đầu〜kết thúc − nghỉ trưa trong \"Nhập thời gian khả dụng\". Thời gian không có trong báo cáo là \"Không ghi\".",
+        btn_back: "← Quay lại", btn_prev: "← Ngày trước", btn_next: "Ngày sau →", btn_time: "⏱ Nhập thời gian khả dụng", btn_coverage: "📅 Kiểm tra nhập",
+        hint: "※ Mã được hiển thị đúng như đã nhập trong báo cáo (700 Đùn là toàn bộ thời gian đùn nên không tính). \"Đùn\" = thời gian báo cáo − thời gian các mã. \"Không ghi\" = thời gian khả dụng − thời gian báo cáo trong khung bắt đầu〜kết thúc. \"Ngoài giờ\" là thời gian báo cáo nằm ngoài khung.",
+        chart_title: "{date} Thời gian vận hành máy đùn 1・2・3 (giờ)",
+        machine: "Máy {m}", extrude: "Đùn", no_record: "Không ghi", available: "Khả dụng", outside: "Ngoài giờ",
+        reported: "Thời gian báo cáo", dies: "Số khuôn", setting: "{s}〜{e}{lunch}", with_lunch: " (nghỉ trưa 45 phút)",
+        no_setting: "Chưa có thời gian khả dụng (hãy nhập ở \"Nhập thời gian khả dụng\")",
+        no_press: "Không có báo cáo", plans: "Kế hoạch đùn {n}",
+        holiday: "Nghỉ (không có kế hoạch đùn và báo cáo)", holiday_short: "Nghỉ", inherited: "kế thừa từ tuần trước",
+        list: "Danh sách lần đùn ({n})", gaps: "Khoảng trống ({n})",
+        col_die: "Mã khuôn", col_time: "Giờ", col_min: "Phút", col_codes: "Mã",
+        gap: "Không ghi", hours: "giờ", min: "phút",
+      },
+    };
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k];
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      render();
+    }
+
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const hours = (m) => (m / 60).toFixed(2);
+    const hm = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+
+    // コードの色：押出は青で固定。コードは 300（型交換）を橙に固定し、ほかは番号の小さい順に決まった順番で割り当てる
+    const CODE_COLORS = ["#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"];
+    const CODE_300 = "#eb6834";
+    const OTHER_COLOR = "#8a8984";
+    let data = null;
+
+    function codeColorMap() {
+      const codes = [...new Set(data.machines.flatMap(m => m.codes.map(c => c.code)))].sort((a, b) => a - b);
+      const map = {};
+      let i = 0;
+      codes.forEach(c => { map[c] = c === 300 ? CODE_300 : (CODE_COLORS[i++] ?? OTHER_COLOR); });
+      return map;
+    }
+    const codeLabel = (c) => `${c} ${data.code_names[c] ?? ""}`.trim();
+
+    async function load() {
+      document.getElementById("statusMsg").textContent = "";
+      try {
+        const res = await fetch(`./php/operation_report/get_day.php?date=${document.getElementById("fDate").value}`);
+        const d = await res.json();
+        if (!res.ok || d.error) throw new Error(d.error || res.statusText);
+        data = d;
+        render();
+      } catch (err) {
+        document.getElementById("statusMsg").textContent = err.message;
+      }
+    }
+
+    function render() {
+      if (!data) return;
+      const colors = codeColorMap();
+      document.getElementById("chartTitle").textContent = t("chart_title", { date: data.date });
+      renderLegend(colors);
+      renderChart(colors);
+      renderSums(colors);
+      renderMachines(colors);
+    }
+
+    function renderLegend(colors) {
+      const items = [[`background:var(--s-extrude)`, t("extrude")]]
+        .concat(Object.entries(colors).map(([c, col]) => [`background:${col}`, codeLabel(Number(c))]))
+        .concat([[`background:repeating-linear-gradient(45deg,var(--s-norecord) 0 3px,#eeede8 3px 6px)`, t("no_record")]]);
+      document.getElementById("legend").innerHTML = items.map(([st, label]) => `<span><i style="${st}"></i>${esc(label)}</span>`).join("")
+        + `<span><i class="line"></i>${t("available")}</span>`;
+    }
+
+    // 縦棒の積み上げ（Tan さんのグラフと同じ形）：1号機〜3号機を1本ずつ。下から 押出 → コード → 記録なし。持ち時間の高さに横線
+    function renderChart(colors) {
+      const svg = document.getElementById("chart");
+      const W = 560, H = 420, left = 44, right = 16, top = 16, bottom = 34;
+      const rows = data.machines;
+      const totalOf = (m) => m.reported + (m.no_record ?? 0);
+      const maxMin = Math.max(60, ...rows.map(m => Math.max(totalOf(m), m.available ?? 0)));
+      const maxH = Math.ceil(maxMin / 60 / 2) * 2;
+      const y = (min) => H - bottom - (min / 60) / maxH * (H - top - bottom);
+      const slot = (W - left - right) / rows.length, barW = Math.min(90, slot * 0.45);
+      let s = `<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="6" height="6" fill="#eeede8"/><rect width="3" height="6" fill="var(--s-norecord)"/></pattern></defs>`;
+      for (let h = 0; h <= maxH; h += 2) {
+        s += `<line x1="${left}" x2="${W - right}" y1="${y(h * 60)}" y2="${y(h * 60)}" stroke="var(--grid)" />`;
+        s += `<text x="${left - 8}" y="${y(h * 60) + 4}" font-size="11" fill="var(--ink-3)" text-anchor="end">${h.toFixed(1)}</text>`;
+      }
+      rows.forEach((m, i) => {
+        const cx = left + slot * (i + 0.5), x0 = cx - barW / 2;
+        s += `<text x="${cx}" y="${H - 12}" font-size="13" font-weight="bold" fill="var(--ink)" text-anchor="middle">${t("machine", { m: m.machine })}</text>`;
+        const segs = [{ label: t("extrude"), min: m.extruding, fill: "var(--s-extrude)" }]
+          .concat(m.codes.map(c => ({ label: codeLabel(c.code), min: c.minutes, fill: colors[c.code] })))
+          .concat(m.no_record ? [{ label: t("no_record"), min: m.no_record, fill: "url(#hatch)" }] : []);
+        let cur = 0;
+        segs.forEach(sg => {
+          if (sg.min <= 0) return;
+          const yTop = y(cur + sg.min), yBot = y(cur), h = Math.max(0, yBot - yTop - 2);
+          s += `<rect x="${x0}" y="${yTop}" width="${barW}" height="${h}" rx="3" fill="${sg.fill}" data-tip="${esc(t("machine", { m: m.machine }))}|${esc(sg.label)}|${sg.min}" class="seg" />`;
+          if (h > 15) s += `<text x="${cx}" y="${yTop + h / 2 + 4}" font-size="11" text-anchor="middle" fill="${sg.fill === "url(#hatch)" ? "var(--ink-2)" : "#fff"}" pointer-events="none">${hours(sg.min)}</text>`;
+          else s += `<text x="${x0 + barW + 4}" y="${yTop + h / 2 + 4}" font-size="10" fill="var(--ink-2)" pointer-events="none">${hours(sg.min)}</text>`;
+          cur += sg.min;
+        });
+        if (m.holiday) {
+          s += `<text x="${cx}" y="${y(0) - 8}" font-size="11" fill="var(--ink-3)" text-anchor="middle">${t("holiday_short")}</text>`;
+        } else if (m.available !== null) {
+          const ly = y(m.available);
+          s += `<line x1="${x0 - 8}" x2="${x0 + barW + 8}" y1="${ly}" y2="${ly}" stroke="var(--ink)" stroke-width="2" />`;
+          s += `<text x="${x0 + barW + 10}" y="${ly + 4}" font-size="10" fill="var(--ink-2)">${t("available")} ${hours(m.available)}</text>`;
+        } else if (!m.reported) {
+          s += `<text x="${cx}" y="${y(0) - 8}" font-size="11" fill="var(--ink-3)" text-anchor="middle">${t("no_press")}</text>`;
+        }
+      });
+      s += `<line x1="${left}" x2="${W - right}" y1="${y(0)}" y2="${y(0)}" stroke="var(--ink-3)" />`;
+      svg.setAttribute("height", H);
+      svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+      svg.innerHTML = s;
+    }
+
+    const tip = document.getElementById("tip");
+    document.getElementById("chart").addEventListener("mousemove", (e) => {
+      const r = e.target.closest("rect.seg");
+      if (!r) { tip.style.display = "none"; return; }
+      const [mc, label, min] = r.dataset.tip.split("|");
+      tip.innerHTML = `${esc(mc)}　${esc(label)}<br><b>${hours(Number(min))}</b> ${t("hours")}（${min} ${t("min")}）`;
+      const box = document.getElementById("chartWrap").getBoundingClientRect();
+      tip.style.left = `${e.clientX - box.left + 12}px`;
+      tip.style.top = `${e.clientY - box.top + 12}px`;
+      tip.style.display = "block";
+    });
+    document.getElementById("chart").addEventListener("mouseleave", () => tip.style.display = "none");
+
+    const swatch = (col) => `<span class="swatch" style="background:${col}"></span>`;
+    function settingNote(m) {
+      if (m.holiday) return `<div class="sum-note">${t("holiday")}</div>`;
+      if (m.setting && m.setting.end) {
+        const txt = t("setting", { s: m.setting.start, e: m.setting.end, lunch: m.setting.has_lunch ? t("with_lunch") : "" });
+        return `<div class="sum-note">${t("available")}：${esc(txt)}${m.setting.inherited ? `（${t("inherited")}）` : ""}</div>`;
+      }
+      return `<div class="sum-note warn">${t("no_setting")}</div>`;
+    }
+
+    // 右：号機ごとの表（Tan さんの表と同じ並び）
+    function renderSums(colors) {
+      document.getElementById("sums").innerHTML = data.machines.map(m => {
+        const row = (label, min, cls = "", sw = "") => `<tr class="${cls}"><td class="${cls.includes("sub") ? "sub" : ""}">${sw}${esc(label)}</td><td class="n">${min === null ? "－" : hours(min)}</td></tr>`;
+        return `<div>
+          <table class="sum-table">
+            <tr><th colspan="2">${t("machine", { m: m.machine })}　<span style="font-weight:normal;font-size:12px">${t("dies")} ${m.dies}</span></th></tr>
+            ${row(t("available"), m.available, "strong")}
+            ${row(t("reported"), m.reported, "strong")}
+            ${row(t("extrude"), m.extruding, "sub", swatch("var(--s-extrude)"))}
+            ${m.codes.map(c => row(codeLabel(c.code), c.minutes, "sub", swatch(colors[c.code]))).join("")}
+            ${row(t("no_record"), m.no_record, m.no_record ? "warn" : "")}
+            ${m.outside ? row(t("outside"), m.outside) : ""}
+          </table>
+          ${settingNote(m)}
+        </div>`;
+      }).join("");
+    }
+
+    // 下：号機ごとの押出の一覧と記録のすき間
+    function renderMachines(colors) {
+      document.getElementById("machines").innerHTML = data.machines.map(m => {
+        const pressRows = m.presses.map(p => `<tr>
+            <td class="mono">${esc(p.die_number)}</td><td class="mono">${p.start ?? ""}–${p.end ?? ""}</td><td class="mono">${p.minutes}</td>
+            <td class="code">${p.codes.map(c => `${swatch(colors[c.code])}${c.code} ${c.start}–${c.end}（${c.minutes}${t("min")}）${c.note ? " " + esc(c.note) : ""}`).join("<br>")}</td></tr>`).join("");
+        const gapRows = m.gaps.map(g => `<tr class="gap-row"><td>${t("gap")}</td><td class="mono">${g.start}–${g.end}</td><td class="mono">${g.minutes}</td><td></td></tr>`).join("");
+        return `<div class="card">
+          <div class="card-header"><span>${t("machine", { m: m.machine })}</span><span style="font-weight:normal;font-size:12px">${t("plans", { n: m.plans })}</span></div>
+          <div class="card-body">
+            ${m.presses.length ? `<details open><summary>${t("list", { n: m.presses.length })}</summary>
+              <table class="list"><thead><tr><th>${t("col_die")}</th><th>${t("col_time")}</th><th>${t("col_min")}</th><th>${t("col_codes")}</th></tr></thead><tbody>${pressRows}</tbody></table></details>`
+              : `<div class="note">${m.holiday ? t("holiday") : t("no_press")}</div>`}
+            ${m.gaps.length ? `<details><summary>${t("gaps", { n: m.gaps.length })}</summary>
+              <table class="list"><tbody>${gapRows}</tbody></table></details>` : ""}
+          </div>
+        </div>`;
+      }).join("");
+    }
+
+    function shiftDay(n) {
+      const d = new Date(document.getElementById("fDate").value + "T00:00:00");
+      d.setDate(d.getDate() + n);
+      document.getElementById("fDate").value = ymd(d);
+      load();
+    }
+    document.getElementById("btnPrev").onclick = () => shiftDay(-1);
+    document.getElementById("btnNext").onclick = () => shiftDay(1);
+    document.getElementById("fDate").addEventListener("change", load);
+
+    const qDate = new URLSearchParams(location.search).get("date");
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    document.getElementById("fDate").value = /^\d{4}-\d{2}-\d{2}$/.test(qDate || "") ? qDate : ymd(y);
+    setLang(currentLang);
+    load();
+  </script>
+</body>
+</html>
