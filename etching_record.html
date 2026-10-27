@@ -15,6 +15,7 @@
       background: #fff; border-radius: 5px; cursor: pointer; font-size: 13px;
     }
     .lang-buttons button.active { background: #0078d4; color: #fff; }
+    .lang-buttons .btn-help { background: #fff8e1; border-color: #ffb300; color: #8a5a00; font-weight: bold; margin-right: 8px; }
 
     h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
     .subtitle { font-size: 13px; color: #777; margin-bottom: 12px; padding-left: 16px; }
@@ -35,14 +36,16 @@
     .card-body { padding: 12px; }
 
     /* 左：押出の一覧 */
-    .left { width: 560px; flex-shrink: 0; }
+    .left { width: 680px; flex-shrink: 0; }
     .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
     .filters input { padding: 8px 10px; border: 1px solid #aac4e8; border-radius: 6px; font-size: 15px; width: 160px; }
     .seg { display: inline-flex; border: 1px solid #0078d4; border-radius: 6px; overflow: hidden; }
     .seg button { padding: 8px 14px; border: none; background: #fff; color: #0078d4; font-size: 14px; font-weight: bold; cursor: pointer; }
     .seg button + button { border-left: 1px solid #0078d4; }
     .seg button.active { background: #0078d4; color: #fff; }
-    .list-wrap { max-height: calc(100vh - 240px); overflow: auto; }
+    .list-wrap { max-height: calc(100vh - 240px); overflow: auto; }   /* 広い画面では下の .layout.fit で高さを決める */
+    .list-wrap table { font-size: 15px; }
+    .list-wrap th { font-size: 13px; }
     .hint { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.5; }
 
     table { border-collapse: collapse; width: 100%; font-size: 13px; }
@@ -64,7 +67,7 @@
     .fin-4 { background: #fff59d; color: #6d5d00; }
 
     /* 右：選んだ押出 */
-    .right { flex: 1; min-width: 0; }
+    .right { flex: 0 1 1060px; min-width: 0; }   /* 広い画面でも伸ばしすぎない（状態のボタンが約200px） */
     .placeholder { padding: 40px; text-align: center; color: #999; }
     .btn-to-list { display: none; }
     .press-info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; margin-bottom: 12px; }
@@ -94,7 +97,7 @@
     .sums b { font-family: "Roboto Mono", monospace; font-size: 15px; margin-left: 4px; }
     .sums .hot { background: #ffebee; color: #c62828; }
 
-    .data-wrap { max-height: calc(100vh - 250px); overflow: auto; }
+    .data-wrap { max-height: calc(100vh - 250px); overflow: auto; }   /* 広い画面では下の .layout.fit で高さを決める */
     #dataTable { width: auto; }
     #dataTable td { padding: 3px; }
     #dataTable td.pos { font-family: "Roboto Mono", monospace; font-weight: bold; font-size: 15px; padding: 3px 10px; }
@@ -128,10 +131,16 @@
       .list-wrap { max-height: none; }
       .data-wrap { max-height: none; }
     }
+    /* 左右のカードを画面の下端までの同じ高さに固定し、表の部分だけが残りの高さを使う（fitHeights() が .fit を付ける） */
+    .layout.fit > .left, .layout.fit > .right > .card { height: var(--fit-h); display: flex; flex-direction: column; }
+    .layout.fit .card-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .layout.fit .card-body > * { flex-shrink: 0; }
+    .layout.fit .list-wrap, .layout.fit .data-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
   </style>
 </head>
 <body>
   <div class="lang-buttons">
+    <button class="btn-help" onclick="location.href='etching_record_help.html'" data-key="btn_help">❓ 使い方</button>
     <button id="btnJa" onclick="setLang('ja')">日本語</button>
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
   </div>
@@ -190,7 +199,7 @@
       ja: {
         title: "🧪 エッチング評価記録",
         subtitle: "押出を選び、サンプル位置ごとにエッチングの判定を押して入れます。押すたびに保存されます。",
-        btn_back: "← 戻る", btn_to_list: "← 一覧へ",
+        btn_back: "← 戻る", btn_to_list: "← 一覧へ", btn_help: "❓ 使い方",
         list_title: "押出の一覧",
         ph_die: "型番で検索",
         st_all: "すべて", st_open: "未完了", st_done: "完了",
@@ -223,7 +232,7 @@
       vi: {
         title: "🧪 Ghi kết quả etching",
         subtitle: "Chọn lần đùn, bấm kết quả etching cho từng vị trí mẫu. Mỗi lần bấm sẽ được lưu ngay.",
-        btn_back: "← Quay lại", btn_to_list: "← Danh sách",
+        btn_back: "← Quay lại", btn_to_list: "← Danh sách", btn_help: "❓ Hướng dẫn",
         list_title: "Danh sách lần đùn",
         ph_die: "Tìm mã khuôn",
         st_all: "Tất cả", st_open: "Chưa HT", st_done: "Đã HT",
@@ -504,7 +513,20 @@
           </div>
         </div>`;
       renderSums();
+      fitHeights();
     }
+
+    // 左右のカードを、画面の下端までの同じ高さに固定する。はみ出す分は表の中でスクロール
+    function fitHeights() {
+      const layout = document.querySelector(".layout");
+      if (window.matchMedia("(max-width: 1100px)").matches) { layout.classList.remove("fit"); return; }   // 狭い画面では一覧と記録の切り替えなので固定しない
+      const bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+      const h = Math.max(400, window.innerHeight - (layout.getBoundingClientRect().top + window.scrollY) - bottomPad);
+      layout.style.setProperty("--fit-h", h + "px");
+      layout.classList.add("fit");
+    }
+    window.addEventListener("resize", fitHeights);
+    window.addEventListener("load", fitHeights);
 
     /* ---------- 押出ごとの項目：変えたらすぐ保存 ---------- */
     async function saveInfo() {

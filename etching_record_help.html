@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Etching Record Help</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 16px; color: #222; line-height: 1.7; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 8px 14px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 13px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    .page { max-width: 980px; margin: 0 auto; }
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 14px; color: #666; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-main { background: #0078d4; color: #fff; }
+
+    .toc { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .toc a { background: #fff; border: 1px solid #aac4e8; border-radius: 16px; padding: 4px 12px; font-size: 13px; color: #0055a5; text-decoration: none; }
+    .toc a:hover { background: #e8f1ff; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 16px; scroll-margin-top: 12px; }
+    .card-header { background: #e8f1ff; padding: 10px 14px; font-size: 16px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; }
+    .card-body { padding: 14px 16px; font-size: 15px; }
+    .card-body p + p { margin-top: 8px; }
+
+    /* 手順 */
+    .steps { list-style: none; counter-reset: step; }
+    .steps > li { counter-increment: step; position: relative; padding: 10px 0 10px 46px; border-bottom: 1px dashed #dde3ea; }
+    .steps > li:last-child { border-bottom: none; }
+    .steps > li::before {
+      content: counter(step); position: absolute; left: 0; top: 10px;
+      width: 32px; height: 32px; border-radius: 50%; background: #0078d4; color: #fff;
+      font-weight: bold; text-align: center; line-height: 32px;
+    }
+    .steps b.t { display: block; font-size: 16px; }
+    .steps .sub { color: #555; font-size: 14px; margin-top: 2px; }
+    .steps ul { margin: 4px 0 0 20px; font-size: 14px; color: #444; }
+
+    .note { background: #fff8e1; border-left: 4px solid #ffb300; padding: 8px 12px; font-size: 14px; margin-top: 10px; border-radius: 4px; }
+
+    /* 画面の見本（本物の画面と同じ見た目） */
+    .demo { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 6px 0; }
+    .cell { display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 38px; border: 1px solid #ccd; border-radius: 6px; background: #fafafa; font-size: 14px; font-weight: bold; color: #bbb; }
+    .cell.j1 { background: #e8f5e9; color: #2e7d32; border-color: #a5d6a7; }
+    .cell.j2 { background: #e53935; color: #fff; border-color: #c62828; }
+    .cell.j5 { background: #2e7d32; color: #fff; border-color: #1b5e20; }
+    .fin-btn { padding: 6px 14px; border: 2px solid #ccd; border-radius: 6px; background: #fff; font-size: 13px; font-weight: bold; color: #555; }
+    .fin-btn.active { border-color: #0078d4; background: #0078d4; color: #fff; }
+    .fin { display: inline-block; border-radius: 4px; padding: 1px 6px; font-size: 12px; font-weight: bold; white-space: nowrap; }
+    .fin-0 { background: #ffe0b2; color: #e65100; }
+    .fin-1 { background: #c8e6c9; color: #1b5e20; }
+    .fin-2 { background: #ffcdd2; color: #b71c1c; }
+    .fin-3 { background: #f8bbd0; color: #880e4f; }
+    .fin-4 { background: #fff59d; color: #6d5d00; }
+
+    /* 再検査の例 */
+    .round-demo { border-collapse: collapse; margin: 8px 0; }
+    .round-demo th { background: #e8f1ff; font-size: 12px; padding: 4px 8px; }
+    .round-demo td { padding: 3px; }
+    .round-demo td.pos { font-family: "Roboto Mono", monospace; font-weight: bold; padding: 3px 10px; }
+
+    /* 画面の配置図 */
+    .layout-demo { display: flex; gap: 8px; margin: 8px 0; font-size: 13px; }
+    .layout-demo > div { border: 2px solid #aac4e8; border-radius: 8px; padding: 8px 10px; background: #fbfdff; }
+    .layout-demo .l { width: 38%; }
+    .layout-demo .r { flex: 1; }
+    .layout-demo .r div { border: 1px dashed #aac4e8; border-radius: 6px; padding: 4px 8px; margin-top: 6px; background: #fff; }
+    .layout-demo b { color: #0055a5; }
+
+    table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 4px; }
+    .tbl th, .tbl td { border-bottom: 1px solid #e0e0e0; padding: 7px 8px; text-align: left; vertical-align: top; }
+    .tbl th { background: #e8f1ff; font-size: 13px; white-space: nowrap; }
+    .tbl td:first-child { white-space: nowrap; }
+    .code { font-family: "Roboto Mono", monospace; font-weight: bold; }
+
+    .faq dt { font-weight: bold; margin-top: 10px; }
+    .faq dt::before { content: "Q. "; color: #0078d4; }
+    .faq dd { margin-left: 22px; font-size: 14px; color: #444; }
+
+    /* 言語：日本語・ベトナム語の文をそれぞれ書き、選んだほうだけ出す */
+    html[lang="ja"] [data-lang="vi"], html[lang="vi"] [data-lang="ja"] { display: none !important; }
+
+    @media (max-width: 700px) {
+      .layout-demo { flex-direction: column; }
+      .layout-demo .l { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <div class="page">
+    <h1><span data-lang="ja">❓ エッチング評価記録の使い方</span><span data-lang="vi">❓ Hướng dẫn ghi kết quả etching</span></h1>
+    <div class="subtitle">
+      <span data-lang="ja">押出ごとに、サンプル位置の継ぎ目（溶着ライン）をエッチングで確かめ、その判定を記録する画面です。</span>
+      <span data-lang="vi">Màn hình ghi kết quả kiểm tra etching mối nối (đường hàn) tại từng vị trí mẫu của mỗi lần đùn.</span>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-main" onclick="location.href='etching_record.html'">
+        <span data-lang="ja">← エッチング評価記録へ</span><span data-lang="vi">← Về màn hình ghi etching</span>
+      </button>
+    </div>
+
+    <nav class="toc">
+      <a href="#s-layout"><span data-lang="ja">画面の見方</span><span data-lang="vi">Bố cục màn hình</span></a>
+      <a href="#s-steps"><span data-lang="ja">入力の手順</span><span data-lang="vi">Các bước nhập</span></a>
+      <a href="#s-judge"><span data-lang="ja">判定の種類</span><span data-lang="vi">Các loại kết quả</span></a>
+      <a href="#s-retest"><span data-lang="ja">再検査（Lần 1〜4）</span><span data-lang="vi">Kiểm tra lại (Lần 1〜4)</span></a>
+      <a href="#s-status"><span data-lang="ja">状態</span><span data-lang="vi">Trạng thái</span></a>
+      <a href="#s-faq"><span data-lang="ja">困ったとき</span><span data-lang="vi">Khi gặp vấn đề</span></a>
+    </nav>
+
+    <!-- 大事なこと -->
+    <div class="card">
+      <div class="card-header"><span data-lang="ja">⭐ はじめに：保存ボタンはありません</span><span data-lang="vi">⭐ Lưu ý: Không có nút "Lưu"</span></div>
+      <div class="card-body">
+        <p data-lang="ja">判定・日付・担当者・状態は、<b>押したり選んだりしたときにすぐ保存</b>されます。右上に「✓ 保存しました」と出れば保存できています。赤い文字で「保存できませんでした」と出たときは、もう一度押してください。</p>
+        <p data-lang="vi">Kết quả, ngày, người check, trạng thái <b>được lưu ngay khi bấm hoặc chọn</b>. Nếu góc trên bên phải hiện "✓ Đã lưu" là đã lưu xong. Nếu hiện chữ đỏ "Không lưu được", hãy bấm lại.</p>
+      </div>
+    </div>
+
+    <!-- 画面の見方 -->
+    <div class="card" id="s-layout">
+      <div class="card-header"><span data-lang="ja">1. 画面の見方</span><span data-lang="vi">1. Bố cục màn hình</span></div>
+      <div class="card-body">
+        <div class="layout-demo">
+          <div class="l">
+            <b data-lang="ja">左：押出の一覧</b><b data-lang="vi">Trái: Danh sách lần đùn</b><br />
+            <span data-lang="ja">型番で検索／未完了・完了・すべて で絞り込み。行を押すと右に記録が出ます。</span>
+            <span data-lang="vi">Tìm theo mã khuôn / lọc Chưa HT・Đã HT・Tất cả. Bấm vào dòng để mở bên phải.</span>
+          </div>
+          <div class="r">
+            <b data-lang="ja">右：選んだ押出の記録</b><b data-lang="vi">Phải: Kết quả của lần đùn đã chọn</b>
+            <div><span data-lang="ja">押出の情報（押出日・号機・型番・品番・nBn など）</span><span data-lang="vi">Thông tin lần đùn (ngày đùn, máy, mã khuôn, mã SP, nBn…)</span></div>
+            <div><span data-lang="ja">状態・エッチングの日・担当者・確認者・メモ・写真</span><span data-lang="vi">Trạng thái, ngày ngâm, người check, xác nhận, ghi chú, ảnh</span></div>
+            <div><span data-lang="ja">位置ごとの判定の表（Lần 0〜4）</span><span data-lang="vi">Bảng kết quả theo vị trí (Lần 0〜4)</span></div>
+          </div>
+        </div>
+        <table class="tbl">
+          <tr><th data-lang="ja">一覧の列</th><th data-lang="vi">Cột danh sách</th><th data-lang="ja">意味</th><th data-lang="vi">Ý nghĩa</th></tr>
+          <tr><td data-lang="ja">位置</td><td data-lang="vi">Vị trí</td><td data-lang="ja">記録を作ったサンプル位置の数（空なら、まだ記録を始めていない）</td><td data-lang="vi">Số vị trí mẫu đã tạo (trống = chưa bắt đầu ghi)</td></tr>
+          <tr><td>NG</td><td data-lang="ja">どこかの回（Lần）で NG になった位置の数</td><td data-lang="vi">Số vị trí bị NG ở một lần (Lần) nào đó</td></tr>
+          <tr><td data-lang="ja">実施日</td><td data-lang="vi">Ngày ngâm</td><td data-lang="ja">エッチングの日（月-日）</td><td data-lang="vi">Ngày ngâm etching (tháng-ngày)</td></tr>
+          <tr><td data-lang="ja">状態</td><td data-lang="vi">Trạng thái</td><td data-lang="ja">右の「状態」で選んだもの（<a href="#s-status">5. 状態</a>）</td><td data-lang="vi">Trạng thái đã chọn bên phải (<a href="#s-status">5. Trạng thái</a>)</td></tr>
+        </table>
+        <div class="note">
+          <span data-lang="ja">一覧には新しい押出から350件まで出ます（種別「〇」の押出は出ません）。古い押出は型番で検索してください。</span>
+          <span data-lang="vi">Danh sách hiện tối đa 350 lần đùn mới nhất (không hiện kiểu "〇"). Lần đùn cũ hãy tìm theo mã khuôn.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 手順 -->
+    <div class="card" id="s-steps">
+      <div class="card-header"><span data-lang="ja">2. 入力の手順</span><span data-lang="vi">2. Các bước nhập</span></div>
+      <div class="card-body">
+        <ol class="steps">
+          <li>
+            <b class="t" data-lang="ja">左の一覧で押出を選ぶ</b><b class="t" data-lang="vi">Chọn lần đùn ở danh sách bên trái</b>
+            <div class="sub" data-lang="ja">まだ終わっていない押出は「未完了」に出ます。型番の一部を入れて探すこともできます。</div>
+            <div class="sub" data-lang="vi">Lần đùn chưa xong nằm ở "Chưa HT". Có thể nhập một phần mã khuôn để tìm.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">はじめての押出は「記録を始める」を押す</b><b class="t" data-lang="vi">Lần đùn mới: bấm "Bắt đầu ghi"</b>
+            <div class="sub" data-lang="ja">押出指示書の nBn・穴の数・ビレット本数から、サンプル位置（1H、1E、2H…）が自動で作られます。<b>Lần 0 は全部 OK</b> で作られるので、NG の位置だけ直せば済みます。</div>
+            <div class="sub" data-lang="vi">Các vị trí mẫu (1H, 1E, 2H…) được tạo tự động từ nBn, số lỗ, số billet trong phiếu đùn. <b>Lần 0 được tạo sẵn là OK</b>, chỉ cần sửa các vị trí NG.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">エッチングの日・担当者・確認者を入れる</b><b class="t" data-lang="vi">Nhập ngày ngâm, người check, người xác nhận</b>
+            <div class="sub" data-lang="ja">「今日」を押すと今日の日付が入ります。未来の日付は入れられません。</div>
+            <div class="sub" data-lang="vi">Bấm "Hôm nay" để nhập ngày hôm nay. Không nhập được ngày trong tương lai.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">NG の位置のマスを押して、判定を選ぶ</b><b class="t" data-lang="vi">Bấm vào ô của vị trí NG và chọn kết quả</b>
+            <div class="demo">
+              <span class="cell j1">OK</span> →
+              <span class="cell j2">320</span>
+            </div>
+            <div class="sub" data-lang="ja">マスを押すと判定のボタンが大きく出ます（<a href="#s-judge">3. 判定の種類</a>）。押し間違えたら、もう一度そのマスを押して選び直してください。</div>
+            <div class="sub" data-lang="vi">Bấm vào ô sẽ hiện các nút kết quả lớn (<a href="#s-judge">3. Các loại kết quả</a>). Nếu bấm nhầm, bấm lại ô đó và chọn lại.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">NG が出たら再検査して、右の列（Lần 1〜）に入れる</b><b class="t" data-lang="vi">Nếu NG thì kiểm tra lại và nhập vào cột bên phải (Lần 1〜)</b>
+            <div class="sub" data-lang="ja">くわしくは <a href="#s-retest">4. 再検査</a>。</div>
+            <div class="sub" data-lang="vi">Chi tiết xem <a href="#s-retest">4. Kiểm tra lại</a>.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">写真を付ける（あれば）</b><b class="t" data-lang="vi">Đính kèm ảnh (nếu có)</b>
+            <div class="sub" data-lang="ja">「📷 写真を撮る・選ぶ」で、タブレットのカメラで撮るか、保存した写真を選びます。1つの押出に1枚で、もう一度撮ると<b>前の写真と入れ替わります</b>。小さい写真を押すと大きく見られます。</div>
+            <div class="sub" data-lang="vi">Bấm "📷 Chụp / chọn ảnh" để chụp bằng camera máy tính bảng hoặc chọn ảnh đã lưu. Mỗi lần đùn 1 ảnh, chụp lại sẽ <b>thay ảnh cũ</b>. Bấm vào ảnh nhỏ để xem lớn.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">終わったら「状態」を「完了」にする</b><b class="t" data-lang="vi">Xong thì chọn trạng thái "Đã HT"</b>
+            <div class="demo">
+              <span class="fin-btn" data-lang="ja">未完了</span><span class="fin-btn" data-lang="vi">Chưa HT</span>
+              <span class="fin-btn" data-lang="ja">エッチング中</span><span class="fin-btn" data-lang="vi">Đang ngâm</span>
+              <span class="fin-btn active" data-lang="ja">完了</span><span class="fin-btn active" data-lang="vi">Đã HT</span>
+            </div>
+            <div class="sub" data-lang="ja">「完了」にすると、一覧の「未完了」から消えます（「完了」「すべて」で見られます）。</div>
+            <div class="sub" data-lang="vi">Khi chọn "Đã HT", lần đùn sẽ biến mất khỏi "Chưa HT" (xem được ở "Đã HT", "Tất cả").</div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- 判定 -->
+    <div class="card" id="s-judge">
+      <div class="card-header"><span data-lang="ja">3. 判定の種類</span><span data-lang="vi">3. Các loại kết quả</span></div>
+      <div class="card-body">
+        <table class="tbl">
+          <tr><th data-lang="ja">マスの表示</th><th data-lang="vi">Hiển thị</th><th data-lang="ja">ボタン</th><th data-lang="vi">Nút</th><th data-lang="ja">意味</th><th data-lang="vi">Ý nghĩa</th></tr>
+          <tr><td><span class="cell j1">OK</span></td><td>OK</td><td data-lang="ja">問題なし</td><td data-lang="vi">Không có lỗi</td></tr>
+          <tr><td><span class="cell j2">311</span></td><td class="code">NG 311</td><td data-lang="ja">エッチング不良</td><td data-lang="vi">Lỗi ăn mòn</td></tr>
+          <tr><td><span class="cell j2">319</span></td><td class="code">NG 319</td><td data-lang="ja">不純物</td><td data-lang="vi">Lỗi tạp chất</td></tr>
+          <tr><td><span class="cell j2">320</span></td><td class="code">NG 320</td><td data-lang="ja">溶着ライン</td><td data-lang="vi">Lỗi vết nứt (đường hàn)</td></tr>
+          <tr><td><span class="cell j2">351</span></td><td class="code">NG 351</td><td data-lang="ja">その他の不良</td><td data-lang="vi">Lỗi khác</td></tr>
+          <tr><td><span class="cell j2">NG</span></td><td class="code">NG</td><td data-lang="ja">NG だが、不良コードを決められないとき</td><td data-lang="vi">NG nhưng không xác định được mã lỗi</td></tr>
+          <tr><td><span class="cell j5">BH</span></td><td class="code">BH</td><td data-lang="ja">製品を捨てた</td><td data-lang="vi">Bỏ hàng</td></tr>
+          <tr><td><span class="cell">－</span></td><td data-lang="ja">空欄</td><td data-lang="vi">Trống</td><td data-lang="ja">検査していない（間違えて入れた判定を消すときもこれ）</td><td data-lang="vi">Chưa kiểm tra (cũng dùng để xóa kết quả nhập nhầm)</td></tr>
+        </table>
+        <div class="note">
+          <span data-lang="ja">マスの上の「311 エッチング不良 0」「NG の位置 2」などは、この押出の NG の数です。NG があると赤くなります。</span>
+          <span data-lang="vi">Các ô "311 Lỗi ăn mòn 0", "Vị trí NG 2"… phía trên bảng là số NG của lần đùn này. Có NG thì hiện màu đỏ.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 再検査 -->
+    <div class="card" id="s-retest">
+      <div class="card-header"><span data-lang="ja">4. 再検査（Lần 1〜4）</span><span data-lang="vi">4. Kiểm tra lại (Lần 1〜4)</span></div>
+      <div class="card-body">
+        <p data-lang="ja">ある位置で NG が出たら、その製品を捨て、<b>次の製品の同じ位置</b>をもう一度検査します。その結果を同じ行の右隣の列に入れます。Lần 0 が最初の検査、Lần 1〜4 が再検査です。</p>
+        <p data-lang="vi">Nếu một vị trí bị NG, bỏ sản phẩm đó và kiểm tra lại <b>cùng vị trí ở sản phẩm tiếp theo</b>. Nhập kết quả vào cột bên phải trên cùng dòng. Lần 0 là lần kiểm tra đầu, Lần 1〜4 là kiểm tra lại.</p>
+        <table class="round-demo">
+          <tr><th data-lang="ja">位置</th><th data-lang="vi">Vị trí</th><th>Lần 0</th><th>Lần 1</th><th>Lần 2</th><th>Lần 3</th><th>Lần 4</th></tr>
+          <tr><td class="pos">4E</td><td><span class="cell j1">OK</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td></tr>
+          <tr><td class="pos">5H</td><td><span class="cell j2">320</span></td><td><span class="cell j1">OK</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td></tr>
+          <tr><td class="pos">5E</td><td><span class="cell j2">320</span></td><td><span class="cell j2">320</span></td><td><span class="cell j1">OK</span></td><td><span class="cell">－</span></td><td><span class="cell">－</span></td></tr>
+        </table>
+        <p class="sub" data-lang="ja">例：5H は1回目が 320（溶着ライン）、再検査で OK。5E は再検査でも NG で、2回目の再検査で OK。</p>
+        <p class="sub" data-lang="vi">Ví dụ: 5H lần đầu 320 (đường hàn), kiểm tra lại OK. 5E kiểm tra lại vẫn NG, lần kiểm tra lại thứ 2 thì OK.</p>
+      </div>
+    </div>
+
+    <!-- 状態 -->
+    <div class="card" id="s-status">
+      <div class="card-header"><span data-lang="ja">5. 状態</span><span data-lang="vi">5. Trạng thái</span></div>
+      <div class="card-body">
+        <table class="tbl">
+          <tr><th data-lang="ja">状態</th><th data-lang="vi">Trạng thái</th><th data-lang="ja">いつ選ぶか</th><th data-lang="vi">Khi nào chọn</th><th data-lang="ja">一覧のタブ</th><th data-lang="vi">Tab danh sách</th></tr>
+          <tr><td><span class="fin fin-0" data-lang="ja">未完了</span><span class="fin fin-0" data-lang="vi">Chưa HT</span></td><td data-lang="ja">まだ始めていない（最初はこれ）</td><td data-lang="vi">Chưa bắt đầu (mặc định)</td><td data-lang="ja">未完了</td><td data-lang="vi">Chưa HT</td></tr>
+          <tr><td><span class="fin fin-4" data-lang="ja">エッチング中</span><span class="fin fin-4" data-lang="vi">Đang ngâm</span></td><td data-lang="ja">途中まで入れた・再検査待ち</td><td data-lang="vi">Đã nhập một phần / đang chờ kiểm tra lại</td><td data-lang="ja">未完了</td><td data-lang="vi">Chưa HT</td></tr>
+          <tr><td><span class="fin fin-1" data-lang="ja">完了</span><span class="fin fin-1" data-lang="vi">Đã HT</span></td><td data-lang="ja">全部の位置の判定が終わった</td><td data-lang="vi">Đã có kết quả tất cả vị trí</td><td data-lang="ja">完了</td><td data-lang="vi">Đã HT</td></tr>
+          <tr><td><span class="fin fin-2" data-lang="ja">製品を捨てた</span><span class="fin fin-2" data-lang="vi">Bỏ hàng</span></td><td data-lang="ja">押出材を捨てたので、検査しない</td><td data-lang="vi">Đã bỏ thanh đùn nên không kiểm tra</td><td data-lang="ja">完了</td><td data-lang="vi">Đã HT</td></tr>
+          <tr><td><span class="fin fin-3" data-lang="ja">エッチングしない</span><span class="fin fin-3" data-lang="vi">Không ngâm</span></td><td data-lang="ja">この押出はエッチングの対象ではない</td><td data-lang="vi">Lần đùn này không cần etching</td><td data-lang="ja">完了</td><td data-lang="vi">Đã HT</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 困ったとき -->
+    <div class="card" id="s-faq">
+      <div class="card-header"><span data-lang="ja">6. 困ったとき</span><span data-lang="vi">6. Khi gặp vấn đề</span></div>
+      <div class="card-body">
+        <dl class="faq" data-lang="ja">
+          <dt>「位置を作れません」と出る</dt>
+          <dd>押出指示書の nBn・穴の数、またはビレット本数が入っていません。押出指示書を確かめてください。</dd>
+          <dt>判定を押し間違えた</dt>
+          <dd>同じマスをもう一度押して、正しい判定を選び直してください。消したいときは「空欄」です。</dd>
+          <dt>「保存できませんでした」と赤く出た</dt>
+          <dd>ネットワークを確かめて、もう一度押してください。保存できなかったマスは元の表示に戻ります。</dd>
+          <dt>押出が一覧に出ない</dt>
+          <dd>「すべて」を押す、または型番で検索してください。完了にした押出は「未完了」には出ません。種別「〇」の押出は出ません。</dd>
+          <dt>タブレットを縦にしたら一覧が消えた</dt>
+          <dd>画面が狭いときは、一覧と記録を切り替えて出します。記録の左上の「← 一覧へ」で一覧に戻れます。</dd>
+          <dt>表が長くて下が見えない</dt>
+          <dd>表の中を上下にスクロールしてください（表の右側にスクロールバーがあります）。</dd>
+        </dl>
+        <dl class="faq" data-lang="vi">
+          <dt>Hiện "không tạo được vị trí"</dt>
+          <dd>Phiếu đùn chưa có nBn, số lỗ hoặc số billet. Hãy kiểm tra phiếu đùn.</dd>
+          <dt>Bấm nhầm kết quả</dt>
+          <dd>Bấm lại ô đó và chọn lại kết quả đúng. Muốn xóa thì chọn "Trống".</dd>
+          <dt>Hiện chữ đỏ "Không lưu được"</dt>
+          <dd>Kiểm tra mạng rồi bấm lại. Ô không lưu được sẽ trở về như cũ.</dd>
+          <dt>Không thấy lần đùn trong danh sách</dt>
+          <dd>Bấm "Tất cả" hoặc tìm theo mã khuôn. Lần đùn đã "Đã HT" không hiện ở "Chưa HT". Lần đùn kiểu "〇" không hiện.</dd>
+          <dt>Xoay dọc máy tính bảng thì mất danh sách</dt>
+          <dd>Khi màn hình hẹp, danh sách và kết quả hiện luân phiên. Bấm "← Danh sách" ở góc trên bên trái để quay lại.</dd>
+          <dt>Bảng dài, không thấy phía dưới</dt>
+          <dd>Cuộn lên xuống bên trong bảng (thanh cuộn ở bên phải bảng).</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+    }
+    let lang = "ja";
+    try { lang = localStorage.getItem("lang") || "ja"; } catch (e) {}
+    setLang(lang === "vi" ? "vi" : "ja");
+  </script>
+</body>
+</html>

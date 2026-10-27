@@ -14,6 +14,7 @@
       background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
     }
     .lang-buttons button.active { background: #0078d4; color: #fff; }
+    .lang-buttons .btn-help { background: #fff8e1; border-color: #ffb300; color: #8a5a00; font-weight: bold; margin-right: 8px; }
 
     h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
     .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
@@ -34,14 +35,17 @@
     .card-body { padding: 12px; }
 
     /* 左：押出の一覧 */
-    .left { width: 520px; flex-shrink: 0; }
+    .left { width: 680px; flex-shrink: 0; }
     .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
     .filters input { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; width: 150px; }
     .seg { display: inline-flex; border: 1px solid #0078d4; border-radius: 5px; overflow: hidden; }
     .seg button { padding: 5px 12px; border: none; background: #fff; color: #0078d4; font-size: 13px; font-weight: bold; cursor: pointer; }
     .seg button + button { border-left: 1px solid #0078d4; }
     .seg button.active { background: #0078d4; color: #fff; }
-    .list-wrap { max-height: calc(100vh - 250px); overflow: auto; }
+    .list-wrap { max-height: calc(100vh - 250px); overflow: auto; }   /* 広い画面では下の .layout.fit で高さを決める */
+    .list-wrap table { font-size: 15px; }
+    .list-wrap th { font-size: 13px; }
+    .list-wrap th, .list-wrap td { padding: 7px 5px; }
     .hint { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.5; }
 
     table { border-collapse: collapse; width: 100%; font-size: 12px; }
@@ -58,7 +62,7 @@
     .todo { color: #bbb; }
 
     /* 右：選んだ押出 */
-    .right { flex: 1; min-width: 0; }
+    .right { flex: 0 1 auto; max-width: 1060px; min-width: 0; }   /* 表の幅に合わせる（広い画面でも伸ばしすぎない） */
     .placeholder { padding: 40px; text-align: center; color: #999; }
     .press-info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; margin-bottom: 10px; }
     .press-info b { font-family: "Roboto Mono", monospace; font-size: 14px; }
@@ -72,23 +76,30 @@
     .unsaved { background: #f0a000; color: #fff; border-radius: 4px; padding: 1px 8px; font-size: 12px; font-weight: bold; }
     .new-badge { background: #e3f2fd; color: #0055a5; border-radius: 4px; padding: 1px 6px; font-size: 11px; }
 
-    .data-wrap { max-height: calc(100vh - 330px); overflow: auto; }
-    #dataTable { width: auto; }
+    .data-wrap { max-height: calc(100vh - 330px); overflow: auto; }   /* 広い画面では下の .layout.fit で高さを決める */
+    #dataTable { width: auto; font-size: 14.5px; }
+    #dataTable th { font-size: 13px; }
     #dataTable td { padding: 2px 3px; }
-    #dataTable input { width: 46px; padding: 3px 4px; border: 1px solid #ccd; border-radius: 3px; font-family: "Roboto Mono", monospace; font-size: 12px; text-align: right; }
-    #dataTable input.pos { width: 52px; text-align: left; font-weight: bold; }
+    #dataTable input { width: 58px; padding: 4px 5px; border: 1px solid #ccd; border-radius: 3px; font-family: "Roboto Mono", monospace; font-size: 14.5px; text-align: right; }
+    #dataTable input.pos { width: 64px; text-align: left; font-weight: bold; }
     #dataTable input:focus { outline: 2px solid #0078d4; border-color: #0078d4; }
     #dataTable tr.ng td { background: #ffcdd2; }
-    #dataTable td.avg { font-family: "Roboto Mono", monospace; font-weight: bold; text-align: right; min-width: 44px; }
+    #dataTable td.avg { font-family: "Roboto Mono", monospace; font-weight: bold; text-align: right; min-width: 54px; }
     #dataTable tr.ng td.avg { color: #c62828; }
     .x-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 14px; padding: 0 4px; }
     .add-row { display: flex; gap: 6px; align-items: center; margin-top: 8px; font-size: 12px; }
     .add-row input { width: 70px; padding: 4px 6px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; }
     .actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+    /* 左右のカードを画面の下端までの同じ高さに固定し、表の部分だけが残りの高さを使う（fitHeights() が .fit を付ける） */
+    .layout.fit > .left, .layout.fit > .right > .card { height: var(--fit-h); display: flex; flex-direction: column; }
+    .layout.fit .card-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .layout.fit .card-body > * { flex-shrink: 0; }
+    .layout.fit .list-wrap, .layout.fit .data-wrap { flex: 1 1 auto; min-height: 0; max-height: none; }
   </style>
 </head>
 <body>
   <div class="lang-buttons">
+    <button class="btn-help" onclick="location.href='hardness_record_help.html'" data-key="btn_help">❓ 使い方</button>
     <button id="btnJa" onclick="setLang('ja')">日本語</button>
     <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
   </div>
@@ -139,7 +150,7 @@
       ja: {
         title: "🔩 硬度測定記録",
         subtitle: "押出を選び、サンプル位置ごとに硬度を入力します。平均が基準より 0.5 以上低い位置は赤くなります。",
-        btn_back: "← 戻る",
+        btn_back: "← 戻る", btn_help: "❓ 使い方",
         list_title: "押出の一覧",
         ph_die: "型番で検索",
         st_all: "すべて", st_open: "未完了", st_done: "完了",
@@ -170,7 +181,7 @@
       vi: {
         title: "🔩 Ghi kết quả đo độ cứng",
         subtitle: "Chọn lần đùn, nhập độ cứng cho từng vị trí mẫu. Vị trí có trung bình thấp hơn tiêu chuẩn từ 0.5 trở lên sẽ hiện màu đỏ.",
-        btn_back: "← Quay lại",
+        btn_back: "← Quay lại", btn_help: "❓ Hướng dẫn",
         list_title: "Danh sách lần đùn",
         ph_die: "Tìm mã khuôn",
         st_all: "Tất cả", st_open: "Chưa HT", st_done: "Đã HT",
@@ -221,7 +232,13 @@
        共通
     ===================================================== */
     const API = "./php/hardness_record/";
-    const N_VALUES = 10;
+    const N_VALUES = 10;     // t_hardness の 1hn〜10hn。保存は10個のまま送る
+    const N_INPUT = 3;       // 入力欄は3か所（2026-10 から現場は3か所しか測っていない）
+    // 表に出す欄の数：ふだんは3。昔の記録で4か所目以降に値がある押出だけ、その欄まで出す（値を隠したまま平均しないように）
+    const visibleCols = () => state.records.reduce((n, r) => {
+      const last = r.values.reduce((k, v, i) => (String(v).trim() !== "" && Number(v) !== 0 ? i + 1 : k), 0);
+      return Math.max(n, last);
+    }, N_INPUT);
     const NG_MARGIN = 0.5;   // 平均が 基準 − 0.5 より低ければ NG（ex0.11 と同じ）
 
     const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -372,12 +389,13 @@
         return;
       }
       const info = (k, v) => `<span><span class="lbl">${t(k)}</span><b>${esc(v ?? "－")}</b></span>`;
-      const headCells = Array.from({ length: N_VALUES }, (_, i) => `<th>${i + 1}</th>`).join("");
+      const nCols = visibleCols();
+      const headCells = Array.from({ length: nCols }, (_, i) => `<th>${i + 1}</th>`).join("");
       const bodyRows = state.records.map((r, ri) => {
         const avg = rowAverage(r.values);
         return `<tr data-ri="${ri}" class="${isNg(avg) ? "ng" : ""}">
           <td><input class="pos" data-ri="${ri}" data-col="pos" value="${esc(r.position)}" /></td>
-          ${r.values.map((v, ci) => `<td><input data-ri="${ri}" data-col="${ci}" value="${esc(v)}" inputmode="decimal" /></td>`).join("")}
+          ${r.values.slice(0, nCols).map((v, ci) => `<td><input data-ri="${ri}" data-col="${ci}" value="${esc(v)}" inputmode="decimal" /></td>`).join("")}
           <td class="avg">${fmtAvg(avg)}</td>
           <td><button class="x-btn" data-del="${ri}" title="${t("del_row")}">×</button></td>
         </tr>`;
@@ -428,7 +446,19 @@
             </div>
           </div>
         </div>`;
+      fitHeights();
     }
+
+    // 左右のカードを、画面の下端までの同じ高さに固定する。はみ出す分は表の中でスクロール
+    function fitHeights() {
+      const layout = document.querySelector(".layout");
+      const bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+      const h = Math.max(400, window.innerHeight - (layout.getBoundingClientRect().top + window.scrollY) - bottomPad);
+      layout.style.setProperty("--fit-h", h + "px");
+      layout.classList.add("fit");
+    }
+    window.addEventListener("resize", fitHeights);
+    window.addEventListener("load", fitHeights);
 
     function markDirty() {
       state.dirty = true;
@@ -461,7 +491,8 @@
       if (el.id === "btnToday") { state.checkDate = today(); markDirty(); return renderRight(); }
       if (el.id === "btnFill") {
         // ex0.11 の「Skip」：測定しない位置に基準値を入れる（ここでは空欄だけ）
-        state.records.forEach(r => r.values = r.values.map(v => v === "" ? String(state.press.hardness) : v));
+        const nCols = visibleCols();
+        state.records.forEach(r => r.values = r.values.map((v, i) => v === "" && i < nCols ? String(state.press.hardness) : v));
         markDirty();
         return renderRight();
       }
@@ -494,7 +525,7 @@
       else if (e.key === "ArrowDown") to = [ri + 1, ci];
       else if (e.key === "ArrowLeft" && (el.selectionStart === 0 || el.type !== "text")) to = [ri, ci - 1];
       else if (e.key === "ArrowRight" && el.selectionEnd === el.value.length) to = [ri, ci + 1];
-      else if (e.key === "Enter") to = ci >= N_VALUES - 1 ? [ri + 1, 0] : [ri, ci + 1];
+      else if (e.key === "Enter") to = ci >= visibleCols() - 1 ? [ri + 1, 0] : [ri, ci + 1];
       if (!to) return;
       const [r, c] = to;
       const target = document.querySelector(`#dataTable input[data-ri="${r}"][data-col="${c < 0 ? "pos" : c}"]`);
@@ -529,9 +560,10 @@
     function downloadCsv() {
       const p = state.press;
       const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-      const head = [t("col_pos"), ...Array.from({ length: N_VALUES }, (_, i) => i + 1), t("col_avg")];
+      const nCols = visibleCols();
+      const head = [t("col_pos"), ...Array.from({ length: nCols }, (_, i) => i + 1), t("col_avg")];
       const lines = [head.map(q).join(",")].concat(state.records.map(r =>
-        [r.position, ...r.values, fmtAvg(rowAverage(r.values))].map(q).join(",")));
+        [r.position, ...r.values.slice(0, nCols), fmtAvg(rowAverage(r.values))].map(q).join(",")));
       const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);

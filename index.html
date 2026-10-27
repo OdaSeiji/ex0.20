@@ -385,6 +385,11 @@
           <div class="menu-title" data-key="unpacked_rack_title">未梱包ラック一覧</div>
           <div class="menu-desc" data-key="unpacked_rack_desc">押出済みでまだ梱包が終わっていない時効ラックと残本数</div>
         </div>
+        <div class="menu-card" onclick="openPage('packing.html')">
+          <img class="menu-icon" src="./img/packing.svg" alt="" />
+          <div class="menu-title" data-key="packing_title">梱包入力</div>
+          <div class="menu-desc" data-key="packing_desc">梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録</div>
+        </div>
       </div>
     </div>
 
@@ -695,6 +700,7 @@
           press_directive_title: "押出指示書",
           press_directive_desc: "押出指示書の作成、印刷",
           unpacked_rack_title: "未梱包ラック一覧",
+          packing_title: "梱包入力",
           quality_summary_title: "品質サマリー",
           quality_summary_desc: "押出ごとの本数・NG（コード別）・各工程のチェック日・生産性",
           quality_report_title: "品質評価入力",
@@ -708,6 +714,7 @@
           sample_map_title: "（テスト）サンプル位置の図",
           sample_map_desc: "押出材ごとの製品と、評価サンプルの位置（頭 T・継ぎ目・中央 M・尾 Z）を図で表示",
           unpacked_rack_desc: "押出済みでまだ梱包が終わっていない時効ラックと残本数",
+          packing_desc: "梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録",
           handover_progress_title: "金型進捗一覧",
           handover_progress_desc: "型検・量産トライ・移管の進捗管理",
           watch_title: "重点管理金型リスト",
@@ -809,6 +816,7 @@
           press_directive_title: "Tạo phiếu đùn",
           press_directive_desc: "Tạo và in phiếu đùn",
           unpacked_rack_title: "Danh sách giá chưa đóng gói",
+          packing_title: "Nhập đóng gói",
           quality_summary_title: "Tổng hợp chất lượng",
           quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
           quality_report_title: "Nhập đánh giá chất lượng",
@@ -822,6 +830,7 @@
           sample_map_title: "(Thử nghiệm) Sơ đồ vị trí mẫu",
           sample_map_desc: "Hiển thị bằng hình sản phẩm theo từng thanh ép và vị trí lấy mẫu đánh giá (đầu T, mối nối, giữa M, đuôi Z)",
           unpacked_rack_desc: "Giá hóa già đã ép nhưng chưa đóng gói xong và số cây còn lại",
+          packing_desc: "Ghi công việc đóng gói (ngày, giờ, người làm) và số cây cho vào thùng từ giá hóa già",
           handover_progress_title: "Quản lý tiến độ chuyển giao khuôn",
           handover_progress_desc: "Quản lý tiến độ: kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",

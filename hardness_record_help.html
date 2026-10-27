@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hardness Record Help</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 16px; color: #222; line-height: 1.7; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 8px 14px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 13px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    .page { max-width: 980px; margin: 0 auto; }
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 14px; color: #666; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; white-space: nowrap; }
+    .btn-main { background: #0078d4; color: #fff; }
+
+    .toc { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+    .toc a { background: #fff; border: 1px solid #aac4e8; border-radius: 16px; padding: 4px 12px; font-size: 13px; color: #0055a5; text-decoration: none; }
+    .toc a:hover { background: #e8f1ff; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 16px; scroll-margin-top: 12px; }
+    .card-header { background: #e8f1ff; padding: 10px 14px; font-size: 16px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; }
+    .card-body { padding: 14px 16px; font-size: 15px; }
+    .card-body p + p { margin-top: 8px; }
+    .sub { color: #555; font-size: 14px; margin-top: 2px; }
+
+    /* 手順 */
+    .steps { list-style: none; counter-reset: step; }
+    .steps > li { counter-increment: step; position: relative; padding: 10px 0 10px 46px; border-bottom: 1px dashed #dde3ea; }
+    .steps > li:last-child { border-bottom: none; }
+    .steps > li::before {
+      content: counter(step); position: absolute; left: 0; top: 10px;
+      width: 32px; height: 32px; border-radius: 50%; background: #0078d4; color: #fff;
+      font-weight: bold; text-align: center; line-height: 32px;
+    }
+    .steps b.t { display: block; font-size: 16px; }
+
+    .note { background: #fff8e1; border-left: 4px solid #ffb300; padding: 8px 12px; font-size: 14px; margin-top: 10px; border-radius: 4px; }
+    .unsaved { background: #f0a000; color: #fff; border-radius: 4px; padding: 1px 8px; font-size: 12px; font-weight: bold; }
+    .kbd { display: inline-block; border: 1px solid #bbb; border-bottom-width: 2px; border-radius: 4px; padding: 0 6px; font-family: "Roboto Mono", monospace; font-size: 13px; background: #fafafa; }
+    .mini-btn { display: inline-block; padding: 2px 10px; border-radius: 5px; font-size: 13px; font-weight: bold; }
+    .mini-btn.main { background: #0078d4; color: #fff; }
+    .mini-btn.sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .mini-btn.csv  { background: #217346; color: #fff; }
+
+    /* 入力の表の見本（本物の画面と同じ見た目） */
+    .demo-table { border-collapse: collapse; margin: 8px 0; font-size: 12px; }
+    .demo-table th { background: #e8f1ff; font-size: 11px; padding: 4px 6px; text-align: center; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    .demo-table tr.std th { background: #fff8e1; color: #8d6e00; font-family: "Roboto Mono", monospace; }
+    .demo-table td { padding: 2px 3px; border-bottom: 1px solid #e0e0e0; }
+    .demo-table .gl { border-left: 2px solid #c5d5ea; }
+    .demo-table th.g1 span { text-decoration: underline 3px #d32f2f; text-underline-offset: 3px; }
+    .demo-table th.g2 span { text-decoration: underline dashed 3px #d32f2f; text-underline-offset: 3px; }
+    .inp { display: inline-block; width: 50px; padding: 2px 4px; border: 1px solid #ccd; border-radius: 3px; font-family: "Roboto Mono", monospace; text-align: right; background: #fff; }
+    .inp.pos { text-align: left; font-weight: bold; }
+    .demo-table tr.ng td { background: #ffcdd2; }
+    .demo-table td.avg { font-family: "Roboto Mono", monospace; font-weight: bold; text-align: right; min-width: 44px; padding: 2px 8px; }
+    .demo-table tr.ng td.avg { color: #c62828; }
+    .inp.ng { background: #ffcdd2; color: #c62828; font-weight: bold; border-color: #e57373; }
+
+    /* 画面の配置図 */
+    .layout-demo { display: flex; gap: 8px; margin: 8px 0; font-size: 13px; }
+    .layout-demo > div { border: 2px solid #aac4e8; border-radius: 8px; padding: 8px 10px; background: #fbfdff; }
+    .layout-demo .l { width: 38%; }
+    .layout-demo .r { flex: 1; }
+    .layout-demo .r div { border: 1px dashed #aac4e8; border-radius: 6px; padding: 4px 8px; margin-top: 6px; background: #fff; }
+    .layout-demo b { color: #0055a5; }
+
+    table.tbl { border-collapse: collapse; width: 100%; font-size: 14px; margin-top: 4px; }
+    .tbl th, .tbl td { border-bottom: 1px solid #e0e0e0; padding: 7px 8px; text-align: left; vertical-align: top; }
+    .tbl th { background: #e8f1ff; font-size: 13px; white-space: nowrap; }
+    .tbl td:first-child { white-space: nowrap; }
+
+    .faq dt { font-weight: bold; margin-top: 10px; }
+    .faq dt::before { content: "Q. "; color: #0078d4; }
+    .faq dd { margin-left: 22px; font-size: 14px; color: #444; }
+
+    /* 言語：日本語・ベトナム語の文をそれぞれ書き、選んだほうだけ出す */
+    html[lang="ja"] [data-lang="vi"], html[lang="vi"] [data-lang="ja"] { display: none !important; }
+
+    @media (max-width: 700px) {
+      .layout-demo { flex-direction: column; }
+      .layout-demo .l { width: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <div class="page">
+    <h1><span data-lang="ja">❓ 硬度測定記録の使い方</span><span data-lang="vi">❓ Hướng dẫn ghi kết quả đo độ cứng</span></h1>
+    <div class="subtitle">
+      <span data-lang="ja">押出ごとに、サンプル位置の硬度を記録する画面です。位置ごとの平均を、品番の基準の硬度と比べます。</span>
+      <span data-lang="vi">Màn hình ghi độ cứng tại từng vị trí mẫu của mỗi lần đùn. Trung bình của từng vị trí được so với độ cứng tiêu chuẩn của mã SP.</span>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn btn-main" onclick="location.href='hardness_record.html'">
+        <span data-lang="ja">← 硬度測定記録へ</span><span data-lang="vi">← Về màn hình đo độ cứng</span>
+      </button>
+    </div>
+
+    <nav class="toc">
+      <a href="#s-layout"><span data-lang="ja">画面の見方</span><span data-lang="vi">Bố cục màn hình</span></a>
+      <a href="#s-steps"><span data-lang="ja">入力の手順</span><span data-lang="vi">Các bước nhập</span></a>
+      <a href="#s-table"><span data-lang="ja">測定値の表と判定</span><span data-lang="vi">Bảng giá trị đo và đánh giá</span></a>
+      <a href="#s-keys"><span data-lang="ja">キーボード</span><span data-lang="vi">Bàn phím</span></a>
+      <a href="#s-faq"><span data-lang="ja">困ったとき</span><span data-lang="vi">Khi gặp vấn đề</span></a>
+    </nav>
+
+    <!-- 大事なこと -->
+    <div class="card">
+      <div class="card-header"><span data-lang="ja">⭐ はじめに：最後に「保存」を押してください</span><span data-lang="vi">⭐ Lưu ý: Cuối cùng phải bấm "Lưu"</span></div>
+      <div class="card-body">
+        <p data-lang="ja">この画面は、入力しただけでは保存されません。何か変えると右上に <span class="unsaved">未保存</span> が出ます。入力が終わったら、表の下の <span class="mini-btn main">保存</span> を押してください。</p>
+        <p data-lang="vi">Màn hình này không tự lưu khi nhập. Khi thay đổi gì đó, góc trên bên phải hiện <span class="unsaved">Chưa lưu</span>. Nhập xong hãy bấm <span class="mini-btn main">Lưu</span> ở dưới bảng.</p>
+        <div class="note">
+          <span data-lang="ja">保存しないまま別の押出を押すと「保存していない変更があります」と出ます。もう一度押すと、変更を捨てて移動します。画面を閉じる・戻るときもブラウザが確認を出します。</span>
+          <span data-lang="vi">Nếu bấm sang lần đùn khác khi chưa lưu, sẽ hiện "Có thay đổi chưa lưu". Bấm lần nữa thì bỏ thay đổi và chuyển. Khi đóng màn hình hoặc quay lại, trình duyệt cũng sẽ hỏi xác nhận.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 画面の見方 -->
+    <div class="card" id="s-layout">
+      <div class="card-header"><span data-lang="ja">1. 画面の見方</span><span data-lang="vi">1. Bố cục màn hình</span></div>
+      <div class="card-body">
+        <div class="layout-demo">
+          <div class="l">
+            <b data-lang="ja">左：押出の一覧</b><b data-lang="vi">Trái: Danh sách lần đùn</b><br />
+            <span data-lang="ja">型番で検索／すべて・未完了・完了 で絞り込み。行を押すと右に記録が出ます。</span>
+            <span data-lang="vi">Tìm theo mã khuôn / lọc Tất cả・Chưa HT・Đã HT. Bấm vào dòng để mở bên phải.</span>
+          </div>
+          <div class="r">
+            <b data-lang="ja">右：選んだ押出の記録</b><b data-lang="vi">Phải: Kết quả của lần đùn đã chọn</b>
+            <div><span data-lang="ja">押出の情報（押出日・号機・型番・品番・nBn・基準の硬度）</span><span data-lang="vi">Thông tin lần đùn (ngày đùn, máy, mã khuôn, mã SP, nBn, độ cứng tiêu chuẩn)</span></div>
+            <div><span data-lang="ja">測定日・完了</span><span data-lang="vi">Ngày đo, Hoàn thành</span></div>
+            <div><span data-lang="ja">位置ごとの測定値の表（1〜3 と平均）／行の追加／保存・基準値の入力・CSV</span><span data-lang="vi">Bảng giá trị đo theo vị trí (1〜3 và TB) / thêm dòng / Lưu・điền tiêu chuẩn・CSV</span></div>
+          </div>
+        </div>
+        <table class="tbl">
+          <tr><th data-lang="ja">一覧の列</th><th data-lang="vi">Cột danh sách</th><th data-lang="ja">意味</th><th data-lang="vi">Ý nghĩa</th></tr>
+          <tr><td data-lang="ja">記録</td><td data-lang="vi">Dữ liệu</td><td data-lang="ja">保存した位置の数（空なら、まだ記録がない）</td><td data-lang="vi">Số vị trí đã lưu (trống = chưa có dữ liệu)</td></tr>
+          <tr><td data-lang="ja">測定日</td><td data-lang="vi">Ngày đo</td><td data-lang="ja">右で入れた測定日</td><td data-lang="vi">Ngày đo đã nhập bên phải</td></tr>
+          <tr><td data-lang="ja">完了</td><td data-lang="vi">HT</td><td data-lang="ja"><b style="color:#2e7d32">✔</b> は「完了」にした押出</td><td data-lang="vi"><b style="color:#2e7d32">✔</b> là lần đùn đã chọn "Đã HT"</td></tr>
+        </table>
+        <div class="note">
+          <span data-lang="ja">一覧には新しい押出から350件まで出ます。古い押出は型番で検索してください。</span>
+          <span data-lang="vi">Danh sách hiện tối đa 350 lần đùn mới nhất. Lần đùn cũ hãy tìm theo mã khuôn.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 手順 -->
+    <div class="card" id="s-steps">
+      <div class="card-header"><span data-lang="ja">2. 入力の手順</span><span data-lang="vi">2. Các bước nhập</span></div>
+      <div class="card-body">
+        <ol class="steps">
+          <li>
+            <b class="t" data-lang="ja">左の一覧で押出を選ぶ</b><b class="t" data-lang="vi">Chọn lần đùn ở danh sách bên trái</b>
+            <div class="sub" data-lang="ja">まだ終わっていない押出は「未完了」で探せます。</div>
+            <div class="sub" data-lang="vi">Lần đùn chưa xong có thể tìm ở "Chưa HT".</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">位置を確かめる</b><b class="t" data-lang="vi">Kiểm tra các vị trí</b>
+            <div class="sub" data-lang="ja">はじめての押出は、押出指示書の nBn・穴の数・ビレット本数から位置（1H、1E、2H…）が自動で並びます。まだ保存されていないので、要らない行は右の <b style="color:#c62828">×</b> で消し、足りない位置は表の下の「位置」に入れて <span class="mini-btn sub">＋ 行を追加</span> を押します。</div>
+            <div class="sub" data-lang="vi">Lần đùn mới sẽ tự hiện các vị trí (1H, 1E, 2H…) từ nBn, số lỗ, số billet trong phiếu đùn. Chưa được lưu, nên dòng không cần thì bấm <b style="color:#c62828">×</b> bên phải để xóa, vị trí còn thiếu thì nhập vào ô "Vị trí" dưới bảng rồi bấm <span class="mini-btn sub">＋ Thêm dòng</span>.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">測定日を入れる</b><b class="t" data-lang="vi">Nhập ngày đo</b>
+            <div class="sub" data-lang="ja">「今日」を押すと今日の日付が入ります。未来の日付は入れられません。</div>
+            <div class="sub" data-lang="vi">Bấm "Hôm nay" để nhập ngày hôm nay. Không nhập được ngày trong tương lai.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">位置ごとに硬度を入れる</b><b class="t" data-lang="vi">Nhập độ cứng cho từng vị trí</b>
+            <div class="sub" data-lang="ja">1つの位置で測った <b>3点</b> を、1・2・3 の欄に入れます。右端に平均が出ます。くわしくは <a href="#s-table">3. 測定値の表と判定</a>。</div>
+            <div class="sub" data-lang="vi">Nhập <b>3 điểm</b> đo của một vị trí vào ô 1, 2, 3. Trung bình hiện ở cột cuối. Chi tiết xem <a href="#s-table">3. Bảng giá trị đo và đánh giá</a>.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">（測らない位置があれば）「空欄に基準値を入れる」</b><b class="t" data-lang="vi">(Nếu có vị trí không đo) "Điền giá trị tiêu chuẩn vào ô trống"</b>
+            <div class="sub" data-lang="ja">空いている欄すべてに、品番の基準の硬度が入ります（入力済みの値は変わりません）。品番に基準がないときは押せません。</div>
+            <div class="sub" data-lang="vi">Tất cả các ô trống sẽ được điền độ cứng tiêu chuẩn của mã SP (giá trị đã nhập không đổi). Nếu mã SP không có tiêu chuẩn thì không bấm được.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">終わったら「完了」を選び、「保存」を押す</b><b class="t" data-lang="vi">Xong thì chọn "Đã HT" ở Hoàn thành rồi bấm "Lưu"</b>
+            <div class="sub" data-lang="ja">上に「保存しました」と出れば終わりです。「完了」にした押出は、一覧の「未完了」から消えます。</div>
+            <div class="sub" data-lang="vi">Hiện "Đã lưu" ở phía trên là xong. Lần đùn "Đã HT" sẽ biến mất khỏi "Chưa HT" trong danh sách.</div>
+          </li>
+          <li>
+            <b class="t" data-lang="ja">（必要なら）CSV に出す</b><b class="t" data-lang="vi">(Nếu cần) Xuất CSV</b>
+            <div class="sub" data-lang="ja"><span class="mini-btn csv">📥 CSV</span> で、表の内容（平均を含む）を Excel で開けるファイルにします。</div>
+            <div class="sub" data-lang="vi"><span class="mini-btn csv">📥 CSV</span> để xuất nội dung bảng (gồm cả TB) ra file mở được bằng Excel.</div>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- 表 -->
+    <div class="card" id="s-table">
+      <div class="card-header"><span data-lang="ja">3. 測定値の表と判定</span><span data-lang="vi">3. Bảng giá trị đo và đánh giá</span></div>
+      <div class="card-body">
+        <p class="sub" data-lang="ja">例：基準の硬度が <b>12</b> の品番</p>
+        <p class="sub" data-lang="vi">Ví dụ: mã SP có độ cứng tiêu chuẩn là <b>12</b></p>
+        <table class="demo-table">
+          <tr><th><span data-lang="ja">位置</span><span data-lang="vi">Vị trí</span></th><th>1</th><th>2</th><th>3</th><th><span data-lang="ja">平均</span><span data-lang="vi">TB</span></th></tr>
+          <tr><td><span class="inp pos">1H</span></td><td><span class="inp">12.5</span></td><td><span class="inp">12.0</span></td><td><span class="inp">11.8</span></td><td class="avg">12.1</td></tr>
+          <tr class="ng"><td><span class="inp pos">1E</span></td><td><span class="inp">11.2</span></td><td><span class="inp">11.5</span></td><td><span class="inp">11.0</span></td><td class="avg">11.3</td></tr>
+        </table>
+        <ul class="sub" style="margin-left:20px">
+          <li data-lang="ja"><b>平均</b>は、入れた値だけで計算します（空欄と 0 は数えません）。小数1けたに切り上げて表示します。</li>
+          <li data-lang="vi"><b>TB</b> chỉ tính từ các giá trị đã nhập (không tính ô trống và 0). Hiển thị làm tròn lên 1 chữ số thập phân.</li>
+          <li data-lang="ja">平均が<b>基準より 0.5 以上低い</b>と、その行が<b>赤く</b>なります（例：基準 12 なら、平均 11.5 未満が赤）。</li>
+          <li data-lang="vi">Nếu TB <b>thấp hơn tiêu chuẩn từ 0.5 trở lên</b>, cả dòng sẽ <b>hiện màu đỏ</b> (ví dụ: tiêu chuẩn 12 thì TB dưới 11.5 là đỏ).</li>
+          <li data-lang="ja">品番に基準がないときは「品番に硬度の基準がありません」と出て、判定しません。</li>
+          <li data-lang="vi">Nếu mã SP không có tiêu chuẩn sẽ hiện "Mã SP chưa có độ cứng tiêu chuẩn" và không đánh giá.</li>
+          <li data-lang="ja">昔の記録で4点以上測っている押出は、その数まで欄が出ます（値が隠れないように）。</li>
+          <li data-lang="vi">Lần đùn cũ đã đo từ 4 điểm trở lên sẽ hiện đủ số ô đó (để không bị ẩn giá trị).</li>
+          <li data-lang="ja">値は数字で入れてください（小数点は「.」）。位置の名前も直せます。</li>
+          <li data-lang="vi">Nhập giá trị bằng số (dấu thập phân là "."). Tên vị trí cũng sửa được.</li>
+        </ul>
+        <div class="note">
+          <span data-lang="ja">表が長いときは、表の中を上下にスクロールしてください（表の右側にスクロールバーがあります）。</span>
+          <span data-lang="vi">Khi bảng dài, hãy cuộn lên xuống bên trong bảng (thanh cuộn ở bên phải bảng).</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- キーボード -->
+    <div class="card" id="s-keys">
+      <div class="card-header"><span data-lang="ja">4. キーボードで速く入れる</span><span data-lang="vi">4. Nhập nhanh bằng bàn phím</span></div>
+      <div class="card-body">
+        <table class="tbl">
+          <tr><th data-lang="ja">キー</th><th data-lang="vi">Phím</th><th data-lang="ja">動き</th><th data-lang="vi">Tác dụng</th></tr>
+          <tr><td><span class="kbd">Enter</span></td><td data-lang="ja">右の欄へ（3 の欄からは次の行の 1 へ）</td><td data-lang="vi">Sang ô bên phải (từ ô 3 thì xuống ô 1 của dòng sau)</td></tr>
+          <tr><td><span class="kbd">↑</span> <span class="kbd">↓</span></td><td data-lang="ja">上・下の行の同じ欄へ</td><td data-lang="vi">Lên / xuống cùng cột của dòng trên / dưới</td></tr>
+          <tr><td><span class="kbd">←</span> <span class="kbd">→</span></td><td data-lang="ja">左・右の欄へ（文字の端にカーソルがあるとき）</td><td data-lang="vi">Sang ô trái / phải (khi con trỏ ở đầu / cuối chữ)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- 困ったとき -->
+    <div class="card" id="s-faq">
+      <div class="card-header"><span data-lang="ja">5. 困ったとき</span><span data-lang="vi">5. Khi gặp vấn đề</span></div>
+      <div class="card-body">
+        <dl class="faq" data-lang="ja">
+          <dt>「位置を自動で作れません」と出る</dt>
+          <dd>押出指示書の nBn・穴の数、またはビレット本数が入っていません。表の下の「行を追加」で位置を入れてください。</dd>
+          <dt>「測定値は数字で入力してください」と出る</dt>
+          <dd>数字でない値が入っています（例：カンマ「,」）。（ ）の中の位置の行を直してください。</dd>
+          <dt>「空欄に基準値を入れる」を間違えて押した</dt>
+          <dd>「保存」を押す前なら、別の押出を2回押して移動し（変更を捨てる）、もう一度選び直すと元に戻ります。</dd>
+          <dt>押出が一覧に出ない</dt>
+          <dd>「すべて」を押す、または型番で検索してください。</dd>
+        </dl>
+        <dl class="faq" data-lang="vi">
+          <dt>Hiện "không tự tạo được vị trí"</dt>
+          <dd>Phiếu đùn chưa có nBn, số lỗ hoặc số billet. Hãy thêm vị trí bằng "Thêm dòng" dưới bảng.</dd>
+          <dt>Hiện "Giá trị đo phải là số"</dt>
+          <dd>Có giá trị không phải số (ví dụ dấu phẩy ","). Hãy sửa dòng của vị trí ghi trong ( ).</dd>
+          <dt>Lỡ bấm "Điền giá trị tiêu chuẩn vào ô trống"</dt>
+          <dd>Nếu chưa bấm "Lưu": bấm 2 lần vào lần đùn khác để chuyển (bỏ thay đổi), rồi chọn lại thì sẽ trở về như cũ.</dd>
+          <dt>Không thấy lần đùn trong danh sách</dt>
+          <dd>Bấm "Tất cả" hoặc tìm theo mã khuôn.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function setLang(lang) {
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+    }
+    let lang = "ja";
+    try { lang = localStorage.getItem("lang") || "ja"; } catch (e) {}
+    setLang(lang === "vi" ? "vi" : "ja");
+  </script>
+</body>
+</html>

@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Packing</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 16px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 8px 14px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 13px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; display: flex; align-items: center; gap: 8px; }
+    h1 img { width: 30px; height: 30px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 12px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; min-height: 34px; }
+    .btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-main { background: #0078d4; color: #fff; }
+    .btn-sub  { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .btn-del  { background: #fff; color: #c62828; border: 1px solid #e57373; }
+    .btn-csv  { background: #217346; color: #fff; }
+    .btn-sm   { padding: 4px 10px; font-size: 12px; }
+    .status-msg { font-size: 14px; }
+    .status-msg.err { color: #c62828; font-weight: bold; }
+    .status-msg.ok  { color: #2e7d32; }
+
+    .layout { display: flex; gap: 16px; align-items: flex-start; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .card-header { background: #e8f1ff; padding: 10px 12px; font-size: 14px; font-weight: bold; color: #0055a5; border-radius: 8px 8px 0 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .card-body { padding: 12px; }
+
+    /* 左：発注書の一覧 */
+    .left { width: 680px; flex-shrink: 0; }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+    .filters input { padding: 7px 10px; border: 1px solid #aac4e8; border-radius: 6px; font-size: 14px; width: 200px; }
+    .seg { display: inline-flex; border: 1px solid #0078d4; border-radius: 6px; overflow: hidden; }
+    .seg button { padding: 7px 14px; border: none; background: #fff; color: #0078d4; font-size: 13px; font-weight: bold; cursor: pointer; }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+    .list-wrap { overflow: auto; }
+    .list-wrap table { font-size: 14px; }
+    .hint { font-size: 11px; color: #888; margin-top: 8px; line-height: 1.5; }
+
+    table { border-collapse: collapse; width: 100%; font-size: 13px; }
+    th, td { padding: 6px 6px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; }
+    th { background: #e8f1ff; font-size: 12px; position: sticky; top: 0; z-index: 1; text-align: left; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    td.r, th.r { text-align: right; }
+    td.c, th.c { text-align: center; }
+    tbody tr.pick { cursor: pointer; }
+    tbody tr.pick:hover td { background: #f0f8ff; }
+    tbody tr.selected td { background: #fff3cd !important; }
+    .empty { padding: 18px; text-align: center; color: #999; white-space: normal; }
+    .rest { font-weight: bold; color: #e65100; }
+    .done { color: #2e7d32; font-weight: bold; }
+    .over { color: #c62828; font-weight: bold; }
+
+    /* 右 */
+    .right { flex: 1; min-width: 0; }
+    .placeholder { padding: 30px; text-align: center; color: #999; }
+    .info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 14px; margin-bottom: 12px; }
+    .info b { font-family: "Roboto Mono", monospace; font-size: 15px; }
+    .info .lbl { color: #777; font-size: 12px; margin-right: 4px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .panel { border: 1px solid #d6e2f0; border-radius: 8px; padding: 10px; min-width: 0; }
+    .panel h3 { font-size: 14px; color: #0055a5; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .panel h3 small { font-weight: normal; color: #777; font-size: 12px; }
+    .panel .tbl-wrap { max-height: 230px; overflow: auto; }
+    .panel.disabled { opacity: 0.5; }
+    .form-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; font-size: 13px; }
+    .form-row label { color: #555; font-size: 12px; }
+    .form-row input, .form-row select { padding: 6px 8px; border: 1px solid #aac4e8; border-radius: 5px; font-size: 14px; }
+    .form-row input.time { width: 72px; font-family: "Roboto Mono", monospace; }
+    .form-row input.qty { width: 80px; font-family: "Roboto Mono", monospace; text-align: right; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .chip { background: #e3f2fd; color: #0055a5; border-radius: 14px; padding: 3px 4px 3px 10px; font-size: 13px; display: inline-flex; align-items: center; gap: 2px; }
+    .x-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 15px; padding: 0 5px; line-height: 1; }
+    td input.qty { width: 70px; padding: 3px 5px; border: 1px solid #ccd; border-radius: 4px; font-family: "Roboto Mono", monospace; text-align: right; font-size: 13px; }
+    .note { font-size: 12px; color: #8a5a00; background: #fff8e1; border-radius: 5px; padding: 6px 10px; margin-top: 8px; }
+    .muted { color: #999; font-size: 12px; }
+
+    /* 箱番号を作る・別の発注の箱を使う（小窓） */
+    .modal-back { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .modal-back.open { display: flex; }
+    .modal { background: #fff; border-radius: 10px; padding: 16px; width: min(560px, 94vw); max-height: 86vh; overflow: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.25); }
+    .modal h3 { font-size: 17px; margin-bottom: 10px; }
+    .modal textarea { width: 100%; height: 220px; font-family: "Roboto Mono", monospace; font-size: 13px; padding: 6px; border: 1px solid #aac4e8; border-radius: 5px; }
+    .modal .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+
+    /* 左右のカードを画面の下端までの同じ高さに固定（fitHeights() が .fit を付ける） */
+    .layout.fit > .left, .layout.fit > .right > .card { height: var(--fit-h); display: flex; flex-direction: column; }
+    .layout.fit .card-body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+    .layout.fit .card-body > * { flex-shrink: 0; }
+    .layout.fit .list-wrap { flex: 1 1 auto; min-height: 0; }
+    .layout.fit > .right > .card > .card-body { overflow: auto; display: block; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1><img src="./img/packing.svg" alt="" /><span data-key="title">梱包入力</span></h1>
+  <div class="subtitle" data-key="subtitle">発注書を選び、梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録します。押すたびに保存されます。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <span class="status-msg" id="statusMsg"></span>
+  </div>
+
+  <div class="layout" id="layout">
+    <!-- 左：発注書の一覧 -->
+    <div class="left card">
+      <div class="card-header"><span data-key="list_title">発注書</span><span class="muted" id="listCount"></span></div>
+      <div class="card-body">
+        <div class="filters">
+          <input type="text" id="fQ" data-ph="ph_q" placeholder="発注番号・品番で検索" />
+          <div class="seg" id="statusSeg">
+            <button data-status="open" data-key="st_open">梱包の残りあり</button>
+            <button data-status="all" data-key="st_all">すべて</button>
+          </div>
+        </div>
+        <div class="list-wrap">
+          <table>
+            <thead><tr id="listHead"></tr></thead>
+            <tbody id="listBody"></tbody>
+          </table>
+        </div>
+        <div class="hint" data-key="list_hint">※「梱包の残りあり」は、押出があって 発注数 − 梱包済み が残っている発注書です。新しい発注書から400件まで。</div>
+      </div>
+    </div>
+
+    <!-- 右 -->
+    <div class="right" id="right"></div>
+  </div>
+
+  <!-- 小窓 -->
+  <div class="modal-back" id="modalBack"><div class="modal" id="modal"></div></div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title: "梱包入力",
+        subtitle: "発注書を選び、梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録します。押すたびに保存されます。",
+        btn_back: "← 戻る",
+        list_title: "発注書", ph_q: "発注番号・品番で検索",
+        st_open: "梱包の残りあり", st_all: "すべて",
+        list_hint: "※「梱包の残りあり」は、押出があって 発注数 − 梱包済み が残っている発注書です。新しい発注書から400件まで。",
+        col_issue: "発行日", col_order: "発注番号", col_pn: "品番", col_delivery: "納期", col_qty: "発注数", col_ok: "OK", col_packed: "梱包済", col_rest: "残り",
+        n_rows: "{n} 件", empty: "該当する発注書はありません",
+        recent_title: "最近の梱包作業", recent_hint: "← 左の一覧から発注書を選んでください。下の行を押してもその発注書を開けます。",
+        lbl_from: "期間", lbl_month: "月", btn_csv: "📥 CSV",
+        col_date: "梱包日", col_time: "時間", col_workers: "人", col_boxes: "箱", col_pqty: "本数",
+        btn_close: "× 閉じる",
+        info_order: "発注番号", info_pn: "品番", info_delivery: "納期", info_qty: "発注数", info_ok: "OK", info_packed: "梱包済", info_rest: "残り", info_per_box: "1箱の本数",
+        work_title: "① 梱包作業", work_hint: "行を押すと選べます",
+        col_workers_names: "作業者",
+        lbl_date: "梱包日", lbl_start: "開始", lbl_end: "終了",
+        btn_add: "＋ 追加", btn_update: "更新", btn_delete: "削除", btn_new: "新しい作業",
+        worker_add: "＋ 作業者", staff_none: "－ 作業者 －", no_workers: "作業者がまだいません",
+        press_title: "② 押出", col_pdate: "押出日", col_machine: "号機", col_die: "型番", col_packdate: "梱包完了日",
+        no_press: "この発注書の押出はありません",
+        rack_title: "③ 時効ラック", col_seq: "順", col_rack: "ラック", col_work: "本数", rack_pick: "② で押出を選ぶと、そのラックが出ます",
+        boxlist_title: "箱番号", btn_make_box: "箱番号を作る", btn_other_box: "別の発注の箱を使う",
+        no_boxes: "この発注書の箱番号がまだありません。「箱番号を作る」を押してください。",
+        col_box: "箱番号", col_box_qty: "入っている本数",
+        ng_title: "④ 梱包の NG", ng_none: "NG はありません", code_none: "－ NG コード －",
+        box_title: "⑤ 箱に入れる", box_none: "まだ箱に入れていません", box_pick: "－ 箱番号 －",
+        need_rack: "③ でラックを選んでください", need_work: "① で梱包作業を選んでください（箱に入れた本数は、選んだ作業の記録になります）",
+        rack_rest: "このラックの残り {n} 本",
+        tot: "計",
+        mk_title: "箱番号を作る", mk_desc: "発注数 {qty} 本 ÷ 1箱 {per} 本 = {n} 箱。1行に1つ。直してから「作る」を押せます。",
+        mk_per: "1箱の本数", mk_make: "作る", cancel: "やめる",
+        ot_title: "別の発注の箱を使う", ot_desc: "同じ品番の発注書です。選ぶと、その発注の箱番号が「箱番号」の選択肢に入ります（箱番号が無ければ作ります）。",
+        ot_none: "同じ品番の別の発注書はありません", col_box_count: "箱の数",
+        confirm_del_work: "この梱包作業を消しますか？",
+        err_time: "時刻は 830 や 8:30 のように入れてください",
+        saved: "保存しました",
+      },
+      vi: {
+        title: "Nhập đóng gói",
+        subtitle: "Chọn đơn hàng, ghi công việc đóng gói (ngày, giờ, người làm) và số cây đã cho vào thùng từ giá hóa già. Mỗi lần bấm sẽ được lưu ngay.",
+        btn_back: "← Quay lại",
+        list_title: "Đơn hàng", ph_q: "Tìm số đơn / mã SP",
+        st_open: "Còn chưa đóng gói", st_all: "Tất cả",
+        list_hint: "※ \"Còn chưa đóng gói\" là đơn đã có lần đùn và còn (SL đặt − đã đóng gói). Hiện tối đa 400 đơn mới nhất.",
+        col_issue: "Ngày PH", col_order: "Số đơn", col_pn: "Mã SP", col_delivery: "Ngày giao", col_qty: "SL đặt", col_ok: "OK", col_packed: "Đã ĐG", col_rest: "Còn lại",
+        n_rows: "{n} đơn", empty: "Không có đơn phù hợp",
+        recent_title: "Công việc đóng gói gần đây", recent_hint: "← Chọn đơn hàng ở danh sách bên trái. Bấm vào dòng bên dưới cũng mở được đơn đó.",
+        lbl_from: "Thời gian", lbl_month: "Tháng", btn_csv: "📥 CSV",
+        col_date: "Ngày ĐG", col_time: "Giờ", col_workers: "Người", col_boxes: "Thùng", col_pqty: "SL",
+        btn_close: "× Đóng",
+        info_order: "Số đơn", info_pn: "Mã SP", info_delivery: "Ngày giao", info_qty: "SL đặt", info_ok: "OK", info_packed: "Đã ĐG", info_rest: "Còn lại", info_per_box: "SL/thùng",
+        work_title: "① Công việc đóng gói", work_hint: "Bấm vào dòng để chọn",
+        col_workers_names: "Người làm",
+        lbl_date: "Ngày ĐG", lbl_start: "Bắt đầu", lbl_end: "Kết thúc",
+        btn_add: "＋ Thêm", btn_update: "Cập nhật", btn_delete: "Xóa", btn_new: "Công việc mới",
+        worker_add: "＋ Người làm", staff_none: "－ Người làm －", no_workers: "Chưa có người làm",
+        press_title: "② Lần đùn", col_pdate: "Ngày đùn", col_machine: "Máy", col_die: "Mã khuôn", col_packdate: "Ngày HT ĐG",
+        no_press: "Đơn này chưa có lần đùn",
+        rack_title: "③ Giá hóa già", col_seq: "TT", col_rack: "Giá", col_work: "SL", rack_pick: "Chọn lần đùn ở ② thì các giá sẽ hiện ra",
+        boxlist_title: "Mã thùng", btn_make_box: "Tạo mã thùng", btn_other_box: "Dùng thùng của đơn khác",
+        no_boxes: "Đơn này chưa có mã thùng. Hãy bấm \"Tạo mã thùng\".",
+        col_box: "Mã thùng", col_box_qty: "SL trong thùng",
+        ng_title: "④ NG khi đóng gói", ng_none: "Không có NG", code_none: "－ Mã NG －",
+        box_title: "⑤ Cho vào thùng", box_none: "Chưa cho vào thùng", box_pick: "－ Mã thùng －",
+        need_rack: "Hãy chọn giá ở ③", need_work: "Hãy chọn công việc ở ① (số cây cho vào thùng được ghi vào công việc đã chọn)",
+        rack_rest: "Giá này còn {n} cây",
+        tot: "Tổng",
+        mk_title: "Tạo mã thùng", mk_desc: "SL đặt {qty} ÷ {per}/thùng = {n} thùng. Mỗi dòng 1 mã. Có thể sửa rồi bấm \"Tạo\".",
+        mk_per: "SL/thùng", mk_make: "Tạo", cancel: "Hủy",
+        ot_title: "Dùng thùng của đơn khác", ot_desc: "Các đơn cùng mã SP. Chọn thì mã thùng của đơn đó sẽ vào danh sách \"Mã thùng\" (nếu chưa có thì sẽ tạo).",
+        ot_none: "Không có đơn khác cùng mã SP", col_box_count: "Số thùng",
+        confirm_del_work: "Xóa công việc đóng gói này?",
+        err_time: "Nhập giờ như 830 hoặc 8:30",
+        saved: "Đã lưu",
+      },
+    };
+    let currentLang = "ja";
+    try { currentLang = localStorage.getItem("lang") === "vi" ? "vi" : "ja"; } catch (e) {}
+    const t = (k, vars) => {
+      let s = dict[currentLang][k] ?? k;
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.querySelectorAll("[data-ph]").forEach(el => el.placeholder = dict[lang][el.dataset.ph]);
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      renderList();
+      renderRight();
+    }
+
+    /* =====================================================
+       共通
+    ===================================================== */
+    const API = "./php/packing/";
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const fmt = (n) => Number(n || 0).toLocaleString("en-US");
+    const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const today = () => ymd(new Date());
+    const md = (s) => s ? s.slice(5) : "";
+
+    function showMsg(msg, isErr) {
+      const el = document.getElementById("statusMsg");
+      el.textContent = msg || "";
+      el.className = "status-msg " + (isErr ? "err" : "ok");
+      if (msg && !isErr) setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 2500);
+    }
+    async function getJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || res.statusText);
+      return data;
+    }
+    async function post(file, body) {
+      const res = await fetch(API + file, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || res.statusText);
+      return data;
+    }
+    // 保存してから画面を読み直す。失敗したら赤い文字で出す
+    async function act(file, body, after) {
+      try {
+        const data = await post(file, body);
+        showMsg(t("saved"));
+        if (after) await after(data);
+        return data;
+      } catch (err) {
+        showMsg(err.message, true);
+        return null;
+      }
+    }
+
+    // 時刻：830 → 8:30、0830 → 08:30、8:30 はそのまま。不正なら null
+    function normTime(s) {
+      s = String(s || "").trim().replace("：", ":");
+      let m = /^(\d{1,2}):(\d{2})$/.exec(s) || /^(\d{1,2})(\d{2})$/.exec(s);
+      if (!m) return null;
+      const h = Number(m[1]), mi = Number(m[2]);
+      return h <= 23 && mi <= 59 ? `${h}:${String(mi).padStart(2, "0")}` : null;
+    }
+
+    /* =====================================================
+       状態
+    ===================================================== */
+    const state = {
+      status: "open",
+      orders: null,
+      recent: null,
+      from: "", to: "",
+      orderId: null,
+      d: null,            // get_order.php の結果
+      extraBoxes: [],     // 「別の発注の箱を使う」で足した箱
+      workId: null,
+      pressId: null,
+      racks: null,
+      rackId: null,
+    };
+
+    /* =====================================================
+       左：発注書の一覧
+    ===================================================== */
+    let listSeq = 0;
+    async function loadList() {
+      const seq = ++listSeq;
+      const q = new URLSearchParams({ q: document.getElementById("fQ").value.trim(), status: state.status });
+      const data = await getJson(`${API}get_orders.php?${q}`);
+      if (seq !== listSeq) return;
+      state.orders = data.rows;
+      renderList();
+    }
+    let qTimer = null;
+    document.getElementById("fQ").addEventListener("input", () => {
+      clearTimeout(qTimer);
+      qTimer = setTimeout(() => loadList().catch(err => showMsg(err.message, true)), 300);
+    });
+    document.getElementById("statusSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      state.status = b.dataset.status;
+      loadList().catch(err => showMsg(err.message, true));
+    });
+    document.getElementById("listBody").addEventListener("click", (e) => {
+      const tr = e.target.closest("tr[data-id]");
+      if (tr) selectOrder(Number(tr.dataset.id));
+    });
+
+    function renderList() {
+      document.querySelectorAll("#statusSeg button").forEach(b => b.classList.toggle("active", b.dataset.status === state.status));
+      document.getElementById("listHead").innerHTML =
+        [["col_issue"], ["col_order"], ["col_pn"], ["col_delivery"], ["col_qty", "r"], ["col_ok", "r"], ["col_packed", "r"], ["col_rest", "r"]]
+          .map(([k, c]) => `<th class="${c || ""}">${t(k)}</th>`).join("");
+      const body = document.getElementById("listBody");
+      if (!state.orders) return;
+      document.getElementById("listCount").textContent = t("n_rows", { n: state.orders.length });
+      if (!state.orders.length) { body.innerHTML = `<tr><td colspan="8" class="empty">${t("empty")}</td></tr>`; return; }
+      body.innerHTML = state.orders.map(o => {
+        const rest = o.order_qty - o.packed_qty;
+        return `<tr class="pick ${o.id === state.orderId ? "selected" : ""}" data-id="${o.id}">
+          <td class="mono">${esc(o.issue_date?.slice(2) ?? "")}</td>
+          <td class="mono">${esc(o.ordersheet_number)}</td>
+          <td class="mono">${esc(o.production_number)}</td>
+          <td class="mono">${esc(md(o.delivery_date))}</td>
+          <td class="r mono">${fmt(o.order_qty)}</td>
+          <td class="r mono">${fmt(o.ok_qty)}</td>
+          <td class="r mono">${fmt(o.packed_qty)}</td>
+          <td class="r mono ${rest > 0 ? "rest" : "done"}">${rest > 0 ? fmt(rest) : "✔"}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    /* =====================================================
+       右：最近の梱包作業（発注書を選んでいないとき）
+    ===================================================== */
+    async function loadRecent() {
+      const q = new URLSearchParams({ from: state.from, to: state.to });
+      const data = await getJson(`${API}get_recent.php?${q}`);
+      state.recent = data.rows;
+      if (!state.orderId) renderRight();
+    }
+
+    function renderRecent() {
+      const rows = state.recent;
+      const body = rows === null ? "" : rows.length === 0
+        ? `<tr><td colspan="7" class="empty">－</td></tr>`
+        : rows.map(r => `<tr class="pick" data-order="${r.order_id}">
+            <td class="mono">${esc(r.packing_date)}</td>
+            <td class="mono">${esc(r.start_time)}〜${esc(r.end_time)}</td>
+            <td class="mono">${esc(r.ordersheet_number)}</td>
+            <td class="mono">${esc(r.production_number)}</td>
+            <td class="r mono">${r.worker_count}</td>
+            <td class="r mono">${r.box_count}</td>
+            <td class="r mono">${fmt(r.packed_qty)}</td>
+          </tr>`).join("");
+      const month = state.from ? state.from.slice(0, 7) : "";
+      return `
+        <div class="card">
+          <div class="card-header"><span>${t("recent_title")}</span></div>
+          <div class="card-body">
+            <div class="muted" style="margin-bottom:10px">${t("recent_hint")}</div>
+            <div class="form-row" style="margin:0 0 10px">
+              <label>${t("lbl_from")}</label>
+              <input type="date" id="fFrom" value="${esc(state.from)}" /> 〜 <input type="date" id="fTo" value="${esc(state.to)}" />
+              <label>${t("lbl_month")}</label><input type="month" id="fMonth" value="${esc(month)}" />
+              <button class="btn btn-csv btn-sm" id="btnCsv">${t("btn_csv")}</button>
+            </div>
+            <table>
+              <thead><tr><th>${t("col_date")}</th><th>${t("col_time")}</th><th>${t("col_order")}</th><th>${t("col_pn")}</th>
+                <th class="r">${t("col_workers")}</th><th class="r">${t("col_boxes")}</th><th class="r">${t("col_pqty")}</th></tr></thead>
+              <tbody id="recentBody">${body}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    /* =====================================================
+       右：選んだ発注書
+    ===================================================== */
+    async function selectOrder(id) {
+      showMsg("");
+      if (id !== state.orderId) {
+        Object.assign(state, { orderId: id, d: null, extraBoxes: [], workId: null, pressId: null, racks: null, rackId: null });
+      }
+      renderList();
+      renderRight();
+      await loadOrder();
+    }
+
+    async function loadOrder() {
+      try {
+        state.d = await getJson(`${API}get_order.php?id=${state.orderId}`);
+        if (state.workId && !state.d.works.some(w => w.id === state.workId)) state.workId = null;
+        if (!state.pressId && state.d.presses.length) state.pressId = state.d.presses[0].id;
+        renderRight();
+        if (state.pressId) await loadRacks();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    async function loadRacks() {
+      try {
+        const data = await getJson(`${API}get_racks.php?press_id=${state.pressId}`);
+        state.racks = data.racks;
+        if (state.rackId && !state.racks.some(r => r.id === state.rackId)) state.rackId = null;
+        renderRight();
+      } catch (err) {
+        showMsg(err.message, true);
+      }
+    }
+
+    // 保存のあとに読み直す（発注書の数字・一覧の数字も変わるので両方）
+    async function reloadAll() {
+      await loadOrder();
+      loadList().catch(() => {});
+    }
+
+    const allBoxes = () => {
+      const seen = new Set();
+      return [...(state.d?.boxes || []), ...state.extraBoxes].filter(b => !seen.has(b.id) && seen.add(b.id));
+    };
+
+    function renderRight() {
+      const right = document.getElementById("right");
+      if (!state.orderId) { right.innerHTML = renderRecent(); fitHeights(); return; }
+      const d = state.d;
+      if (!d) { right.innerHTML = `<div class="card"><div class="placeholder">…</div></div>`; fitHeights(); return; }
+      const o = d.order;
+      const packed = d.boxes.filter(b => b.ordersheet_id === o.id).reduce((s, b) => s + b.qty, 0);
+      const info = (k, v, cls) => `<span><span class="lbl">${t(k)}</span><b class="${cls || ""}">${v}</b></span>`;
+      const listRow = state.orders?.find(r => r.id === o.id);
+      const rest = o.order_qty - packed;
+
+      right.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <span>${esc(o.ordersheet_number)}　${esc(o.production_number)}</span>
+            <button class="btn btn-sub btn-sm" id="btnClose">${t("btn_close")}</button>
+          </div>
+          <div class="card-body">
+            <div class="info">
+              ${info("info_delivery", esc(o.delivery_date ?? "－"))}
+              ${info("info_qty", fmt(o.order_qty))}
+              ${listRow ? info("info_ok", fmt(listRow.ok_qty)) : ""}
+              ${info("info_packed", fmt(packed))}
+              ${info("info_rest", rest > 0 ? fmt(rest) : "✔", rest > 0 ? "rest" : "done")}
+              ${info("info_per_box", o.per_box ? fmt(o.per_box) : "－")}
+            </div>
+            <div class="grid2">
+              ${renderWorks()}
+              ${renderPresses()}
+            </div>
+            <div class="grid2">
+              ${renderRacks()}
+              ${renderBoxList()}
+            </div>
+            <div class="grid2">
+              ${renderNg()}
+              ${renderBoxIn()}
+            </div>
+          </div>
+        </div>`;
+      fitHeights();
+    }
+
+    function renderWorks() {
+      const d = state.d, w = d.works.find(x => x.id === state.workId);
+      const rows = d.works.length ? d.works.map(x => `
+        <tr class="pick ${x.id === state.workId ? "selected" : ""}" data-work="${x.id}">
+          <td class="mono">${esc(x.packing_date.slice(2))}</td>
+          <td class="mono">${esc(x.start_time)}〜${esc(x.end_time)}</td>
+          <td>${x.workers.map(p => esc(p.name)).join(", ") || `<span class="muted">－</span>`}</td>
+          <td class="r mono">${x.box_count}</td>
+          <td class="r mono">${fmt(x.packed_qty)}</td>
+        </tr>`).join("") : `<tr><td colspan="5" class="empty">－</td></tr>`;
+      const used = new Set((w?.workers || []).map(p => p.staff_id));
+      const staffOpts = `<option value="">${t("staff_none")}</option>` + d.staff.filter(s => !used.has(s.id)).map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join("");
+      return `
+        <div class="panel">
+          <h3><span>${t("work_title")}</span><small>${t("work_hint")}</small></h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>${t("col_date")}</th><th>${t("col_time")}</th><th>${t("col_workers_names")}</th><th class="r">${t("col_boxes")}</th><th class="r">${t("col_pqty")}</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+          <div class="form-row">
+            <label>${t("lbl_date")}</label><input type="date" id="wDate" value="${esc(w ? w.packing_date : today())}" />
+            <label>${t("lbl_start")}</label><input class="time" id="wStart" value="${esc(w ? w.start_time : "")}" placeholder="8:00" />
+            <label>${t("lbl_end")}</label><input class="time" id="wEnd" value="${esc(w ? w.end_time : "")}" placeholder="10:00" />
+            ${w
+              ? `<button class="btn btn-main btn-sm" id="btnWorkUpdate">${t("btn_update")}</button>
+                 <button class="btn btn-del btn-sm" id="btnWorkDelete">${t("btn_delete")}</button>
+                 <button class="btn btn-sub btn-sm" id="btnWorkNew">${t("btn_new")}</button>`
+              : `<button class="btn btn-main btn-sm" id="btnWorkAdd">${t("btn_add")}</button>`}
+          </div>
+          ${w ? `
+            <div class="chips">${w.workers.length ? w.workers.map(p => `<span class="chip">${esc(p.name)}<button class="x-btn" data-del-worker="${p.id}">×</button></span>`).join("") : `<span class="muted">${t("no_workers")}</span>`}</div>
+            <div class="form-row"><select id="wStaff">${staffOpts}</select><button class="btn btn-sub btn-sm" id="btnWorkerAdd">${t("worker_add")}</button></div>` : ""}
+        </div>`;
+    }
+
+    function renderPresses() {
+      const d = state.d;
+      const rows = d.presses.length ? d.presses.map(p => `
+        <tr class="pick ${p.id === state.pressId ? "selected" : ""}" data-press="${p.id}">
+          <td class="mono">${esc(p.press_date)}</td>
+          <td class="c">${p.machine ?? ""}</td>
+          <td class="mono">${esc(p.die_number)}</td>
+          <td class="mono">${esc(p.packing_check_date ?? "")}</td>
+        </tr>`).join("") : `<tr><td colspan="4" class="empty">${t("no_press")}</td></tr>`;
+      return `
+        <div class="panel">
+          <h3><span>${t("press_title")}</span></h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>${t("col_pdate")}</th><th class="c">${t("col_machine")}</th><th>${t("col_die")}</th><th>${t("col_packdate")}</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+        </div>`;
+    }
+
+    function renderRacks() {
+      let body;
+      if (!state.pressId || !state.racks) body = `<tr><td colspan="6" class="empty">${t("rack_pick")}</td></tr>`;
+      else if (!state.racks.length) body = `<tr><td colspan="6" class="empty">－</td></tr>`;
+      else body = state.racks.map(r => {
+        const rest = r.ok_qty - r.packed_qty;
+        return `<tr class="pick ${r.id === state.rackId ? "selected" : ""}" data-rack="${r.id}">
+          <td class="c">${r.order_number ?? ""}</td>
+          <td class="mono">${esc(r.rack_number)}</td>
+          <td class="r mono">${fmt(r.work_qty)}</td>
+          <td class="r mono">${fmt(r.ok_qty)}</td>
+          <td class="r mono">${fmt(r.packed_qty)}</td>
+          <td class="r mono ${rest > 0 ? "rest" : rest < 0 ? "over" : "done"}">${rest > 0 ? fmt(rest) : rest < 0 ? fmt(rest) : "✔"}</td>
+        </tr>`;
+      }).join("");
+      const tot = (k) => (state.racks || []).reduce((s, r) => s + r[k], 0);
+      const foot = state.racks?.length ? `<tr><td></td><td><b>${t("tot")}</b></td><td class="r mono"><b>${fmt(tot("work_qty"))}</b></td><td class="r mono"><b>${fmt(tot("ok_qty"))}</b></td><td class="r mono"><b>${fmt(tot("packed_qty"))}</b></td><td class="r mono"><b>${fmt(tot("ok_qty") - tot("packed_qty"))}</b></td></tr>` : "";
+      return `
+        <div class="panel">
+          <h3><span>${t("rack_title")}</span></h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th class="c">${t("col_seq")}</th><th>${t("col_rack")}</th><th class="r">${t("col_work")}</th><th class="r">${t("col_ok")}</th><th class="r">${t("col_packed")}</th><th class="r">${t("col_rest")}</th></tr></thead>
+            <tbody>${body}${foot}</tbody>
+          </table></div>
+        </div>`;
+    }
+
+    function renderBoxList() {
+      const boxes = allBoxes();
+      const own = state.d.boxes.filter(b => b.ordersheet_id === state.d.order.id);
+      const rows = boxes.length ? boxes.map(b => `<tr>
+          <td class="mono">${esc(b.box_number)}</td>
+          <td class="r mono">${fmt(b.qty)}</td>
+          <td class="c">${b.qty === 0 && b.ordersheet_id === state.d.order.id ? `<button class="x-btn" data-del-boxno="${b.id}">×</button>` : ""}</td>
+        </tr>`).join("") : `<tr><td colspan="3" class="empty">${t("no_boxes")}</td></tr>`;
+      return `
+        <div class="panel">
+          <h3><span>${t("boxlist_title")}</span>
+            <span>${own.length ? "" : `<button class="btn btn-main btn-sm" id="btnMakeBox">${t("btn_make_box")}</button>`}
+              <button class="btn btn-sub btn-sm" id="btnOtherBox">${t("btn_other_box")}</button></span></h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>${t("col_box")}</th><th class="r">${t("col_box_qty")}</th><th></th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table></div>
+        </div>`;
+    }
+
+    const curRack = () => state.racks?.find(r => r.id === state.rackId) || null;
+
+    function renderNg() {
+      const r = curRack();
+      if (!r) return `<div class="panel disabled"><h3><span>${t("ng_title")}</span></h3><div class="muted">${t("need_rack")}</div></div>`;
+      const label = (c) => `${esc(c.code)} ${esc(currentLang === "vi" ? c.vi : (c.ja || c.vi))}`;
+      const rows = r.ng.length ? r.ng.map(n => `<tr>
+          <td>${label(n)}</td>
+          <td class="r"><input class="qty" data-ng="${n.id}" value="${n.qty}" inputmode="numeric" /></td>
+          <td class="c"><button class="x-btn" data-del-ng="${n.id}">×</button></td>
+        </tr>`).join("") : `<tr><td colspan="3" class="empty">${t("ng_none")}</td></tr>`;
+      const codeOpts = `<option value="">${t("code_none")}</option>` + state.d.codes.map(c => `<option value="${c.id}">${label(c)}</option>`).join("");
+      return `
+        <div class="panel">
+          <h3><span>${t("ng_title")}</span><small>${esc(r.rack_number)}</small></h3>
+          <div class="tbl-wrap"><table><tbody>${rows}</tbody></table></div>
+          <div class="form-row">
+            <select id="ngCode" style="max-width:260px">${codeOpts}</select>
+            <input class="qty" id="ngQty" inputmode="numeric" placeholder="0" />
+            <button class="btn btn-sub btn-sm" id="btnNgAdd">${t("btn_add")}</button>
+          </div>
+        </div>`;
+    }
+
+    function renderBoxIn() {
+      const r = curRack();
+      if (!r) return `<div class="panel disabled"><h3><span>${t("box_title")}</span></h3><div class="muted">${t("need_rack")}</div></div>`;
+      const rest = r.ok_qty - r.packed_qty;
+      const rows = r.boxes.length ? r.boxes.map(b => `<tr>
+          <td class="mono">${esc(b.box_number)}</td>
+          <td class="mono muted">${esc(md(b.packing_date))}</td>
+          <td class="r mono">${fmt(b.qty)}</td>
+          <td class="c"><button class="x-btn" data-del-box="${b.id}">×</button></td>
+        </tr>`).join("") : `<tr><td colspan="4" class="empty">${t("box_none")}</td></tr>`;
+      const boxOpts = `<option value="">${t("box_pick")}</option>` + allBoxes().map(b => `<option value="${b.id}">${esc(b.box_number)}（${fmt(b.qty)}）</option>`).join("");
+      return `
+        <div class="panel">
+          <h3><span>${t("box_title")}</span><small>${esc(r.rack_number)}　${t("rack_rest", { n: fmt(rest) })}</small></h3>
+          <div class="tbl-wrap"><table><tbody>${rows}</tbody></table></div>
+          ${state.workId ? `
+            <div class="form-row">
+              <select id="boxNo" style="max-width:240px">${boxOpts}</select>
+              <input class="qty" id="boxQty" inputmode="numeric" value="${rest > 0 ? rest : ""}" />
+              <button class="btn btn-main btn-sm" id="btnBoxAdd" ${rest > 0 ? "" : "disabled"}>${t("btn_add")}</button>
+            </div>` : `<div class="note">${t("need_work")}</div>`}
+        </div>`;
+    }
+
+    /* ---------- 右のクリック ---------- */
+    document.getElementById("right").addEventListener("click", async (e) => {
+      const el = e.target;
+      const tr = el.closest("tr");
+      if (tr?.dataset.order) return selectOrder(Number(tr.dataset.order));
+      if (el.id === "btnClose") { Object.assign(state, { orderId: null, d: null }); renderList(); renderRight(); return; }
+      if (el.id === "btnCsv") {
+        const q = new URLSearchParams({ from: state.from, to: state.to });
+        location.href = `${API}download.php?${q}`;
+        return;
+      }
+      if (tr?.dataset.work) { state.workId = state.workId === Number(tr.dataset.work) ? null : Number(tr.dataset.work); return renderRight(); }
+      if (tr?.dataset.press) { state.pressId = Number(tr.dataset.press); state.rackId = null; state.racks = null; renderRight(); return loadRacks(); }
+      if (tr?.dataset.rack) { state.rackId = Number(tr.dataset.rack); return renderRight(); }
+
+      // 梱包作業
+      if (el.id === "btnWorkAdd" || el.id === "btnWorkUpdate") {
+        const start = normTime(document.getElementById("wStart").value), end = normTime(document.getElementById("wEnd").value);
+        if (!start || !end) return showMsg(t("err_time"), true);
+        const body = { packing_date: document.getElementById("wDate").value, start, end, press_id: state.pressId };
+        if (el.id === "btnWorkAdd") {
+          return act("save_work.php", { action: "add", order_id: state.orderId, ...body }, async (data) => { state.workId = data.id; await reloadAll(); });
+        }
+        return act("save_work.php", { action: "update", id: state.workId, ...body }, reloadAll);
+      }
+      if (el.id === "btnWorkDelete") {
+        if (!confirm(t("confirm_del_work"))) return;
+        return act("save_work.php", { action: "delete", id: state.workId }, async () => { state.workId = null; await reloadAll(); });
+      }
+      if (el.id === "btnWorkNew") { state.workId = null; return renderRight(); }
+      if (el.id === "btnWorkerAdd") {
+        const staffId = Number(document.getElementById("wStaff").value);
+        if (!staffId) return;
+        return act("save_work.php", { action: "add_worker", packing_id: state.workId, staff_id: staffId }, reloadAll);
+      }
+      if (el.dataset.delWorker) return act("save_work.php", { action: "del_worker", id: Number(el.dataset.delWorker) }, reloadAll);
+
+      // NG
+      if (el.id === "btnNgAdd") {
+        return act("save_rack.php", { action: "ng_add", rack_id: state.rackId, code_id: Number(document.getElementById("ngCode").value), qty: document.getElementById("ngQty").value.trim() }, reloadAll);
+      }
+      if (el.dataset.delNg) return act("save_rack.php", { action: "ng_delete", id: Number(el.dataset.delNg) }, reloadAll);
+
+      // 箱
+      if (el.id === "btnBoxAdd") {
+        return act("save_rack.php", {
+          action: "box_add", packing_id: state.workId, rack_id: state.rackId,
+          box_number_id: Number(document.getElementById("boxNo").value), qty: document.getElementById("boxQty").value.trim(),
+        }, reloadAll);
+      }
+      if (el.dataset.delBox) return act("save_rack.php", { action: "box_delete", id: Number(el.dataset.delBox) }, reloadAll);
+      if (el.dataset.delBoxno) return act("box_numbers.php", { action: "delete", id: Number(el.dataset.delBoxno) }, reloadAll);
+      if (el.id === "btnMakeBox") return openMakeBox();
+      if (el.id === "btnOtherBox") return openOtherBox();
+    });
+
+    // NG の本数を直したら保存
+    document.getElementById("right").addEventListener("change", (e) => {
+      const el = e.target;
+      if (el.dataset.ng) return act("save_rack.php", { action: "ng_update", id: Number(el.dataset.ng), qty: el.value.trim() }, reloadAll);
+      if (el.id === "wStart" || el.id === "wEnd") { const v = normTime(el.value); if (v) el.value = v; }
+      if (el.id === "fFrom" || el.id === "fTo") {
+        state.from = document.getElementById("fFrom").value;
+        state.to = document.getElementById("fTo").value;
+        return loadRecent().catch(err => showMsg(err.message, true));
+      }
+      if (el.id === "fMonth") {
+        if (!el.value) { state.from = ""; state.to = ""; }
+        else {
+          const [y, m] = el.value.split("-").map(Number);
+          state.from = ymd(new Date(y, m - 1, 1));
+          state.to = ymd(new Date(y, m, 0));
+        }
+        return loadRecent().catch(err => showMsg(err.message, true));
+      }
+    });
+
+    /* ---------- 小窓：箱番号を作る ---------- */
+    const modalBack = document.getElementById("modalBack");
+    const closeModal = () => modalBack.classList.remove("open");
+    modalBack.addEventListener("click", (e) => { if (e.target === modalBack || e.target.dataset.cancel) closeModal(); });
+
+    function boxNames(orderNumber, n) {
+      return Array.from({ length: n }, (_, i) => `${orderNumber}-${n >= 10 ? String(i + 1).padStart(2, "0") : i + 1}/${n}`);
+    }
+    function openMakeBox() {
+      const o = state.d.order;
+      const draw = (per) => {
+        const n = per > 0 ? Math.ceil(o.order_qty / per) : 0;
+        document.getElementById("mkDesc").textContent = t("mk_desc", { qty: fmt(o.order_qty), per: per || "?", n });
+        document.getElementById("mkNames").value = n ? boxNames(o.ordersheet_number, n).join("\n") : "";
+      };
+      document.getElementById("modal").innerHTML = `
+        <h3>${t("mk_title")}　<span class="muted">${esc(o.ordersheet_number)}</span></h3>
+        <div class="form-row" style="margin:0 0 8px"><label>${t("mk_per")}</label><input class="qty" id="mkPer" value="${o.per_box ?? ""}" inputmode="numeric" /></div>
+        <div class="muted" id="mkDesc" style="margin-bottom:8px"></div>
+        <textarea id="mkNames"></textarea>
+        <div class="actions"><button class="btn btn-sub" data-cancel="1">${t("cancel")}</button><button class="btn btn-main" id="mkMake">${t("mk_make")}</button></div>`;
+      draw(Number(o.per_box) || 0);
+      document.getElementById("mkPer").addEventListener("input", (e) => draw(Number(e.target.value) || 0));
+      document.getElementById("mkMake").addEventListener("click", async () => {
+        const names = document.getElementById("mkNames").value.split("\n").map(s => s.trim()).filter(Boolean);
+        const ok = await act("box_numbers.php", { action: "create", order_id: o.id, names }, reloadAll);
+        if (ok) closeModal();
+      });
+      modalBack.classList.add("open");
+    }
+
+    /* ---------- 小窓：別の発注の箱を使う ---------- */
+    async function openOtherBox() {
+      let data;
+      try { data = await post("box_numbers.php", { action: "same_pn", order_id: state.orderId }); }
+      catch (err) { return showMsg(err.message, true); }
+      const rows = data.orders.length ? data.orders.map(o => `<tr class="pick" data-use="${o.id}">
+          <td class="mono">${esc(o.ordersheet_number)}</td><td class="mono">${esc(o.delivery_date ?? "")}</td>
+          <td class="r mono">${fmt(o.order_qty)}</td><td class="r mono">${o.box_count}</td></tr>`).join("")
+        : `<tr><td colspan="4" class="empty">${t("ot_none")}</td></tr>`;
+      document.getElementById("modal").innerHTML = `
+        <h3>${t("ot_title")}</h3>
+        <div class="muted" style="margin-bottom:8px">${t("ot_desc")}</div>
+        <table><thead><tr><th>${t("col_order")}</th><th>${t("col_delivery")}</th><th class="r">${t("col_qty")}</th><th class="r">${t("col_box_count")}</th></tr></thead><tbody>${rows}</tbody></table>
+        <div class="actions"><button class="btn btn-sub" data-cancel="1">${t("cancel")}</button></div>`;
+      document.querySelector("#modal tbody").addEventListener("click", async (e) => {
+        const tr = e.target.closest("tr[data-use]");
+        if (!tr) return;
+        const res = await act("box_numbers.php", { action: "use_order", order_id: Number(tr.dataset.use) });
+        if (!res) return;
+        state.extraBoxes = [...state.extraBoxes, ...res.boxes];
+        closeModal();
+        renderRight();
+      });
+      modalBack.classList.add("open");
+    }
+
+    /* ---------- 高さ ---------- */
+    function fitHeights() {
+      const layout = document.getElementById("layout");
+      const bottomPad = parseFloat(getComputedStyle(document.body).paddingBottom) || 0;
+      const h = Math.max(420, window.innerHeight - (layout.getBoundingClientRect().top + window.scrollY) - bottomPad);
+      layout.style.setProperty("--fit-h", h + "px");
+      layout.classList.add("fit");
+    }
+    window.addEventListener("resize", fitHeights);
+
+    setLang(currentLang);
+    loadList().catch(err => showMsg(err.message, true));
+    loadRecent().catch(err => showMsg(err.message, true));
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- 梱包：押出材を詰めた細長い箱（手前の口から材の端が見える）と、2本の帯 -->
+  <!-- 箱の上の面・横の面 -->
+  <path d="M1.5 10 L10.5 10 L22.5 3.5 L13.5 3.5 Z" fill="#6a9fd0" />
+  <path d="M10.5 10 L22.5 3.5 L22.5 12.5 L10.5 19 Z" fill="#2b6ca3" />
+  <!-- 帯（上の面を横切り、横の面へ回る）×2 -->
+  <g fill="#ffffff" opacity="0.9">
+    <path d="M5.7 7.73 L14.7 7.73 L15.54 7.27 L6.54 7.27 Z" />
+    <path d="M14.7 7.73 L15.54 7.27 L15.54 16.27 L14.7 16.73 Z" />
+    <path d="M9.9 5.45 L18.9 5.45 L19.74 5 L10.74 5 Z" />
+    <path d="M18.9 5.45 L19.74 5 L19.74 14 L18.9 14.45 Z" />
+  </g>
+  <!-- 手前の口：材の端が 3×3 に並ぶ -->
+  <rect x="1.5" y="10" width="9" height="9" fill="#1f5482" />
+  <g fill="#d6e6f5">
+    <rect x="2.6" y="11.1" width="2" height="2" rx="0.3" />
+    <rect x="5" y="11.1" width="2" height="2" rx="0.3" />
+    <rect x="7.4" y="11.1" width="2" height="2" rx="0.3" />
+    <rect x="2.6" y="13.5" width="2" height="2" rx="0.3" />
+    <rect x="5" y="13.5" width="2" height="2" rx="0.3" />
+    <rect x="7.4" y="13.5" width="2" height="2" rx="0.3" />
+    <rect x="2.6" y="15.9" width="2" height="2" rx="0.3" />
+    <rect x="5" y="15.9" width="2" height="2" rx="0.3" />
+    <rect x="7.4" y="15.9" width="2" height="2" rx="0.3" />
+  </g>
+</svg>
