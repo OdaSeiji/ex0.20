@@ -75,6 +75,8 @@
     .press-info { display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 13px; }
     .press-info b { font-family: "Roboto Mono", monospace; font-size: 14px; }
     .press-info .lbl { color: #777; font-size: 11px; margin-right: 4px; }
+    .special-note { margin-top: 10px; padding: 6px 10px; border-left: 4px solid #c62828; background: #fff3f3; border-radius: 4px; font-size: 13px; white-space: pre-wrap; }
+    .special-note .lbl { color: #c62828; font-size: 11px; font-weight: bold; margin-right: 6px; }
 
     .steps { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .step { flex: 1 1 180px; border: 2px solid #ddd; border-radius: 8px; padding: 8px 10px; }
@@ -179,7 +181,7 @@
         days_unit: "日", left_fmt: (n) => `あと${n}日`,
         empty: "該当する押出はありません",
         info_date: "押出日", info_machine: "号機", info_die: "型番", info_pn: "品番", info_type: "種別",
-        info_billets: "実績ビレット", info_qty: "本数", info_ng: "NG", info_ok: "OK",
+        info_billets: "実績ビレット", info_qty: "本数", info_ng: "NG", info_ok: "OK", info_special_note: "押出時の特記事項",
         step_dimension: "寸法", step_etching: "エッチング", step_aging: "硬度", step_qc: "QC（最終確認）",
         step_not_yet: "未完了", step_not_required: "〇は不要",
         src_etching: "エッチングの画面で入力", src_aging: "硬度の画面で入力",
@@ -220,7 +222,7 @@
         days_unit: " ngày", left_fmt: (n) => `Còn ${n} ngày`,
         empty: "Không có lần ép phù hợp",
         info_date: "Ngày ép", info_machine: "Máy", info_die: "Mã khuôn", info_pn: "Mã SP", info_type: "Kiểu",
-        info_billets: "Billet TT", info_qty: "Số cây", info_ng: "NG", info_ok: "OK",
+        info_billets: "Billet TT", info_qty: "Số cây", info_ng: "NG", info_ok: "OK", info_special_note: "Ghi chú đặc biệt khi ép",
         step_dimension: "Kích thước", step_etching: "Etching", step_aging: "Độ cứng", step_qc: "QC (xác nhận cuối)",
         step_not_yet: "Chưa xong", step_not_required: "〇 không cần",
         src_etching: "Nhập ở màn hình Etching", src_aging: "Nhập ở màn hình độ cứng",
@@ -515,6 +517,7 @@
               <span><span class="lbl">${t("info_ng")}</span><b style="color:#e65100">${fmt(ngTotal)}</b></span>
               <span><span class="lbl">${t("info_ok")}</span><b style="color:#2e7d32">${fmt(qtyTotal - ngTotal)}</b></span>
             </div>
+            ${p.special_note && p.special_note.trim() ? `<div class="special-note"><span class="lbl">${t("info_special_note")}</span>${esc(p.special_note.trim())}</div>` : ""}
             <div class="steps">
               ${stepBox("dimension", p.dimension_date, true, dimExtra)}
               ${stepBox("etching", p.etching_date, !isTest, `<div class="step-src">${t("src_etching")}</div>`)}

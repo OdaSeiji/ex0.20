@@ -15,6 +15,7 @@ try {
             p.pressing_type_id,
             t.pressing_type,
             p.actual_billet_quantities               AS billets,
+            p.special_note,
             d.die_number,
             COALESCE(pnv.production_number, pnd.production_number) AS production_number,
             DATE_FORMAT(p.dimension_check_date, '%Y-%m-%d') AS dimension_date,

@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-29</span>
         </div>
+        <div class="entry-title" data-key="gw_title">品質評価入力：押出時の特記事項を表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gw_purpose">押出のときに気づいたこと（NG の内容など）を見ながら評価できるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gw_content">押出を選ぶと、押出日報に書かれた特記事項を基本情報のすぐ下に赤い枠で出す。特記事項が無い押出では何も出さない。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-29 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-29</span>
+        </div>
         <div class="entry-title" data-key="gv_title">品質サマリー：全数良品の押出でも T_ng・T_ok・良品率を出す</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gv_purpose">QC 確認済みなのに、NG が0本の押出だけ T_ng・T_ok が空欄になっていたため。</span>
@@ -1664,6 +1682,9 @@
           gv_title: "品質サマリー：全数良品の押出でも T_ng・T_ok・良品率を出す",
           gv_purpose: "QC 確認済みなのに、NG が0本の押出だけ T_ng・T_ok が空欄になっていたため。",
           gv_content: "NG の記録が1件も無い押出は、QC 確認済み（品質評価入力の「完了済み」と同じ条件）なら T_ng=0、T_ok=本数、良品率 100% と出す。QC 確認の前は、評価が終わっていないので今まで通り空欄。",
+          gw_title: "品質評価入力：押出時の特記事項を表示",
+          gw_purpose: "押出のときに気づいたこと（NG の内容など）を見ながら評価できるようにするため。",
+          gw_content: "押出を選ぶと、押出日報に書かれた特記事項を基本情報のすぐ下に赤い枠で出す。特記事項が無い押出では何も出さない。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1908,6 +1929,9 @@
           gv_title: "Tổng hợp chất lượng: hiển thị T_ng, T_ok, tỷ lệ đạt cả với lần ép toàn bộ đạt",
           gv_purpose: "Vì lần ép đã QC xác nhận nhưng có 0 cây NG thì T_ng, T_ok bị để trống.",
           gv_content: "Lần ép không có dữ liệu NG nào: nếu QC đã xác nhận (cùng điều kiện \"Đã xong\" của màn hình nhập đánh giá chất lượng) thì hiện T_ng=0, T_ok=số cây, tỷ lệ đạt 100%. Trước khi QC xác nhận thì vẫn để trống như trước vì chưa đánh giá xong.",
+          gw_title: "Nhập đánh giá chất lượng: hiển thị ghi chú đặc biệt khi ép",
+          gw_purpose: "Để vừa xem những điều ghi nhận khi ép (nội dung NG…) vừa đánh giá.",
+          gw_content: "Khi chọn lần ép, ghi chú đặc biệt trong báo cáo đùn hằng ngày hiện trong khung đỏ ngay dưới thông tin cơ bản. Lần ép không có ghi chú thì không hiện gì.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
