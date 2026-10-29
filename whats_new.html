@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-10-29</span>
         </div>
+        <div class="entry-title" data-key="gv_title">品質サマリー：全数良品の押出でも T_ng・T_ok・良品率を出す</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gv_purpose">QC 確認済みなのに、NG が0本の押出だけ T_ng・T_ok が空欄になっていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gv_content">NG の記録が1件も無い押出は、QC 確認済み（品質評価入力の「完了済み」と同じ条件）なら T_ng=0、T_ok=本数、良品率 100% と出す。QC 確認の前は、評価が終わっていないので今まで通り空欄。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_summary.html'">quality_summary.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-29 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-29</span>
+        </div>
         <div class="entry-title" data-key="gu_title">押出日報：NG などの記録がある日報も、ラック以外は修正できる・副担当者は全スタッフ・保存済みスキャンのプレビュー</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gu_purpose">品質の記録と関係ない押出時間などの間違いを、後から直せるようにするため。</span>
@@ -1643,6 +1661,9 @@
           gu_title: "押出日報：NG などの記録がある日報も、ラック以外は修正できる・副担当者は全スタッフ・保存済みスキャンのプレビュー",
           gu_purpose: "品質の記録と関係ない押出時間などの間違いを、後から直せるようにするため。",
           gu_content: "NG・梱包・時効の記録がある日報は、これまで何も直せなかった。今後はラックの欄だけ変更できず（🔒 表示）、押出時間・停止時間・担当者・温度・金型・押出日などは更新できる。副担当者は、退職者を除くすべてのスタッフから選べる（主担当は今まで通りオペレーターのみ）。保存済みの日報を開いたときも「Preview」で押出指示書のスキャンを見られる。",
+          gv_title: "品質サマリー：全数良品の押出でも T_ng・T_ok・良品率を出す",
+          gv_purpose: "QC 確認済みなのに、NG が0本の押出だけ T_ng・T_ok が空欄になっていたため。",
+          gv_content: "NG の記録が1件も無い押出は、QC 確認済み（品質評価入力の「完了済み」と同じ条件）なら T_ng=0、T_ok=本数、良品率 100% と出す。QC 確認の前は、評価が終わっていないので今まで通り空欄。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1884,6 +1905,9 @@
           gu_title: "Báo cáo đùn hằng ngày: báo cáo đã có dữ liệu NG… vẫn sửa được ngoài rack, người phụ chọn từ tất cả nhân viên, xem trước bản scan đã lưu",
           gu_purpose: "Để có thể sửa sau các lỗi không liên quan đến chất lượng, như giờ đùn.",
           gu_content: "Trước đây, báo cáo đã có dữ liệu NG / đóng gói / hóa già thì không sửa được gì. Nay chỉ phần rack không thay đổi được (hiện 🔒); giờ đùn, thời gian dừng, người phụ trách, nhiệt độ, khuôn, ngày đùn… vẫn cập nhật được. Người phụ chọn được từ tất cả nhân viên (trừ người đã nghỉ việc); người phụ trách chính vẫn chỉ là operator. Khi mở báo cáo đã lưu, bấm \"Preview\" để xem bản scan phiếu đùn.",
+          gv_title: "Tổng hợp chất lượng: hiển thị T_ng, T_ok, tỷ lệ đạt cả với lần ép toàn bộ đạt",
+          gv_purpose: "Vì lần ép đã QC xác nhận nhưng có 0 cây NG thì T_ng, T_ok bị để trống.",
+          gv_content: "Lần ép không có dữ liệu NG nào: nếu QC đã xác nhận (cùng điều kiện \"Đã xong\" của màn hình nhập đánh giá chất lượng) thì hiện T_ng=0, T_ok=số cây, tỷ lệ đạt 100%. Trước khi QC xác nhận thì vẫn để trống như trước vì chưa đánh giá xong.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
