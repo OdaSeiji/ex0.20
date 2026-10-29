@@ -104,6 +104,9 @@
       cursor: pointer; padding: 2px 6px; line-height: 1;
     }
     .row-del-btn:hover { color: #fff; background: #e53935; border-radius: 4px; }
+    .rack-lock-note { display: none; font-size: 12px; color: #c62828; margin-bottom: 6px; }
+    .rack-locked .rack-lock-note { display: block; }
+    .rack-locked #rack__table .row-del-btn { visibility: hidden; }
 
     .card-header-total { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
 
@@ -478,12 +481,13 @@
     </div>
 
     <!-- right__wrapper 相当：ラック登録 ＋ 定尺・数量登録 -->
-    <div class="card right-card">
+    <div class="card right-card" id="rack__card">
       <div class="card-header card-header-total">
         <span data-key="card_rack">ラック登録</span>
         <span class="header-total"><span data-key="lbl_rack_total">合計本数</span>: <span id="rack-total__value" class="mono">0</span></span>
       </div>
       <div class="card-body">
+        <div class="rack-lock-note" data-key="rack_lock_note">🔒 NG・梱包・時効の記録があるため、ラックは変更できません</div>
         <div class="table-wrap rack-wrap">
           <table id="rack__table">
             <thead><tr><th data-key="col_order">Order</th><th data-key="col_rack">Rack</th><th data-key="col_qty">Qty</th><th></th></tr></thead>
@@ -823,6 +827,7 @@
         btn_save: "追加",
         card_rack: "ラック登録", lbl_rack_total: "合計本数", lbl_rack_day_total: "本日の使用ラック数", col_order: "順序", col_rack: "ラック",
         empty_rack: "登録データなし", ph_rack: "ラック番号",
+        rack_lock_note: "🔒 NG・梱包・時効の記録があるため、ラックは変更できません",
         card_worklength: "切出本数", col_len: "長さ", btn_copy: "コピー",
         lbl_worklength_total: "合計", unit_pieces: "本",
         empty_worklength: "登録データなし", ph_len: "長さ",
@@ -892,6 +897,7 @@
         btn_save: "Thêm",
         card_rack: "Đăng ký rack", lbl_rack_total: "Tổng số lượng", lbl_rack_day_total: "Số rack đã dùng trong ngày", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số rack",
+        rack_lock_note: "🔒 Đã có dữ liệu NG / đóng gói / hóa già nên không thể thay đổi rack",
         card_worklength: "Đăng ký chiều dài sản phẩm", col_len: "Chiều dài", btn_copy: "Sao chép",
         lbl_worklength_total: "Tổng", unit_pieces: "thanh",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Chiều dài",
@@ -963,14 +969,14 @@
     }
 
     /* 日付のデフォルト値：t_press の最新日付の翌日 */
-    /* 担当者：m_staff（leave_at IS NULL AND role='operator'）を反映 */
+    /* 担当者：m_staff（leave_at IS NULL）を反映。主担当は role='operator' のみ、副担当者は全スタッフ */
     async function loadStaffList() {
       const res  = await fetch("./php/press_daily_report/get_staff.php");
       const rows = await res.json();
       const sel  = document.getElementById("name__select");
       const sub  = document.getElementById("sub-staff__select");
       rows.forEach(row => {
-        sel.appendChild(new Option(row.staff_name, row.id));
+        if (row.role === "operator") sel.appendChild(new Option(row.staff_name, row.id));
         sub.appendChild(new Option(row.staff_name, row.id));
       });
       sel.addEventListener("change", renderSubStaff);
@@ -2164,27 +2170,49 @@
     ------------------------- */
     let drawingFileURL = null;
 
+    // 保存済みのスキャン（編集モードで読み込んだ日報の添付）
+    function savedScanFileName() {
+      return editingPressId ? document.getElementById("existing_scan_filename").value : "";
+    }
+
     function onDrawingFileChange(input) {
       const file = input.files[0];
-      document.getElementById("drawingFileName").textContent = file ? file.name : "未選択";
-      document.getElementById("preview__button").disabled = !file;
+      document.getElementById("drawingFileName").textContent = file ? file.name : (savedScanFileName() || "未選択");
+      document.getElementById("preview__button").disabled = !file && !savedScanFileName();
       if (drawingFileURL) URL.revokeObjectURL(drawingFileURL);
       drawingFileURL = file ? URL.createObjectURL(file) : null;
     }
 
     function openDrawingPreview() {
+      // 新しく選んだファイルを優先し、無ければ保存済みのファイルを表示する
       const file = document.getElementById("press-direction_file").files[0];
-      if (!file || !drawingFileURL) return;
+      let url, name, kind;
+      if (file && drawingFileURL) {
+        url  = drawingFileURL;
+        name = file.name;
+        kind = file.type.startsWith("image/") ? "image" : file.type === "application/pdf" ? "pdf" : "";
+      } else if (savedScanFileName()) {
+        name = savedScanFileName();
+        url  = `../diereport/upload/01_press_directive/${encodeURIComponent(name)}`;
+        const ext = name.split(".").pop().toLowerCase();
+        kind = ["jpg", "jpeg", "png", "gif"].includes(ext) ? "image" : ext === "pdf" ? "pdf" : "";
+      } else {
+        return;
+      }
 
       const content = document.getElementById("previewContent");
-      if (file.type.startsWith("image/")) {
-        content.innerHTML = `<img src="${drawingFileURL}" alt="${file.name}" />`;
-      } else if (file.type === "application/pdf") {
-        content.innerHTML = `<embed src="${drawingFileURL}" type="application/pdf" width="100%" height="500px" />`;
+      content.innerHTML = "";
+      if (kind === "image") {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = name;
+        content.appendChild(img);
+      } else if (kind === "pdf") {
+        content.innerHTML = `<embed src="${url}" type="application/pdf" width="100%" height="500px" />`;
       } else {
         content.innerHTML = `
           <p style="font-size:13px; color:#666; margin-bottom:10px;">${dict[currentLang].preview_unsupported}</p>
-          <a class="btn btn-add" href="${drawingFileURL}" target="_blank" rel="noopener">${dict[currentLang].btn_open_file}</a>
+          <a class="btn btn-add" href="${url}" target="_blank" rel="noopener">${dict[currentLang].btn_open_file}</a>
         `;
       }
       document.getElementById("previewModal").style.display = "flex";
@@ -2494,7 +2522,18 @@
     });
 
     let editingPressId = null;
-    let editLocked = false;   // 後工程の記録（NG・梱包・時効）がある押出は修正不可
+    let rackLocked = false;   // 後工程の記録（NG・梱包・時効）がある押出は、ラックだけ変更不可（ラック以外は更新できる）
+
+    function setRackLocked(locked) {
+      rackLocked = locked;
+      document.getElementById("rack__card").classList.toggle("rack-locked", locked);
+      ["racknumber__input", "rackqty__input"].forEach(id => {
+        const el = document.getElementById(id);
+        el.disabled = locked;
+        if (locked) el.value = "";
+      });
+      if (locked) document.getElementById("add-rack__button").disabled = true;
+    }
 
     function isFieldEmpty(el) {
       if (el.type === "file") {
@@ -2534,7 +2573,7 @@
       const valid = !cardBody.querySelector(".field-empty, .field-invalid");
       if (editingPressId) {
         document.getElementById("save__button").disabled = true;
-        document.getElementById("update__button").disabled = !valid || editLocked;
+        document.getElementById("update__button").disabled = !valid;
       } else {
         document.getElementById("save__button").disabled = !valid;
         document.getElementById("update__button").disabled = true;
@@ -2769,7 +2808,7 @@
       });
 
       editingPressId = null;
-      editLocked = false;
+      setRackLocked(false);
       document.getElementById("existing_scan_filename").value = "";
       document.getElementById("edit-mode__badge").style.display = "none";
       const selected = document.querySelector("#summary__table tbody tr.selected-record");
@@ -2851,7 +2890,7 @@
         document.getElementById("press-direction_file").value = "";
         document.getElementById("existing_scan_filename").value = p.press_directive_scan_file_name ?? "";
         document.getElementById("drawingFileName").textContent = p.press_directive_scan_file_name ?? "未選択";
-        document.getElementById("preview__button").disabled = true;
+        document.getElementById("preview__button").disabled = !p.press_directive_scan_file_name;
 
         // サブテーブル
         clearSubTables();
@@ -2869,10 +2908,10 @@
         refreshRackDayTotal();
 
         const lk = data.locks || { quality: 0, packing: 0, aging: 0 };
-        editLocked = lk.quality + lk.packing + lk.aging > 0;
-        showSaveStatus(editLocked
-          ? `🔒 品質記録(NG) ${lk.quality}件・梱包 ${lk.packing}件・時効 ${lk.aging}件 の記録があるため修正できません`
-          : "", editLocked);
+        setRackLocked(lk.quality + lk.packing + lk.aging > 0);
+        showSaveStatus(rackLocked
+          ? `🔒 品質記録(NG) ${lk.quality}件・梱包 ${lk.packing}件・時効 ${lk.aging}件 の記録があるため、ラックは変更できません（ラック以外は更新できます）`
+          : "", rackLocked);
         checkAllRequiredFields();
       } catch (err) {
         showSaveStatus("❌ " + err.message, true);

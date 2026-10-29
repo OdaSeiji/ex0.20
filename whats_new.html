@@ -85,7 +85,25 @@
         </div>
       </div>
 
-      <!-- 2026-10-27 (最新) -->
+      <!-- 2026-10-29 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-10-29</span>
+        </div>
+        <div class="entry-title" data-key="gu_title">押出日報：NG などの記録がある日報も、ラック以外は修正できる・副担当者は全スタッフ・保存済みスキャンのプレビュー</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gu_purpose">品質の記録と関係ない押出時間などの間違いを、後から直せるようにするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gu_content">NG・梱包・時効の記録がある日報は、これまで何も直せなかった。今後はラックの欄だけ変更できず（🔒 表示）、押出時間・停止時間・担当者・温度・金型・押出日などは更新できる。副担当者は、退職者を除くすべてのスタッフから選べる（主担当は今まで通りオペレーターのみ）。保存済みの日報を開いたときも「Preview」で押出指示書のスキャンを見られる。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_daily_report.html'">press_daily_report.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-27 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -1622,6 +1640,9 @@
           gt_title: "測定記録（エッチング・粗さ・硬度）：画面の高さに収まる表、使い方のページ、硬度は3か所",
           gt_purpose: "1080px の画面で、ページをスクロールせずに入力できるようにするため。",
           gt_content: "左右のカードを画面の下端までの同じ高さにし、表の中だけスクロールする。左の一覧を広く・文字を大きくした。右上の「❓ 使い方」から各画面の使い方（日本語・ベトナム語）を開ける。硬度の入力欄は3か所に（昔の記録で4か所目以降に値がある押出は、その欄まで出す）、表の文字を大きくした。",
+          gu_title: "押出日報：NG などの記録がある日報も、ラック以外は修正できる・副担当者は全スタッフ・保存済みスキャンのプレビュー",
+          gu_purpose: "品質の記録と関係ない押出時間などの間違いを、後から直せるようにするため。",
+          gu_content: "NG・梱包・時効の記録がある日報は、これまで何も直せなかった。今後はラックの欄だけ変更できず（🔒 表示）、押出時間・停止時間・担当者・温度・金型・押出日などは更新できる。副担当者は、退職者を除くすべてのスタッフから選べる（主担当は今まで通りオペレーターのみ）。保存済みの日報を開いたときも「Preview」で押出指示書のスキャンを見られる。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1860,6 +1881,9 @@
           gt_title: "Ghi kết quả đo (etching, độ nhám, độ cứng): bảng vừa chiều cao màn hình, trang hướng dẫn, độ cứng 3 điểm",
           gt_purpose: "Để nhập trên màn hình 1080px mà không phải cuộn trang.",
           gt_content: "Thẻ trái và phải cao bằng nhau đến cuối màn hình, chỉ cuộn bên trong bảng. Danh sách bên trái rộng hơn, chữ to hơn. Nút \"❓ Hướng dẫn\" góc trên bên phải mở trang hướng dẫn (tiếng Nhật, tiếng Việt). Độ cứng nhập 3 điểm (lần đùn cũ có giá trị từ điểm thứ 4 trở đi thì hiện đủ ô), chữ trong bảng to hơn.",
+          gu_title: "Báo cáo đùn hằng ngày: báo cáo đã có dữ liệu NG… vẫn sửa được ngoài rack, người phụ chọn từ tất cả nhân viên, xem trước bản scan đã lưu",
+          gu_purpose: "Để có thể sửa sau các lỗi không liên quan đến chất lượng, như giờ đùn.",
+          gu_content: "Trước đây, báo cáo đã có dữ liệu NG / đóng gói / hóa già thì không sửa được gì. Nay chỉ phần rack không thay đổi được (hiện 🔒); giờ đùn, thời gian dừng, người phụ trách, nhiệt độ, khuôn, ngày đùn… vẫn cập nhật được. Người phụ chọn được từ tất cả nhân viên (trừ người đã nghỉ việc); người phụ trách chính vẫn chỉ là operator. Khi mở báo cáo đã lưu, bấm \"Preview\" để xem bản scan phiếu đùn.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

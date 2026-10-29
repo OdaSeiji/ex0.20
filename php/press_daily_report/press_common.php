@@ -71,9 +71,9 @@ function bindPressValues($stmt, $p) {
     }
 }
 
-// 修正ロック：この押出のラックに、後工程の記録（NG・梱包・時効）がいくつ付いているか。
+// ラックのロック：この押出のラックに、後工程の記録（NG・梱包・時効）がいくつ付いているか。
 // 更新はラックを全削除→再登録するため、記録があると NG は CASCADE で消え、梱包・時効は RESTRICT で失敗する。
-// どれか1件でもあれば修正させない（使い方を把握してから差分更新を検討する）。
+// どれか1件でもあればラックだけは触らない（ラック以外は更新できる）。
 function pressEditLocks($pdo, $pressId) {
     $count = function ($table) use ($pdo, $pressId) {
         $stmt = $pdo->prepare("
