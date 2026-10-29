@@ -5970,3 +5970,26 @@ http://10.163.50.17/ex0.20/press_daily_report.html
 ### quality_summary.html
 
 - 「Die Handover」の右側に「製造評価完了」を追加する。
+
+# 2026/10/29
+
+`10/23 CXS15S3-V04D`の品質サマリー画面、
+http://10.163.50.17/ex0.20/quality_summary.html
+で`t_ng`と`t_ok`が計算されない。
+品質入力画面
+http://10.163.50.17/ex0.20/quality_report.html
+では、検査完了が入っているが、ng品が0のケースの様。
+また、品質入力が、例えば、エッチングの場合、
+http://10.163.50.17/ex0.20/etching_record.html
+でも、入力できる。二つの入力結果が異なっている可能性もある。
+サマリー画面の`t_ng`と`t_ok`の計算条件、「どのデータが有るとき計算するのか」がおかしいか？でも、完了済みに入っているんだけどな。。。完了済みの判断と、計算条件が異なるのかな。
+
+<figure style="text-align:center;">
+  <img src="./img/20261029-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+<figure style="text-align:center;">
+  <img src="./img/20261029-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
