@@ -3,9 +3,9 @@ header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
 $rows = $pdo->query("
-    SELECT id, staff_name
+    SELECT id, staff_name, role
     FROM m_staff
-    WHERE leave_at IS NULL AND role = 'operator'
+    WHERE leave_at IS NULL
     ORDER BY staff_name
 ")->fetchAll(PDO::FETCH_ASSOC);
 

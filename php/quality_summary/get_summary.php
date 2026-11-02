@@ -75,6 +75,9 @@ $rawSec = "((TIME_TO_SEC(t_press.press_finish_at) - TIME_TO_SEC(t_press.press_st
 $netSec = "(CASE WHEN {$rawSec} > 0 THEN {$rawSec} END)";
 // 総重量（kg）＝ 切出本数 × 比重(kg/m) × 製品長さ(m)
 $weightKg = "(tpq.quantity * IFNULL(mpn.specific_weight, 0) * IFNULL(mpn.production_length, 0))";
+// NG 合計：NG の記録が無いと SUM が NULL になる。QC 確認済み（品質評価入力の完了 QR_DONE_SQL と同じ条件）なら全数良品として 0、
+//   確認前は評価が終わっていないので空欄のまま
+$totalNg = "COALESCE(t10.total_ng, CASE WHEN t_press.qc_check_date IS NOT NULL OR IFNULL(t_press.qc_check_id, 0) > 0 THEN 0 END)";
 
 $sql = "
 SELECT
@@ -88,9 +91,9 @@ SELECT
     t_press.plan_billet_quantities,
     t30.prs_quantity,
     t20.work_quantity,
-    t10.total_ng,
-    t20.work_quantity - t10.total_ng AS total_ok,
-    CONCAT(ROUND((t20.work_quantity - t10.total_ng + t10.code_401) / t20.work_quantity * 100, 1), '%') AS per,
+    {$totalNg} AS total_ng,
+    t20.work_quantity - {$totalNg} AS total_ok,
+    CONCAT(ROUND((t20.work_quantity - {$totalNg} + IFNULL(t10.code_401, 0)) / t20.work_quantity * 100, 1), '%') AS per,
     DATE_FORMAT(t_press.dimension_check_date, '%m-%d') AS dcd,
     CASE
         WHEN t_press_sub.etching_check_staff IS NOT NULL AND t_press_sub.etching_finish IN (1, 2)

@@ -28,16 +28,8 @@ foreach (PRESS_REQUIRED_KEYS as $key) {
     }
 }
 
-$locks = pressEditLocks($pdo, $pressId);
-if (array_sum($locks) > 0) {
-    http_response_code(409);
-    echo json_encode([
-        "success" => false,
-        "locks"   => $locks,
-        "error"   => "品質記録(NG) {$locks["quality"]}件・梱包 {$locks["packing"]}件・時効 {$locks["aging"]}件 の記録があるため修正できません",
-    ], JSON_UNESCAPED_UNICODE);
-    exit;
-}
+// 後工程の記録（NG・梱包・時効）はラックにぶら下がっているので、記録があるときはラックだけ残して他を更新する
+$rackLocked = array_sum(pressEditLocks($pdo, $pressId)) > 0;
 
 try {
     $pdo->beginTransaction();
@@ -58,8 +50,8 @@ try {
     $stmt->bindValue(":id", $pressId, PDO::PARAM_INT);
     $stmt->execute();
 
-    // サブテーブルは一旦全削除してから現在のフォーム内容で作り直す
-    foreach ([
+    // サブテーブルは一旦全削除してから現在のフォーム内容で作り直す（ラックはロック中なら触らない）
+    $subTables = [
         "t_bundle" => "press_id",
         "t_using_aging_rack" => "t_press_id",
         "t_press_work_length_quantity" => "press_id",
@@ -67,7 +59,12 @@ try {
         "t_pull_press" => "press_id",
         "t_cut_press" => "press_id",
         "t_press_staff" => "t_press_id",
-    ] as $table => $col) {
+    ];
+    if ($rackLocked) {
+        unset($subTables["t_using_aging_rack"]);
+        $rack = [];
+    }
+    foreach ($subTables as $table => $col) {
         $del = $pdo->prepare("DELETE FROM {$table} WHERE {$col} = :id");
         $del->bindValue(":id", $pressId, PDO::PARAM_INT);
         $del->execute();
@@ -77,7 +74,7 @@ try {
     saveSubStaff($pdo, $pressId, $subStaff, $p["staff_id"]);
 
     $pdo->commit();
-    echo json_encode(["success" => true, "press_id" => $pressId], JSON_UNESCAPED_UNICODE);
+    echo json_encode(["success" => true, "press_id" => $pressId, "rack_locked" => $rackLocked], JSON_UNESCAPED_UNICODE);
 } catch (Exception $e) {
     $pdo->rollBack();
     http_response_code(500);
