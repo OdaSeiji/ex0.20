@@ -5993,3 +5993,27 @@ http://10.163.50.17/ex0.20/etching_record.html
   <img src="./img/20261029-02.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+以下、現在は品質データを入力すると編集、削除が出来なくなるが、
+編集は出来るようになるべき。
+
+<figure style="text-align:center;">
+  <img src="./img/20261029-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+# 2026/11/02
+
+下記、黄色塗り潰し部、必要なし。
+
+<figure style="text-align:center;">
+  <img src="./img/20261102-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+このページに品質記録を入力するところを設けたい。ただ、このページって、何かの`table`を見ているわけではないハズ。。。
+
+<figure style="text-align:center;">
+  <img src="./img/20261102-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
