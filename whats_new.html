@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-03</span>
         </div>
+        <div class="entry-title" data-key="hc_title">金型輸出・輸入・固定資産登録：品番を金型マスタから表示し、品番で検索できるようにする</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hc_purpose">登録時に入力した品番をそのまま出していたため、空欄だったり、金型マスタの品番と食い違ったりしていた。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hc_content">品番は金型マスタの品番を出す。金型マスタに品番が無いときだけ、登録時に入力した品番を出す。品番の列にも検索窓を付けた（型番と同じく前方一致、* ? 使用可、型番と両方入れると両方に合うものだけ出す）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='handover_list.html'">handover_list.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
         <div class="entry-title" data-key="hb_title">重点管理金型リスト：到着日が「N-NaN-NaN」と出ないようにする</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hb_purpose">到着日が 0000-00-00 で登録されている金型だと、到着日が「N-NaN-NaN」と表示されていたため。</span>
@@ -1792,6 +1810,9 @@
           hb_title: "重点管理金型リスト：到着日が「N-NaN-NaN」と出ないようにする",
           hb_purpose: "到着日が 0000-00-00 で登録されている金型だと、到着日が「N-NaN-NaN」と表示されていたため。",
           hb_content: "日付として読めない値は「—」と表示する。金型タイムラインの日付も同じように直した。",
+          hc_title: "金型輸出・輸入・固定資産登録：品番を金型マスタから表示し、品番で検索できるようにする",
+          hc_purpose: "登録時に入力した品番をそのまま出していたため、空欄だったり、金型マスタの品番と食い違ったりしていた。",
+          hc_content: "品番は金型マスタの品番を出す。金型マスタに品番が無いときだけ、登録時に入力した品番を出す。品番の列にも検索窓を付けた（型番と同じく前方一致、* ? 使用可、型番と両方入れると両方に合うものだけ出す）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2054,6 +2075,9 @@
           hb_title: "Danh sách khuôn quản lý trọng điểm: không còn hiện \"N-NaN-NaN\" ở ngày đến",
           hb_purpose: "Vì với khuôn có ngày đến là 0000-00-00, ngày đến bị hiển thị \"N-NaN-NaN\".",
           hb_content: "Giá trị không đọc được là ngày sẽ hiển thị \"—\". Ngày trên dòng thời gian khuôn cũng được sửa tương tự.",
+          hc_title: "Xuất / nhập khuôn & đăng ký tài sản cố định: hiển thị mã sản phẩm từ master khuôn và tìm theo mã sản phẩm",
+          hc_purpose: "Trước đây hiển thị nguyên mã sản phẩm nhập lúc đăng ký, nên có chỗ để trống hoặc khác với mã trong master khuôn.",
+          hc_content: "Mã sản phẩm được lấy từ master khuôn. Chỉ khi master khuôn không có mã sản phẩm thì mới hiển thị mã đã nhập lúc đăng ký. Thêm ô tìm kiếm ở cột mã sản phẩm (giống mã khuôn: khớp phần đầu, dùng được * ?; nhập cả hai thì chỉ hiện dòng khớp cả hai).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

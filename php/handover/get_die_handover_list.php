@@ -58,7 +58,7 @@ $sql = "
         h.updated_at
     FROM t_die_handover h
     LEFT JOIN m_dies d ON h.die_id = d.id
-    LEFT JOIN m_production_numbers p ON h.product_code = p.production_number
+    LEFT JOIN m_production_numbers p ON d.production_number_id = p.id
     $whereSql
     ORDER BY h.id DESC
 ";

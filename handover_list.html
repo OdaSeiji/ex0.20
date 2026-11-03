@@ -303,7 +303,11 @@
                 onclick="event.stopPropagation()" />
               <span class="sort-icon"></span>
             </th>
-            <th data-col="production_number" data-key="col_pn">品番 <span class="sort-icon"></span></th>
+            <th data-col="production_number" data-key="col_pn">品番
+              <input type="text" id="searchPn" placeholder="検索…" class="die-search"
+                onclick="event.stopPropagation()" />
+              <span class="sort-icon"></span>
+            </th>
             <th data-col="ordered_at" data-key="col_ordered">発注日 <span class="sort-icon"></span></th>
             <th data-col="shipped_at" data-key="col_shipped">出荷日 <span class="sort-icon"></span></th>
             <th data-col="invoice_number" data-key="col_invoice">インボイス番号 <span class="sort-icon"></span></th>
@@ -430,7 +434,7 @@
           }
         });
         localStorage.setItem("lang", lang);
-        if (window._tableData) renderTable(window._tableData);
+        if (window._tableData) renderTable(filterRows());
         updateCheckedCount();
       }
 
@@ -499,6 +503,7 @@
         document.getElementById("saveBtn").style.display = "";
         document.getElementById("cancelBtn").style.display = "";
         document.getElementById("searchDie").disabled = true;
+        document.getElementById("searchPn").disabled = true;
         const checked = (window._tableData || []).filter((r) => checkedIds.has(Number(r.id)));
         renderTable(checked);
       }
@@ -509,7 +514,8 @@
         document.getElementById("saveBtn").style.display = "none";
         document.getElementById("cancelBtn").style.display = "none";
         document.getElementById("searchDie").disabled = false;
-        renderTable(window._tableData || []);
+        document.getElementById("searchPn").disabled = false;
+        renderTable(filterRows());
       }
 
       /* ============================================================
@@ -559,7 +565,7 @@
       async function loadTable() {
         const res = await fetch("./php/handover/get_die_handover_list.php");
         window._tableData = await res.json();
-        renderTable(window._tableData);
+        renderTable(filterRows());
         updateCheckedCount();
       }
 
@@ -710,34 +716,38 @@
           document.querySelectorAll(".sort-icon").forEach((i) => (i.textContent = ""));
           const icon = th.querySelector(".sort-icon");
           if (icon) icon.textContent = sortDir === "asc" ? "▲" : "▼";
-          if (window._tableData) renderTable(window._tableData);
+          if (window._tableData) renderTable(filterRows());
         });
       });
 
       /* ============================================================
-        型番検索
+        型番・品番検索（前方一致、* ? のワイルドカード可。両方入れたら AND）
       ============================================================ */
-      document.getElementById("searchDie").addEventListener("input", function () {
-        const raw = this.value.trim().toUpperCase();
-        let filtered;
-        if (raw === "") {
-          filtered = window._tableData || [];
-        } else if (raw.includes("*") || raw.includes("?")) {
+      function matcher(inputId) {
+        const raw = document.getElementById(inputId).value.trim().toUpperCase();
+        if (raw === "") return () => true;
+        if (raw.includes("*") || raw.includes("?")) {
           const pattern = raw
             .replace(/[.+^${}()|[\]\\]/g, "\\$&")
             .replace(/\*/g, ".*")
             .replace(/\?/g, ".");
           const re = new RegExp("^" + pattern, "i");
-          filtered = (window._tableData || []).filter((row) =>
-            re.test(row.die_number ?? "")
-          );
-        } else {
-          filtered = (window._tableData || []).filter((row) =>
-            (row.die_number ?? "").toUpperCase().startsWith(raw)
-          );
+          return (v) => re.test(v ?? "");
         }
-        renderTable(filtered);
-      });
+        return (v) => (v ?? "").toUpperCase().startsWith(raw);
+      }
+
+      function filterRows() {
+        const dieOk = matcher("searchDie");
+        const pnOk  = matcher("searchPn");
+        return (window._tableData || []).filter(
+          (row) => dieOk(row.die_number) && pnOk(row.production_number)
+        );
+      }
+
+      ["searchDie", "searchPn"].forEach((id) =>
+        document.getElementById(id).addEventListener("input", () => renderTable(filterRows()))
+      );
 
       function isRecentUpdate(dateStr) {
         if (!dateStr) return false;
@@ -927,16 +937,18 @@
         initDropZone();
         loadTable();
 
-        const input = document.getElementById("searchDie");
-        const tip   = document.getElementById("wildcardTip");
-        input.addEventListener("focus", () => {
-          const rect = input.getBoundingClientRect();
-          tip.style.top  = (rect.bottom + 6) + "px";
-          tip.style.left = rect.left + "px";
-          tip.style.display = "block";
-        });
-        input.addEventListener("blur", () => {
-          tip.style.display = "none";
+        const tip = document.getElementById("wildcardTip");
+        ["searchDie", "searchPn"].forEach((id) => {
+          const input = document.getElementById(id);
+          input.addEventListener("focus", () => {
+            const rect = input.getBoundingClientRect();
+            tip.style.top  = (rect.bottom + 6) + "px";
+            tip.style.left = rect.left + "px";
+            tip.style.display = "block";
+          });
+          input.addEventListener("blur", () => {
+            tip.style.display = "none";
+          });
         });
       };
     </script>
