@@ -91,6 +91,25 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-03</span>
         </div>
+        <div class="entry-title" data-key="hd_title">品質評価入力：押出ごとの品質メモを書けるようにする</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hd_purpose">これまでの備考は NG の行ごとにしか書けず、押出全体について気づいたことを残す場所がなかったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hd_content">品質評価入力で押出を選ぶと、特記事項の下に「品質メモ（押出ごと）」の欄が出る。書いて「保存」を押すと保存される（書き直すと上書き、1000字まで）。品質サマリーでは品質メモのある行の左端に青い印が付き、行をクリックすると特記事項と並べて表示する。CSV にも出る。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_report.html'">quality_report.html</a>
+          <a class="file-link" onclick="location.href='quality_summary.html'">quality_summary.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
         <div class="entry-title" data-key="hc_title">金型輸出・輸入・固定資産登録：品番を金型マスタから表示し、品番で検索できるようにする</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hc_purpose">登録時に入力した品番をそのまま出していたため、空欄だったり、金型マスタの品番と食い違ったりしていた。</span>
@@ -1813,6 +1832,9 @@
           hc_title: "金型輸出・輸入・固定資産登録：品番を金型マスタから表示し、品番で検索できるようにする",
           hc_purpose: "登録時に入力した品番をそのまま出していたため、空欄だったり、金型マスタの品番と食い違ったりしていた。",
           hc_content: "品番は金型マスタの品番を出す。金型マスタに品番が無いときだけ、登録時に入力した品番を出す。品番の列にも検索窓を付けた（型番と同じく前方一致、* ? 使用可、型番と両方入れると両方に合うものだけ出す）。",
+          hd_title: "品質評価入力：押出ごとの品質メモを書けるようにする",
+          hd_purpose: "これまでの備考は NG の行ごとにしか書けず、押出全体について気づいたことを残す場所がなかったため。",
+          hd_content: "品質評価入力で押出を選ぶと、特記事項の下に「品質メモ（押出ごと）」の欄が出る。書いて「保存」を押すと保存される（書き直すと上書き、1000字まで）。品質サマリーでは品質メモのある行の左端に青い印が付き、行をクリックすると特記事項と並べて表示する。CSV にも出る。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2078,6 +2100,9 @@
           hc_title: "Xuất / nhập khuôn & đăng ký tài sản cố định: hiển thị mã sản phẩm từ master khuôn và tìm theo mã sản phẩm",
           hc_purpose: "Trước đây hiển thị nguyên mã sản phẩm nhập lúc đăng ký, nên có chỗ để trống hoặc khác với mã trong master khuôn.",
           hc_content: "Mã sản phẩm được lấy từ master khuôn. Chỉ khi master khuôn không có mã sản phẩm thì mới hiển thị mã đã nhập lúc đăng ký. Thêm ô tìm kiếm ở cột mã sản phẩm (giống mã khuôn: khớp phần đầu, dùng được * ?; nhập cả hai thì chỉ hiện dòng khớp cả hai).",
+          hd_title: "Nhập đánh giá chất lượng: có thể ghi chú chất lượng theo từng lần ép",
+          hd_purpose: "Trước đây chỉ ghi chú được theo từng dòng NG, không có chỗ để ghi nhận xét cho cả lần ép.",
+          hd_content: "Khi chọn lần ép trong màn hình Nhập đánh giá chất lượng, ô \"Ghi chú chất lượng (theo lần ép)\" hiện dưới ghi chú đặc biệt. Viết rồi bấm \"Lưu\" để lưu (viết lại sẽ ghi đè, tối đa 1000 ký tự). Trong Tổng hợp chất lượng, dòng có ghi chú chất lượng có vạch xanh ở đầu dòng, bấm vào dòng sẽ hiện cùng ghi chú đặc biệt. Cũng xuất ra CSV.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

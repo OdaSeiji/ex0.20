@@ -15,7 +15,7 @@
 | 人の記録 | 担当者などは必ず m_staff の id で保存する。名前の直書きや独自の番号は使わない |
 | サンプル名 | H/E/A/B/M などの呼び名は、列名やキーに使わない（表示は現場のルールのまま） |
 | コミット | ユーザーが「コミット」「push」と言ったときだけ。push の前に fetch/pull する（ユーザーが documents/memo.md を直接編集するため） |
-| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `hd`**（`hc_content` の行の後ろに ja・vi それぞれ追加。HTML の先頭に「(最新)」の項目を足す） |
+| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `he`**（`hd_content` の行の後ろに ja・vi それぞれ追加。HTML の先頭に「(最新)」の項目を足す） |
 | 文字コード | テーブル・列のコメントは英語で書く（本番は SQL をリモートの PC に貼るので日本語は ? になる）。日本語を含む SQL をローカルで流すときは UTF-8 のファイルにして `mysql --default-character-set=utf8mb4 ... < file.sql`。日本語を含む Python はファイルに書き、先頭に `# -*- coding: utf-8 -*-`（標準入力のヒアドキュメントでは失敗する） |
 | 確認方法 | PHP は `/c/xampp/php/php.exe -l`。JS は `<script>` を取り出して `node --check`。画面はブラウザで確かめる |
 | アイコン | img/ の SVG。1色（#2b6ca3）の濃淡が基本。グラフの画面は、そのグラフの形・色をアイコンにする（ユーザーの好み） |
@@ -45,6 +45,7 @@
 
 - 10/23 までの DB 変更は、本番もすべて反映済み
 - `2026-10-25_press_operation_time.sql`（t_press_schedule_day に end_time を追加）も本番で実行済み（10/27 ユーザー確認）。**本番で未実行の DB 変更は無い**
+- `2026-11-03_press_quality_note.sql`（t_press に quality_note を追加）は 11/03 にユーザーが本番 PC での実行を依頼済み。実行されたか次に確認する
 
 ---
 
@@ -81,9 +82,17 @@
 ### テーブルの整理（ex0.11 を止めたあと）
 20. **似たテーブル**：t_die_handover（正）と t_die_handover_progress が到着日などを別々に持つ。m_dies.arrival_at も含めて整理
 21. **測定のテーブルの作り直し**：t_hardness（1hn〜10hn が文字列、空の行が多い）、t_measurement も文字列。t_sample のような共通の形にする案
-22. **t_press の列が多すぎる**（89列）。ラム速度・圧力・温度の no1〜no5 などを子テーブルに
+22. **t_press の列が多すぎる**（92列。11/03 に quality_note を足した）。ラム速度・圧力・温度の no1〜no5 などを子テーブルに
 23. **外部キーの重複**：t_using_aging_rack.t_press_id に2本、t_press_work_length_quantity.press_id に CASCADE と RESTRICT の2本
 24. **aging_check_date 列の削除**（Aging の完了日は hardness_check_date）
+25. **品質のメモがあちこちに散らかっている**（11/03 ユーザー「かなり酷い」）。押出ごとの品質メモを1か所にまとめ直す。今あるもの：
+    - t_press.special_note … 押出日報の特記事項（押出ごと）
+    - t_press.quality_note … 品質評価入力の品質メモ（押出ごと、11/03 追加、上書き式）
+    - t_press_sub.etching_note … エッチング評価記録のメモ（押出ごと。77行だけ、t_press_sub の重複行にも同じ値が入る）
+    - t_press_quality.note … NG の行ごとの備考（ラック×工程×コード）
+    - t_measurement.note … 粗さのサンプル位置ごとの備考
+    - 硬度にはメモが無い。品番の基準のメモは m_production_numbers.hardness_note と m_measurement_data.note
+    - 先の話（ユーザー 11/03）：誰が・いつ書いたか、定量的な記録にするか は、もう少し先で考える
 
 ---
 

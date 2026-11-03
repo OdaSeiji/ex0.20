@@ -113,6 +113,7 @@ SELECT
         ELSE ROUND(NULLIF({$netSec} / 3600, 0), 2)
     END AS total_time,
     t_press.special_note,
+    t_press.quality_note,
     DATE_FORMAT(hp.die_handover_at, '%y-%m-%d') AS handover_d
 FROM t_press
 LEFT JOIN m_pressing_type ON t_press.pressing_type_id = m_pressing_type.id
