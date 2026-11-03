@@ -91,6 +91,24 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-03</span>
         </div>
+        <div class="entry-title" data-key="ha_title">押出指示書：ベトナム語で残っていた日本語を直す</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ha_purpose">ベトナム語に切り替えても、日本語のまま出るところがあったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ha_content">冷却方式の選択肢（空冷・水冷・ミスト）、履歴と入力済み一覧のプレス種別（試押・量試・量産）、入力欄の下の「前回」、「編集中」のバッジ、保存・更新・削除などのメッセージを、選んだ言語で出す。言語を切り替えると、表示中の履歴なども出し直す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
         <div class="entry-title" data-key="gz_title">金型輸出・輸入・固定資産登録：備考をその場で書ける</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gz_purpose">備考を1行直すだけでも、チェックして編集モードに入る必要があったため。</span>
@@ -1749,6 +1767,9 @@
           gz_title: "金型輸出・輸入・固定資産登録：備考をその場で書ける",
           gz_purpose: "備考を1行直すだけでも、チェックして編集モードに入る必要があったため。",
           gz_content: "一覧の備考のセルをクリックすると入力欄になり、Enter か枠の外をクリックで保存、Esc で取り消し。保存すると更新日時も変わる。備考の列を広げた。ほかの項目は今まで通り「チェックのみ編集」で直す。",
+          ha_title: "押出指示書：ベトナム語で残っていた日本語を直す",
+          ha_purpose: "ベトナム語に切り替えても、日本語のまま出るところがあったため。",
+          ha_content: "冷却方式の選択肢（空冷・水冷・ミスト）、履歴と入力済み一覧のプレス種別（試押・量試・量産）、入力欄の下の「前回」、「編集中」のバッジ、保存・更新・削除などのメッセージを、選んだ言語で出す。言語を切り替えると、表示中の履歴なども出し直す。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2005,6 +2026,9 @@
           gz_title: "Xuất / nhập khuôn, đăng ký tài sản cố định: sửa ghi chú ngay trên danh sách",
           gz_purpose: "Vì chỉ sửa một dòng ghi chú cũng phải chọn dòng rồi vào chế độ sửa.",
           gz_content: "Bấm vào ô ghi chú trong danh sách sẽ thành ô nhập; nhấn Enter hoặc bấm ra ngoài để lưu, Esc để hủy. Khi lưu, ngày giờ cập nhật cũng thay đổi. Cột ghi chú rộng hơn. Các mục khác vẫn sửa bằng \"Chỉnh sửa mục đã chọn\" như trước.",
+          ha_title: "Phiếu đùn: sửa các chỗ còn tiếng Nhật khi dùng tiếng Việt",
+          ha_purpose: "Vì khi chuyển sang tiếng Việt vẫn còn chỗ hiển thị tiếng Nhật.",
+          ha_content: "Lựa chọn kiểu làm mát, loại ép trong lịch sử và danh sách đã nhập (Ép thử / Thử hàng loạt / Hàng loạt), chữ \"Lần trước\" dưới ô nhập, nhãn \"Đang sửa\" và các thông báo lưu / cập nhật / xóa nay hiển thị theo ngôn ngữ đã chọn. Khi đổi ngôn ngữ, lịch sử đang hiển thị cũng được hiển thị lại.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

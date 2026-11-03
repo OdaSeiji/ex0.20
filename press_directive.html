@@ -395,9 +395,9 @@
             <div class="form-item" data-field="fCooling">
               <div class="fi-row"><span class="fi-label" data-key="lbl_cooling">冷却方式</span>
                 <select id="fCooling">
-                  <option value="1">空冷</option>
-                  <option value="2">水冷</option>
-                  <option value="3">ミスト</option>
+                  <option value="1" data-key="cooling_1">空冷</option>
+                  <option value="2" data-key="cooling_2">水冷</option>
+                  <option value="3" data-key="cooling_3">ミスト</option>
                 </select>
               </div>
               <span class="fi-prev" id="prevFCooling"></span>
@@ -496,6 +496,14 @@
           btn_recent: "入力済みリスト", recent_title: "入力済みリスト（最新30件）",
           col_created_at: "入力日", col_machine: "機械番号", col_entry_source: "入力元",
           src_new: "新", src_old: "旧", btn_close: "閉じる", recent_empty: "データなし",
+          cooling_1: "空冷", cooling_2: "水冷", cooling_3: "ミスト",
+          pt_1: "試押", pt_2: "量試", pt_3: "量産",
+          prev_label: "前回", editing: "編集中", no_die_found: "該当する金型がありません",
+          msg_select_die: "金型を選択してください", msg_incomplete: "未入力の項目があります",
+          msg_saved: "保存しました", msg_save_failed: "保存に失敗しました",
+          msg_updated: "更新しました", msg_update_failed: "更新に失敗しました",
+          msg_deleted: "削除しました", msg_delete_failed: "削除に失敗しました",
+          msg_loaded: "編集用に読み込みました",
         },
         vi: {
           btn_back_menu: "← Về menu",
@@ -524,6 +532,14 @@
           btn_recent: "Danh sách đã nhập", recent_title: "Danh sách đã nhập (30 mục mới nhất)",
           col_created_at: "Ngày nhập", col_machine: "Số máy", col_entry_source: "Nguồn nhập",
           src_new: "Mới", src_old: "Cũ", btn_close: "Đóng", recent_empty: "Không có dữ liệu",
+          cooling_1: "Làm mát bằng khí", cooling_2: "Làm mát bằng nước", cooling_3: "Phun sương",
+          pt_1: "Ép thử", pt_2: "Thử hàng loạt", pt_3: "Hàng loạt",
+          prev_label: "Lần trước", editing: "Đang sửa", no_die_found: "Không tìm thấy khuôn",
+          msg_select_die: "Vui lòng chọn khuôn", msg_incomplete: "Còn mục chưa nhập",
+          msg_saved: "Đã lưu", msg_save_failed: "Lưu thất bại",
+          msg_updated: "Đã cập nhật", msg_update_failed: "Cập nhật thất bại",
+          msg_deleted: "Đã xóa", msg_delete_failed: "Xóa thất bại",
+          msg_loaded: "Đã tải để sửa",
         },
       };
 
@@ -540,6 +556,13 @@
         document.querySelectorAll("[data-key-placeholder]").forEach((el) => {
           const k = el.getAttribute("data-key-placeholder");
           if (dict[lang][k] !== undefined) el.placeholder = dict[lang][k];
+        });
+        // JS で組み立てた表示（履歴のプレス種別・編集中バッジ・「前回」）も今の言語で出し直す
+        if (historyRows.length) renderHistory();
+        if (editingId) document.getElementById("editBadge").textContent = `${dict[lang].editing}: ID ${editingId}`;
+        document.querySelectorAll("[id^=prevF]").forEach((el) => {
+          const val = el.querySelector(".val");
+          if (val) el.innerHTML = `${dict[lang].prev_label}: ${val.outerHTML}`;
         });
       }
 
@@ -651,7 +674,7 @@
         dieDropdownActiveIndex = dies.length ? 0 : -1;
         const dd = document.getElementById("dieDropdown");
         if (!dies.length) {
-          dd.innerHTML = `<div style="color:#999;">該当する金型がありません</div>`;
+          dd.innerHTML = `<div style="color:#999;">${dict[currentLang()].no_die_found}</div>`;
           dd.classList.add("show");
           return;
         }
@@ -848,7 +871,7 @@
           return;
         }
         const ptMap = {};
-        masters.pressingTypes.forEach((t) => { ptMap[t.id] = t.remarks_jp ?? t.pressing_type; });
+        masters.pressingTypes.forEach((t) => { ptMap[t.id] = dict[currentLang()]["pt_" + t.id] ?? t.remarks_jp ?? t.pressing_type; });
 
         tbody.innerHTML = historyRows.map((r) => `
           <tr class="selectable ${String(r.id) === String(selectedHistoryId) ? "selected" : ""}" tabindex="0" data-id="${r.id}" onclick="onHistoryRowClick(${r.id})">
@@ -912,8 +935,8 @@
           body: JSON.stringify({ id }),
         });
         const result = await res.json();
-        if (result.status !== "ok") { showToast("削除に失敗しました", false); return; }
-        showToast("削除しました");
+        if (result.status !== "ok") { showToast(dict[currentLang()].msg_delete_failed, false); return; }
+        showToast(dict[currentLang()].msg_deleted);
         resetForm();
         await loadHistory(selectedDie.id);
       }
@@ -922,7 +945,7 @@
         editingId = r.id;
         originalPlanDate = r.plan_date_at ?? null;
         document.getElementById("editBadge").style.display = "";
-        document.getElementById("editBadge").textContent = `編集中: ID ${editingId}`;
+        document.getElementById("editBadge").textContent = `${dict[currentLang()].editing}: ID ${editingId}`;
         document.getElementById("deleteHint").style.display = "";
 
         const vals = {
@@ -952,7 +975,7 @@
           if (id === "fPlanDate") return; // 計画日は履歴の値を反映せず、デフォルト値(今日)を維持する
           document.getElementById(id).value = vals[id];
           const prevEl = document.getElementById("prev" + id[0].toUpperCase() + id.slice(1));
-          if (prevEl) prevEl.innerHTML = vals[id] !== "" ? `前回: <span class="val">${vals[id]}</span>` : "";
+          if (prevEl) prevEl.innerHTML = vals[id] !== "" ? `${dict[currentLang()].prev_label}: <span class="val">${vals[id]}</span>` : "";
         });
 
         if (r.die_production_number_variant_id) {
@@ -962,7 +985,7 @@
 
         checkAllComplete();
         recalcWorkLength();
-        showToast("編集用に読み込みました");
+        showToast(dict[currentLang()].msg_loaded);
         document.getElementById("fPlanDate").focus();
       }
 
@@ -980,7 +1003,7 @@
           return;
         }
         const ptMap = {};
-        masters.pressingTypes.forEach((t) => { ptMap[t.id] = t.remarks_jp ?? t.pressing_type; });
+        masters.pressingTypes.forEach((t) => { ptMap[t.id] = dict[currentLang()]["pt_" + t.id] ?? t.remarks_jp ?? t.pressing_type; });
 
         tbody.innerHTML = rows.map((r) => `
           <tr>
@@ -1070,8 +1093,8 @@
       }
 
       async function saveDirective() {
-        if (!selectedDie) { showToast("金型を選択してください", false); return; }
-        if (!checkAllComplete()) { showToast("未入力の項目があります", false); return; }
+        if (!selectedDie) { showToast(dict[currentLang()].msg_select_die, false); return; }
+        if (!checkAllComplete()) { showToast(dict[currentLang()].msg_incomplete, false); return; }
 
         const res = await fetch("./php/press_directive/save_directive.php", {
           method: "POST",
@@ -1079,16 +1102,16 @@
           body: JSON.stringify(collectPayload()),
         });
         const result = await res.json();
-        if (result.status !== "ok") { showToast(result.message || "保存に失敗しました", false); return; }
+        if (result.status !== "ok") { showToast(result.message || dict[currentLang()].msg_save_failed, false); return; }
 
-        showToast("保存しました");
+        showToast(dict[currentLang()].msg_saved);
         await loadHistory(selectedDie.id);
         resetForm();
       }
 
       async function updateDirective() {
         if (!editingId) return;
-        if (!checkAllComplete()) { showToast("未入力の項目があります", false); return; }
+        if (!checkAllComplete()) { showToast(dict[currentLang()].msg_incomplete, false); return; }
 
         const res = await fetch("./php/press_directive/update_directive.php", {
           method: "POST",
@@ -1096,9 +1119,9 @@
           body: JSON.stringify(collectPayload()),
         });
         const result = await res.json();
-        if (result.status !== "ok") { showToast(result.message || "更新に失敗しました", false); return; }
+        if (result.status !== "ok") { showToast(result.message || dict[currentLang()].msg_update_failed, false); return; }
 
-        showToast("更新しました");
+        showToast(dict[currentLang()].msg_updated);
         await loadHistory(selectedDie.id);
         resetForm();
       }
