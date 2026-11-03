@@ -231,16 +231,16 @@
       <button class="btn-back" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
       <span class="filter-label" data-key="filter_label">フェーズ絞り込み：</span>
       <select class="phase-filter" onchange="applyFilter()">
-        <option value="">すべて</option>
-        <option value="①">① 診断未完了</option>
-        <option value="②">② 診断承認待ち</option>
-        <option value="③">③ 診断却下</option>
-        <option value="④">④ ステージUP承認済・次押出待ち</option>
-        <option value="⑤">⑤ 修理計画未作成</option>
-        <option value="⑥">⑥ 修理計画承認待ち</option>
-        <option value="⑦">⑦ 修理実施待ち</option>
-        <option value="⑧">⑧ 修理報告承認待ち</option>
-        <option value="⑨">⑨ 完了待ち</option>
+        <option value="" data-key="phase_all">すべて</option>
+        <option value="①" data-key="phase_①">① 診断未完了</option>
+        <option value="②" data-key="phase_②">② 診断承認待ち</option>
+        <option value="③" data-key="phase_③">③ 診断却下</option>
+        <option value="④" data-key="phase_④">④ ステージUP承認済・次押出待ち</option>
+        <option value="⑤" data-key="phase_⑤">⑤ 修理計画未作成</option>
+        <option value="⑥" data-key="phase_⑥">⑥ 修理計画承認待ち</option>
+        <option value="⑦" data-key="phase_⑦">⑦ 修理実施待ち</option>
+        <option value="⑧" data-key="phase_⑧">⑧ 修理報告承認待ち</option>
+        <option value="⑨" data-key="phase_⑨">⑨ 完了待ち（Issue未クローズ）</option>
       </select>
       <button id="ngWatchBtn" onclick="toggleNgWatch()"
         style="padding:5px 12px; border-radius:20px; border:1.5px solid #90a4ae;
@@ -280,15 +280,15 @@
       <div class="modal-box">
         <div class="modal-header">
           <span class="modal-die-num" id="modalDieNum"></span>
-          <span id="modalUnregBadge" class="modal-badge-unreg" style="display:none">未登録</span>
+          <span id="modalUnregBadge" class="modal-badge-unreg" style="display:none" data-key="modal_unreg">未登録</span>
         </div>
         <div class="modal-grid" id="modalGrid"></div>
-        <div style="font-size:11px;font-weight:bold;color:#888;margin-bottom:4px;">メモ</div>
+        <div style="font-size:11px;font-weight:bold;color:#888;margin-bottom:4px;" data-key="modal_memo">メモ</div>
         <div class="modal-memo" id="modalMemo"></div>
         <div class="modal-footer">
-          <button class="btn-handover" id="modalHandoverBtn">🔄 型検進捗ページへ</button>
-          <button class="btn-timeline"  id="modalTimelineBtn">📋 タイムライン</button>
-          <button class="btn-close" onclick="closeModal()">✕ 閉じる</button>
+          <button class="btn-handover" id="modalHandoverBtn" data-key="modal_btn_handover">🔄 型検進捗ページへ</button>
+          <button class="btn-timeline"  id="modalTimelineBtn" data-key="modal_btn_timeline">📋 タイムライン</button>
+          <button class="btn-close" onclick="closeModal()" data-key="modal_btn_close">✕ 閉じる</button>
         </div>
       </div>
     </div>
@@ -315,6 +315,29 @@
           col_fix:         "修理完了日",
           days:            "日",
           no_data:         "該当データなし",
+          phase_all: "すべて",
+          "phase_①": "① 診断未完了",
+          "phase_②": "② 診断承認待ち",
+          "phase_③": "③ 診断却下",
+          "phase_④": "④ ステージUP承認済・次押出待ち",
+          "phase_⑤": "⑤ 修理計画未作成",
+          "phase_⑥": "⑥ 修理計画承認待ち",
+          "phase_⑦": "⑦ 修理実施待ち",
+          "phase_⑧": "⑧ 修理報告承認待ち",
+          "phase_⑨": "⑨ 完了待ち（Issue未クローズ）",
+          modal_unreg:        "未登録",
+          modal_no_data:      "型検進捗データ未登録",
+          modal_memo:         "メモ",
+          modal_btn_handover: "🔄 型検進捗ページへ",
+          modal_btn_timeline: "📋 タイムライン",
+          modal_btn_close:    "✕ 閉じる",
+          m_arrival:    "到着日",
+          m_vn_prod:    "VN製造型検日",
+          m_vn_qa:      "VN QA型検日",
+          m_jp_insp:    "日本型検日",
+          m_trial:      "量産トライ日",
+          m_handover:   "金型移管日",
+          m_prod_start: "量産開始日",
         },
         vi: {
           btn_back_menu: "← Về menu",
@@ -336,6 +359,29 @@
           col_fix:         "Ngày SC xong",
           days:            " ngày",
           no_data:         "Không có dữ liệu",
+          phase_all: "Tất cả",
+          "phase_①": "① Chưa xong chẩn đoán",
+          "phase_②": "② Chờ duyệt chẩn đoán",
+          "phase_③": "③ Chẩn đoán bị từ chối",
+          "phase_④": "④ Đã duyệt lên stage, chờ lần ép tiếp theo",
+          "phase_⑤": "⑤ Chưa lập KHSC",
+          "phase_⑥": "⑥ Chờ duyệt KHSC",
+          "phase_⑦": "⑦ Chờ sửa chữa",
+          "phase_⑧": "⑧ Chờ duyệt báo cáo SC",
+          "phase_⑨": "⑨ Chờ hoàn tất (Issue chưa đóng)",
+          modal_unreg:        "Chưa đăng ký",
+          modal_no_data:      "Chưa có dữ liệu tiến độ KT khuôn",
+          modal_memo:         "Ghi chú",
+          modal_btn_handover: "🔄 Trang tiến độ KT khuôn",
+          modal_btn_timeline: "📋 Timeline",
+          modal_btn_close:    "✕ Đóng",
+          m_arrival:    "Ngày đến",
+          m_vn_prod:    "KT khuôn SX VN",
+          m_vn_qa:      "KT khuôn QA VN",
+          m_jp_insp:    "Ngày KT JP",
+          m_trial:      "Ngày thử SX",
+          m_handover:   "Ngày bàn giao",
+          m_prod_start: "Ngày bắt đầu SX",
         },
       };
 
@@ -454,7 +500,8 @@
             ? `<span class="condition-badge condition-${row.die_condition_id}">${row.die_condition_name}</span>`
             : "—";
 
-          const phaseBadge = `<span class="phase-badge ${pcls}">${row.current_phase}</span>`;
+          // フェーズ名は PHP が日本語で返すので、先頭の番号（①〜⑨）で今の言語の名前に置き換える
+          const phaseBadge = `<span class="phase-badge ${pcls}">${dict[currentLang]["phase_" + pk] ?? row.current_phase}</span>`;
 
           const priCls = row.priority == 1 ? "pri-1" : row.priority == 2 ? "pri-2" : "pri-3";
 
@@ -487,13 +534,13 @@
       let _modalDieNumber = null;
 
       const HANDOVER_FIELDS = [
-        { key: "arrival_at",                                label: "到着日" },
-        { key: "vn_production_dimensional_inspection_at",   label: "VN製造型検日" },
-        { key: "vn_qa_dimensional_inspection_at",           label: "VN QA型検日" },
-        { key: "jp_dimensional_inspection_at",              label: "日本型検日" },
-        { key: "mass_production_trial_at",                  label: "量産トライ日" },
-        { key: "die_handover_at",                           label: "金型移管日" },
-        { key: "mass_production_start_at",                  label: "量産開始日" },
+        { key: "arrival_at",                                label: "m_arrival" },
+        { key: "vn_production_dimensional_inspection_at",   label: "m_vn_prod" },
+        { key: "vn_qa_dimensional_inspection_at",           label: "m_vn_qa" },
+        { key: "jp_dimensional_inspection_at",              label: "m_jp_insp" },
+        { key: "mass_production_trial_at",                  label: "m_trial" },
+        { key: "die_handover_at",                           label: "m_handover" },
+        { key: "mass_production_start_at",                  label: "m_prod_start" },
       ];
 
       async function openHandoverModal(die_id, die_number) {
@@ -514,14 +561,14 @@
 
         if (!data.handover_id) {
           document.getElementById("modalUnregBadge").style.display = "inline";
-          grid.innerHTML = "<span style='color:#aaa;font-size:13px;grid-column:1/-1'>型検進捗データ未登録</span>";
+          grid.innerHTML = `<span style='color:#aaa;font-size:13px;grid-column:1/-1'>${dict[currentLang].modal_no_data}</span>`;
         } else {
           HANDOVER_FIELDS.forEach(({ key, label }) => {
             const val = data[key];
             const disp = val ? fmt(val) : null;
             grid.innerHTML += `
               <div class="modal-field">
-                <label>${label}</label>
+                <label>${dict[currentLang][label]}</label>
                 <span class="${disp ? '' : 'empty'}">${disp ?? "—"}</span>
               </div>`;
           });

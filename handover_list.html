@@ -178,6 +178,10 @@
 
       /* インポートモーダル */
       .updated-recent { background: #fff3cd; color: #7b4f00; font-weight: bold; }
+      /* 備考：クリックしてその場で編集 */
+      .note-cell { cursor: text; text-align: left; }
+      .note-cell:hover { background: #eef5ff; }
+      .note-cell input { width: 100%; box-sizing: border-box; }
 
       .import-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -285,7 +289,7 @@
           <col class="col-date" />
           <col class="col-date" />
           <col class="col-flag" />
-          <col style="width:80px" />
+          <col style="width:200px" /><!-- 備考：インラインで書くので広め -->
           <col class="col-flag" />
           <col style="width:112px" />
         </colgroup>
@@ -626,14 +630,67 @@
               <td>${formatDate(row.submitted_to_japan_at)}</td>
               <td>${formatDate(row.asset_registration_applied_at)}</td>
               <td>${accFlag}</td>
-              <td>${row.note2 ?? ""}</td>
+              <td class="note-cell" title="クリックして編集" onclick="editNote2(this, ${row.id})"></td>
               <td>${unusableFlag}</td>
               <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${row.updated_at ? formatDateTime(row.updated_at) : ""}</td>
             `;
           }
 
+          if (!isEditMode) tr.querySelector(".note-cell").textContent = row.note2 ?? "";
           tbody.appendChild(tr);
         });
+      }
+
+      /* ============================================================
+        備考のインライン編集：クリック → 入力 → Enter か枠の外で保存、Esc で取り消し
+      ============================================================ */
+      function editNote2(td, id) {
+        if (td.querySelector("input")) return;
+        const row = (window._tableData || []).find((r) => Number(r.id) === Number(id));
+        const before = row?.note2 ?? "";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = before;
+        td.textContent = "";
+        td.appendChild(input);
+        input.focus();
+
+        let done = false;
+        const finish = async (save) => {
+          if (done) return;
+          done = true;
+          const after = input.value.trim();
+          if (!save || after === before) {
+            td.textContent = before;
+            return;
+          }
+          td.textContent = after;
+          try {
+            const res = await fetch("./php/handover/update_note2.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id, note2: after }),
+            });
+            const result = await res.json();
+            if (result.status !== "ok") throw new Error(result.message || "error");
+            if (row) {
+              row.note2 = result.note2;
+              row.updated_at = result.updated_at;
+            }
+            td.textContent = result.note2 ?? "";
+            const updTd = td.closest("tr").lastElementChild;
+            updTd.textContent = result.updated_at ? formatDateTime(result.updated_at) : "";
+            updTd.className = isRecentUpdate(result.updated_at) ? "updated-recent" : "";
+          } catch (e) {
+            td.textContent = before;
+            alert("備考の保存に失敗しました。");
+          }
+        };
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") { e.preventDefault(); finish(true); }
+          if (e.key === "Escape") finish(false);
+        });
+        input.addEventListener("blur", () => finish(true));
       }
 
       /* ============================================================

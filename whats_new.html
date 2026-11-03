@@ -91,6 +91,42 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-03</span>
         </div>
+        <div class="entry-title" data-key="gz_title">金型輸出・輸入・固定資産登録：備考をその場で書ける</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gz_purpose">備考を1行直すだけでも、チェックして編集モードに入る必要があったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gz_content">一覧の備考のセルをクリックすると入力欄になり、Enter か枠の外をクリックで保存、Esc で取り消し。保存すると更新日時も変わる。備考の列を広げた。ほかの項目は今まで通り「チェックのみ編集」で直す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='handover_list.html'">handover_list.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
+        <div class="entry-title" data-key="gy_title">Issue 進捗管理：型検進捗の枠とフェーズ名をベトナム語に対応</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gy_purpose">ベトナム語に切り替えても、日本語のまま残っていたところがあったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gy_content">型番を押すと出る「型検進捗」の枠（項目名・メモ・ボタン）と、一覧の「現在のフェーズ」のバッジ・フェーズ絞り込みの選択肢を、選んだ言語で表示する。ベトナム語の項目名は型検台帳（Excel）と移管進捗の画面に合わせた。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_issue_progress.html'">die_issue_progress.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
         <div class="entry-title" data-key="gx_title">移管進捗：Step・型検日本提出日・日本型検文書番号を表示しない</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gx_purpose">今は使っていない項目を画面から外し、見やすくするため。</span>
@@ -1707,6 +1743,12 @@
           gx_title: "移管進捗：Step・型検日本提出日・日本型検文書番号を表示しない",
           gx_purpose: "今は使っていない項目を画面から外し、見やすくするため。",
           gx_content: "移管進捗の一覧・編集画面・CSV と、金型課題の進捗の「型検進捗」から3項目を外した。絞り込みの「型検日本提出待ち」も無くし、「日本型検待ち」は VN QA 型検が終わって日本型検がまだの金型にした。DB の値は消していない。",
+          gy_title: "Issue 進捗管理：型検進捗の枠とフェーズ名をベトナム語に対応",
+          gy_purpose: "ベトナム語に切り替えても、日本語のまま残っていたところがあったため。",
+          gy_content: "型番を押すと出る「型検進捗」の枠（項目名・メモ・ボタン）と、一覧の「現在のフェーズ」のバッジ・フェーズ絞り込みの選択肢を、選んだ言語で表示する。ベトナム語の項目名は型検台帳（Excel）と移管進捗の画面に合わせた。",
+          gz_title: "金型輸出・輸入・固定資産登録：備考をその場で書ける",
+          gz_purpose: "備考を1行直すだけでも、チェックして編集モードに入る必要があったため。",
+          gz_content: "一覧の備考のセルをクリックすると入力欄になり、Enter か枠の外をクリックで保存、Esc で取り消し。保存すると更新日時も変わる。備考の列を広げた。ほかの項目は今まで通り「チェックのみ編集」で直す。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1956,7 +1998,13 @@
           gw_content: "Khi chọn lần ép, ghi chú đặc biệt trong báo cáo đùn hằng ngày hiện trong khung đỏ ngay dưới thông tin cơ bản. Lần ép không có ghi chú thì không hiện gì.",
           gx_title: "Tiến độ bàn giao: không hiển thị Step, Ngày gửi KT JP, Số VB KT JP",
           gx_purpose: "Bỏ các mục hiện không dùng khỏi màn hình cho dễ nhìn.",
-          gx_content: "Bỏ 3 mục khỏi danh sách, màn hình sửa, CSV của tiến độ bàn giao và \"Tiến độ kiểm tra khuôn\" trong tiến độ vấn đề khuôn. Bỏ bộ lọc \"Chờ gửi KT JP\"; \"Chờ KT JP\" nay là khuôn đã xong KT QA VN nhưng chưa KT JP. Dữ liệu trong DB không bị xóa.",
+          gx_content: "Bỏ 3 mục khỏi danh sách, màn hình sửa, CSV của tiến độ bàn giao và \"Tiến độ kiểm tra khuôn\" trong tiến độ vấn đề khuôn. Bỏ bộ lọc \"Chờ gửi KT JP\"; \"Chờ KT JP\" nay là khuôn đã có \"KT khuôn QA VN\" nhưng chưa có \"Ngày KT JP\". Dữ liệu trong DB không bị xóa.",
+          gy_title: "Quản lý tiến độ Issue: khung tiến độ KT khuôn và tên giai đoạn hiển thị tiếng Việt",
+          gy_purpose: "Vì khi chuyển sang tiếng Việt vẫn còn chỗ hiển thị tiếng Nhật.",
+          gy_content: "Khung \"Tiến độ KT khuôn\" hiện ra khi bấm mã khuôn (tên mục, ghi chú, nút), nhãn \"Giai đoạn hiện tại\" trong danh sách và các lựa chọn lọc theo giai đoạn nay hiển thị theo ngôn ngữ đã chọn. Tên mục tiếng Việt theo sổ KT khuôn (Excel) và màn hình tiến độ bàn giao.",
+          gz_title: "Xuất / nhập khuôn, đăng ký tài sản cố định: sửa ghi chú ngay trên danh sách",
+          gz_purpose: "Vì chỉ sửa một dòng ghi chú cũng phải chọn dòng rồi vào chế độ sửa.",
+          gz_content: "Bấm vào ô ghi chú trong danh sách sẽ thành ô nhập; nhấn Enter hoặc bấm ra ngoài để lưu, Esc để hủy. Khi lưu, ngày giờ cập nhật cũng thay đổi. Cột ghi chú rộng hơn. Các mục khác vẫn sửa bằng \"Chỉnh sửa mục đã chọn\" như trước.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
