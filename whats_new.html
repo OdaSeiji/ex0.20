@@ -91,6 +91,25 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-03</span>
         </div>
+        <div class="entry-title" data-key="hb_title">重点管理金型リスト：到着日が「N-NaN-NaN」と出ないようにする</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hb_purpose">到着日が 0000-00-00 で登録されている金型だと、到着日が「N-NaN-NaN」と表示されていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hb_content">日付として読めない値は「—」と表示する。金型タイムラインの日付も同じように直した。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_watch.html'">die_watch.html</a>
+          <a class="file-link" onclick="location.href='die_timeline.html'">die_timeline.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
         <div class="entry-title" data-key="ha_title">押出指示書：ベトナム語で残っていた日本語を直す</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ha_purpose">ベトナム語に切り替えても、日本語のまま出るところがあったため。</span>
@@ -1770,6 +1789,9 @@
           ha_title: "押出指示書：ベトナム語で残っていた日本語を直す",
           ha_purpose: "ベトナム語に切り替えても、日本語のまま出るところがあったため。",
           ha_content: "冷却方式の選択肢（空冷・水冷・ミスト）、履歴と入力済み一覧のプレス種別（試押・量試・量産）、入力欄の下の「前回」、「編集中」のバッジ、保存・更新・削除などのメッセージを、選んだ言語で出す。言語を切り替えると、表示中の履歴なども出し直す。",
+          hb_title: "重点管理金型リスト：到着日が「N-NaN-NaN」と出ないようにする",
+          hb_purpose: "到着日が 0000-00-00 で登録されている金型だと、到着日が「N-NaN-NaN」と表示されていたため。",
+          hb_content: "日付として読めない値は「—」と表示する。金型タイムラインの日付も同じように直した。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2029,6 +2051,9 @@
           ha_title: "Phiếu đùn: sửa các chỗ còn tiếng Nhật khi dùng tiếng Việt",
           ha_purpose: "Vì khi chuyển sang tiếng Việt vẫn còn chỗ hiển thị tiếng Nhật.",
           ha_content: "Lựa chọn kiểu làm mát, loại ép trong lịch sử và danh sách đã nhập (Ép thử / Thử hàng loạt / Hàng loạt), chữ \"Lần trước\" dưới ô nhập, nhãn \"Đang sửa\" và các thông báo lưu / cập nhật / xóa nay hiển thị theo ngôn ngữ đã chọn. Khi đổi ngôn ngữ, lịch sử đang hiển thị cũng được hiển thị lại.",
+          hb_title: "Danh sách khuôn quản lý trọng điểm: không còn hiện \"N-NaN-NaN\" ở ngày đến",
+          hb_purpose: "Vì với khuôn có ngày đến là 0000-00-00, ngày đến bị hiển thị \"N-NaN-NaN\".",
+          hb_content: "Giá trị không đọc được là ngày sẽ hiển thị \"—\". Ngày trên dòng thời gian khuôn cũng được sửa tương tự.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

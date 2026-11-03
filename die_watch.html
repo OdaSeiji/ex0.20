@@ -441,6 +441,7 @@
       function fmtDate(str) {
         if (!str) return "—";
         const d  = new Date(str);
+        if (isNaN(d)) return "—";  // 0000-00-00 など日付として読めない値
         const yy = String(d.getFullYear()).slice(2);
         const mm = String(d.getMonth() + 1).padStart(2, "0");
         const dd = String(d.getDate()).padStart(2, "0");
