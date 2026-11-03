@@ -85,7 +85,26 @@
         </div>
       </div>
 
-      <!-- 2026-10-29 (最新) -->
+      <!-- 2026-11-03 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-03</span>
+        </div>
+        <div class="entry-title" data-key="gx_title">移管進捗：Step・型検日本提出日・日本型検文書番号を表示しない</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="gx_purpose">今は使っていない項目を画面から外し、見やすくするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="gx_content">移管進捗の一覧・編集画面・CSV と、金型課題の進捗の「型検進捗」から3項目を外した。絞り込みの「型検日本提出待ち」も無くし、「日本型検待ち」は VN QA 型検が終わって日本型検がまだの金型にした。DB の値は消していない。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_handover_progress.html'">die_handover_progress.html</a>
+          <a class="file-link" onclick="location.href='die_issue_progress.html'">die_issue_progress.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-10-29 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -1685,6 +1704,9 @@
           gw_title: "品質評価入力：押出時の特記事項を表示",
           gw_purpose: "押出のときに気づいたこと（NG の内容など）を見ながら評価できるようにするため。",
           gw_content: "押出を選ぶと、押出日報に書かれた特記事項を基本情報のすぐ下に赤い枠で出す。特記事項が無い押出では何も出さない。",
+          gx_title: "移管進捗：Step・型検日本提出日・日本型検文書番号を表示しない",
+          gx_purpose: "今は使っていない項目を画面から外し、見やすくするため。",
+          gx_content: "移管進捗の一覧・編集画面・CSV と、金型課題の進捗の「型検進捗」から3項目を外した。絞り込みの「型検日本提出待ち」も無くし、「日本型検待ち」は VN QA 型検が終わって日本型検がまだの金型にした。DB の値は消していない。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -1932,6 +1954,9 @@
           gw_title: "Nhập đánh giá chất lượng: hiển thị ghi chú đặc biệt khi ép",
           gw_purpose: "Để vừa xem những điều ghi nhận khi ép (nội dung NG…) vừa đánh giá.",
           gw_content: "Khi chọn lần ép, ghi chú đặc biệt trong báo cáo đùn hằng ngày hiện trong khung đỏ ngay dưới thông tin cơ bản. Lần ép không có ghi chú thì không hiện gì.",
+          gx_title: "Tiến độ bàn giao: không hiển thị Step, Ngày gửi KT JP, Số VB KT JP",
+          gx_purpose: "Bỏ các mục hiện không dùng khỏi màn hình cho dễ nhìn.",
+          gx_content: "Bỏ 3 mục khỏi danh sách, màn hình sửa, CSV của tiến độ bàn giao và \"Tiến độ kiểm tra khuôn\" trong tiến độ vấn đề khuôn. Bỏ bộ lọc \"Chờ gửi KT JP\"; \"Chờ KT JP\" nay là khuôn đã xong KT QA VN nhưng chưa KT JP. Dữ liệu trong DB không bị xóa.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

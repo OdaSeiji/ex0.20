@@ -158,9 +158,6 @@
     <button class="filter-btn" data-filter="vn_qa_wait" onclick="setStatusFilter('vn_qa_wait')">
       <span data-key="filter_vn_qa_wait">VNQA型検待ち</span><span class="cnt" id="cnt_vn_qa_wait"></span>
     </button>
-    <button class="filter-btn" data-filter="submit_jp_wait" onclick="setStatusFilter('submit_jp_wait')">
-      <span data-key="filter_submit_jp_wait">型検日本提出待ち</span><span class="cnt" id="cnt_submit_jp_wait"></span>
-    </button>
     <button class="filter-btn" data-filter="jp_wait" onclick="setStatusFilter('jp_wait')">
       <span data-key="filter_jp_wait">日本型検待ち</span><span class="cnt" id="cnt_jp_wait"></span>
     </button>
@@ -183,13 +180,10 @@
                      border-radius:3px; background:#eceff1; color:#555; cursor:pointer;">
             </button>
           </th>
-          <th data-col="die_planning_phase_steps"                 data-key="col_step">Step <span class="sort-icon"></span></th>
           <th data-col="arrival_at"                               data-key="col_arrival">到着日 <span class="sort-icon"></span></th>
           <th data-col="vn_production_dimensional_inspection_at"  data-key="col_vn_prod">VN製造型検日 <span class="sort-icon"></span></th>
           <th data-col="vn_qa_dimensional_inspection_at"          data-key="col_vn_qa">VN QA型検日 <span class="sort-icon"></span></th>
-          <th data-col="submit_dimensional_inspection_to_japan_at" data-key="col_submit_jp">型検日本提出日 <span class="sort-icon"></span></th>
           <th data-col="jp_dimensional_inspection_at"             data-key="col_jp_insp">日本型検合格日 <span class="sort-icon"></span></th>
-          <th data-col="jp_dimensional_inspection_document_number" data-key="col_jp_doc">日本型検文書番号 <span class="sort-icon"></span></th>
           <th class="no-sort"                                     data-key="col_anodize_req">アルマイト確認要否</th>
           <th data-col="anodizing_quality_check_at"               data-key="col_anodize_at">アルマイト確認日 <span class="sort-icon"></span></th>
           <th data-col="mass_production_trial_at"                 data-key="col_trial">量産トライ日 <span class="sort-icon"></span></th>
@@ -238,13 +232,10 @@
         zzz_show:     "-ZZZ 表示中",
         checked_count: n => `${n}件選択中`,
         col_die:       "型番",
-        col_step:      "Step",
         col_arrival:   "到着日",
         col_vn_prod:   "VN製造型検日",
         col_vn_qa:     "VN QA型検日",
-        col_submit_jp: "型検日本提出日",
         col_jp_insp:   "日本型検合格日",
-        col_jp_doc:    "日本型検文書番号",
         col_anodize_req: "アルマイト確認要否",
         col_anodize_at:  "アルマイト確認日",
         col_trial:     "量産トライ日",
@@ -264,14 +255,11 @@
         del_err:       "削除に失敗しました",
         // FIELDS labels
         f_original:    "元表番号",
-        f_step:        "Step",
         f_arrival:     "到着日",
         arrival_src:   "到着日は引き継ぎ一覧で入力します（ここでは変更できません）",
         f_vn_prod:     "VN製造型検日",
         f_vn_qa:       "VN QA型検日",
-        f_submit_jp:   "型検日本提出日",
         f_jp_insp:     "日本型検合格日",
-        f_jp_doc:      "日本型検文書番号",
         f_anodize_req: "アルマイト確認要否",
         f_anodize_at:  "アルマイト確認日",
         f_trial:       "量産トライ日",
@@ -286,7 +274,6 @@
         filter_all:           "すべて表示",
         filter_vn_prod_wait:  "VN製造型検待ち",
         filter_vn_qa_wait:    "VNQA型検待ち",
-        filter_submit_jp_wait:"型検日本提出待ち",
         filter_jp_wait:       "日本型検待ち",
         filter_handover_wait: "金型移管待ち",
       },
@@ -300,13 +287,10 @@
         zzz_show:     "-ZZZ Đang hiện",
         checked_count: n => `Đã chọn ${n} mục`,
         col_die:       "Số khuôn",
-        col_step:      "Step",
         col_arrival:   "Ngày đến",
         col_vn_prod:   "KT khuôn SX VN",
         col_vn_qa:     "KT khuôn QA VN",
-        col_submit_jp: "Ngày gửi KT JP",
         col_jp_insp:   "Ngày KT JP",
-        col_jp_doc:    "Số VB KT JP",
         col_anodize_req: "Cần XN anodize",
         col_anodize_at:  "Ngày XN anodize",
         col_trial:     "Ngày thử SX",
@@ -325,14 +309,11 @@
         del_confirm:   name => `Xóa dữ liệu tiến độ của「${name}」?`,
         del_err:       "Xóa thất bại",
         f_original:    "Số bảng gốc",
-        f_step:        "Step",
         f_arrival:     "Ngày đến",
         arrival_src:   "Ngày đến được nhập ở danh sách bàn giao (không sửa được ở đây)",
         f_vn_prod:     "KT khuôn SX VN",
         f_vn_qa:       "KT khuôn QA VN",
-        f_submit_jp:   "Ngày gửi KT JP",
         f_jp_insp:     "Ngày KT JP",
-        f_jp_doc:      "Số VB KT JP",
         f_anodize_req: "Cần XN anodize",
         f_anodize_at:  "Ngày XN anodize",
         f_trial:       "Ngày thử SX",
@@ -347,7 +328,6 @@
         filter_all:           "Tất cả",
         filter_vn_prod_wait:  "Chờ KT khuôn SX VN",
         filter_vn_qa_wait:    "Chờ KT khuôn QA VN",
-        filter_submit_jp_wait:"Chờ gửi KT JP",
         filter_jp_wait:       "Chờ KT JP",
         filter_handover_wait: "Chờ bàn giao khuôn",
       },
@@ -402,20 +382,17 @@
     const FILTER_FUNS = {
       vn_prod_wait:   r => !!r.arrival_at && !r.vn_production_dimensional_inspection_at,
       vn_qa_wait:     r => !!r.vn_production_dimensional_inspection_at && !r.vn_qa_dimensional_inspection_at,
-      submit_jp_wait: r => !!r.vn_qa_dimensional_inspection_at && !r.submit_dimensional_inspection_to_japan_at,
-      jp_wait:        r => !!r.submit_dimensional_inspection_to_japan_at && !r.jp_dimensional_inspection_at,
+      // 型検日本提出日は画面に出さない（11/02）ので、日本型検待ちは VN QA 型検の後から数える
+      jp_wait:        r => !!r.vn_qa_dimensional_inspection_at && !r.jp_dimensional_inspection_at,
       handover_wait:  r => !!r.jp_dimensional_inspection_at && !r.die_handover_at,
     };
 
     const FIELDS = [
       { key: "original_table_no",                         labelKey: "f_original",    type: "number"   },
-      { key: "die_planning_phase_steps",                  labelKey: "f_step",        type: "number"   },
       { key: "arrival_at",                                labelKey: "f_arrival",     type: "date",    readonly: true },  // 引き継ぎ一覧の値を表示するだけ
       { key: "vn_production_dimensional_inspection_at",   labelKey: "f_vn_prod",     type: "date"     },
       { key: "vn_qa_dimensional_inspection_at",           labelKey: "f_vn_qa",       type: "date"     },
-      { key: "submit_dimensional_inspection_to_japan_at", labelKey: "f_submit_jp",   type: "date"     },
       { key: "jp_dimensional_inspection_at",              labelKey: "f_jp_insp",     type: "date"     },
-      { key: "jp_dimensional_inspection_document_number", labelKey: "f_jp_doc",      type: "text"     },
       { key: "anodizing_quality_check_required_flag",     labelKey: "f_anodize_req", type: "check"    },
       { key: "anodizing_quality_check_at",                labelKey: "f_anodize_at",  type: "date"     },
       { key: "mass_production_trial_at",                  labelKey: "f_trial",       type: "date"     },
@@ -491,13 +468,10 @@
               onchange="toggleCheck('${dieId}', this.checked)" />
           </td>
           <td class="die-num sticky-die">${row.die_number ?? ""}</td>
-          <td class="mono">${row.die_planning_phase_steps ?? ""}</td>
           <td class="mono" title="${t.arrival_src}">${fmtDate(row.arrival_at)}</td>
           ${makeDateCell("vn_production_dimensional_inspection_at", dieId, row.id, row.vn_production_dimensional_inspection_at)}
           ${makeDateCell("vn_qa_dimensional_inspection_at", dieId, row.id, row.vn_qa_dimensional_inspection_at)}
-          ${makeDateCell("submit_dimensional_inspection_to_japan_at", dieId, row.id, row.submit_dimensional_inspection_to_japan_at)}
           ${makeDateCell("jp_dimensional_inspection_at", dieId, row.id, row.jp_dimensional_inspection_at)}
-          <td class="mono">${row.jp_dimensional_inspection_document_number ?? ""}</td>
           <td>${flag(row.anodizing_quality_check_required_flag)}</td>
           ${makeDateCell("anodizing_quality_check_at", dieId, row.id, row.anodizing_quality_check_at)}
           ${makeDateCell("mass_production_trial_at", dieId, row.id, row.mass_production_trial_at)}
@@ -769,22 +743,22 @@
     ===================================================== */
     function exportCSV() {
       const headersJa = [
-        "型番","Step","到着日","VN製造型検日","VN QA型検日",
-        "型検日本提出日","日本型検送付","日本型検文書番号","アルマイト確認要否",
+        "型番","到着日","VN製造型検日","VN QA型検日",
+        "日本型検送付","アルマイト確認要否",
         "アルマイト確認日","量産トライ日","金型移管日","量産開始日",
         "切替業連発行日","寸法検査担当者","BCP","移管準備完了","メモ"
       ];
       const headersVi = [
-        "Số khuôn","Step","Ngày đến","KT khuôn SX VN","KT khuôn QA VN",
-        "Ngày gửi KT JP","Ngày KT JP","Số VB KT JP","Cần XN anodize",
+        "Số khuôn","Ngày đến","KT khuôn SX VN","KT khuôn QA VN",
+        "Ngày KT JP","Cần XN anodize",
         "Ngày XN anodize","Ngày thử SX","Ngày bàn giao","Ngày bắt đầu SX",
         "Ngày phát hành BC","Người KT KT","BCP","Hoàn tất CB BG","Ghi chú"
       ];
       const rows = filteredData.map(r => [
-        r.die_number ?? "", r.die_planning_phase_steps ?? "",
+        r.die_number ?? "",
         fmtDate(r.arrival_at), fmtDate(r.vn_production_dimensional_inspection_at),
-        fmtDate(r.vn_qa_dimensional_inspection_at), fmtDate(r.submit_dimensional_inspection_to_japan_at),
-        fmtDate(r.jp_dimensional_inspection_at), r.jp_dimensional_inspection_document_number ?? "",
+        fmtDate(r.vn_qa_dimensional_inspection_at),
+        fmtDate(r.jp_dimensional_inspection_at),
         r.anodizing_quality_check_required_flag ? "●" : "", fmtDate(r.anodizing_quality_check_at),
         fmtDate(r.mass_production_trial_at), fmtDate(r.die_handover_at),
         fmtDate(r.mass_production_start_at), r.production_site_change_notice ?? "",
