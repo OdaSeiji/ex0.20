@@ -75,7 +75,8 @@
     tr.low-yield { background: #eaffb0; }
     tr.has-note td { color: #c62828; }
     tr.has-note, tr.has-qnote { cursor: pointer; }
-    tr.has-qnote td.sticky-l { box-shadow: inset 4px 0 0 #1e88e5; }
+    /* 品質メモのある行：型番の後ろにバッジ */
+    .qn-badge { display: inline-block; margin-left: 4px; padding: 0 5px; border-radius: 8px; background: #1e88e5; color: #fff; font-size: 10px; font-weight: bold; line-height: 15px; vertical-align: middle; }
     tr:hover td { background: #f0f8ff; }
     tr.selected td { background: #fff3cd; }
     tfoot td { position: sticky; bottom: 0; background: #e3f2fd; font-weight: bold; color: #1565c0; z-index: 1; }
@@ -166,7 +167,7 @@
     <span class="legend" style="background:#ffcc80"></span><span data-key="lg_ng">NGあり</span>
     <span class="legend" style="background:#eaffb0"></span><span data-key="lg_low">良品率90%以下（〇以外）</span>
     <span class="legend" style="background:#c62828"></span><span data-key="lg_note">特記事項あり（行クリックで表示）</span>
-    <span class="legend" style="background:#1e88e5"></span><span data-key="lg_qnote">品質メモあり（行クリックで表示）</span>
+    <span class="qn-badge" data-key="qn_badge">メモ</span> <span data-key="lg_qnote">品質メモあり（行クリックで表示）</span>
   </div>
 
   <div class="table-wrap">
@@ -193,7 +194,7 @@
         label_check: "チェック日：", ck_all: "いずれか", ck_dim: "寸法", ck_etching: "エッチング", ck_aging: "時効", ck_packing: "梱包",
         stat_press: "押出数", stat_qty: "本数", stat_ng: "NG", stat_yield: "良品率", stat_productivity: "生産性",
         note: "※ 条件なしの場合は最新400件。良品率 =（本数 − NG + コード401）÷ 本数。生産性 = 総重量 ÷ 正味押出時間（停止時間を除く）。NGコードの見出しにマウスを乗せると説明が出ます。",
-        lg_ng: "NGあり", lg_low: "良品率90%以下（〇以外）", lg_note: "特記事項あり（行クリックで表示）", lg_qnote: "品質メモあり（行クリックで表示）",
+        lg_ng: "NGあり", lg_low: "良品率90%以下（〇以外）", lg_note: "特記事項あり（行クリックで表示）", lg_qnote: "品質メモあり（行クリックで表示）", qn_badge: "メモ",
         loading: "読込中…", empty: "該当する押出はありません", sum: "合計",
         col_date: "押出日", col_die: "型番", col_pn: "品番", col_type: "種別", col_machine: "号機",
         col_pb: "計画ビレット数", col_ab: "実績ビレット数（ビレット情報の合計）", col_qty: "本数", col_ng: "NG", col_ok: "OK", col_per: "良品率",
@@ -210,7 +211,7 @@
         label_check: "Ngày kiểm tra：", ck_all: "Bất kỳ", ck_dim: "Kích thước", ck_etching: "Etching", ck_aging: "Hóa già", ck_packing: "Đóng gói",
         stat_press: "Số lần ép", stat_qty: "Số cây", stat_ng: "NG", stat_yield: "Tỷ lệ đạt", stat_productivity: "Năng suất",
         note: "※ Khi không có điều kiện sẽ hiển thị 400 lần ép mới nhất. Tỷ lệ đạt = (số cây − NG + mã 401) ÷ số cây. Năng suất = tổng khối lượng ÷ thời gian ép thực (trừ thời gian dừng). Di chuột lên tiêu đề mã NG để xem giải thích.",
-        lg_ng: "Có NG", lg_low: "Tỷ lệ đạt ≤ 90% (trừ 〇)", lg_note: "Có ghi chú đặc biệt (bấm vào dòng để xem)", lg_qnote: "Có ghi chú chất lượng (bấm vào dòng để xem)",
+        lg_ng: "Có NG", lg_low: "Tỷ lệ đạt ≤ 90% (trừ 〇)", lg_note: "Có ghi chú đặc biệt (bấm vào dòng để xem)", lg_qnote: "Có ghi chú chất lượng (bấm vào dòng để xem)", qn_badge: "Ghi chú",
         loading: "Đang tải…", empty: "Không có dữ liệu phù hợp", sum: "Tổng",
         col_date: "Ngày ép", col_die: "Mã khuôn", col_pn: "Mã SP", col_type: "Kiểu", col_machine: "Máy",
         col_pb: "Số billet kế hoạch", col_ab: "Số billet thực tế (tổng thông tin billet)", col_qty: "Số cây", col_ng: "NG", col_ok: "OK", col_per: "Tỷ lệ đạt",
@@ -381,7 +382,8 @@
     function cellHtml(c, r) {
       const v = r[c.key];
       if (c.code) return num(v) > 0 ? fmt(v) : "";
-      if (c.key === "qc_check_result") return v === "Checked" ? "OK" : "";
+      if (c.key === "qc_check_result") return v === "Checked" ? "✓" : "";  // QC 完了（合否ではない）
+      if (c.key === "die_number" && r.quality_note) return esc(v ?? "") + `<span class="qn-badge">${esc(t("qn_badge"))}</span>`;
       if (c.dec) return v === null ? "" : Number(v).toFixed(c.dec);
       if (c.key === "productivity" || c.key === "actual_cycletime") return esc(unitText(v));
       return esc(v ?? "");

@@ -15,7 +15,7 @@
 | 人の記録 | 担当者などは必ず m_staff の id で保存する。名前の直書きや独自の番号は使わない |
 | サンプル名 | H/E/A/B/M などの呼び名は、列名やキーに使わない（表示は現場のルールのまま） |
 | コミット | ユーザーが「コミット」「push」と言ったときだけ。push の前に fetch/pull する（ユーザーが documents/memo.md を直接編集するため） |
-| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `he`**（`hd_content` の行の後ろに ja・vi それぞれ追加。HTML の先頭に「(最新)」の項目を足す） |
+| 更新履歴 | whats_new.html に日本語とベトナム語で追記する。**次に使うキーは `hg`**（`hf_content` の行の後ろに ja・vi それぞれ追加。HTML の先頭に「(最新)」の項目を足す） |
 | 文字コード | テーブル・列のコメントは英語で書く（本番は SQL をリモートの PC に貼るので日本語は ? になる）。日本語を含む SQL をローカルで流すときは UTF-8 のファイルにして `mysql --default-character-set=utf8mb4 ... < file.sql`。日本語を含む Python はファイルに書き、先頭に `# -*- coding: utf-8 -*-`（標準入力のヒアドキュメントでは失敗する） |
 | 確認方法 | PHP は `/c/xampp/php/php.exe -l`。JS は `<script>` を取り出して `node --check`。画面はブラウザで確かめる |
 | アイコン | img/ の SVG。1色（#2b6ca3）の濃淡が基本。グラフの画面は、そのグラフの形・色をアイコンにする（ユーザーの好み） |
@@ -45,7 +45,7 @@
 
 - 10/23 までの DB 変更は、本番もすべて反映済み
 - `2026-10-25_press_operation_time.sql`（t_press_schedule_day に end_time を追加）も本番で実行済み（10/27 ユーザー確認）。**本番で未実行の DB 変更は無い**
-- `2026-11-03_press_quality_note.sql`（t_press に quality_note を追加）は 11/03 にユーザーが本番 PC での実行を依頼済み。実行されたか次に確認する
+- `2026-11-03_press_quality_note.sql`（t_press に quality_note を追加）も本番で実行済み（11/04、本番の品質サマリーで品質メモが表示されているのを確認）
 
 ---
 

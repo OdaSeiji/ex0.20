@@ -85,7 +85,43 @@
         </div>
       </div>
 
-      <!-- 2026-11-03 (最新) -->
+      <!-- 2026-11-04 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-04</span>
+        </div>
+        <div class="entry-title" data-key="hf_title">押出指示書：入力済みリストから直接印刷する</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hf_purpose">入力済みリストで見つけた指示書を印刷するのに、いったん読み込んでから印刷ボタンを押す必要があったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hf_content">入力済みリストの各行の右に「印刷」ボタンを付けた。押すと、その指示書の印刷のダイアログがすぐ出る（旧画面で入力した指示書も印刷できる）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_directive.html'">press_directive.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-04 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-04</span>
+        </div>
+        <div class="entry-title" data-key="he_title">品質サマリー：QC 完了を ✓ で表示、品質メモのある行にバッジ</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="he_purpose">QC 列の「OK」は合否ではなく完了の意味なので紛らわしかった。また、品質メモのある行の左端の青い線が分かりにくかったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="he_content">QC が完了した押出は「OK」ではなく「✓」と表示する（CSV は今まで通り）。品質メモのある行は、型番の後ろに青い「メモ」のバッジを出す。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='quality_summary.html'">quality_summary.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-03 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -1835,6 +1871,12 @@
           hd_title: "品質評価入力：押出ごとの品質メモを書けるようにする",
           hd_purpose: "これまでの備考は NG の行ごとにしか書けず、押出全体について気づいたことを残す場所がなかったため。",
           hd_content: "品質評価入力で押出を選ぶと、特記事項の下に「品質メモ（押出ごと）」の欄が出る。書いて「保存」を押すと保存される（書き直すと上書き、1000字まで）。品質サマリーでは品質メモのある行の左端に青い印が付き、行をクリックすると特記事項と並べて表示する。CSV にも出る。",
+          he_title: "品質サマリー：QC 完了を ✓ で表示、品質メモのある行にバッジ",
+          he_purpose: "QC 列の「OK」は合否ではなく完了の意味なので紛らわしかった。また、品質メモのある行の左端の青い線が分かりにくかったため。",
+          he_content: "QC が完了した押出は「OK」ではなく「✓」と表示する（CSV は今まで通り）。品質メモのある行は、型番の後ろに青い「メモ」のバッジを出す。",
+          hf_title: "押出指示書：入力済みリストから直接印刷する",
+          hf_purpose: "入力済みリストで見つけた指示書を印刷するのに、いったん読み込んでから印刷ボタンを押す必要があったため。",
+          hf_content: "入力済みリストの各行の右に「印刷」ボタンを付けた。押すと、その指示書の印刷のダイアログがすぐ出る（旧画面で入力した指示書も印刷できる）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2103,6 +2145,12 @@
           hd_title: "Nhập đánh giá chất lượng: có thể ghi chú chất lượng theo từng lần ép",
           hd_purpose: "Trước đây chỉ ghi chú được theo từng dòng NG, không có chỗ để ghi nhận xét cho cả lần ép.",
           hd_content: "Khi chọn lần ép trong màn hình Nhập đánh giá chất lượng, ô \"Ghi chú chất lượng (theo lần ép)\" hiện dưới ghi chú đặc biệt. Viết rồi bấm \"Lưu\" để lưu (viết lại sẽ ghi đè, tối đa 1000 ký tự). Trong Tổng hợp chất lượng, dòng có ghi chú chất lượng có vạch xanh ở đầu dòng, bấm vào dòng sẽ hiện cùng ghi chú đặc biệt. Cũng xuất ra CSV.",
+          he_title: "Tổng hợp chất lượng: hiển thị QC hoàn thành bằng ✓, gắn nhãn cho dòng có ghi chú chất lượng",
+          he_purpose: "Chữ \"OK\" ở cột QC có nghĩa là đã hoàn thành chứ không phải đạt/không đạt nên dễ nhầm. Vạch xanh ở đầu dòng có ghi chú chất lượng cũng khó nhận ra.",
+          he_content: "Lần ép đã hoàn thành QC hiển thị \"✓\" thay cho \"OK\" (CSV giữ nguyên). Dòng có ghi chú chất lượng có nhãn xanh \"Ghi chú\" sau mã khuôn.",
+          hf_title: "Phiếu đùn: in trực tiếp từ danh sách đã nhập",
+          hf_purpose: "Vì muốn in phiếu tìm thấy trong danh sách đã nhập thì phải tải phiếu lên rồi mới bấm nút in.",
+          hf_content: "Thêm nút \"In\" ở bên phải mỗi dòng của danh sách đã nhập. Bấm vào sẽ hiện ngay hộp thoại in của phiếu đó (in được cả phiếu nhập ở màn hình cũ).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
