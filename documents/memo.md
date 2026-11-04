@@ -6017,3 +6017,37 @@ http://10.163.50.17/ex0.20/etching_record.html
   <img src="./img/20261102-02.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/11/04
+
+記録13.15と出ているが、`http://10.163.50.17/ex0.20/operation_report.html`で見ると、12.88になっている。見た感じ、12.88が正しそう。13.15はどうやって算出しているか？
+
+<figure style="text-align:center;">
+  <img src="./img/20261104-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+QCが完了するとOKと表示されるが、正しくは「完了」なので、
+チェックマークとかが良いと思う。
+
+<figure style="text-align:center;">
+  <img src="./img/20261104-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+この画面で印刷できるようにならないか？
+
+<figure style="text-align:center;">
+  <img src="./img/20261104-03.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+更新日時？
+
+<figure style="text-align:center;">
+  <img src="./img/20261104-04.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+http://10.163.50.17/ex0.20/die_handover_progress.html
+の表示に時間がかかる。
