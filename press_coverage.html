@@ -51,6 +51,7 @@
       .block.rec { background: #1565c0; }
       .block.rec.alt { background: #42a5f5; }
       .block.rec.old { background: #78909c; }
+      .block.rec.overlap { outline: 2px solid #e53935; outline-offset: -2px; }
       .block.plc { background: #9e9e9e; }
       .block.plc.idle { background: #e0e0e0; color: #777; }
       .block.auto-off { background: #616161; border-radius: 0; padding: 0; z-index: 1; }
@@ -60,6 +61,7 @@
       .sum { font-size: 12px; line-height: 1.5; }
       .sum b { font-size: 14px; }
       .sum .ok { color: #2e7d32; } .sum .ng { color: #c62828; }
+      .sum .overlap { color: #c62828; }
       .empty-day { font-size: 12px; color: #bbb; padding-left: 4px; line-height: 24px; }
       .hint { font-size: 12px; color: #888; margin-top: 10px; line-height: 1.7; }
     </style>
@@ -98,7 +100,7 @@
           <div class="scroller" id="scroller"><div class="inner"><div class="axis col-head" id="axis"></div><div id="days"></div></div></div>
           <div><div class="col-head"></div><div id="sums"></div></div>
         </div>
-        <div class="hint" data-key="hint">8時間（480分）を基準に、押出の記録の合計時間を出しています。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。</div>
+        <div class="hint" data-key="hint">押出の記録の合計時間を出しています（記録どうしが重なった時間は1回だけ数える）。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。</div>
       </div>
     </div>
 
@@ -108,19 +110,19 @@
           btn_back: "← 押出日報入力へ戻る", title: "押出日報の入力確認",
           lg_record: "押出の記録（押出日報）", lg_plc: "PLC の稼働（ビレットあり）", lg_plc_idle: "PLC の稼働（ビレットなし）", lg_auto_off: "自動運転 OFF（press_mode）", tip_auto_off: "自動運転 OFF", minutes: "分",
           lg_gap: "記録のすき間（10分以上）", lane_rec: "記録", lane_plc: "PLC",
-          sum_total: "記録", sum_gap: "すき間", sum_count: "押出", times: "回", no_record: "記録なし",
+          sum_total: "記録", sum_gap: "すき間", sum_overlap: "記録の重なり", sum_count: "押出", times: "回", no_record: "記録なし",
           dow: ["日", "月", "火", "水", "木", "金", "土"],
           tip_billets: "ビレット", tip_src_old: "旧画面で入力", tip_src_new: "ex0.20 で入力",
-          hint: "8時間（480分）を基準に、押出の記録の合計時間を出しています。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。",
+          hint: "押出の記録の合計時間を出しています（記録どうしが重なった時間は1回だけ数える）。帯にマウスを乗せると、型番・時刻・ビレット本数が出ます。PLC の稼働は、PLC のログがある号機・期間だけ表示します。",
         },
         vi: {
           btn_back: "← Về nhập báo cáo đùn", title: "Kiểm tra nhập báo cáo đùn",
           lg_record: "Bản ghi đùn (báo cáo đùn)", lg_plc: "PLC chạy (có billet)", lg_plc_idle: "PLC chạy (không billet)", lg_auto_off: "Tắt chế độ tự động (press_mode)", tip_auto_off: "Tắt tự động", minutes: "phút",
           lg_gap: "Khoảng trống (từ 10 phút)", lane_rec: "Ghi", lane_plc: "PLC",
-          sum_total: "Ghi", sum_gap: "Trống", sum_count: "Đùn", times: "lần", no_record: "Không có bản ghi",
+          sum_total: "Ghi", sum_gap: "Trống", sum_overlap: "Bản ghi chồng nhau", sum_count: "Đùn", times: "lần", no_record: "Không có bản ghi",
           dow: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
           tip_billets: "Billet", tip_src_old: "Nhập ở màn hình cũ", tip_src_new: "Nhập ở ex0.20",
-          hint: "Tổng thời gian bản ghi đùn so với chuẩn 8 giờ (480 phút). Di chuột lên dải để xem mã khuôn, giờ và số billet. PLC chỉ hiển thị cho máy / thời gian có log PLC.",
+          hint: "Tổng thời gian bản ghi đùn (phần chồng nhau chỉ tính một lần). Di chuột lên dải để xem mã khuôn, giờ và số billet. PLC chỉ hiển thị cho máy / thời gian có log PLC.",
         },
       };
       function currentLang() { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } }
@@ -140,7 +142,6 @@
 
       const DAY_FROM = 0, DAY_TO = 24 * 60, SPAN = DAY_TO - DAY_FROM;   // 0:00〜24:00（横スクロール。最初は 6:00 から見せる）
       const VIEW_FROM = 6 * 60;
-      const BASE_MIN = 480;   // 8時間
       const GAP_MIN = 10;     // これ以上のすき間を表示
       const DAYS = 7;
       const toMin = (s) => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
@@ -189,13 +190,23 @@
           const dow = new Date(date + "T00:00:00").getDay();
           const recs = presses.filter((p) => p.press_date_at === date && p.start_at && p.finish_at);
 
-          // 押出の記録の帯（続けて同じ色にならないよう交互に色を変える）
-          let total = 0;
+          // 記録の合計は、重なった時間を1回だけ数える（稼働日報と同じ）。重なった分は別に出す
+          const ivs = recs.map((p) => [toMin(p.start_at), toMin(p.finish_at)]).filter(([a, b]) => b > a).sort((x, y) => x[0] - y[0]);
+          let total = 0, rawTotal = 0, cur = null;
+          ivs.forEach(([a, b]) => {
+            rawTotal += b - a;
+            if (!cur || a > cur[1]) { if (cur) total += cur[1] - cur[0]; cur = [a, b]; }
+            else cur[1] = Math.max(cur[1], b);
+          });
+          if (cur) total += cur[1] - cur[0];
+          const overlapTotal = rawTotal - total;
+          const overlaps = (k, s, e) => recs.some((q, j) => j !== k && toMin(q.start_at) < e && s < toMin(q.finish_at));
+
+          // 押出の記録の帯（続けて同じ色にならないよう交互に色を変える。ほかの記録と重なる帯は赤い枠）
           const recBlocks = recs.map((p, k) => {
             const s = toMin(p.start_at), e = toMin(p.finish_at);
-            total += Math.max(e - s, 0);
             const tip = `${p.pressing_type ?? ""} ${p.die_number ?? ""}  ${p.start_at}–${p.finish_at}  ${t("tip_billets")} ${p.billets ?? "-"}  (${Number(p.entry_source) === 1 ? t("tip_src_new") : t("tip_src_old")})`;
-            const cls = k % 2 ? "alt" : "";
+            const cls = (k % 2 ? "alt" : "") + (overlaps(k, s, e) ? " overlap" : "");
             return `<div class="block rec ${cls}" style="left:${pct(s)}%; width:${pct(e) - pct(s)}%" title="${esc(tip)}">${esc(p.die_number ?? "")}</div>`;
           }).join("");
 
@@ -238,7 +249,6 @@
             }).join("");
           }).join("");
 
-          const ratio = Math.round(total / BASE_MIN * 100);
           labels += `
             <div class="row">
               <div class="day-label ${dow === 0 ? "sun" : dow === 6 ? "sat" : ""}">${date.slice(5)}<span class="dow">(${t("dow")[dow]})</span></div>
@@ -253,7 +263,7 @@
             </div>`;
           sums += `
             <div class="row"><div class="sum">
-              ${recs.length ? `${t("sum_total")} <b class="${total >= BASE_MIN ? "ok" : "ng"}">${hm(total)}</b>（${ratio}%）<br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}` : `<span class="empty-day">${t("no_record")}</span>`}
+              ${recs.length ? `${t("sum_total")} <b>${hm(total)}</b><br>${t("sum_count")} ${recs.length}${t("times")}・${t("sum_gap")} ${hm(gapTotal)}${overlapTotal > 0 ? `<br><span class="overlap">${t("sum_overlap")} ${hm(overlapTotal)}</span>` : ""}` : `<span class="empty-day">${t("no_record")}</span>`}
             </div></div>`;
         }
         document.getElementById("labels").innerHTML = labels;

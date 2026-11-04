@@ -430,10 +430,10 @@
     /* =====================================================
        テーブル描画
     ===================================================== */
+    // 日付の入力欄は編集を始めたときに作る（1,300行×7列ぶんを最初から置くと、表示に数秒かかるため）
     function makeDateCell(field, dieId, hpId, val) {
-      return `<td class="mono date-cell" data-field="${field}" data-die-id="${dieId}" data-hp-id="${hpId ?? ''}" title="クリックして編集">`
+      return `<td class="mono date-cell" data-field="${field}" data-die-id="${dieId}" data-hp-id="${hpId ?? ''}" data-value="${rawDate(val)}" title="クリックして編集">`
            + `<span class="date-text">${fmtDate(val)}</span>`
-           + `<input type="date" class="date-input" value="${rawDate(val)}" style="display:none">`
            + `</td>`;
     }
 
@@ -798,14 +798,17 @@
           document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
           return;
         }
-        const inp = cell.querySelector(".date-input");
-        if (!inp || inp.style.display !== "none") return;
+        if (cell.querySelector(".date-input")) return;  // 編集中
         if (cell.classList.contains("cell-selected")) {
-          // 2回目クリック：編集モード
+          // 2回目クリック：編集モード（入力欄をここで作る）
           document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
+          const inp = document.createElement("input");
+          inp.type = "date";
+          inp.className = "date-input";
+          inp.value = cell.dataset.value || "";
           inp.dataset.original = inp.value;
           cell.querySelector(".date-text").style.display = "none";
-          inp.style.display = "";
+          cell.appendChild(inp);
           inp.focus();
           try { inp.showPicker(); } catch(_) {}
         } else {
@@ -819,21 +822,19 @@
           document.querySelectorAll("td.date-cell.cell-selected").forEach(c => c.classList.remove("cell-selected"));
         }
       });
-      let escaping = false;
       mainTable.addEventListener("keydown", function(e) {
         if (e.key !== "Escape") return;
         const inp = document.activeElement;
         if (!inp || !inp.classList.contains("date-input")) return;
         const cell = inp.closest("td.date-cell");
         if (!cell) return;
-        escaping = true;
-        inp.value = inp.dataset.original ?? "";
-        inp.style.display = "none";
+        inp.dataset.cancel = "1";  // 消すときに focusout が来ても保存しない
+        inp.remove();
         cell.querySelector(".date-text").style.display = "";
       });
       mainTable.addEventListener("focusout", async function(e) {
         if (!e.target.classList.contains("date-input")) return;
-        if (escaping) { escaping = false; return; }
+        if (e.target.dataset.cancel) return;
         const inp   = e.target;
         const cell  = inp.closest("td.date-cell");
         if (!cell) return;
@@ -842,8 +843,10 @@
         const dieId = cell.dataset.dieId;
         const hpId  = cell.dataset.hpId;
         const newVal = inp.value || null;
-        inp.style.display  = "none";
+        inp.remove();
         span.style.display = "";
+        if ((newVal ?? "") === (inp.dataset.original ?? "")) return;  // 変わっていなければ保存しない
+        cell.dataset.value = newVal ?? "";
         span.textContent   = fmtDate(newVal);
         const needsInsert = !hpId;
         const payload = [{ die_id: Number(dieId), id: hpId ? Number(hpId) : null, [field]: newVal }];
@@ -863,6 +866,7 @@
           alert(dict[currentLang].save_err + ": " + (result.message ?? ""));
           const row = allData.find(r => String(r.die_id) === String(dieId));
           span.textContent = fmtDate(row ? row[field] : null);
+          cell.dataset.value = rawDate(row ? row[field] : null);
         }
       });
 

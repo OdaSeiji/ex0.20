@@ -91,6 +91,42 @@
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
           <span class="entry-date">2026-11-04</span>
         </div>
+        <div class="entry-title" data-key="hh_title">移管進捗：表示を速くする</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hh_purpose">金型 1,300 型あまりの表を開くのに時間がかかっていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hh_content">日付の各セルに最初から置いていた入力欄（1行に7つ、合わせて9,000個あまり）をやめ、セルを編集し始めたときに作るようにした。ローカルでは表を出す時間が約半分になった。日付の編集のしかたは今まで通り（1回目のクリックで選択、2回目で編集、Esc で取り消し）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='die_handover_progress.html'">die_handover_progress.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-04 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-04</span>
+        </div>
+        <div class="entry-title" data-key="hg_title">押出日報の入力確認：記録の合計を稼働日報と合わせる</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hg_purpose">押出日報の入力確認の「記録」は記録の時間を単純に足していたため、記録どうしが重なっていると稼働日報より長く出ていた（例：13:15 と 12.88 時間）。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hg_content">記録の合計は、重なった時間を1回だけ数える（稼働日報と同じ）。重なりがある日は右に「記録の重なり」の時間を赤で出し、重なっている記録の帯に赤い枠を付ける。8時間を基準にした割合（%）と、それによる色分けはやめた。なお、稼働日報は時間を小数（12.88 時間 ＝ 12:53）で出している。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_coverage.html'">press_coverage.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-04 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-04</span>
+        </div>
         <div class="entry-title" data-key="hf_title">押出指示書：入力済みリストから直接印刷する</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hf_purpose">入力済みリストで見つけた指示書を印刷するのに、いったん読み込んでから印刷ボタンを押す必要があったため。</span>
@@ -1877,6 +1913,12 @@
           hf_title: "押出指示書：入力済みリストから直接印刷する",
           hf_purpose: "入力済みリストで見つけた指示書を印刷するのに、いったん読み込んでから印刷ボタンを押す必要があったため。",
           hf_content: "入力済みリストの各行の右に「印刷」ボタンを付けた。押すと、その指示書の印刷のダイアログがすぐ出る（旧画面で入力した指示書も印刷できる）。",
+          hg_title: "押出日報の入力確認：記録の合計を稼働日報と合わせる",
+          hg_purpose: "押出日報の入力確認の「記録」は記録の時間を単純に足していたため、記録どうしが重なっていると稼働日報より長く出ていた（例：13:15 と 12.88 時間）。",
+          hg_content: "記録の合計は、重なった時間を1回だけ数える（稼働日報と同じ）。重なりがある日は右に「記録の重なり」の時間を赤で出し、重なっている記録の帯に赤い枠を付ける。8時間を基準にした割合（%）と、それによる色分けはやめた。なお、稼働日報は時間を小数（12.88 時間 ＝ 12:53）で出している。",
+          hh_title: "移管進捗：表示を速くする",
+          hh_purpose: "金型 1,300 型あまりの表を開くのに時間がかかっていたため。",
+          hh_content: "日付の各セルに最初から置いていた入力欄（1行に7つ、合わせて9,000個あまり）をやめ、セルを編集し始めたときに作るようにした。ローカルでは表を出す時間が約半分になった。日付の編集のしかたは今まで通り（1回目のクリックで選択、2回目で編集、Esc で取り消し）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2151,6 +2193,12 @@
           hf_title: "Phiếu đùn: in trực tiếp từ danh sách đã nhập",
           hf_purpose: "Vì muốn in phiếu tìm thấy trong danh sách đã nhập thì phải tải phiếu lên rồi mới bấm nút in.",
           hf_content: "Thêm nút \"In\" ở bên phải mỗi dòng của danh sách đã nhập. Bấm vào sẽ hiện ngay hộp thoại in của phiếu đó (in được cả phiếu nhập ở màn hình cũ).",
+          hg_title: "Kiểm tra nhập báo cáo đùn: tổng thời gian ghi khớp với báo cáo vận hành",
+          hg_purpose: "Trước đây \"Ghi\" cộng đơn giản thời gian các bản ghi, nên khi các bản ghi chồng nhau thì dài hơn báo cáo vận hành (ví dụ 13:15 và 12.88 giờ).",
+          hg_content: "Tổng thời gian ghi chỉ tính phần chồng nhau một lần (giống báo cáo vận hành). Ngày có chồng nhau sẽ hiện thời gian \"Bản ghi chồng nhau\" màu đỏ ở bên phải, và dải của bản ghi bị chồng có viền đỏ. Bỏ tỷ lệ (%) so với chuẩn 8 giờ và màu theo tỷ lệ đó. Báo cáo vận hành hiển thị giờ dạng số thập phân (12.88 giờ = 12:53).",
+          hh_title: "Tiến độ bàn giao: hiển thị nhanh hơn",
+          hh_purpose: "Vì mở bảng hơn 1.300 khuôn mất nhiều thời gian.",
+          hh_content: "Bỏ các ô nhập ngày đặt sẵn trong từng ô (7 ô mỗi dòng, hơn 9.000 ô), chỉ tạo khi bắt đầu sửa ô. Trên máy thử, thời gian hiển thị bảng giảm khoảng một nửa. Cách sửa ngày giữ nguyên (bấm lần 1 để chọn, lần 2 để sửa, Esc để hủy).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
