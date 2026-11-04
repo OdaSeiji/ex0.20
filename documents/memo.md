@@ -6049,5 +6049,12 @@ QCが完了するとOKと表示されるが、正しくは「完了」なので�
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
 
+メモの表示が出来るようになったが、メモの有るレコードが分かりにくい。なんか、表示するか、色を変えるか。。。
+
+<figure style="text-align:center;">
+  <img src="./img/20261104-05.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
 http://10.163.50.17/ex0.20/die_handover_progress.html
 の表示に時間がかかる。
