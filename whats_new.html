@@ -96,7 +96,7 @@
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hl_purpose">品番のカテゴリごとに、良品の重量と長さが月ごとにどれだけ出ているかを見るため。</span>
         </div>
         <div class="entry-purpose">
-          <span class="label" data-key="lbl_content">内容:</span><span data-key="hl_content">実績のメニューに「カテゴリ別 良品実績」を追加した。カテゴリ1（またはカテゴリ2）ごとに、月別の良品重量（t）と良品長さ（m）を表にする。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開ける（押出投入実績と同じ）。右端は今年度平均で、行はその大きい順。良品重量は押出投入実績の良品重量集計と同じ計算なので、月の合計も同じになる。CSV 出力あり。</span>
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hl_content">実績のメニューに「カテゴリ別 良品実績」を追加した。カテゴリ1（またはカテゴリ2）ごとに、月別の良品重量（t）と良品長さ（m）を表にする。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開ける（押出投入実績と同じ）。右端は今年度平均で、行はその大きい順。良品重量は押出投入実績の良品重量集計と同じ計算なので、月の合計も同じになる。CSV 出力あり。表の下に、カテゴリ別の積み上げ棒グラフ（今年度平均の大きい8カテゴリ＋その他）を出す。</span>
         </div>
         <div class="file-links">
           <a class="file-link" onclick="location.href='category_good_report.html'">category_good_report.html</a>
@@ -2003,7 +2003,7 @@
           hk_content: "社員の設定と社員の登録で、ロールに packing（梱包）と quality_control（品管）を選べるようにした。DB の m_staff.role にも2つを足した（本番は SQL の実行が必要）。",
           hl_title: "実績：カテゴリ別 良品実績を追加",
           hl_purpose: "品番のカテゴリごとに、良品の重量と長さが月ごとにどれだけ出ているかを見るため。",
-          hl_content: "実績のメニューに「カテゴリ別 良品実績」を追加した。カテゴリ1（またはカテゴリ2）ごとに、月別の良品重量（t）と良品長さ（m）を表にする。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開ける（押出投入実績と同じ）。右端は今年度平均で、行はその大きい順。良品重量は押出投入実績の良品重量集計と同じ計算なので、月の合計も同じになる。CSV 出力あり。",
+          hl_content: "実績のメニューに「カテゴリ別 良品実績」を追加した。カテゴリ1（またはカテゴリ2）ごとに、月別の良品重量（t）と良品長さ（m）を表にする。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開ける（押出投入実績と同じ）。右端は今年度平均で、行はその大きい順。良品重量は押出投入実績の良品重量集計と同じ計算なので、月の合計も同じになる。CSV 出力あり。表の下に、カテゴリ別の積み上げ棒グラフ（今年度平均の大きい8カテゴリ＋その他）を出す。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2295,7 +2295,7 @@
           hk_content: "Trong cài đặt và đăng ký nhân viên, có thể chọn vai trò packing (đóng gói) và quality_control (QC). Đã thêm 2 giá trị này vào m_staff.role (máy chính cần chạy SQL).",
           hl_title: "Thực tế: thêm báo cáo hàng tốt theo danh mục",
           hl_purpose: "Để xem theo từng danh mục mã SP, mỗi tháng có bao nhiêu trọng lượng và chiều dài hàng tốt.",
-          hl_content: "Thêm \"Thực tế hàng tốt theo danh mục\" vào menu Thực tế. Theo danh mục 1 (hoặc danh mục 2), lập bảng trọng lượng hàng tốt (t) và chiều dài hàng tốt (m) theo tháng. Các năm trước (tháng 4 ~ tháng 3) gộp thành 1 cột trung bình tháng, bấm ▸ để mở theo tháng (giống báo cáo nạp phôi). Cột cuối là TB năm nay, dòng xếp từ lớn đến nhỏ. Trọng lượng hàng tốt tính giống tổng hợp SP tốt của báo cáo nạp phôi nên tổng mỗi tháng cũng bằng nhau. Có xuất CSV.",
+          hl_content: "Thêm \"Thực tế hàng tốt theo danh mục\" vào menu Thực tế. Theo danh mục 1 (hoặc danh mục 2), lập bảng trọng lượng hàng tốt (t) và chiều dài hàng tốt (m) theo tháng. Các năm trước (tháng 4 ~ tháng 3) gộp thành 1 cột trung bình tháng, bấm ▸ để mở theo tháng (giống báo cáo nạp phôi). Cột cuối là TB năm nay, dòng xếp từ lớn đến nhỏ. Trọng lượng hàng tốt tính giống tổng hợp SP tốt của báo cáo nạp phôi nên tổng mỗi tháng cũng bằng nhau. Có xuất CSV. Dưới mỗi bảng có biểu đồ cột cộng dồn theo danh mục (8 danh mục lớn nhất theo TB năm nay + Khác).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
