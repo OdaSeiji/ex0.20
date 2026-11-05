@@ -6058,3 +6058,171 @@ QCが完了するとOKと表示されるが、正しくは「完了」なので�
 
 http://10.163.50.17/ex0.20/die_handover_progress.html
 の表示に時間がかかる。
+
+# 2026/11/05
+
+`die_handover`と`die_handover_progress`のデータのズレ
+
+```sql
+WITH h AS (
+  SELECT die_id,
+         MAX(CASE WHEN IFNULL(is_accessory_item_flag, 0) = 0 THEN NULLIF(asset_registration_applied_at, '0000-00-00') END) AS main_asset,
+         MAX(CASE WHEN is_accessory_item_flag = 1 THEN NULLIF(asset_registration_applied_at, '0000-00-00') END)              AS acc_asset,
+         COUNT(CASE WHEN IFNULL(is_accessory_item_flag, 0) = 0 THEN 1 END)                                                  AS main_rows
+  FROM t_die_handover
+  GROUP BY die_id
+)
+SELECT
+  SUM(h.main_asset IS NOT NULL AND p.die_handover_at IS NOT NULL AND h.main_asset =  p.die_handover_at) AS `一致`,
+  SUM(h.main_asset IS NOT NULL AND p.die_handover_at IS NOT NULL AND h.main_asset <> p.die_handover_at) AS `食い違い`,
+  SUM(h.main_asset IS NOT NULL AND p.die_handover_at IS NULL)                                          AS `一覧だけに日付`,
+  SUM(h.main_asset IS NULL AND p.die_handover_at IS NOT NULL AND h.main_rows = 0)                      AS `進捗だけ_本体の行なし`,
+  SUM(h.main_asset IS NULL AND p.die_handover_at IS NOT NULL AND h.main_rows > 0)                      AS `進捗だけ_本体の行あり`,
+  SUM(h.main_rows > 1)                                                                                 AS `本体の行が2行以上`
+FROM h
+LEFT JOIN t_die_handover_progress p ON p.die_id = h.die_id;
+```
+
+```
++------+----------+----------------+-----------------------+-----------------------+-------------------+
+| 一致 | 食い違い | 一覧だけに日付 | 進捗だけ*本体の行なし | 進捗だけ*本体の行あり | 本体の行が2行以上 |
++------+----------+----------------+-----------------------+-----------------------+-------------------+
+| 734 | 0 | 0 | 69 | 12 | 0 |
++------+----------+----------------+-----------------------+-----------------------+-------------------+
+1 row in set (0.12 sec)
+
+mysql>
+```
+
+```sql
+WITH h AS (
+  SELECT die_id,
+         MAX(CASE WHEN IFNULL(is_accessory_item_flag, 0) = 0 THEN NULLIF(asset_registration_applied_at, '0000-00-00') END) AS main_asset,
+         MAX(CASE WHEN is_accessory_item_flag = 1 THEN NULLIF(asset_registration_applied_at, '0000-00-00') END)              AS acc_asset,
+         COUNT(CASE WHEN IFNULL(is_accessory_item_flag, 0) = 0 THEN 1 END)                                                  AS main_rows
+  FROM t_die_handover
+  GROUP BY die_id
+)
+SELECT
+  d.die_number,
+  h.main_asset      AS asset_main,      -- 一覧：金型本体の行の固定資産登録日
+  h.acc_asset       AS asset_accessory, -- 一覧：付属品の行の固定資産登録日（いちばん新しいもの）
+  h.main_rows,
+  p.die_handover_at AS progress_handover, -- 移管進捗の金型移管日
+  CASE
+    WHEN h.main_asset IS NOT NULL AND p.die_handover_at IS NOT NULL THEN '食い違い'
+    WHEN h.main_asset IS NOT NULL                                    THEN '一覧だけに日付'
+    WHEN h.main_rows = 0                                             THEN '進捗だけ_本体の行なし'
+    ELSE                                                                  '進捗だけ_本体の行あり'
+  END AS kind
+FROM h
+JOIN m_dies d ON d.id = h.die_id
+LEFT JOIN t_die_handover_progress p ON p.die_id = h.die_id
+WHERE NOT (h.main_asset <=> p.die_handover_at)
+ORDER BY kind, d.die_number;
+```
+
+```sql
++---------------+------------+-----------------+-----------+-------------------+-----------------------+
+| die_number    | asset_main | asset_accessory | main_rows | progress_handover | kind                  |
++---------------+------------+-----------------+-----------+-------------------+-----------------------+
+| CP9632SG-V01D | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| CQ20T3-V02B   | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| CQ80T3-V02C   | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| CXS16S2-V01E  | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| MGPL50B2-V02D | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| MGPM50B2-V02D | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| MLU25LB-V01E  | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| MSQ20BB2-V01D | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| MSQ50B2-V03D  | NULL       | NULL            |         1 | 2020-01-01        | 進捗だけ_本体の行あり |
+| MXQ12B-V02D   | NULL       | NULL            |         1 | 2020-01-01        | 進捗だけ_本体の行あり |
+| MXQ16B-V01D   | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| RSQ12RC-V01D  | NULL       | NULL            |         1 | 2026-03-20        | 進捗だけ_本体の行あり |
+| CA40S-V01D    | NULL       | 2024-06-21      |         0 | 2024-06-21        | 進捗だけ_本体の行なし |
+| CA63S-V01D    | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CG32H-V01C    | NULL       | 2022-06-24      |         0 | 2022-06-24        | 進捗だけ_本体の行なし |
+| CG40H-V01C    | NULL       | 2022-06-24      |         0 | 2022-06-24        | 進捗だけ_本体の行なし |
+| CJ06C-V01D    | NULL       | 2022-06-24      |         0 | 2022-06-24        | 進捗だけ_本体の行なし |
+| CJ06C-V02D    | NULL       | 2026-07-02      |         0 | 2026-07-02        | 進捗だけ_本体の行なし |
+| CJ06C2-V01D   | NULL       | 2022-06-20      |         0 | 2022-06-20        | 進捗だけ_本体の行なし |
+| CJ06C2-V02D   | NULL       | 2026-03-13      |         0 | 2026-03-13        | 進捗だけ_本体の行なし |
+| CJ06RT-V01D   | NULL       | 2022-06-20      |         0 | 2022-06-20        | 進捗だけ_本体の行なし |
+| CJ06RT-V02D   | NULL       | 2026-07-02      |         0 | 2026-07-02        | 進捗だけ_本体の行なし |
+| CJ10C-V01D    | NULL       | 2023-01-03      |         0 | 2023-01-03        | 進捗だけ_本体の行なし |
+| CJ10C-V02D    | NULL       | 2024-02-01      |         0 | 2024-02-01        | 進捗だけ_本体の行なし |
+| CJ16C-V01D    | NULL       | 2022-10-21      |         0 | 2022-10-21        | 進捗だけ_本体の行なし |
+| CJ16C-V02D    | NULL       | 2024-02-01      |         0 | 2024-02-01        | 進捗だけ_本体の行なし |
+| CJP10B-V01D   | NULL       | 2023-03-03      |         0 | 2023-03-03        | 進捗だけ_本体の行なし |
+| CJP10B-V02D   | NULL       | 2023-10-24      |         0 | 2023-10-24        | 進捗だけ_本体の行なし |
+| CJP16B-V01D   | NULL       | 2023-03-03      |         0 | 2023-03-03        | 進捗だけ_本体の行なし |
+| CJP16B-V02D   | NULL       | 2023-10-24      |         0 | 2023-10-24        | 進捗だけ_本体の行なし |
+| CP9632T-V04B  | NULL       | 2026-08-03      |         0 | 2026-08-03        | 進捗だけ_本体の行なし |
+| CQ12G-V01C    | NULL       | 2022-02-22      |         0 | 2022-02-22        | 進捗だけ_本体の行なし |
+| CQ16G-V01C    | NULL       | 2022-03-08      |         0 | 2022-03-08        | 進捗だけ_本体の行なし |
+| CQ20G-V01C    | NULL       | 2022-03-08      |         0 | 2022-03-08        | 進捗だけ_本体の行なし |
+| CQ20K-V01D    | NULL       | 2022-04-04      |         0 | 2022-04-04        | 進捗だけ_本体の行なし |
+| CQ25G-V01C    | NULL       | 2022-02-22      |         0 | 2022-02-22        | 進捗だけ_本体の行なし |
+| CQ32G-V01C    | NULL       | 2022-03-08      |         0 | 2022-03-08        | 進捗だけ_本体の行なし |
+| CQ32R3-V01D   | NULL       | 2024-02-19      |         0 | 2024-02-19        | 進捗だけ_本体の行なし |
+| CQ40G-V01C    | NULL       | 2022-03-08      |         0 | 2022-03-08        | 進捗だけ_本体の行なし |
+| CQS12R-V01D   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CQS16R-V01E   | NULL       | 2025-02-25      |         0 | 2025-02-25        | 進捗だけ_本体の行なし |
+| CQS20R-V01E   | NULL       | 2025-02-25      |         0 | 2025-02-25        | 進捗だけ_本体の行なし |
+| CQS25R-V01E   | NULL       | 2025-02-25      |         0 | 2025-02-25        | 進捗だけ_本体の行なし |
+| CX10P-V01D    | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CX15P-V01D    | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CXS06P-V01D   | NULL       | 2025-03-19      |         0 | 2025-03-19        | 進捗だけ_本体の行なし |
+| CXS15P-V01D   | NULL       | 2025-03-19      |         0 | 2025-03-19        | 進捗だけ_本体の行なし |
+| CXS20P-V01E   | NULL       | 2025-03-19      |         0 | 2025-03-19        | 進捗だけ_本体の行なし |
+| CXS25P-V01E   | NULL       | 2025-03-19      |         0 | 2025-03-19        | 進捗だけ_本体の行なし |
+| CXS32P-V01E   | NULL       | 2025-03-19      |         0 | 2025-03-19        | 進捗だけ_本体の行なし |
+| CYB06C-V01D   | NULL       | 2024-08-15      |         0 | 2024-08-15        | 進捗だけ_本体の行なし |
+| CYB10C-V01D   | NULL       | 2025-01-06      |         0 | 2025-01-06        | 進捗だけ_本体の行なし |
+| CYB15C-V01D   | NULL       | 2025-01-06      |         0 | 2025-01-06        | 進捗だけ_本体の行なし |
+| CYB32C-V01D   | NULL       | 2025-01-06      |         0 | 2025-01-06        | 進捗だけ_本体の行なし |
+| CYB40C-V01D   | NULL       | 2024-08-15      |         0 | 2024-08-15        | 進捗だけ_本体の行なし |
+| CYR06E-V01D   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CYR06SR-V01D  | NULL       | 2025-02-25      |         0 | 2025-02-25        | 進捗だけ_本体の行なし |
+| CYR10E-V01D   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CYR15E-V01E   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CYR20E-V01E   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CYR25E-V01E   | NULL       | 2024-03-22      |         0 | 2024-03-22        | 進捗だけ_本体の行なし |
+| CYR32E2-V01E  | NULL       | 2025-08-04      |         0 | 2025-08-04        | 進捗だけ_本体の行なし |
+| MB32C-V01D    | NULL       | 2022-10-21      |         0 | 2022-10-21        | 進捗だけ_本体の行なし |
+| MB32C-V02D    | NULL       | 2023-10-24      |         0 | 2023-10-24        | 進捗だけ_本体の行なし |
+| MGJ06B-V01D   | NULL       | 2022-10-21      |         0 | 2022-10-21        | 進捗だけ_本体の行なし |
+| MGJ06B-V02D   | NULL       | 2023-10-06      |         0 | 2023-10-06        | 進捗だけ_本体の行なし |
+| MGJ10B-V01D   | NULL       | 2022-10-21      |         0 | 2022-10-21        | 進捗だけ_本体の行なし |
+| MHKL12B-V01D  | NULL       | 2023-02-08      |         0 | 2023-02-08        | 進捗だけ_本体の行なし |
+| MHKL12B-V02D  | NULL       | 2024-02-19      |         0 | 2024-02-19        | 進捗だけ_本体の行なし |
+| MHZJ20B-V01D  | NULL       | 2023-10-24      |         0 | 2023-10-24        | 進捗だけ_本体の行なし |
+| MRH16B2-V01D  | NULL       | 2024-01-04      |         0 | 2024-01-04        | 進捗だけ_本体の行なし |
+| MSUB3B-V01D   | NULL       | 2024-01-05      |         0 | 2024-01-05        | 進捗だけ_本体の行なし |
+| MSUB7B-V01D   | NULL       | 2024-01-04      |         0 | 2024-01-04        | 進捗だけ_本体の行なし |
+| MXS06TB-V02D  | NULL       | 2021-08-27      |         0 | 2021-08-27        | 進捗だけ_本体の行なし |
+| MXS08TB-V02D  | NULL       | 2021-08-27      |         0 | 2021-08-27        | 進捗だけ_本体の行なし |
+| MXS12TB-V02D  | NULL       | 2021-08-27      |         0 | 2021-08-27        | 進捗だけ_本体の行なし |
+| MXS12TB-V03D  | NULL       | 2023-10-05      |         0 | 2023-10-05        | 進捗だけ_本体の行なし |
+| MXS16TB-V02D  | NULL       | 2021-08-27      |         0 | 2021-08-27        | 進捗だけ_本体の行なし |
+| MXS16TB-V03D  | NULL       | 2023-10-05      |         0 | 2023-10-05        | 進捗だけ_本体の行なし |
+| MXS20TB-V02D  | NULL       | 2021-08-27      |         0 | 2021-08-27        | 進捗だけ_本体の行なし |
+| XT790C-V01E   | NULL       | 2025-08-04      |         0 | 2025-08-04        | 進捗だけ_本体の行なし |
++---------------+------------+-----------------+-----------+-------------------+-----------------------+
+81 rows in set (0.12 sec)
+
+mysql>
+```
+
+押出計画画面で、右側のテーブルをクリックすると、編集モードに入るが、
+変種モードに入るか否か、ダイアログが欲しい。
+
+<figure style="text-align:center;">
+  <img src="./img/20261105-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+以下のページ。
+・入力前／後のカテゴリ1、カテゴリ2のinput要素の幅が変わるのはやりにくい。
+・品番を編集して、戻ってきたら、カテゴリでフィルターが解除されてしまう。品番で、ワイルドカードで抽出後、チェックボックスで選択、一括カテゴリー変更が出来るようにならないか？
+
+http://10.163.50.17/ex0.20/production_number.html
