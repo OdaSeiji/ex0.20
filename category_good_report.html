@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Category Good Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 18px; padding-left: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-csv  { background: #217346; color: #fff; }
+    .btn-toggle { background: #8e5ec7; color: #fff; }
+    .seg { display: flex; border: 1px solid #0078d4; border-radius: 5px; overflow: hidden; }
+    .seg button { padding: 6px 14px; border: none; background: #fff; color: #0078d4; font-size: 12px; font-weight: bold; cursor: pointer; }
+    .seg button + button { border-left: 1px solid #0078d4; }
+    .seg button.active { background: #0078d4; color: #fff; }
+    .note { font-size: 12px; color: #777; margin-bottom: 8px; padding-left: 4px; }
+
+    .section-head { display: flex; align-items: center; gap: 12px; margin: 24px 0 8px; }
+    .section-title {
+      font-size: 15px; font-weight: bold; color: #2b6ca3;
+      padding-left: 8px; border-left: 4px solid #0078d4;
+    }
+    .table-wrap {
+      background: #fff; border-radius: 8px; overflow: auto; max-height: 70vh;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 8px;
+    }
+    table { border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 6px 10px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
+    th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; z-index: 1; }
+    td.label-col { text-align: left; font-weight: bold; background: #f5f5f5; position: sticky; left: 0; }
+    th.label-col { position: sticky; left: 0; z-index: 3; text-align: left; }
+    td.label-col.cat1-sub { font-weight: normal; color: #777; left: 0; }
+    td.total-col { font-weight: bold; background: #e8f5e9; color: #2e7d32; }
+    th.col-fyavg, td.col-fyavg { background: #fff8e1; }
+    tr.sum-row td.col-fyavg { background: #ffecb3; }
+    .fy-toggle-btn {
+      border: none; background: transparent; color: #8e5ec7; cursor: pointer;
+      font-size: 12px; font-weight: bold; padding: 0 2px; vertical-align: middle;
+    }
+    .fy-toggle-btn:hover { text-decoration: underline; }
+    tr.sum-row td { background: #e3f2fd; font-weight: bold; color: #1565c0; position: sticky; bottom: 0; }
+    tr.sum-row td.label-col { background: #bbdefb; z-index: 2; }
+    tr:hover td { background: #f0f8ff; }
+    tr:hover td.label-col { background: #e8f1ff; }
+    td.mono { font-family: "Roboto Mono", monospace; }
+    .loading { padding: 20px; color: #0078d4; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🏷️ カテゴリ別 良品実績</h1>
+  <div class="subtitle" data-key="subtitle">品番のカテゴリ別：月次の良品重量（t）と良品長さ（m）</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <div class="seg" id="levelSeg">
+      <button data-level="1" class="active" data-key="level_1">カテゴリ1</button>
+      <button data-level="2" data-key="level_2">カテゴリ2</button>
+    </div>
+    <button class="btn btn-toggle" id="btnToggleView" onclick="toggleView()">📆 月別に展開</button>
+  </div>
+  <div class="note" data-key="note">※ 良品本数 ＝ 時効ラックの本数 − NG。1本の長さは実測の長さ（無ければ品番の製品長）。良品重量は押出投入実績の「良品重量集計」と同じ計算です。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開けます。行は今年度平均の大きい順。</div>
+
+  <div class="section-head">
+    <div class="section-title" data-key="sec_weight">✅ 良品重量（t）</div>
+    <button class="btn btn-csv" onclick="exportCSV('weight')" data-key="btn_csv">📥 CSV出力</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="weightHead"></tr></thead>
+      <tbody id="weightBody"><tr><td class="loading">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="section-head">
+    <div class="section-title" data-key="sec_length">📏 良品長さ（m）</div>
+    <button class="btn btn-csv" onclick="exportCSV('length')" data-key="btn_csv">📥 CSV出力</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="lengthHead"></tr></thead>
+      <tbody id="lengthBody"><tr><td class="loading">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <script>
+    /* =====================================================
+       多言語
+    ===================================================== */
+    const dict = {
+      ja: {
+        title: "🏷️ カテゴリ別 良品実績",
+        subtitle: "品番のカテゴリ別：月次の良品重量（t）と良品長さ（m）",
+        btn_back: "← 戻る",
+        btn_csv: "📥 CSV出力",
+        btn_expand: "📆 月別に展開",
+        btn_collapse: "📅 年度平均で表示",
+        level_1: "カテゴリ1",
+        level_2: "カテゴリ2",
+        note: "※ 良品本数 ＝ 時効ラックの本数 − NG。1本の長さは実測の長さ（無ければ品番の製品長）。良品重量は押出投入実績の「良品重量集計」と同じ計算です。過去の年度（4月〜3月）は月平均の1列にまとめ、▸ で月別に開けます。行は今年度平均の大きい順。",
+        sec_weight: "✅ 良品重量（t）",
+        sec_length: "📏 良品長さ（m）",
+        col_cat1: "カテゴリ1",
+        col_cat2: "カテゴリ2",
+        col_total: "今年度平均",
+        sum_row: "合計",
+        uncategorized: "（未分類）",
+        fyLabel: fy => `${String(fy % 100).padStart(2, "0")}年度(月平均)`,
+        title_expand: "この年度を月別に展開",
+        title_collapse: "この年度を月平均に戻す",
+        title_avg_excl_current: "当年度(4月〜)の月平均。進行中の当月は除く",
+        csv_weight: "カテゴリ別良品重量",
+        csv_length: "カテゴリ別良品長さ",
+      },
+      vi: {
+        title: "🏷️ Thực tế hàng tốt theo danh mục",
+        subtitle: "Theo danh mục mã SP: trọng lượng hàng tốt (t) và chiều dài hàng tốt (m) theo tháng",
+        btn_back: "← Quay lại",
+        btn_csv: "📥 Xuất CSV",
+        btn_expand: "📆 Mở theo tháng",
+        btn_collapse: "📅 Hiển thị TB năm",
+        level_1: "Danh mục 1",
+        level_2: "Danh mục 2",
+        note: "※ Số cây tốt = số cây trên giá lão hóa − NG. Chiều dài 1 cây là chiều dài thực đo (nếu không có thì dùng chiều dài SP). Trọng lượng hàng tốt tính giống \"Tổng hợp trọng lượng SP tốt\" của báo cáo nạp phôi. Các năm trước (tháng 4 ~ tháng 3) gộp thành 1 cột trung bình tháng, bấm ▸ để mở theo tháng. Dòng xếp theo TB năm nay từ lớn đến nhỏ.",
+        sec_weight: "✅ Trọng lượng hàng tốt (t)",
+        sec_length: "📏 Chiều dài hàng tốt (m)",
+        col_cat1: "Danh mục 1",
+        col_cat2: "Danh mục 2",
+        col_total: "TB năm nay",
+        sum_row: "Tổng",
+        uncategorized: "(Chưa phân loại)",
+        fyLabel: fy => `Năm TC ${String(fy % 100).padStart(2, "0")} (TB tháng)`,
+        title_expand: "Mở năm này theo tháng",
+        title_collapse: "Gộp lại thành TB tháng",
+        title_avg_excl_current: "TB tháng của năm nay (từ tháng 4), không tính tháng đang chạy",
+        csv_weight: "trong_luong_hang_tot_theo_danh_muc",
+        csv_length: "chieu_dai_hang_tot_theo_danh_muc",
+      },
+    };
+    let currentLang = localStorage.getItem("lang") || "ja";
+    const t = () => dict[currentLang];
+
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.querySelectorAll("[data-key]").forEach(el => {
+        const v = dict[lang][el.dataset.key];
+        if (typeof v === "string") el.textContent = v;
+      });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      syncExpandState();
+      render();
+    }
+
+    /* =====================================================
+       データ
+    ===================================================== */
+    let raw = null;      // { months, rows: [{ cat1Id, cat1Jp, cat1Vn, cat2Id, cat2Jp, cat2Vn, weight: {月: t}, length: {月: m} }] }
+    let level = 1;       // 1 = カテゴリ1でまとめる、2 = カテゴリ2ごと
+
+    async function loadData() {
+      const res = await fetch("./php/report_php/get_category_good_monthly.php");
+      raw = await res.json();
+      syncExpandState();
+      render();
+    }
+
+    const catName = (jp, vn) => (currentLang === "vi" ? (vn || jp) : (jp || vn)) || t().uncategorized;
+
+    // 表示する行：カテゴリ1でまとめるときは、カテゴリ2の行を足し合わせる
+    function groupedRows(metric) {
+      const map = new Map();
+      raw.rows.forEach(r => {
+        const key = level === 1 ? String(r.cat1Id ?? "none") : String(r.cat2Id ?? "none");
+        if (!map.has(key)) {
+          map.set(key, {
+            label1: catName(r.cat1Jp, r.cat1Vn),
+            label2: level === 2 ? catName(r.cat2Jp, r.cat2Vn) : "",
+            none: r.cat1Id === null,
+            values: {},
+          });
+        }
+        const g = map.get(key);
+        Object.entries(r[metric]).forEach(([m, v]) => { g.values[m] = (g.values[m] ?? 0) + v; });
+      });
+      return [...map.values()];
+    }
+
+    /* =====================================================
+       年度平均表示 ⇔ 月別表示（extrusion_quantity_report.html と同じ考え方）
+       年度は4月始まり。過去年度は月平均1列にまとめ、当年度は月別。
+    ===================================================== */
+    let expandedFYs = new Set();
+
+    function fiscalYearOf(monthStr) {
+      const [y, m] = monthStr.split("-").map(Number);
+      return m >= 4 ? y : y - 1;
+    }
+    function currentFiscalYear() {
+      const now = new Date();
+      return now.getMonth() + 1 >= 4 ? now.getFullYear() : now.getFullYear() - 1;
+    }
+    function currentMonthStr() {
+      const now = new Date();
+      return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+    // 右端の「今年度平均」：当年度（4月〜）のうち、進行中の当月を除いた月
+    function averageMonths(months) {
+      const curFY = currentFiscalYear(), cur = currentMonthStr();
+      return months.filter(m => fiscalYearOf(m) === curFY && m !== cur);
+    }
+    function allPastFiscalYears(months) {
+      const curFY = currentFiscalYear();
+      return [...new Set((months ?? []).map(fiscalYearOf))].filter(fy => fy < curFY).sort((a, b) => a - b);
+    }
+    function buildColumns(months) {
+      const curFY = currentFiscalYear();
+      const byFY = new Map();
+      months.forEach(m => {
+        const fy = fiscalYearOf(m);
+        if (!byFY.has(fy)) byFY.set(fy, []);
+        byFY.get(fy).push(m);
+      });
+      const columns = [];
+      [...byFY.keys()].sort((a, b) => a - b).forEach(fy => {
+        const fyMonths = byFY.get(fy);
+        const isCurrent = fy === curFY;
+        if (!isCurrent && !expandedFYs.has(fy)) {
+          columns.push({ type: "fy-avg", key: "fy" + fy, fy, months: fyMonths });
+        } else {
+          fyMonths.forEach((m, i) => columns.push({ type: "month", key: m, month: m, fy, collapsible: !isCurrent && i === 0 }));
+        }
+      });
+      return columns;
+    }
+    function columnLabel(col) {
+      return col.type === "month" ? col.month.slice(2).replace("-", "/") : t().fyLabel(col.fy);
+    }
+    // 年度平均は、データのある月数ではなく、その年度に表示している月の数で割る（押出投入実績と同じ）
+    function columnValue(values, col) {
+      if (col.type === "month") return values[col.month] ?? 0;
+      return col.months.reduce((s, m) => s + (values[m] ?? 0), 0) / (col.months.length || 1);
+    }
+    function columnHeaderHtml(col) {
+      if (col.type === "fy-avg") {
+        return `<th class="col-fyavg"><button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t().title_expand}">▸</button> ${columnLabel(col)}</th>`;
+      }
+      if (col.collapsible) {
+        return `<th><button type="button" class="fy-toggle-btn" onclick="toggleFY(${col.fy})" title="${t().title_collapse}">▾</button> ${columnLabel(col)}</th>`;
+      }
+      return `<th>${columnLabel(col)}</th>`;
+    }
+    function toggleFY(fy) {
+      if (expandedFYs.has(fy)) expandedFYs.delete(fy); else expandedFYs.add(fy);
+      syncExpandState();
+      render();
+    }
+    function syncExpandState() {
+      const past = allPastFiscalYears(raw?.months);
+      const all = past.length > 0 && past.every(fy => expandedFYs.has(fy));
+      document.getElementById("btnToggleView").textContent = all ? t().btn_collapse : t().btn_expand;
+    }
+    function toggleView() {
+      const past = allPastFiscalYears(raw?.months);
+      const all = past.length > 0 && past.every(fy => expandedFYs.has(fy));
+      if (all) expandedFYs.clear(); else past.forEach(fy => expandedFYs.add(fy));
+      syncExpandState();
+      render();
+    }
+
+    /* =====================================================
+       描画
+    ===================================================== */
+    const FMT = {
+      weight: v => v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+      length: v => Math.round(v).toLocaleString(),
+    };
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // 表の中身（CSV にも使う）：見出し・行・合計
+    function buildTable(metric) {
+      const months = raw.months;
+      const columns = buildColumns(months);
+      const avgMonths = averageMonths(months);
+      const rowAvg = values => avgMonths.reduce((s, m) => s + (values[m] ?? 0), 0) / (avgMonths.length || 1);
+      const total = values => Object.values(values).reduce((s, v) => s + v, 0);
+      const rows = groupedRows(metric).sort((a, b) =>
+        (a.none - b.none) || (rowAvg(b.values) - rowAvg(a.values)) || (total(b.values) - total(a.values)) || a.label1.localeCompare(b.label1));
+      const sums = {};
+      rows.forEach(r => Object.entries(r.values).forEach(([m, v]) => { sums[m] = (sums[m] ?? 0) + v; }));
+      return { columns, rows, sums, rowAvg };
+    }
+
+    function renderTable(metric) {
+      const { columns, rows, sums, rowAvg } = buildTable(metric);
+      const fmt = FMT[metric];
+      const labelHead = level === 1
+        ? `<th class="label-col">${t().col_cat1}</th>`
+        : `<th class="label-col">${t().col_cat1} / ${t().col_cat2}</th>`;
+      document.getElementById(metric + "Head").innerHTML =
+        labelHead + columns.map(columnHeaderHtml).join("") + `<th title="${t().title_avg_excl_current}">${t().col_total}</th>`;
+
+      const cells = (values) => columns.map(col => {
+        const v = columnValue(values, col);
+        return `<td class="mono${col.type === "fy-avg" ? " col-fyavg" : ""}">${v > 0 ? fmt(v) : ""}</td>`;
+      }).join("");
+      const label = r => level === 1 ? esc(r.label1) : `${esc(r.label1)} / ${esc(r.label2)}`;
+      document.getElementById(metric + "Body").innerHTML =
+        rows.map(r => `<tr><td class="label-col">${label(r)}</td>${cells(r.values)}<td class="total-col mono">${fmt(rowAvg(r.values))}</td></tr>`).join("") +
+        `<tr class="sum-row"><td class="label-col">${t().sum_row}</td>${cells(sums)}<td class="total-col mono">${fmt(rowAvg(sums))}</td></tr>`;
+    }
+
+    function render() {
+      if (!raw) return;
+      document.querySelectorAll("#levelSeg button").forEach(b => b.classList.toggle("active", Number(b.dataset.level) === level));
+      renderTable("weight");
+      renderTable("length");
+    }
+
+    document.getElementById("levelSeg").addEventListener("click", e => {
+      const b = e.target.closest("button[data-level]");
+      if (!b) return;
+      level = Number(b.dataset.level);
+      render();
+    });
+
+    /* =====================================================
+       CSV（いま表示している列のまま）
+    ===================================================== */
+    function exportCSV(metric) {
+      if (!raw) return;
+      const { columns, rows, sums, rowAvg } = buildTable(metric);
+      const dec = metric === "weight" ? 2 : 0;
+      const n = v => (v ? v.toFixed(dec) : "");
+      const q = s => `"${String(s ?? "").replace(/"/g, '""')}"`;
+      const head = (level === 1 ? [t().col_cat1] : [t().col_cat1, t().col_cat2]).concat(columns.map(columnLabel), [t().col_total]);
+      const line = (labels, values) => labels.concat(columns.map(c => n(columnValue(values, c))), [n(rowAvg(values))]).map(q).join(",");
+      const lines = [head.map(q).join(",")]
+        .concat(rows.map(r => line(level === 1 ? [r.label1] : [r.label1, r.label2], r.values)))
+        .concat([line(level === 1 ? [t().sum_row] : [t().sum_row, ""], sums)]);
+      const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${t()["csv_" + metric]}_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    setLang(currentLang);
+    loadData();
+  </script>
+</body>
+</html>

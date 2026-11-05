@@ -503,6 +503,11 @@
           <div class="menu-title" data-key="quantity_report_title">押出投入実績(t)</div>
           <div class="menu-desc" data-key="quantity_report_desc">押出種別・ビレットサイズ・製造工場別の月次投入重量</div>
         </div>
+        <div class="menu-card" onclick="openPage('category_good_report.html')">
+          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <div class="menu-title" data-key="category_good_title">カテゴリ別 良品実績</div>
+          <div class="menu-desc" data-key="category_good_desc">品番のカテゴリ別の月次良品重量（t）と良品長さ（m）</div>
+        </div>
         <div class="menu-card" onclick="openPage('aging_rack_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
           <div class="menu-title" data-key="aging_rack_report_title">時効ラック使用・解放</div>
@@ -683,6 +688,8 @@
           operation_report_desc: "1日の号機ごとの時間の使い方（持ち時間・押出・停止コード・記録なし）を、押出日報からまとめる",
           quantity_report_title: "押出投入実績(t)",
           quantity_report_desc: "押出種別・ビレットサイズ・製造工場別の月次投入重量",
+          category_good_title: "カテゴリ別 良品実績",
+          category_good_desc: "品番のカテゴリ別の月次良品重量（t）と良品長さ（m）",
           aging_rack_report_title: "時効ラック使用・解放",
           aging_rack_report_desc: "日別の使用ラック数と解放ラック数",
           ram_log_title: "（試作）押出波形",
@@ -799,6 +806,8 @@
           operation_report_desc: "Cách sử dụng thời gian trong ngày của từng máy (khả dụng, đùn, mã dừng, không ghi), tổng hợp từ báo cáo đùn",
           quantity_report_title: "Thực tế nạp phôi đùn (t)",
           quantity_report_desc: "Trọng lượng theo tháng: Loại ép, kích thước phôi, nhà máy",
+          category_good_title: "Thực tế hàng tốt theo danh mục",
+          category_good_desc: "Trọng lượng (t) và chiều dài (m) hàng tốt theo tháng, theo danh mục mã SP",
           aging_rack_report_title: "Giá hóa già: SD / GP",
           aging_rack_report_desc: "Số giá sử dụng và giải phóng theo ngày",
           ram_log_title: "（Thử nghiệm）Dạng sóng ép đùn",
