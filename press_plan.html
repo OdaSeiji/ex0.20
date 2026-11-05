@@ -141,17 +141,18 @@
       .src-badge.src-old { background: #e0e0e0; color: #666; }
       .row-del { border: none; background: none; color: #c62828; cursor: pointer; font-size: 13px; padding: 0 4px; }
       .row-del:hover { color: #fff; background: #c62828; border-radius: 3px; }
-      dialog#deleteDialog {
+      dialog.confirm-dlg {
         border: none; border-radius: 10px; padding: 20px 24px; margin: auto;
         box-shadow: 0 4px 20px rgba(0,0,0,0.2); font-size: 14px; min-width: 320px;
       }
-      dialog#deleteDialog::backdrop { background: rgba(0,0,0,0.4); }
-      dialog#deleteDialog .dlg-target { margin: 10px 0; padding: 8px 10px; background: #f5f5f5; border-radius: 6px; font-size: 13px; }
-      dialog#deleteDialog .dlg-error { color: #c62828; font-size: 12px; min-height: 16px; margin-top: 6px; }
-      dialog#deleteDialog .dlg-btn-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
-      dialog#deleteDialog button { padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; }
-      dialog#deleteDialog .dlg-cancel { background: #9e9e9e; color: #fff; }
-      dialog#deleteDialog .dlg-delete { background: #c62828; color: #fff; }
+      dialog.confirm-dlg::backdrop { background: rgba(0,0,0,0.4); }
+      dialog.confirm-dlg .dlg-target { margin: 10px 0; padding: 8px 10px; background: #f5f5f5; border-radius: 6px; font-size: 13px; }
+      dialog.confirm-dlg .dlg-error { color: #c62828; font-size: 12px; min-height: 16px; margin-top: 6px; }
+      dialog.confirm-dlg .dlg-btn-row { display: flex; gap: 10px; margin-top: 12px; justify-content: flex-end; }
+      dialog.confirm-dlg button { padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; }
+      dialog.confirm-dlg .dlg-cancel { background: #9e9e9e; color: #fff; }
+      dialog.confirm-dlg .dlg-delete { background: #c62828; color: #fff; }
+      dialog.confirm-dlg .dlg-ok { background: #e65100; color: #fff; }
 
       #toast {
         position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
@@ -254,7 +255,17 @@
       </div>
     </div>
 
-    <dialog id="deleteDialog">
+    <dialog id="editDialog" class="confirm-dlg">
+      <div data-key="dlg_edit_confirm">この計画を修正しますか？</div>
+      <div class="dlg-target" id="editTarget"></div>
+      <div style="font-size:12px; color:#777;" data-key="dlg_edit_note">中央の入力中の内容は、この計画に置き換わります。</div>
+      <div class="dlg-btn-row">
+        <button class="dlg-cancel" onclick="document.getElementById('editDialog').close()" data-key="dlg_cancel">キャンセル</button>
+        <button class="dlg-ok" id="editOk" onclick="confirmEdit()" data-key="dlg_edit_ok">修正する</button>
+      </div>
+    </dialog>
+
+    <dialog id="deleteDialog" class="confirm-dlg">
       <div data-key="dlg_confirm">この計画を削除しますか？</div>
       <div class="dlg-target" id="deleteTarget"></div>
       <div style="display:flex; align-items:center; gap:8px;">
@@ -301,6 +312,7 @@
           col_size: "サイズ", col_material: "材質", col_length: "長さ", col_stock: "在庫", col_used: "実績", col_plan: "計画", col_order: "発注",
           tip_stock_at: "在庫の調査日",
           dlg_confirm: "この計画を削除しますか？", lbl_passcode: "パスコード", dlg_cancel: "キャンセル", dlg_delete: "削除する",
+          dlg_edit_confirm: "この計画を修正しますか？", dlg_edit_note: "中央の入力中の内容は、この計画に置き換わります。", dlg_edit_ok: "修正する",
           msg_deleted: "削除しました", err_passcode: "パスコードが違います", tip_delete: "削除", btn_schedule: "スケジュール表", col_src: "入力元", src_new: "新", src_old: "旧", tip_src: "新＝ex0.20 の押出計画で作成、旧＝ex0.11 で作成", tip_created: "作成", tip_updated: "更新",
         },
         vi: {
@@ -330,6 +342,7 @@
           col_size: "Cỡ", col_material: "Vật liệu", col_length: "Dài", col_stock: "Tồn HT", col_used: "Thực tế", col_plan: "Kế hoạch", col_order: "Order",
           tip_stock_at: "Ngày kiểm kê",
           dlg_confirm: "Xóa kế hoạch này?", lbl_passcode: "Mã xác nhận", dlg_cancel: "Hủy", dlg_delete: "Xóa",
+          dlg_edit_confirm: "Sửa kế hoạch này?", dlg_edit_note: "Nội dung đang nhập ở giữa sẽ được thay bằng kế hoạch này.", dlg_edit_ok: "Sửa",
           msg_deleted: "Đã xóa", err_passcode: "Sai mã xác nhận", tip_delete: "Xóa", btn_schedule: "Lịch đùn", col_src: "Nguồn", src_new: "Mới", src_old: "Cũ", tip_src: "Mới = tạo ở kế hoạch ép đùn ex0.20, Cũ = tạo ở ex0.11", tip_created: "Tạo", tip_updated: "Cập nhật",
         },
       };
@@ -625,7 +638,7 @@
         body.innerHTML = plans.map((p) => {
           const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
           return `
-          <tr class="selectable ${cls} ${p.id === selectedPlanId ? "selected" : ""}" onclick="openPlan(${p.id})">
+          <tr class="selectable ${cls} ${p.id === selectedPlanId ? "selected" : ""}" onclick="askEditPlan(${p.id})">
             <td>${p.plan_date}</td><td>${p.press_machine}</td>
             <td>${esc(p.production_number ?? "-")}</td><td>${esc(p.die_number ?? "-")}</td><td class="c">${ptypeLabel(p.pressing_type_id)}</td>
             <td>${shiftLabel(p.shift_id)}</td><td>${esc(p.ordinal ?? "")}</td>
@@ -638,7 +651,24 @@
         }).join("");
       }
 
-      // 一覧の行をクリック：同じ日の計画を号機ごとの色で示し、中央に修正用に読み込む
+      // 一覧の行をクリック：修正するか確かめてから読み込む（うっかり修正モードに入らないように）
+      let askingEditId = null;
+      function askEditPlan(id) {
+        const p = plans.find((x) => x.id === id);
+        if (!p || id === editingId) return;  // もう修正中の計画なら何もしない
+        askingEditId = id;
+        document.getElementById("editTarget").textContent =
+          `${p.plan_date}  No.${p.press_machine}  ${p.die_number ?? "-"}  ${shiftLabel(p.shift_id)}  ${t("col_qty")} ${p.quantity}`;
+        document.getElementById("editDialog").showModal();
+        document.getElementById("editOk").focus();
+      }
+      function confirmEdit() {
+        document.getElementById("editDialog").close();
+        if (askingEditId !== null) openPlan(askingEditId);
+        askingEditId = null;
+      }
+
+      // 同じ日の計画を号機ごとの色で示し、中央に修正用に読み込む
       function openPlan(id) {
         const p = plans.find((x) => x.id === id);
         if (!p) return;

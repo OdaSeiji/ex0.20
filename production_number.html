@@ -86,7 +86,7 @@
       /* ── カテゴリ選択 ── */
       .cat-wrap {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);  /* 中身の長さで左右の幅が変わらないように */
         gap: 16px;
         margin-bottom: 20px;
       }
@@ -135,17 +135,29 @@
       .list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
       .list-header h2 { font-size: 15px; color: #333; }
       .count-label { font-size: 12px; color: #888; }
+      /* 検索欄は幅を固定する（前はフォーカスで広がり、外すと 20px に戻って入力した文字が見えなかった） */
       .th-search {
-        width: 20px; padding: 2px 4px; margin-left: 6px;
+        width: 110px; padding: 2px 4px; margin-left: 6px;
         border: 1px solid #bbb; border-radius: 3px;
         font-size: 11px; font-family: inherit;
         vertical-align: middle; cursor: text;
-        transition: width 0.2s ease;
       }
       .th-search:focus {
-        width: 120px; outline: none;
+        outline: none;
         border-color: #0078d4;
       }
+      .th-search.has-value { border-color: #0078d4; background: #e8f1ff; }
+      .col-chk { width: 32px; text-align: center !important; }
+      tr.checked-row td { background: #fff8e1; }
+      .bulk-btn {
+        padding: 5px 12px; background: #e65100; color: #fff; border: none;
+        border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;
+      }
+      .bulk-btn:disabled { background: #bdbdbd; cursor: default; }
+      .bulk-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; font-size: 13px; }
+      .bulk-row label { width: 90px; color: #555; }
+      .bulk-row select { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; }
+      .bulk-targets { max-height: 160px; overflow-y: auto; background: #f5f5f5; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: monospace; margin-bottom: 14px; white-space: pre; }
 
       .table-wrap { overflow-y: auto; max-height: 60vh; }
 
@@ -162,9 +174,9 @@
       tr:hover { background: #f7f9ff; }
 
       /* カラム幅 */
-      .col-cat1 { min-width: 130px; width: 130px; }
+      .col-cat1 { min-width: 200px; width: 200px; }
       .col-cat2 { width: 110px; max-width: 110px; }
-      .col-pn   { min-width: 130px; }
+      .col-pn   { min-width: 220px; }
       .col-mat, .col-age { width: 70px; }
       .col-num  { width: 110px; }
       .col-act  { width: 72px; }
@@ -173,7 +185,7 @@
 
       .edit-btn {
         padding: 4px 12px; background: #1565c0; color: #fff;
-        border: none; border-radius: 4px; cursor: pointer; font-size: 12px;
+        border: none; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap;
       }
 
       /* ── Toast ── */
@@ -474,14 +486,16 @@
         <div class="list-header">
           <h2 data-key="list_title">品番一覧</h2>
           <span class="count-label" id="countLabel"></span>
+          <button class="bulk-btn" id="bulkBtn" onclick="openBulkModal()" disabled>🗂 <span id="bulkBtnLabel">選んだ品番のカテゴリを変更</span>（<span id="checkedCount">0</span>）</button>
         </div>
         <div class="table-wrap">
         <table id="mainTable">
           <thead>
             <tr>
+              <th class="col-chk"><input type="checkbox" id="checkAll" title="表示中をすべて選ぶ" onclick="toggleCheckAll(this.checked)" /></th>
               <th class="sortable col-cat1" onclick="sortBy('category1_jp')"><span data-key="col_cat1">カテゴリ1</span><span class="sort-icon" data-sortkey="category1_jp">↕</span><input type="text" id="searchCat1" class="th-search" placeholder="🔍" oninput="filterByCat1(this.value)" onclick="event.stopPropagation()" /></th>
               <th class="sortable col-cat2" onclick="sortBy('category2_jp')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="category2_jp">↕</span></th>
-              <th class="sortable col-pn"   onclick="sortBy('production_number')"><span data-key="col_pn">品番</span><span class="sort-icon" data-sortkey="production_number">↕</span><input type="text" id="searchInput" class="th-search" placeholder="🔍" oninput="filterTable(this.value)" onclick="event.stopPropagation()" /></th>
+              <th class="sortable col-pn"   onclick="sortBy('production_number')"><span data-key="col_pn">品番</span><span class="sort-icon" data-sortkey="production_number">↕</span><input type="text" id="searchInput" class="th-search" placeholder="🔍 * ? 可" title="* は任意の文字列、? は任意の1文字（例：C2Q*-30K）" oninput="filterTable(this.value)" onclick="event.stopPropagation()" /></th>
               <th class="col-mat" data-key="col_material">材質</th>
               <th class="col-age" data-key="col_aging">時効</th>
               <th class="col-num" data-key="col_area">断面積 (mm²)</th>
@@ -493,6 +507,24 @@
           </thead>
           <tbody id="mainTbody"></tbody>
         </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- まとめてカテゴリ変更モーダル -->
+    <div id="bulkModal" class="modal-overlay">
+      <div class="modal-box" style="width:520px;">
+        <div class="modal-header">
+          <h3 data-key="bulk_title">選んだ品番のカテゴリを変更</h3>
+          <button class="modal-close" onclick="closeBulkModal()">✕</button>
+        </div>
+        <div style="font-size:12px;color:#555;margin-bottom:4px;"><span data-key="bulk_targets">対象の品番</span>（<span id="bulkCount"></span>）</div>
+        <div class="bulk-targets" id="bulkTargets"></div>
+        <div class="bulk-row"><label data-key="lbl_cat1">カテゴリ1</label><select id="bulkCat1" onchange="loadBulkCat2(this.value)"></select></div>
+        <div class="bulk-row"><label data-key="lbl_cat2">カテゴリ2</label><select id="bulkCat2"></select></div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="closeBulkModal()" data-key="btn_cancel">キャンセル</button>
+          <button class="btn-save" id="bulkSave" onclick="saveBulk()" data-key="bulk_save">変更する</button>
         </div>
       </div>
     </div>
@@ -658,6 +690,13 @@
           col_action:  "操作",
           col_updated: "更新日",
           btn_import: "📂 CSV・Excel インポート",
+          bulk_btn: "選んだ品番のカテゴリを変更",
+          bulk_title: "選んだ品番のカテゴリを変更",
+          bulk_targets: "対象の品番",
+          bulk_save: "変更する",
+          bulk_select: "— 選択 —",
+          bulk_need_cat2: "カテゴリ2を選んでください",
+          bulk_done: (n) => `${n} 件のカテゴリを変更しました`,
         },
         vi: {
           btn_back_menu: "← Về menu",
@@ -696,6 +735,13 @@
           col_action:  "Thao tác",
           col_updated: "Ngày cập nhật",
           btn_import: "📂 Nhập CSV・Excel",
+          bulk_btn: "Đổi danh mục các mã đã chọn",
+          bulk_title: "Đổi danh mục các mã đã chọn",
+          bulk_targets: "Mã sản phẩm được chọn",
+          bulk_save: "Đổi",
+          bulk_select: "— Chọn —",
+          bulk_need_cat2: "Vui lòng chọn danh mục 2",
+          bulk_done: (n) => `Đã đổi danh mục cho ${n} mã`,
         },
       };
 
@@ -720,8 +766,9 @@
         currentLang = lang;
         document.querySelectorAll("[data-key]").forEach((el) => {
           const k = el.getAttribute("data-key");
-          if (dict[lang][k] !== undefined) el.textContent = dict[lang][k];
+          if (typeof dict[lang][k] === "string") el.textContent = dict[lang][k];
         });
+        document.getElementById("bulkBtnLabel").textContent = dict[lang].bulk_btn;
         localStorage.setItem("lang", lang);
       }
 
@@ -758,7 +805,7 @@
       ════════════════════════════ */
       async function loadList() {
         allData = await postForm("./php/ProductionNumber/SelSummaryV3.php", { dummy: "dummy" });
-        renderTable(allData);
+        applyFilters();  // 編集して戻っても、検索欄の絞り込みと並べ替えをそのまま保つ
       }
 
       function renderTable(data) {
@@ -767,7 +814,7 @@
         tbody.innerHTML = "";
 
         if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
           return;
         }
 
@@ -778,7 +825,10 @@
           const agi  = row.aging_type      ?? "—";
 
           const tr = document.createElement("tr");
+          const checked = checkedIds.has(Number(row.id));
+          if (checked) tr.classList.add("checked-row");
           tr.innerHTML = `
+            <td class="col-chk"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleCheck(${row.id}, this.checked, this)" /></td>
             <td>${cat1}</td>
             <td>${cat2}</td>
             <td><strong>${row.production_number ?? ""}</strong></td>
@@ -792,6 +842,7 @@
           `;
           tbody.appendChild(tr);
         });
+        syncCheckAll();
       }
 
       /* 絞り込み */
@@ -808,11 +859,103 @@
         applyFilters();
       }
 
+      // 品番は * ? のワイルドカードが使える（* ? が無ければ前と同じく「含む」で探す）
+      function pnMatcher(q) {
+        if (!q) return () => true;
+        if (!q.includes("*") && !q.includes("?")) return (v) => v.includes(q);
+        const re = new RegExp("^" + q.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".") + "$");
+        return (v) => re.test(v);
+      }
+
+      let shownData = [];  // 今、表に出ている行（全選択の対象）
       function applyFilters() {
-        renderTable(allData.filter((r) =>
-          String(r.production_number ?? "").toUpperCase().includes(searchPn) &&
+        const pnOk = pnMatcher(searchPn);
+        let list = allData.filter((r) =>
+          pnOk(String(r.production_number ?? "").toUpperCase()) &&
           String(r.category1_jp     ?? "").toUpperCase().includes(searchCat1)
-        ));
+        );
+        if (sortKey) {
+          list = [...list].sort((a, b) => {
+            let va = a[sortKey] ?? "", vb = b[sortKey] ?? "";
+            const n = Number(va) - Number(vb);
+            const result = (!isNaN(va) && !isNaN(vb) && va !== "")
+              ? n
+              : String(va).localeCompare(String(vb), "ja");
+            return sortAsc ? result : -result;
+          });
+        }
+        shownData = list;
+        document.getElementById("searchInput").classList.toggle("has-value", !!searchPn);
+        document.getElementById("searchCat1").classList.toggle("has-value", !!searchCat1);
+        renderTable(list);
+      }
+
+      /* ── チェックして、まとめてカテゴリを変える ── */
+      const checkedIds = new Set();
+      function toggleCheck(id, on, el) {
+        if (on) checkedIds.add(Number(id)); else checkedIds.delete(Number(id));
+        el?.closest("tr")?.classList.toggle("checked-row", on);
+        syncCheckAll();
+      }
+      function toggleCheckAll(on) {
+        shownData.forEach((r) => on ? checkedIds.add(Number(r.id)) : checkedIds.delete(Number(r.id)));
+        renderTable(shownData);
+      }
+      function syncCheckAll() {
+        const all = document.getElementById("checkAll");
+        const n = shownData.filter((r) => checkedIds.has(Number(r.id))).length;
+        all.checked = shownData.length > 0 && n === shownData.length;
+        all.indeterminate = n > 0 && n < shownData.length;
+        document.getElementById("checkedCount").textContent = checkedIds.size;
+        document.getElementById("bulkBtn").disabled = checkedIds.size === 0;
+      }
+
+      async function openBulkModal() {
+        if (!checkedIds.size) return;
+        const t = dict[currentLang];
+        const rows = allData.filter((r) => checkedIds.has(Number(r.id)));
+        document.getElementById("bulkCount").textContent = rows.length;
+        document.getElementById("bulkTargets").textContent = rows.map((r) => `${r.production_number}（${r.category1_jp || "—"} / ${r.category2_jp || "—"}）`).join("\n");
+        const cat1 = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
+        document.getElementById("bulkCat1").innerHTML = `<option value="">${t.bulk_select}</option>` +
+          cat1.map((c) => `<option value="${c.id}">${c.name_jp ?? ""}</option>`).join("");
+        document.getElementById("bulkCat2").innerHTML = `<option value="">${t.bulk_select}</option>`;
+        document.getElementById("bulkModal").classList.add("open");
+      }
+      async function loadBulkCat2(cat1Id) {
+        const t = dict[currentLang];
+        const sel = document.getElementById("bulkCat2");
+        sel.innerHTML = `<option value="">${t.bulk_select}</option>`;
+        if (!cat1Id) return;
+        const cat2 = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: cat1Id });
+        sel.innerHTML += cat2.map((c) => `<option value="${c.id}">${c.name_jp ?? ""}</option>`).join("");
+      }
+      function closeBulkModal() {
+        document.getElementById("bulkModal").classList.remove("open");
+      }
+      async function saveBulk() {
+        const t = dict[currentLang];
+        const cat2 = document.getElementById("bulkCat2").value;
+        if (!cat2) { showToast(t.bulk_need_cat2, false); return; }
+        const btn = document.getElementById("bulkSave");
+        btn.disabled = true;
+        try {
+          const res = await fetch("./php/ProductionNumber/bulk_update_category.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ids: [...checkedIds], category2_id: Number(cat2) }),
+          });
+          const r = await res.json();
+          if (r.status !== "ok") throw new Error(r.message || "error");
+          showToast(t.bulk_done(checkedIds.size));
+          checkedIds.clear();
+          closeBulkModal();
+          await loadList();
+        } catch (e) {
+          showToast(e.message, false);
+        } finally {
+          btn.disabled = false;
+        }
       }
 
       /* cat-card カテゴリ1 絞り込み */
@@ -832,15 +975,7 @@
         const icon = document.querySelector(`.sort-icon[data-sortkey="${key}"]`);
         if (icon) icon.textContent = sortAsc ? "↑" : "↓";
 
-        const sorted = [...allData].sort((a, b) => {
-          let va = a[key] ?? "", vb = b[key] ?? "";
-          const n = Number(va) - Number(vb);
-          const result = (!isNaN(va) && !isNaN(vb) && va !== "")
-            ? n
-            : String(va).localeCompare(String(vb), "ja");
-          return sortAsc ? result : -result;
-        });
-        renderTable(sorted);
+        applyFilters();
       }
 
       /* ════════════════════════════

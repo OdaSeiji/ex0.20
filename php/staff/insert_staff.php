@@ -21,7 +21,7 @@ if (!preg_match('/^\d{7}$/', $num)) staffFail("社員番号は数字7桁で入�
 if (mb_strlen($name) < 2 || mb_strlen($name) > 40) staffFail("氏名は2〜40文字で入れてください");
 if (!in_array($pos, [1, 2], true)) staffFail("区分を選んでください");
 if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $join, $m) || !checkdate((int)$m[2], (int)$m[3], (int)$m[1])) staffFail("入社日が不正です");
-$roles = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer"];
+$roles = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer", "packing", "quality_control"];
 if ($role !== "" && !in_array($role, $roles, true)) staffFail("ロールが不正です");
 
 try {

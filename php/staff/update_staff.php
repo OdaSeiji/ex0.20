@@ -17,7 +17,7 @@ if ($action === "update_staff") {
     $name  = trim(preg_replace('/\s+/u', " ", (string)($input["staff_name"] ?? "")));
     $role  = $input["role"] ?? null;
     $leave = $input["leave_at"] ?? null;
-    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer"];
+    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer", "packing", "quality_control"];
     $fail = function (string $msg) {
         echo json_encode(["status" => "error", "message" => $msg], JSON_UNESCAPED_UNICODE);
         exit;
@@ -41,7 +41,7 @@ if ($action === "update_staff") {
 
 } elseif ($action === "update_role") {
     $role    = $input["role"] ?? null;
-    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer"];
+    $allowed = ["admin", "operator", "maintenance", "inspector", "die_setup", "die_engineer", "packing", "quality_control"];
 
     if ($role !== null && !in_array($role, $allowed)) {
         echo json_encode(["status" => "error", "message" => "invalid role"]);

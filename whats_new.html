@@ -85,7 +85,62 @@
         </div>
       </div>
 
-      <!-- 2026-11-04 (最新) -->
+      <!-- 2026-11-05 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-05</span>
+        </div>
+        <div class="entry-title" data-key="hk_title">社員管理：ロールに「梱包」と「品管」を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hk_purpose">梱包と品管の担当者を、ロールで分けて選べるようにするため（memo 10/28）。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hk_content">社員の設定と社員の登録で、ロールに packing（梱包）と quality_control（品管）を選べるようにした。DB の m_staff.role にも2つを足した（本番は SQL の実行が必要）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='staff_settings.html'">staff_settings.html</a>
+          <a class="file-link" onclick="location.href='staff_register.html'">staff_register.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-05 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-05</span>
+        </div>
+        <div class="entry-title" data-key="hj_title">品番管理：検索欄の幅を固定、編集後も絞り込みを保つ、カテゴリをまとめて変更</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hj_purpose">検索欄が入力のあと細くなって見えなかった。品番を編集して戻ると絞り込みが外れていた。複数の品番のカテゴリを1つずつ直すのが大変だったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hj_content">一覧の検索欄の幅を固定し、入力中は色を付けた。保存・並べ替えのあとも絞り込みを保つ。品番の検索で * ? のワイルドカードを使える（例：C2Q*-30K）。一覧の左にチェックボックスを付け、「選んだ品番のカテゴリを変更」でカテゴリ1・2をまとめて変えられる（見出しのチェックで表示中をすべて選ぶ）。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='production_number.html'">production_number.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-05 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-05</span>
+        </div>
+        <div class="entry-title" data-key="hi_title">押出計画：一覧の行をクリックしたら、修正するか確かめる</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hi_purpose">一覧の行をクリックするだけで修正モードに入ってしまい、入力中の内容が置き換わることがあったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hi_content">右の計画の一覧で行をクリックすると「この計画を修正しますか？」の確認が出る。「修正する」を押したときだけ、中央に読み込んで修正モードにする。</span>
+        </div>
+        <div class="file-links">
+          <a class="file-link" onclick="location.href='press_plan.html'">press_plan.html</a>
+        </div>
+      </div>
+
+      <!-- 2026-11-04 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -1919,6 +1974,15 @@
           hh_title: "移管進捗：表示を速くする",
           hh_purpose: "金型 1,300 型あまりの表を開くのに時間がかかっていたため。",
           hh_content: "日付の各セルに最初から置いていた入力欄（1行に7つ、合わせて9,000個あまり）をやめ、セルを編集し始めたときに作るようにした。ローカルでは表を出す時間が約半分になった。日付の編集のしかたは今まで通り（1回目のクリックで選択、2回目で編集、Esc で取り消し）。",
+          hi_title: "押出計画：一覧の行をクリックしたら、修正するか確かめる",
+          hi_purpose: "一覧の行をクリックするだけで修正モードに入ってしまい、入力中の内容が置き換わることがあったため。",
+          hi_content: "右の計画の一覧で行をクリックすると「この計画を修正しますか？」の確認が出る。「修正する」を押したときだけ、中央に読み込んで修正モードにする。",
+          hj_title: "品番管理：検索欄の幅を固定、編集後も絞り込みを保つ、カテゴリをまとめて変更",
+          hj_purpose: "検索欄が入力のあと細くなって見えなかった。品番を編集して戻ると絞り込みが外れていた。複数の品番のカテゴリを1つずつ直すのが大変だったため。",
+          hj_content: "一覧の検索欄の幅を固定し、入力中は色を付けた。保存・並べ替えのあとも絞り込みを保つ。品番の検索で * ? のワイルドカードを使える（例：C2Q*-30K）。一覧の左にチェックボックスを付け、「選んだ品番のカテゴリを変更」でカテゴリ1・2をまとめて変えられる（見出しのチェックで表示中をすべて選ぶ）。",
+          hk_title: "社員管理：ロールに「梱包」と「品管」を追加",
+          hk_purpose: "梱包と品管の担当者を、ロールで分けて選べるようにするため（memo 10/28）。",
+          hk_content: "社員の設定と社員の登録で、ロールに packing（梱包）と quality_control（品管）を選べるようにした。DB の m_staff.role にも2つを足した（本番は SQL の実行が必要）。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2199,6 +2263,15 @@
           hh_title: "Tiến độ bàn giao: hiển thị nhanh hơn",
           hh_purpose: "Vì mở bảng hơn 1.300 khuôn mất nhiều thời gian.",
           hh_content: "Bỏ các ô nhập ngày đặt sẵn trong từng ô (7 ô mỗi dòng, hơn 9.000 ô), chỉ tạo khi bắt đầu sửa ô. Trên máy thử, thời gian hiển thị bảng giảm khoảng một nửa. Cách sửa ngày giữ nguyên (bấm lần 1 để chọn, lần 2 để sửa, Esc để hủy).",
+          hi_title: "Kế hoạch đùn: hỏi xác nhận trước khi sửa khi bấm vào dòng",
+          hi_purpose: "Vì chỉ cần bấm vào dòng là vào chế độ sửa, nội dung đang nhập có thể bị thay thế.",
+          hi_content: "Bấm vào dòng trong danh sách kế hoạch bên phải sẽ hiện xác nhận \"Sửa kế hoạch này?\". Chỉ khi bấm \"Sửa\" mới tải vào giữa và vào chế độ sửa.",
+          hj_title: "Quản lý mã SP: cố định độ rộng ô tìm kiếm, giữ bộ lọc sau khi sửa, đổi danh mục hàng loạt",
+          hj_purpose: "Ô tìm kiếm bị thu nhỏ sau khi nhập nên không thấy chữ. Sửa mã SP xong quay lại thì bộ lọc bị mất. Đổi danh mục từng mã một rất mất công.",
+          hj_content: "Cố định độ rộng ô tìm kiếm và tô màu khi đang lọc. Giữ bộ lọc sau khi lưu hoặc sắp xếp. Tìm mã SP dùng được ký tự đại diện * ? (ví dụ C2Q*-30K). Thêm ô chọn ở bên trái danh sách, bấm \"Đổi danh mục các mã đã chọn\" để đổi danh mục 1・2 hàng loạt (ô chọn ở tiêu đề chọn tất cả đang hiển thị).",
+          hk_title: "Quản lý nhân viên: thêm vai trò \"Đóng gói\" và \"QC\"",
+          hk_purpose: "Để có thể phân biệt người phụ trách đóng gói và QC theo vai trò (memo 10/28).",
+          hk_content: "Trong cài đặt và đăng ký nhân viên, có thể chọn vai trò packing (đóng gói) và quality_control (QC). Đã thêm 2 giá trị này vào m_staff.role (máy chính cần chạy SQL).",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",
