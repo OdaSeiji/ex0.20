@@ -61,7 +61,11 @@
     table { border-collapse: collapse; font-size: 12px; }
     th, td { padding: 3px 2px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: right; }
     th { background: #e8f1ff; text-align: center; font-size: 11px; position: sticky; top: 0; z-index: 2; }
-    th.code, td.code { width: 26px; min-width: 26px; padding-left: 1px; padding-right: 1px; }
+    /* 不良コードの列：幅を一定にして、縦にも横と同じ線を引く */
+    th.code, td.code {
+      width: 40px; min-width: 40px; max-width: 40px; padding-left: 1px; padding-right: 1px;
+      overflow: hidden; border-left: 1px solid #e0e0e0; border-right: 1px solid #e0e0e0;
+    }
     th.code { cursor: help; }
     td.pn { max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
     td.mono { font-family: "Roboto Mono", monospace; }
@@ -72,7 +76,9 @@
     td.sticky-l { position: sticky; left: 0; background: inherit; z-index: 1; }
     th.sticky-l { left: 0; z-index: 3; }
     tr { background: #fff; }
-    tr.low-yield { background: #eaffb0; }
+    /* 1 行おきに薄い色（歩留まりの低い行の色は優先） */
+    tbody tr:nth-child(even) { background: #f3f7fc; }
+    tbody tr.low-yield { background: #eaffb0; }
     tr.has-note td { color: #c62828; }
     tr.has-note, tr.has-qnote { cursor: pointer; }
     /* 品質メモのある行：型番の後ろにバッジ */
@@ -423,7 +429,7 @@
       const sums = {};
       COLS.filter(c => c.sum).forEach(c => sums[c.key] = list.reduce((s, r) => s + num(r[c.key]), 0));
       const qty = sums.work_quantity, ng = sums.total_ng, ok401 = sums.code_401;
-      const yieldPct = qty > 0 ? ((qty - ng + ok401) / qty * 100).toFixed(1) + "%" : "-";
+      const yieldPct = qty > 0 ? ((qty - ng + ok401) / qty * 100).toFixed(0) + "%" : "-";
       const prod = sums.total_time > 0 ? (sums.total_weight / sums.total_time).toFixed(2) + " ton/h" : "-";
 
       document.getElementById("footRow").innerHTML = SHOW.map(c => {

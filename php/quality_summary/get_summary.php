@@ -93,7 +93,7 @@ SELECT
     t20.work_quantity,
     {$totalNg} AS total_ng,
     t20.work_quantity - {$totalNg} AS total_ok,
-    CONCAT(ROUND((t20.work_quantity - {$totalNg} + IFNULL(t10.code_401, 0)) / t20.work_quantity * 100, 1), '%') AS per,
+    CONCAT(ROUND((t20.work_quantity - {$totalNg} + IFNULL(t10.code_401, 0)) / t20.work_quantity * 100, 0), '%') AS per,
     DATE_FORMAT(t_press.dimension_check_date, '%m-%d') AS dcd,
     CASE
         WHEN t_press_sub.etching_check_staff IS NOT NULL AND t_press_sub.etching_finish IN (1, 2)
