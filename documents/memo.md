@@ -6226,3 +6226,193 @@ mysql>
 ・品番を編集して、戻ってきたら、カテゴリでフィルターが解除されてしまう。品番で、ワイルドカードで抽出後、チェックボックスで選択、一括カテゴリー変更が出来るようにならないか？
 
 http://10.163.50.17/ex0.20/production_number.html
+
+それと、hand_overとhand_over_listの話は、到着日は同期しているが、
+移管日は同期していないのではないか？
+
+# 2026/11/06
+
+```terminal
+mysql> -- 1-A. 直す行の確認：本体の行が無い金型の、備考（note2）が空の部品の行（その金型に1行だけのもの）
+mysql> SELECT d.die_number, h.id, h.note2, h.die_model_code, h.asset_registration_applied_at, p.die_handover_at
+    -> FROM t_die_handover h
+    -> JOIN m_dies d ON d.id = h.die_id
+    -> LEFT JOIN t_die_handover_progress p ON p.die_id = h.die_id
+    -> WHERE h.is_accessory_item_flag = 1
+    ->   AND IFNULL(TRIM(h.note2), '') = ''
+    ->   AND h.die_id IN (
+    ->       SELECT die_id FROM t_die_handover
+    ->       GROUP BY die_id
+    ->       HAVING SUM(IFNULL(is_accessory_item_flag, 0) = 0) = 0                                   -- 本体の行が無い
+    ->          AND SUM(is_accessory_item_flag = 1 AND IFNULL(TRIM(note2), '') = '') = 1             -- 備考が空の部品の行が1行だけ
+    ->   )
+    -> ORDER BY d.die_number;
+ERROR 2013 (HY000): Lost connection to MySQL server during query
+No connection. Trying to reconnect...
+Connection id:    689815
+Current database: extrusion
+
++--------------+------+-------+----------------+-------------------------------+-----------------+
+| die_number   | id   | note2 | die_model_code | asset_registration_applied_at | die_handover_at |
++--------------+------+-------+----------------+-------------------------------+-----------------+
+| APT2-V01C    |  422 |       | APT2-V01C      | NULL                          | NULL            |
+| APT3-V01C    |  423 |       | APT3-V01C      | NULL                          | NULL            |
+| CA40S-V01D   |  544 |       | CA40S-V01D     | 2024-06-21                    | 2024-06-21      |
+| CA63S-V01D   |  545 |       | CA63S-V01D     | 2024-03-22                    | 2024-03-22      |
+| CG20H-V01D   | 2053 | NULL  | CG20H-V01D     | NULL                          | NULL            |
+| CG25H-V01D   | 2054 | NULL  | CG25H-V01D     | NULL                          | NULL            |
+| CG32H-V01C   |   15 |       | CG32H-V01C     | 2022-06-24                    | 2022-06-24      |
+| CG40H-V01C   |   18 |       | CG40H-V01C     | 2022-06-24                    | 2022-06-24      |
+| CJ06C-V01D   |   27 |       | CJ06C-V01D     | 2022-06-24                    | 2022-06-24      |
+| CJ06C-V02D   |  747 | NULL  | CJ06C-V02D     | 2026-07-02                    | 2026-07-02      |
+| CJ06C2-V01D  |   26 |       | CJ06C2-V01D    | 2022-06-20                    | 2022-06-20      |
+| CJ06C2-V02D  |  746 |       | CJ06C2-V02D    | 2026-03-13                    | 2026-03-13      |
+| CJ06RT-V01D  |   28 |       | CJ06RT-V01D    | 2022-06-20                    | 2022-06-20      |
+| CJ06RT-V02D  |  745 | NULL  | CJ06RT-V02D    | 2026-07-02                    | 2026-07-02      |
+| CJ10C-V01D   |  190 |       | CJ10C-V01D     | 2023-01-03                    | 2023-01-03      |
+| CJ10C-V02D   |  328 |       | CJ10C-V02D     | 2024-02-01                    | 2024-02-01      |
+| CJ16C-V01D   |  191 |       | CJ16C-V01D     | 2022-10-21                    | 2022-10-21      |
+| CJ16C-V02D   |  329 |       | CJ16C-V02D     | 2024-02-01                    | 2024-02-01      |
+| CJP10B-V01D  |  323 |       | CJP10B-V01D    | 2023-03-03                    | 2023-03-03      |
+| CJP10B-V02D  |  453 |       | CJP10B-V02D    | 2023-10-24                    | 2023-10-24      |
+| CJP16B-V01D  |  324 |       | CJP16B-V01D    | 2023-03-03                    | 2023-03-03      |
+| CJP16B-V02D  |  454 |       | CJP16B-V02D    | 2023-10-24                    | 2023-10-24      |
+| CQ12G-V01C   |   41 |       | CQ12G-V01C     | 2022-02-22                    | 2022-02-22      |
+| CQ12G-V01D   |  383 |       | CQ12G-V01D     | NULL                          | NULL            |
+| CQ16G-V01C   |   43 |       | CQ16G-V01C     | 2022-03-08                    | 2022-03-08      |
+| CQ16G-V01D   |  359 |       | CQ16G-V01D     | NULL                          | NULL            |
+| CQ20G-V01C   |   45 |       | CQ20G-V01C     | 2022-03-08                    | 2022-03-08      |
+| CQ20G-V01D   |  360 |       | CQ20G-V01D     | NULL                          | NULL            |
+| CQ20K-V01D   |   46 |       | CQ20K-V01D     | 2022-04-04                    | 2022-04-04      |
+| CQ25G-V01C   |   48 |       | CQ25G-V01C     | 2022-02-22                    | 2022-02-22      |
+| CQ25G-V01D   |  361 |       | CQ25G-V01D     | NULL                          | NULL            |
+| CQ32G-V01C   |   50 |       | CQ32G-V01C     | 2022-03-08                    | 2022-03-08      |
+| CQ32G-V01D   |  843 |       | CQ32G-V01D     | NULL                          | NULL            |
+| CQ32R3-V01D  |  424 |       | CQ32R3-V01D    | 2024-02-19                    | 2024-02-19      |
+| CQ40G-V01C   |   54 |       | CQ40G-V01C     | 2022-03-08                    | 2022-03-08      |
+| CQ40G-V01D   |  384 |       | CQ40G-V01D     | NULL                          | NULL            |
+| CQS12R-V01D  |  553 |       | CQS12R-V01D    | 2024-03-22                    | 2024-03-22      |
+| CQS16R-V01E  |  550 |       | CQS16R-V01E    | 2025-02-25                    | 2025-02-25      |
+| CQS20R-V01E  |  549 |       | CQS20R-V01E    | 2025-02-25                    | 2025-02-25      |
+| CQS25R-V01E  |  548 |       | CQS25R-V01E    | 2025-02-25                    | 2025-02-25      |
+| CSB0S-V01D   |  543 |       | CSB0S-V01D     | NULL                          | NULL            |
+| CX10P-V01D   |  551 |       | CX10P-V01D     | 2024-03-22                    | 2024-03-22      |
+| CX15P-V01D   |  552 |       | CX15P-V01D     | 2024-03-22                    | 2024-03-22      |
+| CXS06P-V01D  |  755 |       | CXS06P-V01D    | 2025-03-19                    | 2025-03-19      |
+| CXS15P-V01D  |  754 |       | CXS15P-V01D    | 2025-03-19                    | 2025-03-19      |
+| CXS20P-V01E  |  661 |       | CXS20P-V01E    | 2025-03-19                    | 2025-03-19      |
+| CXS25P-V01E  |  662 |       | CXS25P-V01E    | 2025-03-19                    | 2025-03-19      |
+| CXS32P-V01E  |  663 |       | CXS32P-V01E    | 2025-03-19                    | 2025-03-19      |
+| CYB06C-V01D  |  594 |       | CYB06C-V01D    | 2024-08-15                    | 2024-08-15      |
+| CYB10C-V01D  |  595 |       | CYB10C-V01D    | 2025-01-06                    | 2025-01-06      |
+| CYB15C-V01D  |  596 |       | CYB15C-V01D    | 2025-01-06                    | 2025-01-06      |
+| CYB32C-V01D  |  597 |       | CYB32C-V01D    | 2025-01-06                    | 2025-01-06      |
+| CYB40C-V01D  |  598 |       | CYB40C-V01D    | 2024-08-15                    | 2024-08-15      |
+| CYR06E-V01D  |  546 |       | CYR06E-V01D    | 2024-03-22                    | 2024-03-22      |
+| CYR06SR-V01D |  660 |       | CYR06SR-V01D   | 2025-02-25                    | 2025-02-25      |
+| CYR10E-V01D  |  547 |       | CYR10E-V01D    | 2024-03-22                    | 2024-03-22      |
+| CYR15E-V01E  |  565 |       | CYR15E-V01E    | 2024-03-22                    | 2024-03-22      |
+| CYR20E-V01E  |  563 |       | CYR20E-V01E    | 2024-03-22                    | 2024-03-22      |
+| CYR25E-V01E  |  564 |       | CYR25E-V01E    | 2024-03-22                    | 2024-03-22      |
+| CYR32E2-V01E |  566 |       | CYR32E2-V01E   | 2025-08-04                    | 2025-08-04      |
+| MB32C-V01D   |  214 |       | MB32C-V01D     | 2022-10-21                    | 2022-10-21      |
+| MB32C-V02D   |  485 |       | MB32C-V02D     | 2023-10-24                    | 2023-10-24      |
+| MGJ06B-V01D  |  236 |       | MGJ06B-V01D    | 2022-10-21                    | 2022-10-21      |
+| MGJ06B-V02D  |  457 |       | MGJ06B-V02D    | 2023-10-06                    | 2023-10-06      |
+| MGJ10B-V01D  |  237 |       | MGJ10B-V01D    | 2022-10-21                    | 2022-10-21      |
+| MHKL12B-V01D |  208 |       | MHKL12B-V01D   | 2023-02-08                    | 2023-02-08      |
+| MHKL12B-V02D |  486 |       | MHKL12B-V02D   | 2024-02-19                    | 2024-02-19      |
+| MHZJ20B-V01D |  345 |       | MHZJ20B-V01D   | 2023-10-24                    | 2023-10-24      |
+| MRH16B2-V01D |  340 |       | MRH16B2-V01D   | 2024-01-04                    | 2024-01-04      |
+| MSUB3B-V01D  |  342 |       | MSUB3B-V01D    | 2024-01-05                    | 2024-01-05      |
+| MSUB7B-V01D  |  341 |       | MSUB7B-V01D    | 2024-01-04                    | 2024-01-04      |
+| MXS06TB-V02D |  100 |       | MXS06TB-V02D   | 2021-08-27                    | 2021-08-27      |
+| MXS08TB-V02D |  102 |       | MXS08TB-V02D   | 2021-08-27                    | 2021-08-27      |
+| MXS12TB-V02D |  104 |       | MXS12TB-V02D   | 2021-08-27                    | 2021-08-27      |
+| MXS12TB-V03D |  279 |       | MXS12TB-V03D   | 2023-10-05                    | 2023-10-05      |
+| MXS16TB-V02D |  106 |       | MXS16TB-V02D   | 2021-08-27                    | 2021-08-27      |
+| MXS16TB-V03D |  280 |       | MXS16TB-V03D   | 2023-10-05                    | 2023-10-05      |
+| MXS20TB-V02D |  108 |       | MXS20TB-V02D   | 2021-08-27                    | 2021-08-27      |
+| XT790C-V01E  |  559 |       | XT790C-V01E    | 2025-08-04                    | 2025-08-04      |
++--------------+------+-------+----------------+-------------------------------+-----------------+
+79 rows in set (0.39 sec)
+
+mysql>
+```
+
+```terminal
+mysql> SELECT d.die_number, h.id, h.asset_registration_applied_at, p.die_handover_at
+    -> FROM t_die_handover h
+    -> JOIN m_dies d ON d.id = h.die_id
+    -> JOIN t_die_handover_progress p ON p.die_id = h.die_id
+    -> WHERE IFNULL(h.is_accessory_item_flag, 0) = 0
+    ->   AND NULLIF(h.asset_registration_applied_at, '0000-00-00') IS NULL
+    ->   AND p.die_handover_at IS NOT NULL
+    -> ORDER BY d.die_number;
++---------------+-----+-------------------------------+-----------------+
+| die_number    | id  | asset_registration_applied_at | die_handover_at |
++---------------+-----+-------------------------------+-----------------+
+| CP9632SG-V01D | 800 | NULL                          | 2026-03-20      |
+| CQ20T3-V02B   | 833 | NULL                          | 2026-03-20      |
+| CQ80T3-V02C   | 882 | NULL                          | 2026-03-20      |
+| CXS16S2-V01E  | 721 | NULL                          | 2026-03-20      |
+| MGPL50B2-V02D | 914 | NULL                          | 2026-03-20      |
+| MGPM50B2-V02D | 915 | NULL                          | 2026-03-20      |
+| MLU25LB-V01E  | 910 | NULL                          | 2026-03-20      |
+| MSQ20BB2-V01D | 973 | NULL                          | 2026-03-20      |
+| MSQ50B2-V03D  | 611 | NULL                          | 2020-01-01      |
+| MXQ12B-V02D   | 715 | NULL                          | 2020-01-01      |
+| MXQ16B-V01D   | 864 | NULL                          | 2026-03-20      |
+| RSQ12RC-V01D  | 954 | NULL                          | 2026-03-20      |
++---------------+-----+-------------------------------+-----------------+
+12 rows in set (0.15 sec)
+
+mysql>
+```
+
+```terminal
+mysql> -- 2026-11-05 m_staff のロールに「梱包」(packing) と「品管」(quality_control) を追加する（memo 2026/10/28）
+mysql> --   既存の値はそのまま。並びは既存の後ろに足すだけなので、今入っている値は変わらない
+mysql> ALTER TABLE m_staff
+    ->   MODIFY COLUMN role ENUM('operator','maintenance','inspector','die_setup','admin','die_engineer','packing','quality_control') NULL DEFAULT NULL
+    ->   COMMENT 'Staff role (packing = packing staff, quality_control = QC staff)';
+Query OK, 0 rows affected (0.19 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+```
+
+ちょっと、移管日の統一の`SQL`は実行を見合わせる。
+私自身の内容の理解が不足している。
+
+http://10.163.50.17/ex0.20/production_number.html
+のカテゴリー名を途中で制限するのやめた方が良いな。
+広さが有るので、十分に表示できるはず。
+
+押出日報入力htmlで、ビレット本数の確認。合わない場合、ポップアップを出すとか、上部に赤く点滅させるとか。
+
+<figure style="text-align:center;">
+  <img src="./img/20261106-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+ラックへの積載本数と、切断本数は一致させる。
+
+<figure style="text-align:center;">
+  <img src="./img/20261106-02.png" width="200">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+段取り時間の登録は必ず必要。
+
+<figure style="text-align:center;">
+  <img src="./img/20261106-03.png" width="200">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+切断時間、ストレッチ時間の登録は必ず必要。
+
+<figure style="text-align:center;">
+  <img src="./img/20261106-04.png" width="200">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
