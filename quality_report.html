@@ -214,35 +214,35 @@
         err_staff: "判定者を選んでください", err_qc_staff: "確認者を選んでください", err_qc_date: "確認日を入力してください",
       },
       vi: {
-        title: "📝 Nhập đánh giá chất lượng",
-        subtitle: "Chọn lần ép, ghi mã lỗi và số cây NG theo từng giá. Khi đủ 3 công đoạn, người phụ trách QC xác nhận để hoàn thành.",
+        title: "📝 Nhập đánh rack chất lượng",
+        subtitle: "Chọn lần đùn, ghi mã lỗi và Số thanh NG theo từng rack. Khi đủ 3 công đoạn, người phụ trách QC xác nhận để hoàn thành.",
         btn_back: "← Quay lại",
-        list_title: "Danh sách lần ép (1 tháng gần nhất)",
+        list_title: "Danh sách lần đùn (1 tháng gần nhất)",
         st_open: "Chưa xong", st_done: "Đã xong",
-        list_hint: "※ Lần ép quá 1 tháng sẽ biến mất khỏi danh sách (xử lý ở màn hình cũ QualityReportV7). \"Còn ◯ ngày\" là số ngày trước khi biến mất.",
-        placeholder: "← Chọn lần ép ở danh sách bên trái",
-        col_date: "Ngày ép", sort_hint: "Nhấn để đổi thứ tự ngày ép cũ → mới / mới → cũ", col_machine: "Máy", col_die: "Mã khuôn", col_days: "Đã qua", col_ng: "NG", col_left: "Còn",
+        list_hint: "※ Lần đùn quá 1 tháng sẽ biến mất khỏi danh sách (xử lý ở màn hình cũ QualityReportV7). \"Còn ◯ ngày\" là số ngày trước khi biến mất.",
+        placeholder: "← Chọn lần đùn ở danh sách bên trái",
+        col_date: "Ngày đùn", sort_hint: "Nhấn để đổi thứ tự ngày đùn cũ → mới / mới → cũ", col_machine: "Máy", col_die: "Mã khuôn", col_days: "Đã qua", col_ng: "NG", col_left: "Còn",
         col_dim: "KT", col_etch: "ET", col_aging: "ĐC", col_qc: "QC",
         days_unit: " ngày", left_fmt: (n) => `Còn ${n} ngày`,
-        empty: "Không có lần ép phù hợp",
-        info_date: "Ngày ép", info_machine: "Máy", info_die: "Mã khuôn", info_pn: "Mã SP", info_type: "Kiểu",
-        info_billets: "Billet TT", info_qty: "Số cây", info_ng: "NG", info_ok: "OK", info_special_note: "Ghi chú đặc biệt khi ép", info_quality_note: "Ghi chú chất lượng (theo lần ép)", ph_quality_note: "Ghi chú về chất lượng của lần ép này (tối đa 1000 ký tự)",
+        empty: "Không có lần đùn phù hợp",
+        info_date: "Ngày đùn", info_machine: "Máy", info_die: "Mã khuôn", info_pn: "Mã SP", info_type: "Kiểu",
+        info_billets: "Billet TT", info_qty: "Số thanh", info_ng: "NG", info_ok: "OK", info_special_note: "Ghi chú đặc biệt khi đùn", info_quality_note: "Ghi chú chất lượng (theo lần đùn)", ph_quality_note: "Ghi chú về chất lượng của lần đùn này (tối đa 1000 ký tự)",
         step_dimension: "Kích thước", step_etching: "Etching", step_aging: "Độ cứng", step_qc: "QC (xác nhận cuối)",
         step_not_yet: "Chưa xong", step_not_required: "〇 không cần",
         src_etching: "Nhập ở màn hình Etching", src_aging: "Nhập ở màn hình độ cứng",
         btn_save_date: "Lưu", btn_clear_date: "Xóa",
         code_totals: "Tổng theo mã NG",
-        rack_title: "Giá", col_order: "TT", col_rack: "Số giá", col_qty: "Số cây", col_ok: "OK",
-        rack_all: "Hiện tất cả giá",
+        rack_title: "RACK", col_order: "TT", col_rack: "Số rack", col_qty: "Số thanh", col_ok: "OK",
+        rack_all: "Hiện tất cả rack",
         ng_title: "Nhập NG",
-        form_target: (r) => r ? `Nhập cho giá ${r.rack_number} (TT ${r.order_number})` : "Hãy chọn giá",
+        form_target: (r) => r ? `Nhập cho rack ${r.rack_number} (TT ${r.order_number})` : "Hãy chọn rack",
         editing: "Đang sửa",
-        lbl_process: "Công đoạn", lbl_code: "Mã", lbl_qty: "Số cây", lbl_staff: "Người đánh giá", lbl_note: "Ghi chú",
+        lbl_process: "Công đoạn", lbl_code: "Mã", lbl_qty: "Số thanh", lbl_staff: "Người đánh rack", lbl_note: "Ghi chú",
         ph_code: "Mã số",
         code0: "Không có lỗi",
         opt_select: "-- Chọn --",
         btn_add: "Thêm", btn_update: "Cập nhật", btn_delete: "Xóa", btn_delete_armed: "Bấm lần nữa để xóa", btn_cancel: "Hủy",
-        col_process: "Công đoạn", col_code: "Mã", col_staff: "Người đánh giá", col_note: "Ghi chú", col_created: "Ngày nhập",
+        col_process: "Công đoạn", col_code: "Mã", col_staff: "Người đánh rack", col_note: "Ghi chú", col_created: "Ngày nhập",
         qc_title: "QC (xác nhận cuối)",
         lbl_qc_date: "Ngày xác nhận", lbl_qc_staff: "Người xác nhận",
         btn_qc_confirm: "Xác nhận và hoàn thành",
@@ -251,8 +251,8 @@
         qc_done_fmt: (d, n) => `✅ Đã xác nhận ${d}　${n}`,
         qc_legacy: "✅ Đã xác nhận ở màn hình cũ (V7) (không có ngày/người xác nhận)",
         msg_saved: "Đã lưu", msg_deleted: "Đã xóa", msg_confirmed: "Đã hoàn thành", msg_cancelled: "Đã hủy hoàn thành",
-        err_rack: "Hãy chọn giá", err_code: "Hãy chọn mã", err_qty: "Số cây phải là số nguyên từ 1 đến 500",
-        err_staff: "Hãy chọn người đánh giá", err_qc_staff: "Hãy chọn người xác nhận", err_qc_date: "Hãy nhập ngày xác nhận",
+        err_rack: "Hãy chọn rack", err_code: "Hãy chọn mã", err_qty: "Số thanh phải là số nguyên từ 1 đến 500",
+        err_staff: "Hãy chọn người đánh rack", err_qc_staff: "Hãy chọn người xác nhận", err_qc_date: "Hãy nhập ngày xác nhận",
       },
     };
     let currentLang = localStorage.getItem("lang") || "ja";
@@ -351,6 +351,7 @@
       const data = await getJson(`${API}get_list.php?type=${state.type}&status=${state.status}`);
       state.counts = data.counts || {};
       state.rows = data.rows;
+      
       if (state.pressId && !state.rows.some(r => r.id === state.pressId) && state.detail && !state.detail.press.in_window) {
         state.pressId = null;
       }
@@ -377,7 +378,7 @@
     });
 
     // 押出日の並び：選んでいなければ既定（未完了は古い順、完了は新しい順）
-    const currentDateSort = () => state.dateSort || (state.status === "done" ? "desc" : "asc");
+    const currentDateSort = () => state.dateSort ||  "desc" ;
     document.getElementById("listHead").addEventListener("click", (e) => {
       if (!e.target.closest("#sortDate")) return;
       state.dateSort = currentDateSort() === "asc" ? "desc" : "asc";
@@ -434,7 +435,7 @@
         state.rackId = null;
         state.editingNgId = null;
         state.showAllRacks = false;
-        state.process = null;   // 押出を選び直したら、未完了の工程を既定にする
+        state.process = 1;   // 押出を選び直したら、寸法タブを既定表示する
       }
       renderList();
       await loadDetail();

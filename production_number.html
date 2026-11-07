@@ -1,1720 +1,2678 @@
 <!doctype html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Production Number</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Production Number</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&display=swap"
+			rel="stylesheet" />
 
-    <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
 
-      body {
-        font-family: "Roboto Mono", "Segoe UI", monospace;
-        background: #f0f2f5;
-        padding: 20px;
-      }
+			body {
+				font-family: 'Roboto Mono', 'Segoe UI', monospace;
+				background: #f0f2f5;
+				padding: 20px;
+			}
 
-      .container { max-width: 1300px; margin: 0 auto; }
+			.container {
+				max-width: 1300px;
+				margin: 0 auto;
+			}
 
-      /* ── ヘッダー ── */
-      .page-header {
-        background: #fff;
-        border-radius: 10px;
-        padding: 16px 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-      }
-      .back-btn {
-        background: #2b6ca3; color: #fff;
-        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;
-        white-space: nowrap;
-      }
-      h1 { font-size: 20px; border-left: 6px solid #0078d4; padding-left: 10px; }
-      .lang-wrap { margin-left: auto; display: flex; gap: 6px; }
-      .lang-btn {
-        padding: 6px 12px; border: 1px solid #0078d4;
-        background: #fff; border-radius: 4px; cursor: pointer; font-size: 13px;
-      }
-      .new-btn {
-        background: #2e7d32; color: #fff;
-        padding: 8px 18px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
-      }
+			/* ── ヘッダー ── */
+			.page-header {
+				background: #fff;
+				border-radius: 10px;
+				padding: 16px 24px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+				display: flex;
+				align-items: center;
+				gap: 16px;
+				margin-bottom: 20px;
+				flex-wrap: wrap;
+			}
+			.back-btn {
+				background: #2b6ca3;
+				color: #fff;
+				padding: 8px 16px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				white-space: nowrap;
+			}
+			h1 {
+				font-size: 20px;
+				border-left: 6px solid #0078d4;
+				padding-left: 10px;
+			}
+			.lang-wrap {
+				margin-left: auto;
+				display: flex;
+				gap: 6px;
+			}
+			.lang-btn {
+				padding: 6px 12px;
+				border: 1px solid #0078d4;
+				background: #fff;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 13px;
+			}
+			.new-btn {
+				background: #2e7d32;
+				color: #fff;
+				padding: 8px 18px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-size: 14px;
+			}
 
-      /* ── フォームカード ── */
-      .form-card {
-        background: #fff;
-        border-radius: 10px;
-        padding: 22px 28px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        margin-bottom: 20px;
-        display: none;
-      }
-      .form-card.open { display: block; }
+			/* ── フォームカード ── */
+			.form-card {
+				background: #fff;
+				border-radius: 10px;
+				padding: 22px 28px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+				margin-bottom: 20px;
+				display: none;
+			}
+			.form-card.open {
+				display: block;
+			}
 
-      .form-title {
-        font-size: 15px; font-weight: bold; color: #1565c0;
-        margin-bottom: 18px; border-bottom: 2px solid #e8f1ff; padding-bottom: 8px;
-      }
-      .form-title.edit { color: #e65100; }
+			.form-title {
+				font-size: 15px;
+				font-weight: bold;
+				color: #1565c0;
+				margin-bottom: 18px;
+				border-bottom: 2px solid #e8f1ff;
+				padding-bottom: 8px;
+			}
+			.form-title.edit {
+				color: #e65100;
+			}
 
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px 20px;
-        margin-bottom: 20px;
-      }
-      .form-group { display: flex; flex-direction: column; gap: 4px; }
-      .form-group.span2 { grid-column: span 2; }
-      .form-group.span3 { grid-column: 1 / -1; }
+			.form-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 12px 20px;
+				margin-bottom: 20px;
+			}
+			.form-group {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+			}
+			.form-group.span2 {
+				grid-column: span 2;
+			}
+			.form-group.span3 {
+				grid-column: 1 / -1;
+			}
 
-      label.f-label { font-size: 12px; font-weight: bold; color: #555; }
+			label.f-label {
+				font-size: 12px;
+				font-weight: bold;
+				color: #555;
+			}
 
-      input[type="text"],
-      select.f-select {
-        padding: 7px 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        font-size: 13px;
-        font-family: inherit;
-      }
+			input[type='text'],
+			select.f-select {
+				padding: 7px 10px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 13px;
+				font-family: inherit;
+			}
 
-      /* ── カテゴリ選択 ── */
-      .cat-wrap {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);  /* 中身の長さで左右の幅が変わらないように */
-        gap: 16px;
-        margin-bottom: 20px;
-      }
-      .cat-card { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; max-height: 220px; display: flex; flex-direction: column; }
-      .cat-title { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #333; flex-shrink: 0; display: flex; align-items: center; gap: 4px; }
-      .cat-scroll { overflow-y: auto; flex: 1; }
-      .cat-table { width: 100%; border-collapse: collapse; }
-      .cat-table td { padding: 7px 12px; font-size: 13px; border-bottom: 1px solid #f0f0f0; cursor: pointer; }
-      .cat-table tr:hover td { background: #f7f9ff; }
-      .cat-table tr.selected td { background: #e8f1ff; font-weight: bold; color: #1565c0; }
-      .cat-hint { font-size: 11px; color: #c62828; padding: 4px 12px; display: none; flex-shrink: 0; }
-      .cat-hint.show { display: block; }
+			/* ── カテゴリ選択 ── */
+			.cat-wrap {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* 中身の長さで左右の幅が変わらないように */
+				gap: 16px;
+				margin-bottom: 20px;
+			}
+			.cat-card {
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				overflow: hidden;
+				max-height: 220px;
+				display: flex;
+				flex-direction: column;
+			}
+			.cat-title {
+				background: #e8f1ff;
+				padding: 8px 12px;
+				font-size: 13px;
+				font-weight: bold;
+				color: #333;
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
+			.cat-scroll {
+				overflow-y: auto;
+				flex: 1;
+			}
+			.cat-table {
+				width: 100%;
+				border-collapse: collapse;
+			}
+			.cat-table td {
+				padding: 7px 12px;
+				font-size: 13px;
+				border-bottom: 1px solid #f0f0f0;
+				cursor: pointer;
+			}
+			.cat-table tr:hover td {
+				background: #f7f9ff;
+			}
+			.cat-table tr.selected td {
+				background: #e8f1ff;
+				font-weight: bold;
+				color: #1565c0;
+			}
+			.cat-hint {
+				font-size: 11px;
+				color: #c62828;
+				padding: 4px 12px;
+				display: none;
+				flex-shrink: 0;
+			}
+			.cat-hint.show {
+				display: block;
+			}
 
-      /* ── 必須バッジ ── */
-      .f-label.req::after,
-      .cat-title.req::after {
-        content: "必須";
-        display: inline-block;
-        margin-left: 6px;
-        background: #c62828;
-        color: #fff;
-        font-size: 10px;
-        font-weight: bold;
-        padding: 1px 6px;
-        border-radius: 3px;
-        vertical-align: middle;
-        letter-spacing: 0.03em;
-      }
+			/* ── 必須バッジ ── */
+			.f-label.req::after,
+			.cat-title.req::after {
+				content: '必須';
+				display: inline-block;
+				margin-left: 6px;
+				background: #c62828;
+				color: #fff;
+				font-size: 10px;
+				font-weight: bold;
+				padding: 1px 6px;
+				border-radius: 3px;
+				vertical-align: middle;
+				letter-spacing: 0.03em;
+			}
 
-      /* ── フォームボタン ── */
-      .form-actions {
-        display: flex; justify-content: flex-end; gap: 10px;
-        padding-top: 16px; border-top: 1px solid #eee;
-      }
-      .btn-cancel { padding: 8px 18px; background: #9e9e9e; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-      .btn-save   { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-      .btn-delete { padding: 8px 18px; background: #c62828; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-right: auto; }
+			/* ── フォームボタン ── */
+			.form-actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: 10px;
+				padding-top: 16px;
+				border-top: 1px solid #eee;
+			}
+			.btn-cancel {
+				padding: 8px 18px;
+				background: #9e9e9e;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			.btn-save {
+				padding: 8px 22px;
+				background: #1565c0;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-weight: bold;
+			}
+			.btn-delete {
+				padding: 8px 18px;
+				background: #c62828;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				margin-right: auto;
+			}
 
-      /* ── 一覧カード ── */
-      .list-card {
-        background: #fff;
-        border-radius: 10px;
-        padding: 20px 24px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      }
-      .list-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-      .list-header h2 { font-size: 15px; color: #333; }
-      .count-label { font-size: 12px; color: #888; }
-      /* 検索欄は幅を固定する（前はフォーカスで広がり、外すと 20px に戻って入力した文字が見えなかった） */
-      .th-search {
-        width: 110px; padding: 2px 4px; margin-left: 6px;
-        border: 1px solid #bbb; border-radius: 3px;
-        font-size: 11px; font-family: inherit;
-        vertical-align: middle; cursor: text;
-      }
-      .th-search:focus {
-        outline: none;
-        border-color: #0078d4;
-      }
-      .th-search.has-value { border-color: #0078d4; background: #e8f1ff; }
-      .col-chk { width: 32px; text-align: center !important; }
-      tr.checked-row td { background: #fff8e1; }
-      .bulk-btn {
-        padding: 5px 12px; background: #e65100; color: #fff; border: none;
-        border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;
-      }
-      .bulk-btn:disabled { background: #bdbdbd; cursor: default; }
-      .bulk-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; font-size: 13px; }
-      .bulk-row label { width: 90px; color: #555; }
-      .bulk-row select { flex: 1; padding: 6px 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; }
-      .bulk-targets { max-height: 160px; overflow-y: auto; background: #f5f5f5; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-family: monospace; margin-bottom: 14px; white-space: pre; }
+			/* ── 一覧カード ── */
+			.list-card {
+				background: #fff;
+				border-radius: 10px;
+				padding: 20px 24px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+			}
+			.list-header {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				margin-bottom: 16px;
+				flex-wrap: wrap;
+			}
+			.list-header h2 {
+				font-size: 15px;
+				color: #333;
+			}
+			.count-label {
+				font-size: 12px;
+				color: #888;
+			}
+			/* 検索欄は幅を固定する（前はフォーカスで広がり、外すと 20px に戻って入力した文字が見えなかった） */
+			.th-search {
+				width: 110px;
+				padding: 2px 4px;
+				margin-left: 6px;
+				border: 1px solid #bbb;
+				border-radius: 3px;
+				font-size: 11px;
+				font-family: inherit;
+				vertical-align: middle;
+				cursor: text;
+			}
+			.th-search:focus {
+				outline: none;
+				border-color: #0078d4;
+			}
+			.th-search.has-value {
+				border-color: #0078d4;
+				background: #e8f1ff;
+			}
+			.col-chk {
+				width: 32px;
+				text-align: center !important;
+			}
+			tr.checked-row td {
+				background: #fff8e1;
+			}
+			.bulk-btn {
+				padding: 5px 12px;
+				background: #e65100;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-size: 12px;
+				font-weight: bold;
+			}
+			.bulk-btn:disabled {
+				background: #bdbdbd;
+				cursor: default;
+			}
+			.bulk-row {
+				display: flex;
+				gap: 12px;
+				align-items: center;
+				margin-bottom: 12px;
+				font-size: 13px;
+			}
+			.bulk-row label {
+				width: 90px;
+				color: #555;
+			}
+			.bulk-row select {
+				flex: 1;
+				padding: 6px 8px;
+				border: 1px solid #ccc;
+				border-radius: 5px;
+				font-size: 13px;
+			}
+			.bulk-targets {
+				max-height: 160px;
+				overflow-y: auto;
+				background: #f5f5f5;
+				border-radius: 6px;
+				padding: 6px 10px;
+				font-size: 12px;
+				font-family: monospace;
+				margin-bottom: 14px;
+				white-space: pre;
+			}
 
-      .table-wrap { overflow-y: auto; max-height: 60vh; }
+			.table-wrap {
+				overflow-y: auto;
+				max-height: 60vh;
+			}
 
-      table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      th, td { padding: 9px 12px; border-bottom: 1px solid #eee; text-align: left; }
-      th {
-        position: sticky; top: 0; z-index: 2;
-        background: #e8f1ff; font-weight: bold; color: #333;
-        white-space: nowrap; user-select: none;
-      }
-      th.sortable { cursor: pointer; }
-      th.sortable:hover { background: #d0e4ff; }
-      .sort-icon { font-size: 10px; margin-left: 3px; color: #999; }
-      tr:hover { background: #f7f9ff; }
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 13px;
+			}
+			th,
+			td {
+				padding: 9px 12px;
+				border-bottom: 1px solid #eee;
+				text-align: left;
+			}
+			th {
+				position: sticky;
+				top: 0;
+				z-index: 2;
+				background: #e8f1ff;
+				font-weight: bold;
+				color: #333;
+				white-space: nowrap;
+				user-select: none;
+			}
+			th.sortable {
+				cursor: pointer;
+			}
+			th.sortable:hover {
+				background: #d0e4ff;
+			}
+			.sort-icon {
+				font-size: 10px;
+				margin-left: 3px;
+				color: #999;
+			}
+			tr:hover {
+				background: #f7f9ff;
+			}
 
-      /* カラム幅 */
-      .col-cat1 { min-width: 200px; width: 200px; }
-      .col-cat2 { width: 110px; max-width: 110px; }
-      .col-pn   { min-width: 220px; }
-      .col-mat, .col-age { width: 70px; }
-      .col-num  { width: 110px; }
-      .col-act  { width: 72px; }
-      .col-date { width: 90px; }
-      .updated-recent { background: #fff3cd; color: #7b4f00; font-weight: bold; }
+			/* カラム幅 */
+			.col-cat1 {
+				min-width: 200px;
+				width: 200px;
+			}
+			.col-cat2 {
+				width: 110px;
+				max-width: 110px;
+			}
+			.col-pn {
+				min-width: 220px;
+			}
+			.col-mat,
+			.col-age {
+				width: 70px;
+			}
+			.col-num {
+				width: 110px;
+			}
+			.col-act {
+				width: 72px;
+			}
+			.col-date {
+				width: 90px;
+			}
+			.updated-recent {
+				background: #fff3cd;
+				color: #7b4f00;
+				font-weight: bold;
+			}
 
-      .edit-btn {
-        padding: 4px 12px; background: #1565c0; color: #fff;
-        border: none; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap;
-      }
+			.edit-btn {
+				padding: 4px 12px;
+				background: #1565c0;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				cursor: pointer;
+				font-size: 12px;
+				white-space: nowrap;
+			}
 
-      /* ── Toast ── */
-      #toast {
-        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-        background: #323232; color: #fff; padding: 10px 24px;
-        border-radius: 6px; font-size: 13px; opacity: 0;
-        transition: opacity 0.3s; pointer-events: none; z-index: 1100;
-      }
-      #toast.show { opacity: 1; }
+			/* ── Toast ── */
+			#toast {
+				position: fixed;
+				bottom: 28px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #323232;
+				color: #fff;
+				padding: 10px 24px;
+				border-radius: 6px;
+				font-size: 13px;
+				opacity: 0;
+				transition: opacity 0.3s;
+				pointer-events: none;
+				z-index: 1100;
+			}
+			#toast.show {
+				opacity: 1;
+			}
 
-      /* ── カテゴリ管理モーダル ── */
-      .modal-overlay {
-        display: none; position: fixed; inset: 0;
-        background: rgba(0,0,0,0.5); z-index: 1000;
-        align-items: center; justify-content: center;
-      }
-      .modal-overlay.open { display: flex; }
-      .modal-box {
-        background: #fff; border-radius: 10px; padding: 24px;
-        width: 760px; max-width: 96vw; max-height: 88vh;
-        overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.25);
-      }
-      .modal-header {
-        display: flex; align-items: center; margin-bottom: 18px;
-      }
-      .modal-header h3 { font-size: 16px; color: #1565c0; flex: 1; }
-      .modal-close {
-        background: none; border: none; font-size: 22px;
-        cursor: pointer; color: #888; line-height: 1;
-      }
-      .modal-close:hover { color: #c62828; }
+			/* ── カテゴリ管理モーダル ── */
+			.modal-overlay {
+				display: none;
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, 0.5);
+				z-index: 1000;
+				align-items: center;
+				justify-content: center;
+			}
+			.modal-overlay.open {
+				display: flex;
+			}
+			.modal-box {
+				background: #fff;
+				border-radius: 10px;
+				padding: 24px;
+				width: 760px;
+				max-width: 96vw;
+				max-height: 88vh;
+				overflow-y: auto;
+				box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+			}
+			.modal-header {
+				display: flex;
+				align-items: center;
+				margin-bottom: 18px;
+			}
+			.modal-header h3 {
+				font-size: 16px;
+				color: #1565c0;
+				flex: 1;
+			}
+			.modal-close {
+				background: none;
+				border: none;
+				font-size: 22px;
+				cursor: pointer;
+				color: #888;
+				line-height: 1;
+			}
+			.modal-close:hover {
+				color: #c62828;
+			}
 
-      .cat-mgr-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-      .cat-mgr-panel { border: 1px solid #ddd; border-radius: 8px; overflow: hidden; }
-      .cat-mgr-head {
-        background: #e8f1ff; padding: 8px 12px;
-        display: flex; align-items: center; gap: 8px;
-      }
-      .cat-mgr-head span { font-size: 13px; font-weight: bold; color: #333; flex: 1; }
-      .cat-mgr-add {
-        background: #2e7d32; color: #fff; border: none;
-        border-radius: 4px; padding: 3px 10px; cursor: pointer; font-size: 12px;
-      }
-      .cat-mgr-search {
-        width: 100%; box-sizing: border-box;
-        padding: 5px 8px; border: 1px solid #ccc; border-radius: 4px;
-        font-size: 12px; margin: 6px 0 0;
-      }
-      .cat-mgr-search-wrap { padding: 6px 10px 4px; border-bottom: 1px solid #eee; }
-      .cat-mgr-list { overflow-y: auto; max-height: 320px; }
-      .cat-mgr-item {
-        display: flex; align-items: center; padding: 8px 12px;
-        border-bottom: 1px solid #f0f0f0; cursor: pointer; font-size: 13px;
-      }
-      .cat-mgr-item:hover { background: #f7f9ff; }
-      .cat-mgr-item.selected { background: #e8f1ff; font-weight: bold; }
-      .cat-mgr-item > span { flex: 1; }
-      .cat-mgr-edit {
-        background: none; border: 1px solid #bbb; border-radius: 3px;
-        padding: 2px 8px; cursor: pointer; font-size: 11px; margin-left: 6px;
-        flex-shrink: 0;
-      }
-      .cat-mgr-edit:hover { background: #f0f0f0; }
-      .cat-mgr-empty { padding: 16px 12px; font-size: 12px; color: #aaa; text-align: center; }
-      .count-badge {
-        font-size: 11px; background: #e8f1ff; color: #1565c0;
-        border-radius: 10px; padding: 1px 7px; margin-left: 4px; flex-shrink: 0;
-      }
-      .count-badge.zero { background: #f5f5f5; color: #bbb; }
-      .cat-mgr-del {
-        background: none; border: 1px solid #e57373; color: #c62828;
-        border-radius: 3px; padding: 2px 7px; cursor: pointer;
-        font-size: 11px; margin-left: 4px; flex-shrink: 0;
-      }
-      .cat-mgr-del:hover { background: #ffebee; }
+			.cat-mgr-wrap {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 16px;
+			}
+			.cat-mgr-panel {
+				border: 1px solid #ddd;
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			.cat-mgr-head {
+				background: #e8f1ff;
+				padding: 8px 12px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.cat-mgr-head span {
+				font-size: 13px;
+				font-weight: bold;
+				color: #333;
+				flex: 1;
+			}
+			.cat-mgr-add {
+				background: #2e7d32;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				padding: 3px 10px;
+				cursor: pointer;
+				font-size: 12px;
+			}
+			.cat-mgr-search {
+				width: 100%;
+				box-sizing: border-box;
+				padding: 5px 8px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				font-size: 12px;
+				margin: 6px 0 0;
+			}
+			.cat-mgr-search-wrap {
+				padding: 6px 10px 4px;
+				border-bottom: 1px solid #eee;
+			}
+			.cat-mgr-list {
+				overflow-y: auto;
+				max-height: 320px;
+			}
+			.cat-mgr-item {
+				display: flex;
+				align-items: center;
+				padding: 8px 12px;
+				border-bottom: 1px solid #f0f0f0;
+				cursor: pointer;
+				font-size: 13px;
+			}
+			.cat-mgr-item:hover {
+				background: #f7f9ff;
+			}
+			.cat-mgr-item.selected {
+				background: #e8f1ff;
+				font-weight: bold;
+			}
+			.cat-mgr-item > span {
+				flex: 1;
+			}
+			.cat-mgr-edit {
+				background: none;
+				border: 1px solid #bbb;
+				border-radius: 3px;
+				padding: 2px 8px;
+				cursor: pointer;
+				font-size: 11px;
+				margin-left: 6px;
+				flex-shrink: 0;
+			}
+			.cat-mgr-edit:hover {
+				background: #f0f0f0;
+			}
+			.cat-mgr-empty {
+				padding: 16px 12px;
+				font-size: 12px;
+				color: #aaa;
+				text-align: center;
+			}
+			.count-badge {
+				font-size: 11px;
+				background: #e8f1ff;
+				color: #1565c0;
+				border-radius: 10px;
+				padding: 1px 7px;
+				margin-left: 4px;
+				flex-shrink: 0;
+			}
+			.count-badge.zero {
+				background: #f5f5f5;
+				color: #bbb;
+			}
+			.cat-mgr-del {
+				background: none;
+				border: 1px solid #e57373;
+				color: #c62828;
+				border-radius: 3px;
+				padding: 2px 7px;
+				cursor: pointer;
+				font-size: 11px;
+				margin-left: 4px;
+				flex-shrink: 0;
+			}
+			.cat-mgr-del:hover {
+				background: #ffebee;
+			}
 
-      /* 品番一覧セクション */
-      .pn-section { margin-top: 14px; border: 1px solid #ffe0b2; border-radius: 8px; overflow: hidden; }
-      .pn-section-head {
-        background: #fff3e0; padding: 8px 14px;
-        font-size: 13px; display: flex; align-items: center; gap: 8px;
-      }
-      .pn-section-head span { color: #555; }
-      .pn-section-head strong { color: #e65100; }
-      .pn-section-list { overflow-y: auto; max-height: 160px; }
-      .pn-section-item {
-        padding: 6px 14px; border-bottom: 1px solid #fff3e0;
-        font-size: 13px; display: flex; align-items: center; gap: 10px;
-      }
-      .pn-section-item:last-child { border-bottom: none; }
-      .pn-section-item:hover { background: #fff8f0; }
-      .pn-no { font-weight: bold; color: #333; flex: 1; }
+			/* 品番一覧セクション */
+			.pn-section {
+				margin-top: 14px;
+				border: 1px solid #ffe0b2;
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			.pn-section-head {
+				background: #fff3e0;
+				padding: 8px 14px;
+				font-size: 13px;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+			}
+			.pn-section-head span {
+				color: #555;
+			}
+			.pn-section-head strong {
+				color: #e65100;
+			}
+			.pn-section-list {
+				overflow-y: auto;
+				max-height: 160px;
+			}
+			.pn-section-item {
+				padding: 6px 14px;
+				border-bottom: 1px solid #fff3e0;
+				font-size: 13px;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+			.pn-section-item:last-child {
+				border-bottom: none;
+			}
+			.pn-section-item:hover {
+				background: #fff8f0;
+			}
+			.pn-no {
+				font-weight: bold;
+				color: #333;
+				flex: 1;
+			}
 
-      .cat-inline-form {
-        padding: 10px 12px; background: #f5f8ff;
-        border-bottom: 2px solid #1565c0; display: none;
-      }
-      .cat-inline-form.open { display: block; }
-      .cat-inline-label {
-        font-size: 11px; font-weight: bold; color: #555; margin-bottom: 4px;
-      }
-      .cat-inline-form input[type="text"] {
-        width: 100%; padding: 6px 8px; border: 1px solid #ccc;
-        border-radius: 4px; font-size: 13px; margin-bottom: 8px;
-        font-family: inherit;
-      }
-      .cat-inline-btns { display: flex; gap: 6px; justify-content: flex-end; }
-      .cat-inline-save {
-        background: #1565c0; color: #fff; border: none;
-        border-radius: 4px; padding: 5px 14px; cursor: pointer; font-size: 12px;
-      }
-      .cat-inline-cancel {
-        background: #9e9e9e; color: #fff; border: none;
-        border-radius: 4px; padding: 5px 10px; cursor: pointer; font-size: 12px;
-      }
-      .cat-mgr-btn {
-        background: #546e7a; color: #fff;
-        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
-      }
-      .import-btn {
-        background: #00695c; color: #fff;
-        padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;
-      }
+			.cat-inline-form {
+				padding: 10px 12px;
+				background: #f5f8ff;
+				border-bottom: 2px solid #1565c0;
+				display: none;
+			}
+			.cat-inline-form.open {
+				display: block;
+			}
+			.cat-inline-label {
+				font-size: 11px;
+				font-weight: bold;
+				color: #555;
+				margin-bottom: 4px;
+			}
+			.cat-inline-form input[type='text'] {
+				width: 100%;
+				padding: 6px 8px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				font-size: 13px;
+				margin-bottom: 8px;
+				font-family: inherit;
+			}
+			.cat-inline-btns {
+				display: flex;
+				gap: 6px;
+				justify-content: flex-end;
+			}
+			.cat-inline-save {
+				background: #1565c0;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				padding: 5px 14px;
+				cursor: pointer;
+				font-size: 12px;
+			}
+			.cat-inline-cancel {
+				background: #9e9e9e;
+				color: #fff;
+				border: none;
+				border-radius: 4px;
+				padding: 5px 10px;
+				cursor: pointer;
+				font-size: 12px;
+			}
+			.cat-mgr-btn {
+				background: #546e7a;
+				color: #fff;
+				padding: 8px 16px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-size: 14px;
+			}
+			.import-btn {
+				background: #00695c;
+				color: #fff;
+				padding: 8px 16px;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-size: 14px;
+			}
 
-      /* ── CSV インポートモーダル ── */
-      .drop-zone {
-        border: 2px dashed #90caf9; border-radius: 8px;
-        padding: 28px 20px; text-align: center; color: #1565c0;
-        background: #f0f7ff; cursor: pointer; transition: background 0.2s;
-        font-size: 14px;
-      }
-      .drop-zone.drag-over { background: #dceeff; border-color: #1565c0; }
-      .drop-zone input[type="file"] { display: none; }
+			/* ── CSV インポートモーダル ── */
+			.drop-zone {
+				border: 2px dashed #90caf9;
+				border-radius: 8px;
+				padding: 28px 20px;
+				text-align: center;
+				color: #1565c0;
+				background: #f0f7ff;
+				cursor: pointer;
+				transition: background 0.2s;
+				font-size: 14px;
+			}
+			.drop-zone.drag-over {
+				background: #dceeff;
+				border-color: #1565c0;
+			}
+			.drop-zone input[type='file'] {
+				display: none;
+			}
 
-      .import-preview { margin-top: 14px; overflow-x: auto; }
-      .import-preview table { width: 100%; border-collapse: collapse; font-size: 13px; }
-      .import-preview th { background: #e8f1ff; padding: 7px 10px; border-bottom: 2px solid #c5d8f5; text-align: left; white-space: nowrap; }
-      .import-preview td { padding: 7px 10px; border-bottom: 1px solid #eee; vertical-align: top; }
-      .import-preview tr.row-warn td { background: #fff8e1; }
-      .badge-warn { background: #ff9800; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-      .warn-note { color: #e65100; font-size: 11px; margin-top: 3px; white-space: normal; }
-      .auto-note { color: #1565c0; font-size: 10px; }
+			.import-preview {
+				margin-top: 14px;
+				overflow-x: auto;
+			}
+			.import-preview table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 13px;
+			}
+			.import-preview th {
+				background: #e8f1ff;
+				padding: 7px 10px;
+				border-bottom: 2px solid #c5d8f5;
+				text-align: left;
+				white-space: nowrap;
+			}
+			.import-preview td {
+				padding: 7px 10px;
+				border-bottom: 1px solid #eee;
+				vertical-align: top;
+			}
+			.import-preview tr.row-warn td {
+				background: #fff8e1;
+			}
+			.badge-warn {
+				background: #ff9800;
+				color: #fff;
+				padding: 2px 8px;
+				border-radius: 10px;
+				font-size: 11px;
+				font-weight: bold;
+			}
+			.warn-note {
+				color: #e65100;
+				font-size: 11px;
+				margin-top: 3px;
+				white-space: normal;
+			}
+			.auto-note {
+				color: #1565c0;
+				font-size: 10px;
+			}
 
-      .badge-new   { display: inline-block; background: #e8f5e9; color: #2e7d32; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
-      .badge-dup   { display: inline-block; background: #ffebee; color: #c62828; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
-      .badge-warn  { display: inline-block; background: #fff3e0; color: #e65100; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: bold; }
+			.badge-new {
+				display: inline-block;
+				background: #e8f5e9;
+				color: #2e7d32;
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-size: 11px;
+				font-weight: bold;
+			}
+			.badge-dup {
+				display: inline-block;
+				background: #ffebee;
+				color: #c62828;
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-size: 11px;
+				font-weight: bold;
+			}
+			.badge-warn {
+				display: inline-block;
+				background: #fff3e0;
+				color: #e65100;
+				border-radius: 4px;
+				padding: 2px 8px;
+				font-size: 11px;
+				font-weight: bold;
+			}
 
-      .import-summary { font-size: 13px; color: #555; margin-top: 10px; display: flex; gap: 16px; flex-wrap: wrap; }
-      .import-summary span { display: flex; align-items: center; gap: 4px; }
+			.import-summary {
+				font-size: 13px;
+				color: #555;
+				margin-top: 10px;
+				display: flex;
+				gap: 16px;
+				flex-wrap: wrap;
+			}
+			.import-summary span {
+				display: flex;
+				align-items: center;
+				gap: 4px;
+			}
 
-      .import-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #eee; }
-      .btn-import-submit { padding: 8px 22px; background: #1565c0; color: #fff; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
-      .btn-import-submit:disabled { background: #90a4ae; cursor: default; }
-    </style>
-  </head>
+			.import-actions {
+				display: flex;
+				justify-content: flex-end;
+				gap: 10px;
+				margin-top: 16px;
+				padding-top: 14px;
+				border-top: 1px solid #eee;
+			}
+			.btn-import-submit {
+				padding: 8px 22px;
+				background: #1565c0;
+				color: #fff;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+				font-weight: bold;
+			}
+			.btn-import-submit:disabled {
+				background: #90a4ae;
+				cursor: default;
+			}
+		</style>
+	</head>
 
-  <body>
-    <div class="container">
+	<body>
+		<div class="container">
+			<!-- ヘッダー -->
+			<div class="page-header">
+				<button
+					class="back-btn"
+					onclick="location.href = 'index.html'"
+					data-key="btn_back_menu">
+					← メニューへ戻る
+				</button>
+				<h1 data-key="title">品番管理</h1>
+				<div class="lang-wrap">
+					<button class="lang-btn" onclick="setLang('ja')">日本語</button>
+					<button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
+				</div>
+				<button
+					class="cat-mgr-btn"
+					onclick="openCatMgr()"
+					data-key="btn_cat_mgr">
+					🗂 カテゴリ管理
+				</button>
+				<button
+					class="import-btn"
+					onclick="openImportModal()"
+					data-key="btn_import">
+					📂 CSV・Excel インポート
+				</button>
+				<button class="new-btn" onclick="openNewForm()" data-key="btn_new">
+					＋ 新規登録
+				</button>
+			</div>
 
-      <!-- ヘッダー -->
-      <div class="page-header">
-        <button class="back-btn" onclick="location.href='index.html'" data-key="btn_back_menu">← メニューへ戻る</button>
-        <h1 data-key="title">品番管理</h1>
-        <div class="lang-wrap">
-          <button class="lang-btn" onclick="setLang('ja')">日本語</button>
-          <button class="lang-btn" onclick="setLang('vi')">Tiếng Việt</button>
-        </div>
-        <button class="cat-mgr-btn" onclick="openCatMgr()" data-key="btn_cat_mgr">🗂 カテゴリ管理</button>
-        <button class="import-btn" onclick="openImportModal()" data-key="btn_import">📂 CSV・Excel インポート</button>
-        <button class="new-btn" onclick="openNewForm()" data-key="btn_new">＋ 新規登録</button>
-      </div>
+			<!-- フォームカード -->
+			<div class="form-card" id="formCard">
+				<div class="form-title" id="formTitle">✚ 新規登録</div>
+				<input type="hidden" id="fId" />
 
-      <!-- フォームカード -->
-      <div class="form-card" id="formCard">
-        <div class="form-title" id="formTitle">✚ 新規登録</div>
-        <input type="hidden" id="fId" />
+				<div class="form-grid">
+					<div class="form-group">
+						<label class="f-label req" data-key="lbl_pn">品番</label>
+						<input
+							type="text"
+							id="fPn"
+							placeholder="例: ABC-001"
+							oninput="this.value = this.value.toUpperCase()" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_dept">図面部門</label>
+						<select class="f-select" id="fDept">
+							<option value="0">—</option>
+							<option value="1">Dev. 1</option>
+							<option value="2">Dev. 2</option>
+							<option value="3">Dev. 3</option>
+							<option value="4">Dev. 4</option>
+							<option value="5">Dev. 5</option>
+							<option value="6">Dev. 6</option>
+							<option value="7">Dev. 7</option>
+							<option value="8">Dev. 8</option>
+							<option value="9">Dev. 9</option>
+							<option value="11">Dev. 11</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="f-label req" data-key="lbl_material">材質</label>
+						<select class="f-select" id="fMaterial">
+							<option value="0">—</option>
+							<option value="1">A6061</option>
+							<option value="2">A6063</option>
+							<option value="3">A6N01A</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_aging">時効処理</label>
+						<select class="f-select" id="fAging">
+							<option value="0">—</option>
+							<option value="1">O</option>
+							<option value="2">T5</option>
+							<option value="3">T6</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label class="f-label req" data-key="lbl_length">製品長 (m)</label>
+						<input type="text" id="fLength" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_circle">外接円 (mm)</label>
+						<input type="text" id="fCircle" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_weight">単重 (kg/m)</label>
+						<input type="text" id="fWeight" />
+					</div>
+					<div class="form-group">
+						<label class="f-label req" data-key="lbl_area">断面積 (mm²)</label>
+						<input type="text" id="fArea" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_pack_qty">梱包数 (個)</label>
+						<input type="text" id="fPackQty" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_pack_row">梱包 行</label>
+						<input type="text" id="fPackRow" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_pack_col">梱包 列</label>
+						<input type="text" id="fPackCol" />
+					</div>
+					<div class="form-group">
+						<label class="f-label" data-key="lbl_hardness">硬さ (HRF)</label>
+						<input type="text" id="fHardness" />
+					</div>
+					<div class="form-group span2">
+						<label class="f-label" data-key="lbl_hardness_note">硬さ備考</label>
+						<input type="text" id="fHardnessNote" />
+					</div>
+				</div>
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label class="f-label req" data-key="lbl_pn">品番</label>
-            <input type="text" id="fPn" placeholder="例: ABC-001" oninput="this.value = this.value.toUpperCase()" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_dept">図面部門</label>
-            <select class="f-select" id="fDept">
-              <option value="0">—</option>
-              <option value="1">Dev. 1</option>
-              <option value="2">Dev. 2</option>
-              <option value="3">Dev. 3</option>
-              <option value="4">Dev. 4</option>
-              <option value="5">Dev. 5</option>
-              <option value="6">Dev. 6</option>
-              <option value="7">Dev. 7</option>
-              <option value="8">Dev. 8</option>
-              <option value="9">Dev. 9</option>
-              <option value="11">Dev. 11</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="f-label req" data-key="lbl_material">材質</label>
-            <select class="f-select" id="fMaterial">
-              <option value="0">—</option>
-              <option value="1">A6061</option>
-              <option value="2">A6063</option>
-              <option value="3">A6N01A</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_aging">時効処理</label>
-            <select class="f-select" id="fAging">
-              <option value="0">—</option>
-              <option value="1">O</option>
-              <option value="2">T5</option>
-              <option value="3">T6</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="f-label req" data-key="lbl_length">製品長 (m)</label>
-            <input type="text" id="fLength" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_circle">外接円 (mm)</label>
-            <input type="text" id="fCircle" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_weight">単重 (kg/m)</label>
-            <input type="text" id="fWeight" />
-          </div>
-          <div class="form-group">
-            <label class="f-label req" data-key="lbl_area">断面積 (mm²)</label>
-            <input type="text" id="fArea" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_pack_qty">梱包数 (個)</label>
-            <input type="text" id="fPackQty" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_pack_row">梱包 行</label>
-            <input type="text" id="fPackRow" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_pack_col">梱包 列</label>
-            <input type="text" id="fPackCol" />
-          </div>
-          <div class="form-group">
-            <label class="f-label" data-key="lbl_hardness">硬さ (HRF)</label>
-            <input type="text" id="fHardness" />
-          </div>
-          <div class="form-group span2">
-            <label class="f-label" data-key="lbl_hardness_note">硬さ備考</label>
-            <input type="text" id="fHardnessNote" />
-          </div>
-        </div>
+				<!-- カテゴリ選択 -->
+				<div class="cat-wrap">
+					<div class="cat-card">
+						<div class="cat-title req">
+							<span data-key="lbl_cat1">カテゴリ1</span>
+							<input
+								type="text"
+								id="cat1Search"
+								class="th-search"
+								style="margin-left: auto"
+								placeholder="🔍"
+								oninput="filterCat1(this.value)"
+								onclick="event.stopPropagation()" />
+						</div>
+						<div class="cat-scroll">
+							<table class="cat-table">
+								<tbody id="cat1Tbody"></tbody>
+							</table>
+						</div>
+						<div class="cat-hint" id="cat1Hint" data-key="hint_cat">
+							選択してください
+						</div>
+					</div>
+					<div class="cat-card">
+						<div class="cat-title req" data-key="lbl_cat2">カテゴリ2</div>
+						<div class="cat-scroll">
+							<table class="cat-table">
+								<tbody id="cat2Tbody"></tbody>
+							</table>
+						</div>
+						<div class="cat-hint" id="cat2Hint" data-key="hint_cat">
+							選択してください
+						</div>
+					</div>
+				</div>
 
-        <!-- カテゴリ選択 -->
-        <div class="cat-wrap">
-          <div class="cat-card">
-            <div class="cat-title req">
-              <span data-key="lbl_cat1">カテゴリ1</span>
-              <input type="text" id="cat1Search" class="th-search" style="margin-left:auto;" placeholder="🔍" oninput="filterCat1(this.value)" onclick="event.stopPropagation()" />
-            </div>
-            <div class="cat-scroll">
-              <table class="cat-table"><tbody id="cat1Tbody"></tbody></table>
-            </div>
-            <div class="cat-hint" id="cat1Hint" data-key="hint_cat">選択してください</div>
-          </div>
-          <div class="cat-card">
-            <div class="cat-title req" data-key="lbl_cat2">カテゴリ2</div>
-            <div class="cat-scroll">
-              <table class="cat-table"><tbody id="cat2Tbody"></tbody></table>
-            </div>
-            <div class="cat-hint" id="cat2Hint" data-key="hint_cat">選択してください</div>
-          </div>
-        </div>
+				<!-- カテゴリ2選択時：紐づき品番 -->
+				<div id="formPnSection" style="display: none; margin-bottom: 12px">
+					<div class="pn-section">
+						<div class="pn-section-head">
+							<span>紐づき品番：</span>
+							<strong id="formPnCat2Name"></strong>
+							<span
+								id="formPnCount"
+								style="margin-left: auto; font-size: 12px; color: #888"></span>
+						</div>
+						<div class="pn-section-list" id="formPnList"></div>
+					</div>
+				</div>
 
-        <!-- カテゴリ2選択時：紐づき品番 -->
-        <div id="formPnSection" style="display:none; margin-bottom:12px;">
-          <div class="pn-section">
-            <div class="pn-section-head">
-              <span>紐づき品番：</span>
-              <strong id="formPnCat2Name"></strong>
-              <span id="formPnCount" style="margin-left:auto;font-size:12px;color:#888"></span>
-            </div>
-            <div class="pn-section-list" id="formPnList"></div>
-          </div>
-        </div>
+				<div class="form-actions">
+					<button
+						class="btn-delete"
+						id="deleteBtn"
+						style="display: none"
+						onclick="deleteRecord()"
+						data-key="btn_delete">
+						削除
+					</button>
+					<button
+						class="btn-cancel"
+						onclick="closeForm()"
+						data-key="btn_cancel">
+						キャンセル
+					</button>
+					<button
+						class="btn-save"
+						id="saveBtn"
+						onclick="saveForm()"
+						data-key="btn_save">
+						登録する
+					</button>
+				</div>
+			</div>
 
-        <div class="form-actions">
-          <button class="btn-delete" id="deleteBtn" style="display:none;" onclick="deleteRecord()" data-key="btn_delete">削除</button>
-          <button class="btn-cancel" onclick="closeForm()" data-key="btn_cancel">キャンセル</button>
-          <button class="btn-save"   id="saveBtn"   onclick="saveForm()"   data-key="btn_save">登録する</button>
-        </div>
-      </div>
+			<!-- 一覧 -->
+			<div class="list-card">
+				<div class="list-header">
+					<h2 data-key="list_title">品番一覧</h2>
+					<span class="count-label" id="countLabel"></span>
+					<button
+						class="bulk-btn"
+						id="bulkBtn"
+						onclick="openBulkModal()"
+						disabled>
+						🗂 <span id="bulkBtnLabel">選んだ品番のカテゴリを変更</span>（<span
+							id="checkedCount"
+							>0</span
+						>）
+					</button>
+				</div>
+				<div class="table-wrap">
+					<table id="mainTable">
+						<thead>
+							<tr>
+								<th class="col-chk">
+									<input
+										type="checkbox"
+										id="checkAll"
+										title="表示中をすべて選ぶ"
+										onclick="toggleCheckAll(this.checked)" />
+								</th>
+								<th class="sortable col-cat1" onclick="sortBy('category1_jp')">
+									<span data-key="col_cat1">カテゴリ1</span
+									><span class="sort-icon" data-sortkey="category1_jp">↕</span
+									><input
+										type="text"
+										id="searchCat1"
+										class="th-search"
+										placeholder="🔍"
+										oninput="filterByCat1(this.value)"
+										onclick="event.stopPropagation()" />
+								</th>
+								<th
+									class="sortable col-cat2"
+									onclick="sortBy('category2_jp')"
+									data-key="col_cat2">
+									カテゴリ2<span class="sort-icon" data-sortkey="category2_jp"
+										>↕</span
+									>
+								</th>
+								<th
+									class="sortable col-pn"
+									onclick="sortBy('production_number')">
+									<span data-key="col_pn">品番</span
+									><span class="sort-icon" data-sortkey="production_number"
+										>↕</span
+									><input
+										type="text"
+										id="searchInput"
+										class="th-search"
+										placeholder="🔍 * ? 可"
+										title="* は任意の文字列、? は任意の1文字（例：C2Q*-30K）"
+										oninput="filterTable(this.value)"
+										onclick="event.stopPropagation()" />
+								</th>
+								<th class="col-mat" data-key="col_material">材質</th>
+								<th class="col-age" data-key="col_aging">時効</th>
+								<th class="col-num" data-key="col_area">断面積 (mm²)</th>
+								<th class="col-num" data-key="col_weight">単重 (kg/m)</th>
+								<th class="col-num" data-key="col_length">製品長 (m)</th>
+								<th class="col-act" data-key="col_action">操作</th>
+								<th
+									class="col-date sortable"
+									onclick="sortBy('updated_at')"
+									data-key="col_updated">
+									更新日<span class="sort-icon" data-sortkey="updated_at"
+										>↕</span
+									>
+								</th>
+							</tr>
+						</thead>
+						<tbody id="mainTbody"></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
 
-      <!-- 一覧 -->
-      <div class="list-card">
-        <div class="list-header">
-          <h2 data-key="list_title">品番一覧</h2>
-          <span class="count-label" id="countLabel"></span>
-          <button class="bulk-btn" id="bulkBtn" onclick="openBulkModal()" disabled>🗂 <span id="bulkBtnLabel">選んだ品番のカテゴリを変更</span>（<span id="checkedCount">0</span>）</button>
-        </div>
-        <div class="table-wrap">
-        <table id="mainTable">
-          <thead>
-            <tr>
-              <th class="col-chk"><input type="checkbox" id="checkAll" title="表示中をすべて選ぶ" onclick="toggleCheckAll(this.checked)" /></th>
-              <th class="sortable col-cat1" onclick="sortBy('category1_jp')"><span data-key="col_cat1">カテゴリ1</span><span class="sort-icon" data-sortkey="category1_jp">↕</span><input type="text" id="searchCat1" class="th-search" placeholder="🔍" oninput="filterByCat1(this.value)" onclick="event.stopPropagation()" /></th>
-              <th class="sortable col-cat2" onclick="sortBy('category2_jp')" data-key="col_cat2">カテゴリ2<span class="sort-icon" data-sortkey="category2_jp">↕</span></th>
-              <th class="sortable col-pn"   onclick="sortBy('production_number')"><span data-key="col_pn">品番</span><span class="sort-icon" data-sortkey="production_number">↕</span><input type="text" id="searchInput" class="th-search" placeholder="🔍 * ? 可" title="* は任意の文字列、? は任意の1文字（例：C2Q*-30K）" oninput="filterTable(this.value)" onclick="event.stopPropagation()" /></th>
-              <th class="col-mat" data-key="col_material">材質</th>
-              <th class="col-age" data-key="col_aging">時効</th>
-              <th class="col-num" data-key="col_area">断面積 (mm²)</th>
-              <th class="col-num" data-key="col_weight">単重 (kg/m)</th>
-              <th class="col-num" data-key="col_length">製品長 (m)</th>
-              <th class="col-act" data-key="col_action">操作</th>
-              <th class="col-date sortable" onclick="sortBy('updated_at')" data-key="col_updated">更新日<span class="sort-icon" data-sortkey="updated_at">↕</span></th>
-            </tr>
-          </thead>
-          <tbody id="mainTbody"></tbody>
-        </table>
-        </div>
-      </div>
-    </div>
+		<!-- まとめてカテゴリ変更モーダル -->
+		<div id="bulkModal" class="modal-overlay">
+			<div class="modal-box" style="width: 520px">
+				<div class="modal-header">
+					<h3 data-key="bulk_title">選んだ品番のカテゴリを変更</h3>
+					<button class="modal-close" onclick="closeBulkModal()">✕</button>
+				</div>
+				<div style="font-size: 12px; color: #555; margin-bottom: 4px">
+					<span data-key="bulk_targets">対象の品番</span>（<span
+						id="bulkCount"></span
+					>）
+				</div>
+				<div class="bulk-targets" id="bulkTargets"></div>
+				<div class="bulk-row">
+					<label data-key="lbl_cat1">カテゴリ1</label
+					><select id="bulkCat1" onchange="loadBulkCat2(this.value)"></select>
+				</div>
+				<div class="bulk-row">
+					<label data-key="lbl_cat2">カテゴリ2</label
+					><select id="bulkCat2"></select>
+				</div>
+				<div class="form-actions">
+					<button
+						class="btn-cancel"
+						onclick="closeBulkModal()"
+						data-key="btn_cancel">
+						キャンセル
+					</button>
+					<button
+						class="btn-save"
+						id="bulkSave"
+						onclick="saveBulk()"
+						data-key="bulk_save">
+						変更する
+					</button>
+				</div>
+			</div>
+		</div>
 
-    <!-- まとめてカテゴリ変更モーダル -->
-    <div id="bulkModal" class="modal-overlay">
-      <div class="modal-box" style="width:520px;">
-        <div class="modal-header">
-          <h3 data-key="bulk_title">選んだ品番のカテゴリを変更</h3>
-          <button class="modal-close" onclick="closeBulkModal()">✕</button>
-        </div>
-        <div style="font-size:12px;color:#555;margin-bottom:4px;"><span data-key="bulk_targets">対象の品番</span>（<span id="bulkCount"></span>）</div>
-        <div class="bulk-targets" id="bulkTargets"></div>
-        <div class="bulk-row"><label data-key="lbl_cat1">カテゴリ1</label><select id="bulkCat1" onchange="loadBulkCat2(this.value)"></select></div>
-        <div class="bulk-row"><label data-key="lbl_cat2">カテゴリ2</label><select id="bulkCat2"></select></div>
-        <div class="form-actions">
-          <button class="btn-cancel" onclick="closeBulkModal()" data-key="btn_cancel">キャンセル</button>
-          <button class="btn-save" id="bulkSave" onclick="saveBulk()" data-key="bulk_save">変更する</button>
-        </div>
-      </div>
-    </div>
+		<!-- カテゴリ管理モーダル -->
+		<div id="catMgrModal" class="modal-overlay">
+			<div class="modal-box">
+				<div class="modal-header">
+					<h3>🗂 カテゴリ管理</h3>
+					<button class="modal-close" onclick="closeCatMgr()">✕</button>
+				</div>
+				<div class="cat-mgr-wrap">
+					<!-- カテゴリ1 -->
+					<div class="cat-mgr-panel">
+						<div class="cat-mgr-head">
+							<span>カテゴリ1</span>
+							<button
+								class="cat-mgr-add"
+								onclick="showCatInlineForm('cat1', null)">
+								＋ 追加
+							</button>
+						</div>
+						<div class="cat-mgr-search-wrap">
+							<input
+								type="text"
+								class="cat-mgr-search"
+								id="cat1MgrSearch"
+								placeholder="🔍 検索…"
+								oninput="filterCat1Mgr(this.value)" />
+						</div>
+						<div class="cat-inline-form" id="cat1InlineForm">
+							<div class="cat-inline-label" id="cat1InlineLabel">新規追加</div>
+							<input
+								type="text"
+								id="cat1InlineName"
+								placeholder="カテゴリ1名を入力" />
+							<input type="hidden" id="cat1InlineId" />
+							<div class="cat-inline-btns">
+								<button
+									class="cat-inline-cancel"
+									onclick="hideCatInlineForm('cat1')">
+									キャンセル
+								</button>
+								<button class="cat-inline-save" onclick="saveCatInline('cat1')">
+									保存
+								</button>
+							</div>
+						</div>
+						<div class="cat-mgr-list" id="cat1MgrList">
+							<div class="cat-mgr-empty">読み込み中...</div>
+						</div>
+					</div>
 
-    <!-- カテゴリ管理モーダル -->
-    <div id="catMgrModal" class="modal-overlay">
-      <div class="modal-box">
-        <div class="modal-header">
-          <h3>🗂 カテゴリ管理</h3>
-          <button class="modal-close" onclick="closeCatMgr()">✕</button>
-        </div>
-        <div class="cat-mgr-wrap">
+					<!-- カテゴリ2 -->
+					<div class="cat-mgr-panel">
+						<div class="cat-mgr-head">
+							<span
+								>カテゴリ2
+								<small
+									id="cat2MgrSub"
+									style="font-weight: normal; color: #666"></small
+							></span>
+							<button
+								class="cat-mgr-add"
+								onclick="showCatInlineForm('cat2', null)">
+								＋ 追加
+							</button>
+						</div>
+						<div class="cat-inline-form" id="cat2InlineForm">
+							<div class="cat-inline-label" id="cat2InlineLabel">新規追加</div>
+							<input
+								type="text"
+								id="cat2InlineName"
+								placeholder="カテゴリ2名を入力" />
+							<input type="hidden" id="cat2InlineId" />
+							<div class="cat-inline-btns">
+								<button
+									class="cat-inline-cancel"
+									onclick="hideCatInlineForm('cat2')">
+									キャンセル
+								</button>
+								<button class="cat-inline-save" onclick="saveCatInline('cat2')">
+									保存
+								</button>
+							</div>
+						</div>
+						<div class="cat-mgr-list" id="cat2MgrList">
+							<div class="cat-mgr-empty">← カテゴリ1を選択してください</div>
+						</div>
+					</div>
+				</div>
 
-          <!-- カテゴリ1 -->
-          <div class="cat-mgr-panel">
-            <div class="cat-mgr-head">
-              <span>カテゴリ1</span>
-              <button class="cat-mgr-add" onclick="showCatInlineForm('cat1', null)">＋ 追加</button>
-            </div>
-            <div class="cat-mgr-search-wrap">
-              <input type="text" class="cat-mgr-search" id="cat1MgrSearch"
-                placeholder="🔍 検索…" oninput="filterCat1Mgr(this.value)" />
-            </div>
-            <div class="cat-inline-form" id="cat1InlineForm">
-              <div class="cat-inline-label" id="cat1InlineLabel">新規追加</div>
-              <input type="text" id="cat1InlineName" placeholder="カテゴリ1名を入力" />
-              <input type="hidden" id="cat1InlineId" />
-              <div class="cat-inline-btns">
-                <button class="cat-inline-cancel" onclick="hideCatInlineForm('cat1')">キャンセル</button>
-                <button class="cat-inline-save" onclick="saveCatInline('cat1')">保存</button>
-              </div>
-            </div>
-            <div class="cat-mgr-list" id="cat1MgrList">
-              <div class="cat-mgr-empty">読み込み中...</div>
-            </div>
-          </div>
+				<!-- 品番一覧（cat2選択時に表示） -->
+				<div id="pnSection" class="pn-section" style="display: none">
+					<div class="pn-section-head">
+						<span>紐づき品番：</span>
+						<strong id="pnSectionCat2Name"></strong>
+						<span
+							id="pnSectionCount"
+							style="margin-left: auto; font-size: 12px; color: #888"></span>
+					</div>
+					<div class="pn-section-list" id="pnSectionList"></div>
+				</div>
+			</div>
+		</div>
 
-          <!-- カテゴリ2 -->
-          <div class="cat-mgr-panel">
-            <div class="cat-mgr-head">
-              <span>カテゴリ2 <small id="cat2MgrSub" style="font-weight:normal;color:#666"></small></span>
-              <button class="cat-mgr-add" onclick="showCatInlineForm('cat2', null)">＋ 追加</button>
-            </div>
-            <div class="cat-inline-form" id="cat2InlineForm">
-              <div class="cat-inline-label" id="cat2InlineLabel">新規追加</div>
-              <input type="text" id="cat2InlineName" placeholder="カテゴリ2名を入力" />
-              <input type="hidden" id="cat2InlineId" />
-              <div class="cat-inline-btns">
-                <button class="cat-inline-cancel" onclick="hideCatInlineForm('cat2')">キャンセル</button>
-                <button class="cat-inline-save" onclick="saveCatInline('cat2')">保存</button>
-              </div>
-            </div>
-            <div class="cat-mgr-list" id="cat2MgrList">
-              <div class="cat-mgr-empty">← カテゴリ1を選択してください</div>
-            </div>
-          </div>
+		<!-- CSV インポートモーダル -->
+		<div id="importModal" class="modal-overlay">
+			<div class="modal-box" style="width: 820px">
+				<div class="modal-header">
+					<h3>📂 品番 CSV・Excel インポート</h3>
+					<button class="modal-close" onclick="closeImportModal()">✕</button>
+				</div>
 
-        </div>
+				<!-- ドロップゾーン -->
+				<div
+					class="drop-zone"
+					id="importDropZone"
+					ondragover="
+						event.preventDefault();
+						this.classList.add('drag-over');
+					"
+					ondragleave="this.classList.remove('drag-over')"
+					ondrop="handleImportDrop(event)"
+					onclick="document.getElementById('importFileInput').click()">
+					<input
+						type="file"
+						id="importFileInput"
+						accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls"
+						onchange="handleImportFile(this.files[0])" />
+					<div>
+						CSV または Excel のファイルをここにドロップ、またはクリックして選択
+					</div>
+					<div style="font-size: 12px; color: #888; margin-top: 6px">
+						1行目は見出し：品番、材質、製品長、断面積、単重（kg/m）、時効処理（O
+						/ T5 / T6）<br />単重が空なら断面積 × 0.0027
+						で入れる。単重と断面積が ±3% を超えて合わない行は「警告」
+					</div>
+				</div>
 
-        <!-- 品番一覧（cat2選択時に表示） -->
-        <div id="pnSection" class="pn-section" style="display:none">
-          <div class="pn-section-head">
-            <span>紐づき品番：</span>
-            <strong id="pnSectionCat2Name"></strong>
-            <span id="pnSectionCount" style="margin-left:auto;font-size:12px;color:#888"></span>
-          </div>
-          <div class="pn-section-list" id="pnSectionList"></div>
-        </div>
+				<!-- プレビュー -->
+				<div id="importPreviewWrap" style="display: none">
+					<div class="import-preview">
+						<table>
+							<thead>
+								<tr>
+									<th>品番</th>
+									<th>材質</th>
+									<th>製品長 (m)</th>
+									<th>断面積 (mm²)</th>
+									<th>単重 (kg/m)</th>
+									<th>時効</th>
+									<th>状態</th>
+								</tr>
+							</thead>
+							<tbody id="importPreviewTbody"></tbody>
+						</table>
+					</div>
+					<div class="import-summary" id="importSummary"></div>
+					<label
+						id="importWarnRow"
+						style="
+							display: none;
+							font-size: 13px;
+							margin-top: 6px;
+							cursor: pointer;
+						">
+						<input
+							type="checkbox"
+							id="importIncludeWarn"
+							onchange="updateImportButton()" />
+						警告のある行も登録する
+					</label>
+				</div>
 
-      </div>
-    </div>
+				<div class="import-actions">
+					<button class="btn-cancel" onclick="closeImportModal()">
+						キャンセル
+					</button>
+					<button
+						class="btn-import-submit"
+						id="importSubmitBtn"
+						disabled
+						onclick="submitImport()">
+						登録 (0件)
+					</button>
+				</div>
+			</div>
+		</div>
 
-    <!-- CSV インポートモーダル -->
-    <div id="importModal" class="modal-overlay">
-      <div class="modal-box" style="width:820px;">
-        <div class="modal-header">
-          <h3>📂 品番 CSV・Excel インポート</h3>
-          <button class="modal-close" onclick="closeImportModal()">✕</button>
-        </div>
+		<div id="toast"></div>
 
-        <!-- ドロップゾーン -->
-        <div class="drop-zone" id="importDropZone"
-             ondragover="event.preventDefault(); this.classList.add('drag-over')"
-             ondragleave="this.classList.remove('drag-over')"
-             ondrop="handleImportDrop(event)"
-             onclick="document.getElementById('importFileInput').click()">
-          <input type="file" id="importFileInput" accept=".csv,.tsv,.txt,.xlsx,.xlsm,.xls" onchange="handleImportFile(this.files[0])">
-          <div>CSV または Excel のファイルをここにドロップ、またはクリックして選択</div>
-          <div style="font-size:12px;color:#888;margin-top:6px;">1行目は見出し：品番、材質、製品長、断面積、単重（kg/m）、時効処理（O / T5 / T6）<br>単重が空なら断面積 × 0.0027 で入れる。単重と断面積が ±3% を超えて合わない行は「警告」</div>
-        </div>
+		<script src="./lib/xlsx.js"></script>
+		<script>
+			/* ── 多言語辞書 ── */
+			const dict = {
+				ja: {
+					btn_back_menu: '← メニューへ戻る',
+					title: '品番管理',
+					btn_new: '＋ 新規登録',
+					btn_cat_mgr: '🗂 カテゴリ管理',
+					btn_save: '登録する',
+					btn_update: '更新する',
+					btn_cancel: 'キャンセル',
+					btn_delete: '削除',
+					list_title: '品番一覧',
+					lbl_pn: '品番',
+					lbl_dept: '図面部門',
+					lbl_material: '材質',
+					lbl_aging: '時効処理',
+					lbl_length: '製品長 (m)',
+					lbl_circle: '外接円 (mm)',
+					lbl_weight: '単重 (kg/m)',
+					lbl_area: '断面積 (mm²)',
+					lbl_pack_qty: '梱包数 (個)',
+					lbl_pack_row: '梱包 行',
+					lbl_pack_col: '梱包 列',
+					lbl_hardness: '硬さ (HRF)',
+					lbl_hardness_note: '硬さ備考',
+					lbl_cat1: 'カテゴリ1',
+					lbl_cat2: 'カテゴリ2',
+					hint_cat: '選択してください',
+					col_cat1: 'カテゴリ1',
+					col_cat2: 'カテゴリ2',
+					col_pn: '品番',
+					col_material: '材質',
+					col_aging: '時効',
+					col_area: '断面積 (mm²)',
+					col_weight: '単重 (kg/m)',
+					col_length: '製品長 (m)',
+					col_action: '操作',
+					col_updated: '更新日',
+					btn_import: '📂 CSV・Excel インポート',
+					bulk_btn: '選んだ品番のカテゴリを変更',
+					bulk_title: '選んだ品番のカテゴリを変更',
+					bulk_targets: '対象の品番',
+					bulk_save: '変更する',
+					bulk_select: '— 選択 —',
+					bulk_need_cat2: 'カテゴリ2を選んでください',
+					bulk_done: (n) => `${n} 件のカテゴリを変更しました`,
+				},
+				vi: {
+					btn_back_menu: '← Về menu',
+					title: 'Quản lý mã sản phẩm',
+					btn_new: '＋ Thêm mới',
+					btn_cat_mgr: '🗂 Quản lý danh mục',
+					btn_save: 'Lưu',
+					btn_update: 'Cập nhật',
+					btn_cancel: 'Hủy',
+					btn_delete: 'Xóa',
+					list_title: 'Danh sách mã sản phẩm',
+					lbl_pn: 'Mã SP',
+					lbl_dept: 'Bộ phận thiết kế',
+					lbl_material: 'Vật liệu',
+					lbl_aging: 'Xử lý lão hóa',
+					lbl_length: 'Chiều dài SP (m)',
+					lbl_circle: 'Đường tròn ngoại tiếp (mm)',
+					lbl_weight: 'Trọng lượng đơn vị (kg/m)',
+					lbl_area: 'Diện tích tiết diện (mm²)',
+					lbl_pack_qty: 'Số lượng đóng gói (cái)',
+					lbl_pack_row: 'Hàng đóng gói',
+					lbl_pack_col: 'Cột đóng gói',
+					lbl_hardness: 'Độ cứng (HRF)',
+					lbl_hardness_note: 'Ghi chú độ cứng',
+					lbl_cat1: 'Danh mục 1',
+					lbl_cat2: 'Danh mục 2',
+					hint_cat: 'Vui lòng chọn',
+					col_cat1: 'Danh mục 1',
+					col_cat2: 'Danh mục 2',
+					col_pn: 'Mã SP',
+					col_material: 'Vật liệu',
+					col_aging: 'Lão hóa',
+					col_area: 'Tiết diện (mm²)',
+					col_weight: 'TL đơn vị (kg/m)',
+					col_length: 'Dài (m)',
+					col_action: 'Thao tác',
+					col_updated: 'Ngày cập nhật',
+					btn_import: '📂 Nhập CSV・Excel',
+					bulk_btn: 'Đổi danh mục các mã đã chọn',
+					bulk_title: 'Đổi danh mục các mã đã chọn',
+					bulk_targets: 'Mã sản phẩm được chọn',
+					bulk_save: 'Đổi',
+					bulk_select: '— Chọn —',
+					bulk_need_cat2: 'Vui lòng chọn danh mục 2',
+					bulk_done: (n) => `Đã đổi danh mục cho ${n} mã`,
+				},
+			};
 
-        <!-- プレビュー -->
-        <div id="importPreviewWrap" style="display:none;">
-          <div class="import-preview">
-            <table>
-              <thead>
-                <tr>
-                  <th>品番</th>
-                  <th>材質</th>
-                  <th>製品長 (m)</th>
-                  <th>断面積 (mm²)</th>
-                  <th>単重 (kg/m)</th>
-                  <th>時効</th>
-                  <th>状態</th>
-                </tr>
-              </thead>
-              <tbody id="importPreviewTbody"></tbody>
-            </table>
-          </div>
-          <div class="import-summary" id="importSummary"></div>
-          <label id="importWarnRow" style="display:none; font-size:13px; margin-top:6px; cursor:pointer;">
-            <input type="checkbox" id="importIncludeWarn" onchange="updateImportButton()"> 警告のある行も登録する
-          </label>
-        </div>
+			let currentLang = localStorage.getItem('lang') || 'ja';
 
-        <div class="import-actions">
-          <button class="btn-cancel" onclick="closeImportModal()">キャンセル</button>
-          <button class="btn-import-submit" id="importSubmitBtn" disabled onclick="submitImport()">登録 (0件)</button>
-        </div>
-      </div>
-    </div>
+			function formatDate(dateStr) {
+				if (!dateStr) return '';
+				const parts = String(dateStr).split('-');
+				if (parts.length !== 3) return dateStr;
+				const [yyyy, mm, dd] = parts;
+				const yy = yyyy.slice(2);
+				return currentLang === 'vi' ? `${dd}-${mm}-${yy}` : `${yy}-${mm}-${dd}`;
+			}
 
-    <div id="toast"></div>
+			function isRecentUpdate(dateStr) {
+				if (!dateStr) return false;
+				const diff = Date.now() - new Date(dateStr).getTime();
+				return diff >= 0 && diff <= 30 * 24 * 60 * 60 * 1000;
+			}
 
-    <script src="./lib/xlsx.js"></script>
-    <script>
-      /* ── 多言語辞書 ── */
-      const dict = {
-        ja: {
-          btn_back_menu: "← メニューへ戻る",
-          title: "品番管理",
-          btn_new: "＋ 新規登録",
-          btn_cat_mgr: "🗂 カテゴリ管理",
-          btn_save: "登録する",
-          btn_update: "更新する",
-          btn_cancel: "キャンセル",
-          btn_delete: "削除",
-          list_title: "品番一覧",
-          lbl_pn: "品番",
-          lbl_dept: "図面部門",
-          lbl_material: "材質",
-          lbl_aging: "時効処理",
-          lbl_length: "製品長 (m)",
-          lbl_circle: "外接円 (mm)",
-          lbl_weight: "単重 (kg/m)",
-          lbl_area: "断面積 (mm²)",
-          lbl_pack_qty: "梱包数 (個)",
-          lbl_pack_row: "梱包 行",
-          lbl_pack_col: "梱包 列",
-          lbl_hardness: "硬さ (HRF)",
-          lbl_hardness_note: "硬さ備考",
-          lbl_cat1: "カテゴリ1",
-          lbl_cat2: "カテゴリ2",
-          hint_cat: "選択してください",
-          col_cat1: "カテゴリ1",
-          col_cat2: "カテゴリ2",
-          col_pn: "品番",
-          col_material: "材質",
-          col_aging: "時効",
-          col_area: "断面積 (mm²)",
-          col_weight: "単重 (kg/m)",
-          col_length: "製品長 (m)",
-          col_action:  "操作",
-          col_updated: "更新日",
-          btn_import: "📂 CSV・Excel インポート",
-          bulk_btn: "選んだ品番のカテゴリを変更",
-          bulk_title: "選んだ品番のカテゴリを変更",
-          bulk_targets: "対象の品番",
-          bulk_save: "変更する",
-          bulk_select: "— 選択 —",
-          bulk_need_cat2: "カテゴリ2を選んでください",
-          bulk_done: (n) => `${n} 件のカテゴリを変更しました`,
-        },
-        vi: {
-          btn_back_menu: "← Về menu",
-          title: "Quản lý mã sản phẩm",
-          btn_new: "＋ Thêm mới",
-          btn_cat_mgr: "🗂 Quản lý danh mục",
-          btn_save: "Lưu",
-          btn_update: "Cập nhật",
-          btn_cancel: "Hủy",
-          btn_delete: "Xóa",
-          list_title: "Danh sách mã sản phẩm",
-          lbl_pn: "Mã SP",
-          lbl_dept: "Bộ phận thiết kế",
-          lbl_material: "Vật liệu",
-          lbl_aging: "Xử lý lão hóa",
-          lbl_length: "Chiều dài SP (m)",
-          lbl_circle: "Đường tròn ngoại tiếp (mm)",
-          lbl_weight: "Trọng lượng đơn vị (kg/m)",
-          lbl_area: "Diện tích tiết diện (mm²)",
-          lbl_pack_qty: "Số lượng đóng gói (cái)",
-          lbl_pack_row: "Hàng đóng gói",
-          lbl_pack_col: "Cột đóng gói",
-          lbl_hardness: "Độ cứng (HRF)",
-          lbl_hardness_note: "Ghi chú độ cứng",
-          lbl_cat1: "Danh mục 1",
-          lbl_cat2: "Danh mục 2",
-          hint_cat: "Vui lòng chọn",
-          col_cat1: "Danh mục 1",
-          col_cat2: "Danh mục 2",
-          col_pn: "Mã SP",
-          col_material: "Vật liệu",
-          col_aging: "Lão hóa",
-          col_area: "Tiết diện (mm²)",
-          col_weight: "TL đơn vị (kg/m)",
-          col_length: "Dài (m)",
-          col_action:  "Thao tác",
-          col_updated: "Ngày cập nhật",
-          btn_import: "📂 Nhập CSV・Excel",
-          bulk_btn: "Đổi danh mục các mã đã chọn",
-          bulk_title: "Đổi danh mục các mã đã chọn",
-          bulk_targets: "Mã sản phẩm được chọn",
-          bulk_save: "Đổi",
-          bulk_select: "— Chọn —",
-          bulk_need_cat2: "Vui lòng chọn danh mục 2",
-          bulk_done: (n) => `Đã đổi danh mục cho ${n} mã`,
-        },
-      };
+			function setLang(lang) {
+				currentLang = lang;
+				document.querySelectorAll('[data-key]').forEach((el) => {
+					const k = el.getAttribute('data-key');
+					if (typeof dict[lang][k] === 'string') el.textContent = dict[lang][k];
+				});
+				document.getElementById('bulkBtnLabel').textContent =
+					dict[lang].bulk_btn;
+				localStorage.setItem('lang', lang);
+			}
 
-      let currentLang = localStorage.getItem("lang") || "ja";
+			/* ── Toast ── */
+			function showToast(msg, ok = true) {
+				const t = document.getElementById('toast');
+				t.textContent = msg;
+				t.style.background = ok ? '#323232' : '#c62828';
+				t.classList.add('show');
+				setTimeout(() => t.classList.remove('show'), 2200);
+			}
 
-      function formatDate(dateStr) {
-        if (!dateStr) return "";
-        const parts = String(dateStr).split("-");
-        if (parts.length !== 3) return dateStr;
-        const [yyyy, mm, dd] = parts;
-        const yy = yyyy.slice(2);
-        return currentLang === "vi" ? `${dd}-${mm}-${yy}` : `${yy}-${mm}-${dd}`;
-      }
+			/* ── POST helper ── */
+			async function postForm(url, params) {
+				const res = await fetch(url, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+					body: new URLSearchParams(params).toString(),
+				});
+				return res.json();
+			}
 
-      function isRecentUpdate(dateStr) {
-        if (!dateStr) return false;
-        const diff = Date.now() - new Date(dateStr).getTime();
-        return diff >= 0 && diff <= 30 * 24 * 60 * 60 * 1000;
-      }
+			/* ── 状態 ── */
+			let allData = [];
+			let sortKey = '';
+			let sortAsc = true;
+			let editingId = null;
+			let selectedCat1Id = null;
+			let selectedCat2Id = null;
 
-      function setLang(lang) {
-        currentLang = lang;
-        document.querySelectorAll("[data-key]").forEach((el) => {
-          const k = el.getAttribute("data-key");
-          if (typeof dict[lang][k] === "string") el.textContent = dict[lang][k];
-        });
-        document.getElementById("bulkBtnLabel").textContent = dict[lang].bulk_btn;
-        localStorage.setItem("lang", lang);
-      }
-
-      /* ── Toast ── */
-      function showToast(msg, ok = true) {
-        const t = document.getElementById("toast");
-        t.textContent = msg;
-        t.style.background = ok ? "#323232" : "#c62828";
-        t.classList.add("show");
-        setTimeout(() => t.classList.remove("show"), 2200);
-      }
-
-
-      /* ── POST helper ── */
-      async function postForm(url, params) {
-        const res = await fetch(url, {
-          method:  "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body:    new URLSearchParams(params).toString(),
-        });
-        return res.json();
-      }
-
-      /* ── 状態 ── */
-      let allData       = [];
-      let sortKey       = "";
-      let sortAsc       = true;
-      let editingId     = null;
-      let selectedCat1Id = null;
-      let selectedCat2Id = null;
-
-      /* ════════════════════════════
+			/* ════════════════════════════
          一覧
       ════════════════════════════ */
-      async function loadList() {
-        allData = await postForm("./php/ProductionNumber/SelSummaryV3.php", { dummy: "dummy" });
-        applyFilters();  // 編集して戻っても、検索欄の絞り込みと並べ替えをそのまま保つ
-      }
+			async function loadList() {
+				allData = await postForm('./php/ProductionNumber/SelSummaryV3.php', {
+					dummy: 'dummy',
+				});
+				applyFilters(); // 編集して戻っても、検索欄の絞り込みと並べ替えをそのまま保つ
+			}
 
-      function renderTable(data) {
-        document.getElementById("countLabel").textContent = `${data.length} 件`;
-        const tbody = document.getElementById("mainTbody");
-        tbody.innerHTML = "";
+			function renderTable(data) {
+				document.getElementById('countLabel').textContent = `${data.length} 件`;
+				const tbody = document.getElementById('mainTbody');
+				tbody.innerHTML = '';
 
-        if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
-          return;
-        }
+				if (!data.length) {
+					tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+					return;
+				}
 
-        data.forEach((row) => {
-          const cat1 = row.category1_jp    ?? "—";
-          const cat2 = row.category2_jp    ?? "—";
-          const mat  = row.billet_material ?? "—";
-          const agi  = row.aging_type      ?? "—";
+				data.forEach((row) => {
+					const cat1 = row.category1_jp ?? '—';
+					const cat2 = row.category2_jp ?? '—';
+					const mat = row.billet_material ?? '—';
+					const agi = row.aging_type ?? '—';
 
-          const tr = document.createElement("tr");
-          const checked = checkedIds.has(Number(row.id));
-          if (checked) tr.classList.add("checked-row");
-          tr.innerHTML = `
-            <td class="col-chk"><input type="checkbox" ${checked ? "checked" : ""} onchange="toggleCheck(${row.id}, this.checked, this)" /></td>
+					const tr = document.createElement('tr');
+					const checked = checkedIds.has(Number(row.id));
+					if (checked) tr.classList.add('checked-row');
+					tr.innerHTML = `
+            <td class="col-chk"><input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleCheck(${row.id}, this.checked, this)" /></td>
             <td>${cat1}</td>
             <td>${cat2}</td>
-            <td><strong>${row.production_number ?? ""}</strong></td>
+            <td><strong>${row.production_number ?? ''}</strong></td>
             <td>${mat}</td>
             <td>${agi}</td>
-            <td>${row.cross_section_area ?? "—"}</td>
-            <td>${row.specific_weight    ?? "—"}</td>
-            <td>${row.production_length  ?? "—"}</td>
+            <td>${row.cross_section_area ?? '—'}</td>
+            <td>${row.specific_weight ?? '—'}</td>
+            <td>${row.production_length ?? '—'}</td>
             <td><button class="edit-btn" onclick="openEditForm(${row.id})">✏ 編集</button></td>
             <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${formatDate(row.updated_at)}</td>
           `;
-          tbody.appendChild(tr);
-        });
-        syncCheckAll();
-      }
+					tbody.appendChild(tr);
+				});
+				syncCheckAll();
+			}
 
-      /* 絞り込み */
-      let searchPn   = "";
-      let searchCat1 = "";
+			/* 絞り込み */
+			let searchPn = '';
+			let searchCat1 = '';
 
-      function filterTable(q) {
-        searchPn = q.toUpperCase();
-        applyFilters();
-      }
+			function filterTable(q) {
+				searchPn = q.toUpperCase();
+				applyFilters();
+			}
 
-      function filterByCat1(q) {
-        searchCat1 = q.toUpperCase();
-        applyFilters();
-      }
+			function filterByCat1(q) {
+				searchCat1 = q.toUpperCase();
+				applyFilters();
+			}
 
-      // 品番は * ? のワイルドカードが使える（* ? が無ければ前と同じく「含む」で探す）
-      function pnMatcher(q) {
-        if (!q) return () => true;
-        if (!q.includes("*") && !q.includes("?")) return (v) => v.includes(q);
-        const re = new RegExp("^" + q.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".") + "$");
-        return (v) => re.test(v);
-      }
+			// 品番は * ? のワイルドカードが使える（* ? が無ければ前と同じく「含む」で探す）
+			function pnMatcher(q) {
+				if (!q) return () => true;
+				if (!q.includes('*') && !q.includes('?')) return (v) => v.includes(q);
+				const re = new RegExp(
+					'^' +
+						q
+							.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+							.replace(/\*/g, '.*')
+							.replace(/\?/g, '.') +
+						'$',
+				);
+				return (v) => re.test(v);
+			}
 
-      let shownData = [];  // 今、表に出ている行（全選択の対象）
-      function applyFilters() {
-        const pnOk = pnMatcher(searchPn);
-        let list = allData.filter((r) =>
-          pnOk(String(r.production_number ?? "").toUpperCase()) &&
-          String(r.category1_jp     ?? "").toUpperCase().includes(searchCat1)
-        );
-        if (sortKey) {
-          list = [...list].sort((a, b) => {
-            let va = a[sortKey] ?? "", vb = b[sortKey] ?? "";
-            const n = Number(va) - Number(vb);
-            const result = (!isNaN(va) && !isNaN(vb) && va !== "")
-              ? n
-              : String(va).localeCompare(String(vb), "ja");
-            return sortAsc ? result : -result;
-          });
-        }
-        shownData = list;
-        document.getElementById("searchInput").classList.toggle("has-value", !!searchPn);
-        document.getElementById("searchCat1").classList.toggle("has-value", !!searchCat1);
-        renderTable(list);
-      }
+			let shownData = []; // 今、表に出ている行（全選択の対象）
+			function applyFilters() {
+				const pnOk = pnMatcher(searchPn);
+				let list = allData.filter(
+					(r) =>
+						pnOk(String(r.production_number ?? '').toUpperCase()) &&
+						String(r.category1_jp ?? '')
+							.toUpperCase()
+							.includes(searchCat1),
+				);
+				if (sortKey) {
+					list = [...list].sort((a, b) => {
+						let va = a[sortKey] ?? '',
+							vb = b[sortKey] ?? '';
+						const n = Number(va) - Number(vb);
+						const result =
+							!isNaN(va) && !isNaN(vb) && va !== ''
+								? n
+								: String(va).localeCompare(String(vb), 'ja');
+						return sortAsc ? result : -result;
+					});
+				}
+				shownData = list;
+				document
+					.getElementById('searchInput')
+					.classList.toggle('has-value', !!searchPn);
+				document
+					.getElementById('searchCat1')
+					.classList.toggle('has-value', !!searchCat1);
+				renderTable(list);
+			}
 
-      /* ── チェックして、まとめてカテゴリを変える ── */
-      const checkedIds = new Set();
-      function toggleCheck(id, on, el) {
-        if (on) checkedIds.add(Number(id)); else checkedIds.delete(Number(id));
-        el?.closest("tr")?.classList.toggle("checked-row", on);
-        syncCheckAll();
-      }
-      function toggleCheckAll(on) {
-        shownData.forEach((r) => on ? checkedIds.add(Number(r.id)) : checkedIds.delete(Number(r.id)));
-        renderTable(shownData);
-      }
-      function syncCheckAll() {
-        const all = document.getElementById("checkAll");
-        const n = shownData.filter((r) => checkedIds.has(Number(r.id))).length;
-        all.checked = shownData.length > 0 && n === shownData.length;
-        all.indeterminate = n > 0 && n < shownData.length;
-        document.getElementById("checkedCount").textContent = checkedIds.size;
-        document.getElementById("bulkBtn").disabled = checkedIds.size === 0;
-      }
+			/* ── チェックして、まとめてカテゴリを変える ── */
+			const checkedIds = new Set();
+			function toggleCheck(id, on, el) {
+				if (on) checkedIds.add(Number(id));
+				else checkedIds.delete(Number(id));
+				el?.closest('tr')?.classList.toggle('checked-row', on);
+				syncCheckAll();
+			}
+			function toggleCheckAll(on) {
+				shownData.forEach((r) =>
+					on ? checkedIds.add(Number(r.id)) : checkedIds.delete(Number(r.id)),
+				);
+				renderTable(shownData);
+			}
+			function syncCheckAll() {
+				const all = document.getElementById('checkAll');
+				const n = shownData.filter((r) => checkedIds.has(Number(r.id))).length;
+				all.checked = shownData.length > 0 && n === shownData.length;
+				all.indeterminate = n > 0 && n < shownData.length;
+				document.getElementById('checkedCount').textContent = checkedIds.size;
+				document.getElementById('bulkBtn').disabled = checkedIds.size === 0;
+			}
 
-      async function openBulkModal() {
-        if (!checkedIds.size) return;
-        const t = dict[currentLang];
-        const rows = allData.filter((r) => checkedIds.has(Number(r.id)));
-        document.getElementById("bulkCount").textContent = rows.length;
-        document.getElementById("bulkTargets").textContent = rows.map((r) => `${r.production_number}（${r.category1_jp || "—"} / ${r.category2_jp || "—"}）`).join("\n");
-        const cat1 = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
-        document.getElementById("bulkCat1").innerHTML = `<option value="">${t.bulk_select}</option>` +
-          cat1.map((c) => `<option value="${c.id}">${c.name_jp ?? ""}</option>`).join("");
-        document.getElementById("bulkCat2").innerHTML = `<option value="">${t.bulk_select}</option>`;
-        document.getElementById("bulkModal").classList.add("open");
-      }
-      async function loadBulkCat2(cat1Id) {
-        const t = dict[currentLang];
-        const sel = document.getElementById("bulkCat2");
-        sel.innerHTML = `<option value="">${t.bulk_select}</option>`;
-        if (!cat1Id) return;
-        const cat2 = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: cat1Id });
-        sel.innerHTML += cat2.map((c) => `<option value="${c.id}">${c.name_jp ?? ""}</option>`).join("");
-      }
-      function closeBulkModal() {
-        document.getElementById("bulkModal").classList.remove("open");
-      }
-      async function saveBulk() {
-        const t = dict[currentLang];
-        const cat2 = document.getElementById("bulkCat2").value;
-        if (!cat2) { showToast(t.bulk_need_cat2, false); return; }
-        const btn = document.getElementById("bulkSave");
-        btn.disabled = true;
-        try {
-          const res = await fetch("./php/ProductionNumber/bulk_update_category.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ids: [...checkedIds], category2_id: Number(cat2) }),
-          });
-          const r = await res.json();
-          if (r.status !== "ok") throw new Error(r.message || "error");
-          showToast(t.bulk_done(checkedIds.size));
-          checkedIds.clear();
-          closeBulkModal();
-          await loadList();
-        } catch (e) {
-          showToast(e.message, false);
-        } finally {
-          btn.disabled = false;
-        }
-      }
+			async function openBulkModal() {
+				if (!checkedIds.size) return;
+				const t = dict[currentLang];
+				const rows = allData.filter((r) => checkedIds.has(Number(r.id)));
+				document.getElementById('bulkCount').textContent = rows.length;
+				document.getElementById('bulkTargets').textContent = rows
+					.map(
+						(r) =>
+							`${r.production_number}（${r.category1_jp || '—'} / ${r.category2_jp || '—'}）`,
+					)
+					.join('\n');
+				const cat1 = await postForm(
+					'./php/ProductionNumber/SelCategory1V2.php',
+					{ dummy: 'dummy' },
+				);
+				document.getElementById('bulkCat1').innerHTML =
+					`<option value="">${t.bulk_select}</option>` +
+					cat1
+						.map((c) => `<option value="${c.id}">${c.name_jp ?? ''}</option>`)
+						.join('');
+				document.getElementById('bulkCat2').innerHTML =
+					`<option value="">${t.bulk_select}</option>`;
+				document.getElementById('bulkModal').classList.add('open');
+			}
+			async function loadBulkCat2(cat1Id) {
+				const t = dict[currentLang];
+				const sel = document.getElementById('bulkCat2');
+				sel.innerHTML = `<option value="">${t.bulk_select}</option>`;
+				if (!cat1Id) return;
+				const cat2 = await postForm(
+					'./php/ProductionNumber/SelCategory2V2.php',
+					{ targetId: cat1Id },
+				);
+				sel.innerHTML += cat2
+					.map((c) => `<option value="${c.id}">${c.name_jp ?? ''}</option>`)
+					.join('');
+			}
+			function closeBulkModal() {
+				document.getElementById('bulkModal').classList.remove('open');
+			}
+			async function saveBulk() {
+				const t = dict[currentLang];
+				const cat2 = document.getElementById('bulkCat2').value;
+				if (!cat2) {
+					showToast(t.bulk_need_cat2, false);
+					return;
+				}
+				const btn = document.getElementById('bulkSave');
+				btn.disabled = true;
+				try {
+					const res = await fetch(
+						'./php/ProductionNumber/bulk_update_category.php',
+						{
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify({
+								ids: [...checkedIds],
+								category2_id: Number(cat2),
+							}),
+						},
+					);
+					const r = await res.json();
+					if (r.status !== 'ok') throw new Error(r.message || 'error');
+					showToast(t.bulk_done(checkedIds.size));
+					checkedIds.clear();
+					closeBulkModal();
+					await loadList();
+				} catch (e) {
+					showToast(e.message, false);
+				} finally {
+					btn.disabled = false;
+				}
+			}
 
-      /* cat-card カテゴリ1 絞り込み */
-      function filterCat1(q) {
-        q = q.toUpperCase();
-        document.querySelectorAll("#cat1Tbody tr").forEach((tr) => {
-          tr.style.display = tr.textContent.toUpperCase().includes(q) ? "" : "none";
-        });
-      }
+			/* cat-card カテゴリ1 絞り込み */
+			function filterCat1(q) {
+				q = q.toUpperCase();
+				document.querySelectorAll('#cat1Tbody tr').forEach((tr) => {
+					tr.style.display = tr.textContent.toUpperCase().includes(q)
+						? ''
+						: 'none';
+				});
+			}
 
-      /* ソート */
-      function sortBy(key) {
-        if (sortKey === key) sortAsc = !sortAsc;
-        else { sortKey = key; sortAsc = true; }
+			/* ソート */
+			function sortBy(key) {
+				if (sortKey === key) sortAsc = !sortAsc;
+				else {
+					sortKey = key;
+					sortAsc = true;
+				}
 
-        document.querySelectorAll(".sort-icon").forEach((el) => el.textContent = "↕");
-        const icon = document.querySelector(`.sort-icon[data-sortkey="${key}"]`);
-        if (icon) icon.textContent = sortAsc ? "↑" : "↓";
+				document
+					.querySelectorAll('.sort-icon')
+					.forEach((el) => (el.textContent = '↕'));
+				const icon = document.querySelector(
+					`.sort-icon[data-sortkey="${key}"]`,
+				);
+				if (icon) icon.textContent = sortAsc ? '↑' : '↓';
 
-        applyFilters();
-      }
+				applyFilters();
+			}
 
-      /* ════════════════════════════
+			/* ════════════════════════════
          カテゴリ
       ════════════════════════════ */
-      async function loadCat1() {
-        const data = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
-        const tbody = document.getElementById("cat1Tbody");
-        tbody.innerHTML = "";
-        data.forEach((row) => {
-          const vals = Object.values(row);
-          const id   = vals[0];
-          const name = vals[1] ?? "";
-          const tr   = document.createElement("tr");
-          tr.dataset.id  = id;
-          tr.innerHTML   = `<td>${name}</td>`;
-          tr.onclick     = () => onCat1Click(id, tr);
-          tbody.appendChild(tr);
-        });
-      }
+			async function loadCat1() {
+				const data = await postForm(
+					'./php/ProductionNumber/SelCategory1V2.php',
+					{ dummy: 'dummy' },
+				);
+				const tbody = document.getElementById('cat1Tbody');
+				tbody.innerHTML = '';
+				data.forEach((row) => {
+					const vals = Object.values(row);
+					const id = vals[0];
+					const name = vals[1] ?? '';
+					const tr = document.createElement('tr');
+					tr.dataset.id = id;
+					tr.innerHTML = `<td>${name}</td>`;
+					tr.onclick = () => onCat1Click(id, tr);
+					tbody.appendChild(tr);
+				});
+			}
 
-      async function onCat1Click(id, tr) {
-        document.querySelectorAll("#cat1Tbody tr.selected").forEach((r) => r.classList.remove("selected"));
-        tr.classList.add("selected");
-        selectedCat1Id = id;
-        document.getElementById("cat1Hint").classList.remove("show");
+			async function onCat1Click(id, tr) {
+				document
+					.querySelectorAll('#cat1Tbody tr.selected')
+					.forEach((r) => r.classList.remove('selected'));
+				tr.classList.add('selected');
+				selectedCat1Id = id;
+				document.getElementById('cat1Hint').classList.remove('show');
 
-        const data = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: id });
-        const tbody = document.getElementById("cat2Tbody");
-        tbody.innerHTML = "";
-        selectedCat2Id = null;
-        data.forEach((row) => {
-          const vals = Object.values(row);
-          const cid  = vals[0];
-          const name = vals[1] ?? "";
-          const tr2  = document.createElement("tr");
-          tr2.dataset.id = cid;
-          tr2.innerHTML  = `<td>${name}</td>`;
-          tr2.onclick    = () => onCat2Click(cid, tr2);
-          tbody.appendChild(tr2);
-        });
-      }
+				const data = await postForm(
+					'./php/ProductionNumber/SelCategory2V2.php',
+					{ targetId: id },
+				);
+				const tbody = document.getElementById('cat2Tbody');
+				tbody.innerHTML = '';
+				selectedCat2Id = null;
+				data.forEach((row) => {
+					const vals = Object.values(row);
+					const cid = vals[0];
+					const name = vals[1] ?? '';
+					const tr2 = document.createElement('tr');
+					tr2.dataset.id = cid;
+					tr2.innerHTML = `<td>${name}</td>`;
+					tr2.onclick = () => onCat2Click(cid, tr2);
+					tbody.appendChild(tr2);
+				});
+			}
 
-      async function onCat2Click(id, tr) {
-        document.querySelectorAll("#cat2Tbody tr.selected").forEach((r) => r.classList.remove("selected"));
-        tr.classList.add("selected");
-        selectedCat2Id = id;
-        document.getElementById("cat2Hint").classList.remove("show");
+			async function onCat2Click(id, tr) {
+				document
+					.querySelectorAll('#cat2Tbody tr.selected')
+					.forEach((r) => r.classList.remove('selected'));
+				tr.classList.add('selected');
+				selectedCat2Id = id;
+				document.getElementById('cat2Hint').classList.remove('show');
 
-        const name = tr.querySelector("td")?.textContent ?? "";
-        document.getElementById("formPnCat2Name").textContent = name;
-        document.getElementById("formPnCount").textContent    = "";
-        document.getElementById("formPnList").innerHTML =
-          '<div class="cat-mgr-empty" style="padding:8px">読み込み中...</div>';
-        document.getElementById("formPnSection").style.display = "";
+				const name = tr.querySelector('td')?.textContent ?? '';
+				document.getElementById('formPnCat2Name').textContent = name;
+				document.getElementById('formPnCount').textContent = '';
+				document.getElementById('formPnList').innerHTML =
+					'<div class="cat-mgr-empty" style="padding:8px">読み込み中...</div>';
+				document.getElementById('formPnSection').style.display = '';
 
-        const data = await postForm("./php/ProductionNumber/SelPnByCat2.php", { cat2Id: id });
-        document.getElementById("formPnCount").textContent = `${data.length} 件`;
-        const list = document.getElementById("formPnList");
-        if (!data.length) {
-          list.innerHTML = '<div class="cat-mgr-empty" style="padding:8px">品番の紐づきはありません</div>';
-          return;
-        }
-        list.innerHTML = data.map((r) =>
-          `<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`
-        ).join("");
-      }
+				const data = await postForm('./php/ProductionNumber/SelPnByCat2.php', {
+					cat2Id: id,
+				});
+				document.getElementById('formPnCount').textContent =
+					`${data.length} 件`;
+				const list = document.getElementById('formPnList');
+				if (!data.length) {
+					list.innerHTML =
+						'<div class="cat-mgr-empty" style="padding:8px">品番の紐づきはありません</div>';
+					return;
+				}
+				list.innerHTML = data
+					.map(
+						(r) =>
+							`<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`,
+					)
+					.join('');
+			}
 
-      /* ════════════════════════════
+			/* ════════════════════════════
          フォーム
       ════════════════════════════ */
-      function openNewForm() {
-        resetForm();
-        editingId = null;
-        const lang = localStorage.getItem("lang") || "ja";
-        document.getElementById("formTitle").textContent = "✚ " + (lang === "vi" ? "Thêm mới" : "新規登録");
-        document.getElementById("formTitle").className   = "form-title";
-        document.getElementById("deleteBtn").style.display = "none";
-        document.getElementById("saveBtn").textContent   = dict[lang].btn_save;
-        document.getElementById("formCard").classList.add("open");
-        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
-      }
+			function openNewForm() {
+				resetForm();
+				editingId = null;
+				const lang = localStorage.getItem('lang') || 'ja';
+				document.getElementById('formTitle').textContent =
+					'✚ ' + (lang === 'vi' ? 'Thêm mới' : '新規登録');
+				document.getElementById('formTitle').className = 'form-title';
+				document.getElementById('deleteBtn').style.display = 'none';
+				document.getElementById('saveBtn').textContent = dict[lang].btn_save;
+				document.getElementById('formCard').classList.add('open');
+				document
+					.getElementById('formCard')
+					.scrollIntoView({ behavior: 'smooth' });
+			}
 
-      async function openEditForm(id) {
-        resetForm();
-        editingId = id;
+			async function openEditForm(id) {
+				resetForm();
+				editingId = id;
 
-        const data = await postForm("./php/ProductionNumber/SelSelSummaryV3.php", { targetId: id });
-        if (!data.length) return;
-        const r    = data[0];
-        const lang = localStorage.getItem("lang") || "ja";
+				const data = await postForm(
+					'./php/ProductionNumber/SelSelSummaryV3.php',
+					{ targetId: id },
+				);
+				if (!data.length) return;
+				const r = data[0];
+				const lang = localStorage.getItem('lang') || 'ja';
 
-        document.getElementById("formTitle").textContent = `✏ ${lang === "vi" ? "Đang chỉnh sửa" : "編集中"}：${r.production_number}`;
-        document.getElementById("formTitle").className   = "form-title edit";
-        document.getElementById("deleteBtn").style.display = "";
-        document.getElementById("saveBtn").textContent   = dict[lang].btn_update;
-        document.getElementById("fId").value             = id;
+				document.getElementById('formTitle').textContent =
+					`✏ ${lang === 'vi' ? 'Đang chỉnh sửa' : '編集中'}：${r.production_number}`;
+				document.getElementById('formTitle').className = 'form-title edit';
+				document.getElementById('deleteBtn').style.display = '';
+				document.getElementById('saveBtn').textContent = dict[lang].btn_update;
+				document.getElementById('fId').value = id;
 
-        document.getElementById("fPn").value           = r.production_number    ?? "";
-        document.getElementById("fDept").value         = r.drawn_department     ?? "0";
-        document.getElementById("fMaterial").value     = r.billet_material_id   ?? "0";
-        document.getElementById("fAging").value        = r.aging_type_id        ?? "0";
-        document.getElementById("fLength").value       = r.production_length    ?? "";
-        document.getElementById("fCircle").value       = r.circumscribed_circle ?? "";
-        document.getElementById("fWeight").value       = r.specific_weight      ?? "";
-        document.getElementById("fArea").value         = r.cross_section_area   ?? "";
-        document.getElementById("fPackQty").value      = r.packing_quantity     ?? "";
-        document.getElementById("fPackRow").value      = r.packing_row          ?? "";
-        document.getElementById("fPackCol").value      = r.packing_column       ?? "";
-        document.getElementById("fHardness").value     = r.hardness             ?? "";
-        document.getElementById("fHardnessNote").value = r.hardness_note        ?? "";
+				document.getElementById('fPn').value = r.production_number ?? '';
+				document.getElementById('fDept').value = r.drawn_department ?? '0';
+				document.getElementById('fMaterial').value =
+					r.billet_material_id ?? '0';
+				document.getElementById('fAging').value = r.aging_type_id ?? '0';
+				document.getElementById('fLength').value = r.production_length ?? '';
+				document.getElementById('fCircle').value = r.circumscribed_circle ?? '';
+				document.getElementById('fWeight').value = r.specific_weight ?? '';
+				document.getElementById('fArea').value = r.cross_section_area ?? '';
+				document.getElementById('fPackQty').value = r.packing_quantity ?? '';
+				document.getElementById('fPackRow').value = r.packing_row ?? '';
+				document.getElementById('fPackCol').value = r.packing_column ?? '';
+				document.getElementById('fHardness').value = r.hardness ?? '';
+				document.getElementById('fHardnessNote').value = r.hardness_note ?? '';
 
-        /* カテゴリ選択を復元 */
-        await restoreCategories(id, r.production_category2_id ?? null);
+				/* カテゴリ選択を復元 */
+				await restoreCategories(id, r.production_category2_id ?? null);
 
-        document.getElementById("formCard").classList.add("open");
-        document.getElementById("formCard").scrollIntoView({ behavior: "smooth" });
-      }
+				document.getElementById('formCard').classList.add('open');
+				document
+					.getElementById('formCard')
+					.scrollIntoView({ behavior: 'smooth' });
+			}
 
-      async function restoreCategories(targetId, cat2Id) {
-        const d1 = await postForm("./php/ProductionNumber/SelCate2_1.php", { targetId });
-        if (!d1.length) return;
+			async function restoreCategories(targetId, cat2Id) {
+				const d1 = await postForm('./php/ProductionNumber/SelCate2_1.php', {
+					targetId,
+				});
+				if (!d1.length) return;
 
-        const cat1Id = d1[0].category1_id;
-        const cat1Rows = document.querySelectorAll("#cat1Tbody tr");
-        let cat1Tr = null;
-        cat1Rows.forEach((tr) => { if (String(tr.dataset.id) === String(cat1Id)) cat1Tr = tr; });
-        if (cat1Tr) await onCat1Click(cat1Id, cat1Tr);
+				const cat1Id = d1[0].category1_id;
+				const cat1Rows = document.querySelectorAll('#cat1Tbody tr');
+				let cat1Tr = null;
+				cat1Rows.forEach((tr) => {
+					if (String(tr.dataset.id) === String(cat1Id)) cat1Tr = tr;
+				});
+				if (cat1Tr) await onCat1Click(cat1Id, cat1Tr);
 
-        if (cat2Id) {
-          const cat2Rows = document.querySelectorAll("#cat2Tbody tr");
-          cat2Rows.forEach((tr) => {
-            if (String(tr.dataset.id) === String(cat2Id)) onCat2Click(cat2Id, tr);
-          });
-        }
-      }
+				if (cat2Id) {
+					const cat2Rows = document.querySelectorAll('#cat2Tbody tr');
+					cat2Rows.forEach((tr) => {
+						if (String(tr.dataset.id) === String(cat2Id))
+							onCat2Click(cat2Id, tr);
+					});
+				}
+			}
 
-      function closeForm() {
-        document.getElementById("formCard").classList.remove("open");
-        resetForm();
-      }
+			function closeForm() {
+				document.getElementById('formCard').classList.remove('open');
+				resetForm();
+			}
 
-      function resetForm() {
-        ["fId","fPn","fLength","fCircle","fWeight","fArea",
-         "fPackQty","fPackRow","fPackCol","fHardness","fHardnessNote"]
-          .forEach((id) => { document.getElementById(id).value = ""; });
-        document.getElementById("fDept").value     = "0";
-        document.getElementById("fMaterial").value = "0";
-        document.getElementById("fAging").value    = "0";
+			function resetForm() {
+				[
+					'fId',
+					'fPn',
+					'fLength',
+					'fCircle',
+					'fWeight',
+					'fArea',
+					'fPackQty',
+					'fPackRow',
+					'fPackCol',
+					'fHardness',
+					'fHardnessNote',
+				].forEach((id) => {
+					document.getElementById(id).value = '';
+				});
+				document.getElementById('fDept').value = '0';
+				document.getElementById('fMaterial').value = '0';
+				document.getElementById('fAging').value = '0';
 
-        document.querySelectorAll("#cat1Tbody tr.selected, #cat2Tbody tr.selected")
-          .forEach((tr) => tr.classList.remove("selected"));
-        document.getElementById("cat2Tbody").innerHTML = "";
-        document.getElementById("cat1Search").value = "";
-        filterCat1("");
-        document.getElementById("cat1Hint").classList.remove("show");
-        document.getElementById("cat2Hint").classList.remove("show");
-        document.getElementById("formPnSection").style.display = "none";
-        selectedCat1Id = null;
-        selectedCat2Id = null;
-      }
+				document
+					.querySelectorAll('#cat1Tbody tr.selected, #cat2Tbody tr.selected')
+					.forEach((tr) => tr.classList.remove('selected'));
+				document.getElementById('cat2Tbody').innerHTML = '';
+				document.getElementById('cat1Search').value = '';
+				filterCat1('');
+				document.getElementById('cat1Hint').classList.remove('show');
+				document.getElementById('cat2Hint').classList.remove('show');
+				document.getElementById('formPnSection').style.display = 'none';
+				selectedCat1Id = null;
+				selectedCat2Id = null;
+			}
 
-      /* ════════════════════════════
+			/* ════════════════════════════
          保存 / 削除
       ════════════════════════════ */
-      async function saveForm() {
-        const pn = document.getElementById("fPn").value.trim().toUpperCase();
-        if (!pn) { showToast("品番を入力してください", false); return; }
+			async function saveForm() {
+				const pn = document.getElementById('fPn').value.trim().toUpperCase();
+				if (!pn) {
+					showToast('品番を入力してください', false);
+					return;
+				}
 
-        const length = document.getElementById("fLength").value.trim();
-        if (!length) { showToast("製品長を入力してください", false); return; }
+				const length = document.getElementById('fLength').value.trim();
+				if (!length) {
+					showToast('製品長を入力してください', false);
+					return;
+				}
 
-        const area = document.getElementById("fArea").value.trim();
-        if (!area) { showToast("断面積を入力してください", false); return; }
+				const area = document.getElementById('fArea').value.trim();
+				if (!area) {
+					showToast('断面積を入力してください', false);
+					return;
+				}
 
-        const material = document.getElementById("fMaterial").value;
-        if (!material || material === "0") { showToast("材質を選択してください", false); return; }
+				const material = document.getElementById('fMaterial').value;
+				if (!material || material === '0') {
+					showToast('材質を選択してください', false);
+					return;
+				}
 
-        if (!selectedCat2Id) {
-          document.getElementById("cat1Hint").classList.toggle("show", !selectedCat1Id);
-          document.getElementById("cat2Hint").classList.add("show");
-          showToast("カテゴリを選択してください", false);
-          return;
-        }
+				if (!selectedCat2Id) {
+					document
+						.getElementById('cat1Hint')
+						.classList.toggle('show', !selectedCat1Id);
+					document.getElementById('cat2Hint').classList.add('show');
+					showToast('カテゴリを選択してください', false);
+					return;
+				}
 
-        const today = new Date().toISOString().slice(0, 10);
-        const params = {
-          production_number:       pn,
-          drawn_department:        document.getElementById("fDept").value,
-          billet_material_id:      document.getElementById("fMaterial").value,
-          aging_type_id:           document.getElementById("fAging").value,
-          production_length:       document.getElementById("fLength").value,
-          circumscribed_circle:    document.getElementById("fCircle").value,
-          specific_weight:         document.getElementById("fWeight").value,
-          cross_section_area:      document.getElementById("fArea").value,
-          packing_quantity:        document.getElementById("fPackQty").value,
-          packing_row:             document.getElementById("fPackRow").value,
-          packing_column:          document.getElementById("fPackCol").value,
-          hardness:                document.getElementById("fHardness").value,
-          hardness_note:           document.getElementById("fHardnessNote").value,
-          production_category2_id: selectedCat2Id,
-          targetId:                editingId ?? "",
-          updated_at:              today,
-        };
+				const today = new Date().toISOString().slice(0, 10);
+				const params = {
+					production_number: pn,
+					drawn_department: document.getElementById('fDept').value,
+					billet_material_id: document.getElementById('fMaterial').value,
+					aging_type_id: document.getElementById('fAging').value,
+					production_length: document.getElementById('fLength').value,
+					circumscribed_circle: document.getElementById('fCircle').value,
+					specific_weight: document.getElementById('fWeight').value,
+					cross_section_area: document.getElementById('fArea').value,
+					packing_quantity: document.getElementById('fPackQty').value,
+					packing_row: document.getElementById('fPackRow').value,
+					packing_column: document.getElementById('fPackCol').value,
+					hardness: document.getElementById('fHardness').value,
+					hardness_note: document.getElementById('fHardnessNote').value,
+					production_category2_id: selectedCat2Id,
+					targetId: editingId ?? '',
+					updated_at: today,
+				};
 
-        const url = editingId
-          ? "./php/ProductionNumber/UpdateSummaryV3.php"
-          : "./php/ProductionNumber/InsInputData3.php";
+				const url = editingId
+					? './php/ProductionNumber/UpdateSummaryV3.php'
+					: './php/ProductionNumber/InsInputData3.php';
 
-        await postForm(url, params);
-        showToast(editingId ? "更新しました" : "登録しました");
-        closeForm();
-        loadList();
-      }
+				await postForm(url, params);
+				showToast(editingId ? '更新しました' : '登録しました');
+				closeForm();
+				loadList();
+			}
 
-      async function deleteRecord() {
-        if (!editingId) return;
-        if (!confirm("この品番を削除しますか？")) return;
+			async function deleteRecord() {
+				if (!editingId) return;
+				if (!confirm('この品番を削除しますか？')) return;
 
-        await postForm("./php/ProductionNumber/DelSummary.php", { targetId: editingId });
-        showToast("削除しました");
-        closeForm();
-        loadList();
-      }
+				await postForm('./php/ProductionNumber/DelSummary.php', {
+					targetId: editingId,
+				});
+				showToast('削除しました');
+				closeForm();
+				loadList();
+			}
 
-      /* ════════════════════════════
+			/* ════════════════════════════
          カテゴリ管理モーダル
       ════════════════════════════ */
-      let mgrCat1Id   = null;
-      let mgrCat1Name = null;
-      let mgrCat2Id   = null;
-      let mgrCat2Name = null;
+			let mgrCat1Id = null;
+			let mgrCat1Name = null;
+			let mgrCat2Id = null;
+			let mgrCat2Name = null;
 
-      async function openCatMgr() {
-        document.getElementById("catMgrModal").classList.add("open");
-        await loadCat1Mgr();
-      }
+			async function openCatMgr() {
+				document.getElementById('catMgrModal').classList.add('open');
+				await loadCat1Mgr();
+			}
 
-      function closeCatMgr() {
-        document.getElementById("catMgrModal").classList.remove("open");
-        hideCatInlineForm("cat1");
-        hideCatInlineForm("cat2");
-        mgrCat1Id = null; mgrCat1Name = null;
-        mgrCat2Id = null; mgrCat2Name = null;
-        document.getElementById("cat2MgrList").innerHTML = '<div class="cat-mgr-empty">← カテゴリ1を選択してください</div>';
-        document.getElementById("cat2MgrSub").textContent = "";
-        document.getElementById("pnSection").style.display = "none";
-        loadCat1();
-      }
+			function closeCatMgr() {
+				document.getElementById('catMgrModal').classList.remove('open');
+				hideCatInlineForm('cat1');
+				hideCatInlineForm('cat2');
+				mgrCat1Id = null;
+				mgrCat1Name = null;
+				mgrCat2Id = null;
+				mgrCat2Name = null;
+				document.getElementById('cat2MgrList').innerHTML =
+					'<div class="cat-mgr-empty">← カテゴリ1を選択してください</div>';
+				document.getElementById('cat2MgrSub').textContent = '';
+				document.getElementById('pnSection').style.display = 'none';
+				loadCat1();
+			}
 
-      async function loadCat1Mgr() {
-        const data = await postForm("./php/ProductionNumber/SelCategory1V2.php", { dummy: "dummy" });
-        renderCat1MgrList(data);
-      }
+			async function loadCat1Mgr() {
+				const data = await postForm(
+					'./php/ProductionNumber/SelCategory1V2.php',
+					{ dummy: 'dummy' },
+				);
+				renderCat1MgrList(data);
+			}
 
-      function renderCat1MgrList(data) {
-        const list = document.getElementById("cat1MgrList");
-        list.innerHTML = "";
-        if (!data.length) {
-          list.innerHTML = '<div class="cat-mgr-empty">データがありません</div>';
-          return;
-        }
-        data.forEach((row) => {
-          const id    = row.id;
-          const name  = row.name_jp ?? "";
-          const count = parseInt(row.count ?? 0);
+			function renderCat1MgrList(data) {
+				const list = document.getElementById('cat1MgrList');
+				list.innerHTML = '';
+				if (!data.length) {
+					list.innerHTML =
+						'<div class="cat-mgr-empty">データがありません</div>';
+					return;
+				}
+				data.forEach((row) => {
+					const id = row.id;
+					const name = row.name_jp ?? '';
+					const count = parseInt(row.count ?? 0);
 
-          const div = document.createElement("div");
-          div.className  = "cat-mgr-item";
-          div.dataset.id = id;
+					const div = document.createElement('div');
+					div.className = 'cat-mgr-item';
+					div.dataset.id = id;
 
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = name;
+					const nameSpan = document.createElement('span');
+					nameSpan.textContent = name;
 
-          const badge = document.createElement("span");
-          badge.className   = "count-badge" + (count === 0 ? " zero" : "");
-          badge.textContent = `cat2: ${count}`;
-          badge.title       = `カテゴリ2が ${count} 件`;
+					const badge = document.createElement('span');
+					badge.className = 'count-badge' + (count === 0 ? ' zero' : '');
+					badge.textContent = `cat2: ${count}`;
+					badge.title = `カテゴリ2が ${count} 件`;
 
-          const editBtn = document.createElement("button");
-          editBtn.className    = "cat-mgr-edit";
-          editBtn.textContent  = "✎";
-          editBtn.title        = "名前を編集";
-          editBtn.dataset.id   = id;
-          editBtn.dataset.name = name;
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
-            showCatInlineForm("cat1", e.currentTarget.dataset.id, e.currentTarget.dataset.name);
-          };
+					const editBtn = document.createElement('button');
+					editBtn.className = 'cat-mgr-edit';
+					editBtn.textContent = '✎';
+					editBtn.title = '名前を編集';
+					editBtn.dataset.id = id;
+					editBtn.dataset.name = name;
+					editBtn.onclick = (e) => {
+						e.stopPropagation();
+						showCatInlineForm(
+							'cat1',
+							e.currentTarget.dataset.id,
+							e.currentTarget.dataset.name,
+						);
+					};
 
-          div.appendChild(nameSpan);
-          div.appendChild(badge);
-          div.appendChild(editBtn);
+					div.appendChild(nameSpan);
+					div.appendChild(badge);
+					div.appendChild(editBtn);
 
-          if (count === 0) {
-            const delBtn = document.createElement("button");
-            delBtn.className    = "cat-mgr-del";
-            delBtn.textContent  = "🗑";
-            delBtn.title        = "削除（紐づきなし）";
-            delBtn.dataset.id   = id;
-            delBtn.dataset.name = name;
-            delBtn.onclick = (e) => {
-              e.stopPropagation();
-              deleteCat1(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
-            };
-            div.appendChild(delBtn);
-          }
+					if (count === 0) {
+						const delBtn = document.createElement('button');
+						delBtn.className = 'cat-mgr-del';
+						delBtn.textContent = '🗑';
+						delBtn.title = '削除（紐づきなし）';
+						delBtn.dataset.id = id;
+						delBtn.dataset.name = name;
+						delBtn.onclick = (e) => {
+							e.stopPropagation();
+							deleteCat1(
+								e.currentTarget.dataset.id,
+								e.currentTarget.dataset.name,
+							);
+						};
+						div.appendChild(delBtn);
+					}
 
-          div.onclick = () => selectCat1Mgr(id, name, div);
-          if (String(id) === String(mgrCat1Id)) div.classList.add("selected");
-          list.appendChild(div);
-        });
-      }
+					div.onclick = () => selectCat1Mgr(id, name, div);
+					if (String(id) === String(mgrCat1Id)) div.classList.add('selected');
+					list.appendChild(div);
+				});
+			}
 
-      function filterCat1Mgr(q) {
-        q = q.toUpperCase();
-        document.querySelectorAll("#cat1MgrList .cat-mgr-item").forEach((div) => {
-          const name = (div.dataset.name || div.querySelector("span")?.textContent || "").toUpperCase();
-          div.style.display = name.includes(q) ? "" : "none";
-        });
-      }
+			function filterCat1Mgr(q) {
+				q = q.toUpperCase();
+				document
+					.querySelectorAll('#cat1MgrList .cat-mgr-item')
+					.forEach((div) => {
+						const name = (
+							div.dataset.name ||
+							div.querySelector('span')?.textContent ||
+							''
+						).toUpperCase();
+						div.style.display = name.includes(q) ? '' : 'none';
+					});
+			}
 
-      async function selectCat1Mgr(id, name, el) {
-        document.querySelectorAll("#cat1MgrList .cat-mgr-item").forEach((d) => d.classList.remove("selected"));
-        el.classList.add("selected");
-        mgrCat1Id = id; mgrCat1Name = name;
-        mgrCat2Id = null; mgrCat2Name = null;
-        document.getElementById("cat2MgrSub").textContent = `(${name})`;
-        document.getElementById("pnSection").style.display = "none";
-        hideCatInlineForm("cat2");
-        await loadCat2Mgr(id);
-      }
+			async function selectCat1Mgr(id, name, el) {
+				document
+					.querySelectorAll('#cat1MgrList .cat-mgr-item')
+					.forEach((d) => d.classList.remove('selected'));
+				el.classList.add('selected');
+				mgrCat1Id = id;
+				mgrCat1Name = name;
+				mgrCat2Id = null;
+				mgrCat2Name = null;
+				document.getElementById('cat2MgrSub').textContent = `(${name})`;
+				document.getElementById('pnSection').style.display = 'none';
+				hideCatInlineForm('cat2');
+				await loadCat2Mgr(id);
+			}
 
-      async function loadCat2Mgr(cat1Id) {
-        const data = await postForm("./php/ProductionNumber/SelCategory2V2.php", { targetId: cat1Id });
-        const list = document.getElementById("cat2MgrList");
-        list.innerHTML = "";
-        if (!data.length) {
-          list.innerHTML = '<div class="cat-mgr-empty">データがありません</div>';
-          return;
-        }
-        data.forEach((row) => {
-          const id    = row.id;
-          const name  = row.name_jp ?? "";
-          const count = parseInt(row.count ?? 0);
+			async function loadCat2Mgr(cat1Id) {
+				const data = await postForm(
+					'./php/ProductionNumber/SelCategory2V2.php',
+					{ targetId: cat1Id },
+				);
+				const list = document.getElementById('cat2MgrList');
+				list.innerHTML = '';
+				if (!data.length) {
+					list.innerHTML =
+						'<div class="cat-mgr-empty">データがありません</div>';
+					return;
+				}
+				data.forEach((row) => {
+					const id = row.id;
+					const name = row.name_jp ?? '';
+					const count = parseInt(row.count ?? 0);
 
-          const div = document.createElement("div");
-          div.className  = "cat-mgr-item";
-          div.dataset.id = id;
+					const div = document.createElement('div');
+					div.className = 'cat-mgr-item';
+					div.dataset.id = id;
 
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = name;
+					const nameSpan = document.createElement('span');
+					nameSpan.textContent = name;
 
-          const badge = document.createElement("span");
-          badge.className   = "count-badge" + (count === 0 ? " zero" : "");
-          badge.textContent = `品番: ${count}`;
-          badge.title       = `品番が ${count} 件`;
+					const badge = document.createElement('span');
+					badge.className = 'count-badge' + (count === 0 ? ' zero' : '');
+					badge.textContent = `品番: ${count}`;
+					badge.title = `品番が ${count} 件`;
 
-          const editBtn = document.createElement("button");
-          editBtn.className    = "cat-mgr-edit";
-          editBtn.textContent  = "✎";
-          editBtn.title        = "名前を編集";
-          editBtn.dataset.id   = id;
-          editBtn.dataset.name = name;
-          editBtn.onclick = (e) => {
-            e.stopPropagation();
-            showCatInlineForm("cat2", e.currentTarget.dataset.id, e.currentTarget.dataset.name);
-          };
+					const editBtn = document.createElement('button');
+					editBtn.className = 'cat-mgr-edit';
+					editBtn.textContent = '✎';
+					editBtn.title = '名前を編集';
+					editBtn.dataset.id = id;
+					editBtn.dataset.name = name;
+					editBtn.onclick = (e) => {
+						e.stopPropagation();
+						showCatInlineForm(
+							'cat2',
+							e.currentTarget.dataset.id,
+							e.currentTarget.dataset.name,
+						);
+					};
 
-          div.appendChild(nameSpan);
-          div.appendChild(badge);
-          div.appendChild(editBtn);
+					div.appendChild(nameSpan);
+					div.appendChild(badge);
+					div.appendChild(editBtn);
 
-          if (count === 0) {
-            const delBtn = document.createElement("button");
-            delBtn.className    = "cat-mgr-del";
-            delBtn.textContent  = "🗑";
-            delBtn.title        = "削除（紐づきなし）";
-            delBtn.dataset.id   = id;
-            delBtn.dataset.name = name;
-            delBtn.onclick = (e) => {
-              e.stopPropagation();
-              deleteCat2(e.currentTarget.dataset.id, e.currentTarget.dataset.name);
-            };
-            div.appendChild(delBtn);
-          }
+					if (count === 0) {
+						const delBtn = document.createElement('button');
+						delBtn.className = 'cat-mgr-del';
+						delBtn.textContent = '🗑';
+						delBtn.title = '削除（紐づきなし）';
+						delBtn.dataset.id = id;
+						delBtn.dataset.name = name;
+						delBtn.onclick = (e) => {
+							e.stopPropagation();
+							deleteCat2(
+								e.currentTarget.dataset.id,
+								e.currentTarget.dataset.name,
+							);
+						};
+						div.appendChild(delBtn);
+					}
 
-          div.onclick = () => selectCat2Mgr(id, name, div, count);
-          if (String(id) === String(mgrCat2Id)) div.classList.add("selected");
-          list.appendChild(div);
-        });
-      }
+					div.onclick = () => selectCat2Mgr(id, name, div, count);
+					if (String(id) === String(mgrCat2Id)) div.classList.add('selected');
+					list.appendChild(div);
+				});
+			}
 
-      async function selectCat2Mgr(id, name, el, count) {
-        document.querySelectorAll("#cat2MgrList .cat-mgr-item").forEach((d) => d.classList.remove("selected"));
-        el.classList.add("selected");
-        mgrCat2Id = id; mgrCat2Name = name;
+			async function selectCat2Mgr(id, name, el, count) {
+				document
+					.querySelectorAll('#cat2MgrList .cat-mgr-item')
+					.forEach((d) => d.classList.remove('selected'));
+				el.classList.add('selected');
+				mgrCat2Id = id;
+				mgrCat2Name = name;
 
-        const section = document.getElementById("pnSection");
-        section.style.display = "";
-        document.getElementById("pnSectionCat2Name").textContent = name;
+				const section = document.getElementById('pnSection');
+				section.style.display = '';
+				document.getElementById('pnSectionCat2Name').textContent = name;
 
-        if (count === 0) {
-          document.getElementById("pnSectionCount").textContent = "";
-          document.getElementById("pnSectionList").innerHTML =
-            '<div class="cat-mgr-empty" style="padding:12px">品番の紐づきはありません</div>';
-          return;
-        }
+				if (count === 0) {
+					document.getElementById('pnSectionCount').textContent = '';
+					document.getElementById('pnSectionList').innerHTML =
+						'<div class="cat-mgr-empty" style="padding:12px">品番の紐づきはありません</div>';
+					return;
+				}
 
-        document.getElementById("pnSectionList").innerHTML =
-          '<div class="cat-mgr-empty" style="padding:10px">読み込み中...</div>';
+				document.getElementById('pnSectionList').innerHTML =
+					'<div class="cat-mgr-empty" style="padding:10px">読み込み中...</div>';
 
-        const data = await postForm("./php/ProductionNumber/SelPnByCat2.php", { cat2Id: id });
-        document.getElementById("pnSectionCount").textContent = `${data.length} 件`;
-        const list = document.getElementById("pnSectionList");
-        if (!data.length) {
-          list.innerHTML = '<div class="cat-mgr-empty" style="padding:12px">データがありません</div>';
-          return;
-        }
-        list.innerHTML = data.map((r) =>
-          `<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`
-        ).join("");
-      }
+				const data = await postForm('./php/ProductionNumber/SelPnByCat2.php', {
+					cat2Id: id,
+				});
+				document.getElementById('pnSectionCount').textContent =
+					`${data.length} 件`;
+				const list = document.getElementById('pnSectionList');
+				if (!data.length) {
+					list.innerHTML =
+						'<div class="cat-mgr-empty" style="padding:12px">データがありません</div>';
+					return;
+				}
+				list.innerHTML = data
+					.map(
+						(r) =>
+							`<div class="pn-section-item"><span class="pn-no">${r.production_number}</span></div>`,
+					)
+					.join('');
+			}
 
-      async function deleteCat1(id, name) {
-        if (!confirm(`「${name}」を削除しますか？`)) return;
-        const result = await postForm("./php/ProductionNumber/DelCategory1.php", { id });
-        if (result.status === "ok") {
-          showToast("削除しました");
-          await loadCat1Mgr();
-        } else {
-          showToast(result.message || "削除に失敗しました", false);
-        }
-      }
+			async function deleteCat1(id, name) {
+				if (!confirm(`「${name}」を削除しますか？`)) return;
+				const result = await postForm(
+					'./php/ProductionNumber/DelCategory1.php',
+					{ id },
+				);
+				if (result.status === 'ok') {
+					showToast('削除しました');
+					await loadCat1Mgr();
+				} else {
+					showToast(result.message || '削除に失敗しました', false);
+				}
+			}
 
-      async function deleteCat2(id, name) {
-        if (!confirm(`「${name}」を削除しますか？`)) return;
-        const result = await postForm("./php/ProductionNumber/DelCategory2.php", { id });
-        if (result.status === "ok") {
-          showToast("削除しました");
-          document.getElementById("pnSection").style.display = "none";
-          await loadCat2Mgr(mgrCat1Id);
-        } else {
-          showToast(result.message || "削除に失敗しました", false);
-        }
-      }
+			async function deleteCat2(id, name) {
+				if (!confirm(`「${name}」を削除しますか？`)) return;
+				const result = await postForm(
+					'./php/ProductionNumber/DelCategory2.php',
+					{ id },
+				);
+				if (result.status === 'ok') {
+					showToast('削除しました');
+					document.getElementById('pnSection').style.display = 'none';
+					await loadCat2Mgr(mgrCat1Id);
+				} else {
+					showToast(result.message || '削除に失敗しました', false);
+				}
+			}
 
-      function showCatInlineForm(type, id, name = "") {
-        hideCatInlineForm("cat1");
-        hideCatInlineForm("cat2");
-        const isEdit = !!id;
-        document.getElementById(`${type}InlineLabel`).textContent = isEdit ? "✎ 編集中" : "新規追加";
-        document.getElementById(`${type}InlineName`).value = name;
-        document.getElementById(`${type}InlineId`).value   = id ?? "";
-        document.getElementById(`${type}InlineForm`).classList.add("open");
-        document.getElementById(`${type}InlineName`).focus();
-      }
+			function showCatInlineForm(type, id, name = '') {
+				hideCatInlineForm('cat1');
+				hideCatInlineForm('cat2');
+				const isEdit = !!id;
+				document.getElementById(`${type}InlineLabel`).textContent = isEdit
+					? '✎ 編集中'
+					: '新規追加';
+				document.getElementById(`${type}InlineName`).value = name;
+				document.getElementById(`${type}InlineId`).value = id ?? '';
+				document.getElementById(`${type}InlineForm`).classList.add('open');
+				document.getElementById(`${type}InlineName`).focus();
+			}
 
-      function hideCatInlineForm(type) {
-        document.getElementById(`${type}InlineForm`).classList.remove("open");
-        document.getElementById(`${type}InlineName`).value = "";
-        document.getElementById(`${type}InlineId`).value   = "";
-      }
+			function hideCatInlineForm(type) {
+				document.getElementById(`${type}InlineForm`).classList.remove('open');
+				document.getElementById(`${type}InlineName`).value = '';
+				document.getElementById(`${type}InlineId`).value = '';
+			}
 
-      async function saveCatInline(type) {
-        const name = document.getElementById(`${type}InlineName`).value.trim();
-        if (!name) { showToast("名称を入力してください", false); return; }
+			async function saveCatInline(type) {
+				const name = document.getElementById(`${type}InlineName`).value.trim();
+				if (!name) {
+					showToast('名称を入力してください', false);
+					return;
+				}
 
-        const id     = document.getElementById(`${type}InlineId`).value;
-        const isEdit = !!id;
+				const id = document.getElementById(`${type}InlineId`).value;
+				const isEdit = !!id;
 
-        let url, params;
-        if (type === "cat1") {
-          url    = isEdit ? "./php/ProductionNumber/UpdateCategory1.php" : "./php/ProductionNumber/InsCategory1.php";
-          params = isEdit ? { id, name_jp: name } : { name_jp: name };
-        } else {
-          if (!mgrCat1Id) { showToast("カテゴリ1を選択してください", false); return; }
-          url    = isEdit ? "./php/ProductionNumber/UpdateCategory2.php" : "./php/ProductionNumber/InsCategory2.php";
-          params = isEdit ? { id, name_jp: name } : { name_jp: name, category1_id: mgrCat1Id };
-        }
+				let url, params;
+				if (type === 'cat1') {
+					url = isEdit
+						? './php/ProductionNumber/UpdateCategory1.php'
+						: './php/ProductionNumber/InsCategory1.php';
+					params = isEdit ? { id, name_jp: name } : { name_jp: name };
+				} else {
+					if (!mgrCat1Id) {
+						showToast('カテゴリ1を選択してください', false);
+						return;
+					}
+					url = isEdit
+						? './php/ProductionNumber/UpdateCategory2.php'
+						: './php/ProductionNumber/InsCategory2.php';
+					params = isEdit
+						? { id, name_jp: name }
+						: { name_jp: name, category1_id: mgrCat1Id };
+				}
 
-        const result = await postForm(url, params);
-        if (result.status === "ok") {
-          showToast(isEdit ? "更新しました" : "追加しました");
-          hideCatInlineForm(type);
-          if (type === "cat1") {
-            await loadCat1Mgr();
-          } else {
-            await loadCat2Mgr(mgrCat1Id);
-          }
-        } else {
-          showToast(result.message || "エラーが発生しました", false);
-        }
-      }
+				const result = await postForm(url, params);
+				if (result.status === 'ok') {
+					showToast(isEdit ? '更新しました' : '追加しました');
+					hideCatInlineForm(type);
+					if (type === 'cat1') {
+						await loadCat1Mgr();
+					} else {
+						await loadCat2Mgr(mgrCat1Id);
+					}
+				} else {
+					showToast(result.message || 'エラーが発生しました', false);
+				}
+			}
 
-      /* ════════════════════════════
+			/* ════════════════════════════
          CSV インポート
       ════════════════════════════ */
-      const MATERIAL_MAP = {"A6061": 1, "A6063": 2, "A6N01A": 3, "A6N01": 3}; // A6N01 は 6N01A と同じ（昔の入力ミス）。id 4 は使わない
+			const MATERIAL_MAP = { A6061: 1, A6063: 2, A6N01A: 3, A6N01: 3 }; // A6N01 は 6N01A と同じ（昔の入力ミス）。id 4 は使わない
 
-      // 時効処理（m_aging_type）
-      const AGING_MAP = {"O": 1, "T5": 2, "T6": 3};
-      // 単重（kg/m）＝ 断面積（mm²）× 0.0027（アルミの密度 2.70）。これから ±3% を超えたら警告
-      const WEIGHT_PER_AREA = 0.0027;
-      const WEIGHT_TOLERANCE = 0.03;
+			// 時効処理（m_aging_type）
+			const AGING_MAP = { O: 1, T5: 2, T6: 3 };
+			// 単重（kg/m）＝ 断面積（mm²）× 0.0027（アルミの密度 2.70）。これから ±3% を超えたら警告
+			const WEIGHT_PER_AREA = 0.0027;
+			const WEIGHT_TOLERANCE = 0.03;
 
-      let importRows = [];
+			let importRows = [];
 
-      function openImportModal() {
-        importRows = [];
-        document.getElementById("importPreviewWrap").style.display = "none";
-        document.getElementById("importFileInput").value = "";
-        document.getElementById("importDropZone").classList.remove("drag-over");
-        document.getElementById("importIncludeWarn").checked = false;
-        document.getElementById("importSubmitBtn").disabled = true;
-        document.getElementById("importSubmitBtn").textContent = "登録 (0件)";
-        document.getElementById("importModal").classList.add("open");
-      }
+			function openImportModal() {
+				importRows = [];
+				document.getElementById('importPreviewWrap').style.display = 'none';
+				document.getElementById('importFileInput').value = '';
+				document.getElementById('importDropZone').classList.remove('drag-over');
+				document.getElementById('importIncludeWarn').checked = false;
+				document.getElementById('importSubmitBtn').disabled = true;
+				document.getElementById('importSubmitBtn').textContent = '登録 (0件)';
+				document.getElementById('importModal').classList.add('open');
+			}
 
-      function closeImportModal() {
-        document.getElementById("importModal").classList.remove("open");
-      }
+			function closeImportModal() {
+				document.getElementById('importModal').classList.remove('open');
+			}
 
-      function handleImportDrop(e) {
-        e.preventDefault();
-        document.getElementById("importDropZone").classList.remove("drag-over");
-        const file = e.dataTransfer.files[0];
-        if (file) handleImportFile(file);
-      }
+			function handleImportDrop(e) {
+				e.preventDefault();
+				document.getElementById('importDropZone').classList.remove('drag-over');
+				const file = e.dataTransfer.files[0];
+				if (file) handleImportFile(file);
+			}
 
-      // CSV・TSV はテキストとして、Excel（.xlsx / .xls）は SheetJS（lib/xlsx.js）でいちばん左のシートを読む
-      function handleImportFile(file) {
-        if (!file) return;
-        const isExcel = /\.(xlsx|xlsm|xls)$/i.test(file.name);
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-          let table;
-          if (isExcel) {
-            const wb = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
-            const ws = wb.Sheets[wb.SheetNames[0]];
-            table = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
-          } else {
-            const lines = e.target.result.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter(l => l.trim());
-            const delim = lines.length && lines[0].includes("\t") ? "\t" : ",";
-            table = lines.map(l => l.split(delim).map(c => c.trim().replace(/^"|"$/g, "")));
-          }
-          const parsed = parseImportTable(table);
-          if (!parsed.length) { showToast("ファイルにデータが見つかりません（1行目に見出しが必要です）", false); return; }
-          await processImportRows(parsed);
-        };
-        if (isExcel) reader.readAsArrayBuffer(file); else reader.readAsText(file, "UTF-8");
-      }
+			// CSV・TSV はテキストとして、Excel（.xlsx / .xls）は SheetJS（lib/xlsx.js）でいちばん左のシートを読む
+			function handleImportFile(file) {
+				if (!file) return;
+				const isExcel = /\.(xlsx|xlsm|xls)$/i.test(file.name);
+				const reader = new FileReader();
+				reader.onload = async (e) => {
+					let table;
+					if (isExcel) {
+						const wb = XLSX.read(new Uint8Array(e.target.result), {
+							type: 'array',
+						});
+						const ws = wb.Sheets[wb.SheetNames[0]];
+						table = XLSX.utils.sheet_to_json(ws, {
+							header: 1,
+							raw: false,
+							defval: '',
+						});
+					} else {
+						const lines = e.target.result
+							.replace(/\r\n/g, '\n')
+							.replace(/\r/g, '\n')
+							.split('\n')
+							.filter((l) => l.trim());
+						const delim = lines.length && lines[0].includes('\t') ? '\t' : ',';
+						table = lines.map((l) =>
+							l.split(delim).map((c) => c.trim().replace(/^"|"$/g, '')),
+						);
+					}
+					const parsed = parseImportTable(table);
+					if (!parsed.length) {
+						showToast(
+							'ファイルにデータが見つかりません（1行目に見出しが必要です）',
+							false,
+						);
+						return;
+					}
+					await processImportRows(parsed);
+				};
+				if (isExcel) reader.readAsArrayBuffer(file);
+				else reader.readAsText(file, 'UTF-8');
+			}
 
-      // 見出しは大文字・小文字、空白、カッコの中（単位など）を無視して比べる（例：「単重 (kg/m)」→「単重」）
-      const normHeader = (h) => String(h ?? "").toLowerCase().replace(/[（(][^）)]*[）)]/g, "").replace(/\s+/g, "");
+			// 見出しは大文字・小文字、空白、カッコの中（単位など）を無視して比べる（例：「単重 (kg/m)」→「単重」）
+			const normHeader = (h) =>
+				String(h ?? '')
+					.toLowerCase()
+					.replace(/[（(][^）)]*[）)]/g, '')
+					.replace(/\s+/g, '');
 
-      function parseImportTable(table) {
-        if (!table || table.length < 2) return [];
-        const headers = table[0].map(normHeader);
+			function parseImportTable(table) {
+				if (!table || table.length < 2) return [];
+				const headers = table[0].map(normHeader);
 
-        const colMap = {
-          production_number: ["production_number", "production_numbers", "pn", "品番"],
-          billet_material:   ["billet_material", "material", "材質"],
-          production_length: ["production_length", "length", "製品長", "製品長さ"],
-          cross_section_area:["cross_section_area", "area", "断面積"],
-          specific_weight:   ["specific_weight", "weight", "単重", "比重"],
-          aging:             ["aging", "aging_type", "時効", "時効処理"],
-        };
+				const colMap = {
+					production_number: [
+						'production_number',
+						'production_numbers',
+						'pn',
+						'品番',
+					],
+					billet_material: ['billet_material', 'material', '材質'],
+					production_length: [
+						'production_length',
+						'length',
+						'製品長',
+						'製品長さ',
+					],
+					cross_section_area: ['cross_section_area', 'area', '断面積'],
+					specific_weight: ['specific_weight', 'weight', '単重', '比重'],
+					aging: ['aging', 'aging_type', '時効', '時効処理'],
+				};
 
-        const idx = {};
-        for (const [field, aliases] of Object.entries(colMap)) {
-          idx[field] = aliases.map(normHeader).reduce((found, alias) => found >= 0 ? found : headers.indexOf(alias), -1);
-        }
+				const idx = {};
+				for (const [field, aliases] of Object.entries(colMap)) {
+					idx[field] = aliases
+						.map(normHeader)
+						.reduce(
+							(found, alias) => (found >= 0 ? found : headers.indexOf(alias)),
+							-1,
+						);
+				}
 
-        const get = (cols, field) => idx[field] >= 0 ? String(cols[idx[field]] ?? "").trim() : "";
-        const rows = [];
-        for (let i = 1; i < table.length; i++) {
-          const cols = table[i];
-          const pn = get(cols, "production_number");
-          if (!pn) continue;
-          rows.push({
-            production_number: pn.toUpperCase(),
-            billet_material:   get(cols, "billet_material"),
-            production_length: get(cols, "production_length").replace(/,/g, ""),
-            cross_section_area:get(cols, "cross_section_area").replace(/,/g, ""),
-            specific_weight:   get(cols, "specific_weight").replace(/,/g, ""),
-            aging:             get(cols, "aging").toUpperCase(),
-          });
-        }
-        return rows;
-      }
+				const get = (cols, field) =>
+					idx[field] >= 0 ? String(cols[idx[field]] ?? '').trim() : '';
+				const rows = [];
+				for (let i = 1; i < table.length; i++) {
+					const cols = table[i];
+					const pn = get(cols, 'production_number');
+					if (!pn) continue;
+					rows.push({
+						production_number: pn.toUpperCase(),
+						billet_material: get(cols, 'billet_material'),
+						production_length: get(cols, 'production_length').replace(/,/g, ''),
+						cross_section_area: get(cols, 'cross_section_area').replace(
+							/,/g,
+							'',
+						),
+						specific_weight: get(cols, 'specific_weight').replace(/,/g, ''),
+						aging: get(cols, 'aging').toUpperCase(),
+					});
+				}
+				return rows;
+			}
 
-      // 単重と断面積の整合・時効処理の確認。問題があれば warnings に入れる
-      function checkImportRow(row) {
-        const warnings = [];
-        const area = parseFloat(row.cross_section_area);
-        let weight = row.specific_weight;
-        let weightAuto = false;
-        if (weight === "" && area > 0) {
-          weight = (area * WEIGHT_PER_AREA).toFixed(3);   // 単重が空なら断面積から計算
-          weightAuto = true;
-        } else if (weight !== "") {
-          const w = parseFloat(weight);
-          if (!(w > 0)) {
-            warnings.push("単重が数字ではありません");
-          } else if (area > 0) {
-            const ratio = w / (area * WEIGHT_PER_AREA);
-            if (Math.abs(ratio - 1) > WEIGHT_TOLERANCE) {
-              warnings.push(`単重と断面積が合いません（断面積からは ${(area * WEIGHT_PER_AREA).toFixed(3)} kg/m、差 ${((ratio - 1) * 100).toFixed(1)}%）`);
-            }
-          }
-        }
-        if (row.cross_section_area !== "" && !(area > 0)) warnings.push("断面積が数字ではありません");
-        const agingId = row.aging === "" ? 0 : (AGING_MAP[row.aging] ?? -1);
-        if (agingId < 0) warnings.push(`時効処理は O / T5 / T6 のどれかです（「${row.aging}」）`);
-        if (row.billet_material !== "" && !(MATERIAL_MAP[row.billet_material.toUpperCase()] > 0)) warnings.push(`材質が分かりません（「${row.billet_material}」）`);
-        return { weight, weightAuto, agingId: Math.max(agingId, 0), warnings };
-      }
+			// 単重と断面積の整合・時効処理の確認。問題があれば warnings に入れる
+			function checkImportRow(row) {
+				const warnings = [];
+				const area = parseFloat(row.cross_section_area);
+				let weight = row.specific_weight;
+				let weightAuto = false;
+				if (weight === '' && area > 0) {
+					weight = (area * WEIGHT_PER_AREA).toFixed(3); // 単重が空なら断面積から計算
+					weightAuto = true;
+				} else if (weight !== '') {
+					const w = parseFloat(weight);
+					if (!(w > 0)) {
+						warnings.push('単重が数字ではありません');
+					} else if (area > 0) {
+						const ratio = w / (area * WEIGHT_PER_AREA);
+						if (Math.abs(ratio - 1) > WEIGHT_TOLERANCE) {
+							warnings.push(
+								`単重と断面積が合いません（断面積からは ${(area * WEIGHT_PER_AREA).toFixed(3)} kg/m、差 ${((ratio - 1) * 100).toFixed(1)}%）`,
+							);
+						}
+					}
+				}
+				if (row.cross_section_area !== '' && !(area > 0))
+					warnings.push('断面積が数字ではありません');
+				const agingId = row.aging === '' ? 0 : (AGING_MAP[row.aging] ?? -1);
+				if (agingId < 0)
+					warnings.push(
+						`時効処理は O / T5 / T6 のどれかです（「${row.aging}」）`,
+					);
+				if (
+					row.billet_material !== '' &&
+					!(MATERIAL_MAP[row.billet_material.toUpperCase()] > 0)
+				)
+					warnings.push(`材質が分かりません（「${row.billet_material}」）`);
+				return { weight, weightAuto, agingId: Math.max(agingId, 0), warnings };
+			}
 
-      async function processImportRows(parsed) {
-        const numbers = parsed.map(r => r.production_number);
-        let dupMap = {};
-        try {
-          const res = await fetch("./php/ProductionNumber/check_pn_duplicates.php", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(numbers),
-          });
-          dupMap = await res.json();
-        } catch (_) {}
+			async function processImportRows(parsed) {
+				const numbers = parsed.map((r) => r.production_number);
+				let dupMap = {};
+				try {
+					const res = await fetch(
+						'./php/ProductionNumber/check_pn_duplicates.php',
+						{
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(numbers),
+						},
+					);
+					dupMap = await res.json();
+				} catch (_) {}
 
-        importRows = parsed.map(row => {
-          const matId = MATERIAL_MAP[(row.billet_material ?? "").toUpperCase()] ?? 0;
-          const chk = checkImportRow(row);
-          let status = "new";
-          if (dupMap[row.production_number] === true) status = "dup";
-          else if (chk.warnings.length) status = "warn";
-          return { ...row, billet_material_id: matId, specific_weight: chk.weight, weight_auto: chk.weightAuto, aging_type_id: chk.agingId, warnings: chk.warnings, status };
-        });
+				importRows = parsed.map((row) => {
+					const matId =
+						MATERIAL_MAP[(row.billet_material ?? '').toUpperCase()] ?? 0;
+					const chk = checkImportRow(row);
+					let status = 'new';
+					if (dupMap[row.production_number] === true) status = 'dup';
+					else if (chk.warnings.length) status = 'warn';
+					return {
+						...row,
+						billet_material_id: matId,
+						specific_weight: chk.weight,
+						weight_auto: chk.weightAuto,
+						aging_type_id: chk.agingId,
+						warnings: chk.warnings,
+						status,
+					};
+				});
 
-        renderImportPreview();
-      }
+				renderImportPreview();
+			}
 
-      function renderImportPreview() {
-        const tbody = document.getElementById("importPreviewTbody");
-        tbody.innerHTML = "";
-        let cntNew = 0, cntDup = 0, cntWarn = 0;
+			function renderImportPreview() {
+				const tbody = document.getElementById('importPreviewTbody');
+				tbody.innerHTML = '';
+				let cntNew = 0,
+					cntDup = 0,
+					cntWarn = 0;
 
-        importRows.forEach(row => {
-          let badgeHtml;
-          if (row.status === "new")       { badgeHtml = '<span class="badge-new">新規</span>';  cntNew++; }
-          else if (row.status === "warn") { badgeHtml = '<span class="badge-warn">警告</span>'; cntWarn++; }
-          else                            { badgeHtml = '<span class="badge-dup">重複</span>';  cntDup++; }
+				importRows.forEach((row) => {
+					let badgeHtml;
+					if (row.status === 'new') {
+						badgeHtml = '<span class="badge-new">新規</span>';
+						cntNew++;
+					} else if (row.status === 'warn') {
+						badgeHtml = '<span class="badge-warn">警告</span>';
+						cntWarn++;
+					} else {
+						badgeHtml = '<span class="badge-dup">重複</span>';
+						cntDup++;
+					}
 
-          const tr = document.createElement("tr");
-          if (row.status === "warn") tr.className = "row-warn";
-          tr.innerHTML = `
+					const tr = document.createElement('tr');
+					if (row.status === 'warn') tr.className = 'row-warn';
+					tr.innerHTML = `
             <td><strong>${escapeHtml(row.production_number)}</strong></td>
-            <td>${escapeHtml(row.billet_material || "—")}</td>
-            <td>${escapeHtml(row.production_length || "—")}</td>
-            <td>${escapeHtml(row.cross_section_area || "—")}</td>
-            <td>${escapeHtml(row.specific_weight || "—")}${row.weight_auto ? ' <span class="auto-note">自動</span>' : ""}</td>
-            <td>${escapeHtml(row.aging || "—")}</td>
-            <td>${badgeHtml}${row.warnings.length ? `<div class="warn-note">${row.warnings.map(escapeHtml).join("<br>")}</div>` : ""}</td>
+            <td>${escapeHtml(row.billet_material || '—')}</td>
+            <td>${escapeHtml(row.production_length || '—')}</td>
+            <td>${escapeHtml(row.cross_section_area || '—')}</td>
+            <td>${escapeHtml(row.specific_weight || '—')}${row.weight_auto ? ' <span class="auto-note">自動</span>' : ''}</td>
+            <td>${escapeHtml(row.aging || '—')}</td>
+            <td>${badgeHtml}${row.warnings.length ? `<div class="warn-note">${row.warnings.map(escapeHtml).join('<br>')}</div>` : ''}</td>
           `;
-          tbody.appendChild(tr);
-        });
+					tbody.appendChild(tr);
+				});
 
-        const summary = document.getElementById("importSummary");
-        summary.innerHTML =
-          `<span><span class="badge-new">新規</span> ${cntNew}件</span>` +
-          (cntWarn ? `<span><span class="badge-warn">警告</span> ${cntWarn}件</span>` : "") +
-          (cntDup ? `<span><span class="badge-dup">重複</span> ${cntDup}件（スキップ）</span>` : "");
-        document.getElementById("importWarnRow").style.display = cntWarn ? "" : "none";
+				const summary = document.getElementById('importSummary');
+				summary.innerHTML =
+					`<span><span class="badge-new">新規</span> ${cntNew}件</span>` +
+					(cntWarn
+						? `<span><span class="badge-warn">警告</span> ${cntWarn}件</span>`
+						: '') +
+					(cntDup
+						? `<span><span class="badge-dup">重複</span> ${cntDup}件（スキップ）</span>`
+						: '');
+				document.getElementById('importWarnRow').style.display = cntWarn
+					? ''
+					: 'none';
 
-        updateImportButton();
-        document.getElementById("importPreviewWrap").style.display = "";
-      }
+				updateImportButton();
+				document.getElementById('importPreviewWrap').style.display = '';
+			}
 
-      // 登録する行：新規。チェックを入れたときは警告の行も
-      function importTargets() {
-        const withWarn = document.getElementById("importIncludeWarn").checked;
-        return importRows.filter(r => r.status === "new" || (withWarn && r.status === "warn"));
-      }
-      function updateImportButton() {
-        const n = importTargets().length;
-        const btn = document.getElementById("importSubmitBtn");
-        btn.disabled = n === 0;
-        btn.textContent = `登録 (${n}件)`;
-      }
+			// 登録する行：新規。チェックを入れたときは警告の行も
+			function importTargets() {
+				const withWarn = document.getElementById('importIncludeWarn').checked;
+				return importRows.filter(
+					(r) => r.status === 'new' || (withWarn && r.status === 'warn'),
+				);
+			}
+			function updateImportButton() {
+				const n = importTargets().length;
+				const btn = document.getElementById('importSubmitBtn');
+				btn.disabled = n === 0;
+				btn.textContent = `登録 (${n}件)`;
+			}
 
-      function escapeHtml(s) {
-        return String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-      }
+			function escapeHtml(s) {
+				return String(s ?? '').replace(
+					/[&<>"]/g,
+					(c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c],
+				);
+			}
 
-      async function submitImport() {
-        const toInsert = importTargets().map(r => ({
-          production_number:  r.production_number,
-          billet_material_id: r.billet_material_id,
-          production_length:  r.production_length,
-          cross_section_area: r.cross_section_area,
-          specific_weight:    r.specific_weight,
-          aging_type_id:      r.aging_type_id,
-        }));
+			async function submitImport() {
+				const toInsert = importTargets().map((r) => ({
+					production_number: r.production_number,
+					billet_material_id: r.billet_material_id,
+					production_length: r.production_length,
+					cross_section_area: r.cross_section_area,
+					specific_weight: r.specific_weight,
+					aging_type_id: r.aging_type_id,
+				}));
 
-        if (!toInsert.length) return;
+				if (!toInsert.length) return;
 
-        const btn = document.getElementById("importSubmitBtn");
-        btn.disabled = true;
-        btn.textContent = "登録中...";
+				const btn = document.getElementById('importSubmitBtn');
+				btn.disabled = true;
+				btn.textContent = '登録中...';
 
-        try {
-          const res = await fetch("./php/ProductionNumber/bulk_insert_pn.php", {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(toInsert),
-          });
-          const result = await res.json();
-          if (result.status === "ok") {
-            showToast(`${result.inserted}件 登録しました`);
-            closeImportModal();
-            loadList();
-          } else {
-            showToast(result.message || "登録に失敗しました", false);
-            updateImportButton();
-          }
-        } catch (_) {
-          showToast("通信エラーが発生しました", false);
-          updateImportButton();
-        }
-      }
+				try {
+					const res = await fetch('./php/ProductionNumber/bulk_insert_pn.php', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(toInsert),
+					});
+					const result = await res.json();
+					if (result.status === 'ok') {
+						showToast(`${result.inserted}件 登録しました`);
+						closeImportModal();
+						loadList();
+					} else {
+						showToast(result.message || '登録に失敗しました', false);
+						updateImportButton();
+					}
+				} catch (_) {
+					showToast('通信エラーが発生しました', false);
+					updateImportButton();
+				}
+			}
 
-      /* ── 初期化 ── */
-      window.onload = function () {
-        const lang = localStorage.getItem("lang") || "ja";
-        setLang(lang);
-        loadCat1();
-        loadList();
-      };
-    </script>
-  </body>
+			/* ── 初期化 ── */
+			window.onload = function () {
+				const lang = localStorage.getItem('lang') || 'ja';
+				setLang(lang);
+				loadCat1();
+				loadList();
+			};
+		</script>
+	</body>
 </html>
