@@ -7,7 +7,7 @@
     <style>
       body {
         background: linear-gradient(135deg, #eef3f8, #ffffff);
-        font-family: sans-serif;
+        font-family: 'Arial',  sans-serif;
         margin: 0;
         padding: 0;
       }
@@ -69,15 +69,15 @@
       /* カードグリッド */
       .menu-row {
         width: 90%;
-        max-width: 900px;
+        max-width: 1500px;
         margin: 10px auto 30px;
         display: grid;
         gap: 20px;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(7, 1fr);
       }
       /* 各種設定: 列数を3固定にし、3つ未満の行はストレッチさせず左詰めにする */
       .menu-row.fixed3 {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(6, 1fr);
       }
 
       .menu-card {
@@ -368,30 +368,52 @@
 
     <!-- 🏭 押出工程 -->
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/extrusion_press.svg" alt="" /><span data-key="section_press">押出工程</span></div>
-    <div class="accordion-content">
-      <div class="menu-row">
-        <div class="menu-card" onclick="openPage('press_daily_report.html')">
-          <img class="menu-icon" src="./img/press_daily_report.svg" alt="" />
-          <div class="menu-title" data-key="daily_report_title">押出日報入力</div>
-          <div class="menu-desc" data-key="daily_report_desc">押出日報入力画面</div>
-        </div>
-        <div class="menu-card" onclick="openPage('press_directive.html')">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
-          <div class="menu-title" data-key="press_directive_title">押出指示書</div>
-          <div class="menu-desc" data-key="press_directive_desc">押出指示書の作成、印刷</div>
-        </div>
-        <div class="menu-card" onclick="openPage('aging_rack_unpacked.html')">
-          <img class="menu-icon" src="./img/table.svg" alt="" />
-          <div class="menu-title" data-key="unpacked_rack_title">未梱包ラック一覧</div>
-          <div class="menu-desc" data-key="unpacked_rack_desc">押出済みでまだ梱包が終わっていない時効ラックと残本数</div>
-        </div>
-        <div class="menu-card" onclick="openPage('packing.html')">
-          <img class="menu-icon" src="./img/packing.svg" alt="" />
-          <div class="menu-title" data-key="packing_title">梱包入力</div>
-          <div class="menu-desc" data-key="packing_desc">梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録</div>
-        </div>
-      </div>
+        <div class="accordion-content">
+  <div class="menu-row press-menu">
+    <div class="menu-card" onclick="openPage('order_sheet.html')">
+      <img class="menu-icon" src="./img/chart.svg" alt="" />
+      <div class="menu-title" data-key="order_sheet_title">生産指示</div>
+      <div class="menu-desc" data-key="order_sheet_desc">発注書の登録・実績・梱包状況の管理</div>
     </div>
+
+    <div class="menu-card" onclick="openPage('press_plan.html')">
+      <img class="menu-icon" src="./img/chart.svg" alt="" />
+      <div class="menu-title" data-key="press_plan_title">押出計画</div>
+      <div class="menu-desc" data-key="press_plan_desc">押出日・号機ごとに、押す金型とビレット本数を計画</div>
+    </div>
+        <div class="menu-card" onclick="openPage('press_directive.html')">
+      <img class="menu-icon" src="./img/chart.svg" alt="" />
+      <div class="menu-title" data-key="press_directive_title">押出指示書</div>
+      <div class="menu-desc" data-key="press_directive_desc">押出指示書の作成、印刷</div>
+    </div>
+
+    <div class="menu-card" onclick="openPage('operation_time.html')">
+      <img class="menu-icon" src="./img/shift.svg" alt="" />
+      <div class="menu-title" data-key="operation_time_title">持ち時間入力</div>
+      <div class="menu-desc" data-key="operation_time_desc">1週間×号機で、設備を動かす時間（開始〜終了）と昼休みを入れる</div>
+    </div>
+
+    <div class="menu-card" onclick="openPage('press_daily_report.html')">
+      <img class="menu-icon" src="./img/press_daily_report.svg" alt="" />
+      <div class="menu-title" data-key="daily_report_title">押出日報入力</div>
+      <div class="menu-desc" data-key="daily_report_desc">押出日報入力画面</div>
+    </div>
+
+    <div class="menu-card" onclick="openPage('aging_rack_unpacked.html')">
+      <img class="menu-icon" src="./img/table.svg" alt="" />
+      <div class="menu-title" data-key="unpacked_rack_title">未梱包ラック一覧</div>
+      <div class="menu-desc" data-key="unpacked_rack_desc">押出済みでまだ梱包が終わっていない時効ラックと残本数</div>
+    </div>
+
+    <div class="menu-card" onclick="openPage('packing.html')">
+      <img class="menu-icon" src="./img/packing.svg" alt="" />
+      <div class="menu-title" data-key="packing_title">梱包入力</div>
+      <div class="menu-desc" data-key="packing_desc">梱包作業（日付・時間・作業者）と、時効ラックから箱に入れた本数を記録</div>
+    </div>
+
+  </div>
+</div>
+
 
     <!-- 🔍 品質 -->
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/caliper.svg" alt="" /><span data-key="section_quality">品質</span></div>
@@ -769,16 +791,16 @@
         },
 
         vi: {
-          title: "Menu Chính",
+          title: "BẢNG ĐIỀU KHIỂN",
           whats_new_btn: "📋 Cập nhật",
           open_new_tab: "🗗 Mở tab mới", open_same_tab: "➡ Mở trong tab này", open_mode_hint: "Nhấn để đổi cách mở trang từ menu: tab mới / tab này",
-          section_press: "Quy trình ép đùn",
-          section_quality: "Chất lượng",
+          section_press: "ĐÙN (BÁO CÁO NGÀY/ PHIẾU ĐÙN/ KẾ HOẠCH ĐÙN)",
+          section_quality: "CHẤT LƯỢNG",
           section_maintenance: "Bảo trì khuôn",
           section_progress: "Tiến độ khuôn",
           section_register: "Xuất khuôn, xuất linh kiện",
           section_settings: "Cài đặt chung",
-          dashboard_title: "📊 Bảng đo kiểm (Khuôn ép OK)",
+          dashboard_title: "📊 Bảng đo kiểm (Khuôn đùn OK)",
 
           billet_title: "Nạp Billet",
           billet_desc: "Trang liên quan đến việc nạp billet",
@@ -787,7 +809,7 @@
           maintenance_title: "Bảo trì khuôn",
           maintenance_desc: "Trang liên quan đến bảo trì khuôn",
           die_wash_title: "Rửa & xếp kệ khuôn",
-          die_wash_desc: "Quản lý quy trình: sau ép → rửa → xếp kệ",
+          die_wash_desc: "Quản lý quy trình: sau đùn → rửa → xếp kệ",
           progress_title: "Danh sách tiến độ khuôn",
           progress_desc:
             "Quản lý tiến độ: đo → chẩn đoán → phê duyệt → sửa chữa",
@@ -799,37 +821,37 @@
           handover_desc: "Quản lý tiến độ: tài liệu, kiểm tra, giao hàng, tài sản",
           section_report: "Thực tế",
           startup_report_title: "Báo cáo thực tế khởi động khuôn",
-          startup_report_desc: "Tổng hợp theo tháng: đến, KT, bàn giao, thử ép",
+          startup_report_desc: "Tổng hợp theo tháng: đến, KT, bàn giao, thử đùn",
           machine_report_title: "Báo cáo hoạt động máy",
-          machine_report_desc: "Giờ hoạt động & số lần ép theo máy và tháng",
+          machine_report_desc: "Giờ hoạt động & số lần đùn theo máy và tháng",
           operation_report_title: "Báo cáo vận hành",
           operation_report_desc: "Cách sử dụng thời gian trong ngày của từng máy (khả dụng, đùn, mã dừng, không ghi), tổng hợp từ báo cáo đùn",
           quantity_report_title: "Thực tế nạp phôi đùn (t)",
-          quantity_report_desc: "Trọng lượng theo tháng: Loại ép, kích thước phôi, nhà máy",
+          quantity_report_desc: "Trọng lượng theo tháng: Loại đùn, kích thước phôi, nhà máy",
           category_good_title: "Thực tế hàng tốt theo danh mục",
           category_good_desc: "Trọng lượng (t) và chiều dài (m) hàng tốt theo tháng, theo danh mục mã SP",
-          aging_rack_report_title: "Giá hóa già: SD / GP",
-          aging_rack_report_desc: "Số giá sử dụng và giải phóng theo ngày",
-          ram_log_title: "（Thử nghiệm）Dạng sóng ép đùn",
+          aging_rack_report_title: "Rack hóa già: SD / GP",
+          aging_rack_report_desc: "Số Rack sử dụng và giải phóng theo ngày",
+          ram_log_title: "（Thử nghiệm）Dạng sóng đùn",
           ram_log_desc: "Hiển thị áp suất/tốc độ/nhiệt độ đầu ra theo vị trí Ram",
           section_production: "Quản lý sản xuất",
           section_billet: "Billet",
           order_sheet_title: "Chỉ thị sản xuất",
-          press_plan_title: "Kế hoạch ép đùn",
-          press_plan_desc: "Lập kế hoạch khuôn và số billet theo ngày ép và máy",
+          press_plan_title: "Kế hoạch đùn",
+          press_plan_desc: "Lập kế hoạch khuôn và số billet theo ngày đùn và máy",
           operation_time_title: "Nhập thời gian khả dụng",
           operation_time_desc: "Nhập giờ chạy máy (bắt đầu〜kết thúc) và nghỉ trưa theo tuần × máy",
-          order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế ép và đóng gói",
+          order_sheet_desc: "Đăng ký phiếu đặt hàng, theo dõi thực tế đùn và đóng gói",
           billet_check_title: "Cập nhật tồn kho billet",
           billet_check_desc: "Ghi số lượng billet tồn kho theo cỡ, vật liệu và chiều dài",
           press_directive_title: "Tạo phiếu đùn",
           press_directive_desc: "Tạo và in phiếu đùn",
-          unpacked_rack_title: "Danh sách giá chưa đóng gói",
+          unpacked_rack_title: "Danh sách Rack chưa đóng gói",
           packing_title: "Nhập đóng gói",
           quality_summary_title: "Tổng hợp chất lượng",
-          quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần ép",
+          quality_summary_desc: "Số cây, NG (theo mã), ngày kiểm tra từng công đoạn và năng suất theo từng lần đùn",
           quality_report_title: "Nhập đánh giá chất lượng",
-          quality_report_desc: "Chọn lần ép chưa đánh giá xong, ghi mã lỗi và số cây NG theo từng giá",
+          quality_report_desc: "Chọn lần đùn chưa đánh giá xong, ghi mã lỗi và số cây NG theo từng Rack",
           hardness_record_title: "Ghi kết quả đo độ cứng",
           hardness_record_desc: "Chọn lần đùn, nhập độ cứng theo từng vị trí mẫu (chuyển từ HardNess của ex0.11)",
           roughness_record_title: "Ghi kết quả đo độ nhám",
@@ -837,13 +859,13 @@
           etching_record_title: "Ghi kết quả etching",
           etching_record_desc: "Chọn lần đùn, bấm kết quả etching cho từng vị trí mẫu. Dùng cho máy tính bảng (chuyển từ Etching của ex0.11)",
           sample_map_title: "(Thử nghiệm) Sơ đồ vị trí mẫu",
-          sample_map_desc: "Hiển thị bằng hình sản phẩm theo từng thanh ép và vị trí lấy mẫu đánh giá (đầu T, mối nối, giữa M, đuôi Z)",
-          unpacked_rack_desc: "Giá hóa già đã ép nhưng chưa đóng gói xong và số cây còn lại",
-          packing_desc: "Ghi công việc đóng gói (ngày, giờ, người làm) và số cây cho vào thùng từ giá hóa già",
+          sample_map_desc: "Hiển thị bằng hình sản phẩm theo từng thanh đùn và vị trí lấy mẫu đánh giá (đầu T, mối nối, giữa M, đuôi Z)",
+          unpacked_rack_desc: "Rack hóa già đã đùn nhưng chưa đóng gói xong và số cây còn lại",
+          packing_desc: "Ghi công việc đóng gói (ngày, giờ, người làm) và số cây cho vào thùng từ Rack hóa già",
           handover_progress_title: "Quản lý tiến độ chuyển giao khuôn",
           handover_progress_desc: "Quản lý tiến độ: kiểm tra khuôn, thử SX, bàn giao",
           watch_title: "Danh sách khuôn quản lý trọng điểm",
-          watch_desc: "Đăng ký và quản lý khuôn cần theo dõi, kể cả trước khi ép",
+          watch_desc: "Đăng ký và quản lý khuôn cần theo dõi, kể cả trước khi đùn",
           issue_progress_title: "（暫定）Bảng xác nhận tiến độ khuôn",
           issue_progress_desc: "Danh sách giai đoạn hiện tại và tình trạng trì hoãn theo Issue",
           condition_manage_title: "（Thử nghiệm）Quản lý tình trạng khuôn",
@@ -870,7 +892,7 @@
           th_die: "Khuôn",
           th_status: "Kết quả",
           th_time: "Giờ",
-          count_label: "Ép khuôn OK",
+          count_label: "đùn khuôn OK",
           pending: "✖ Chưa đo",
 
           count_unit: "件",
