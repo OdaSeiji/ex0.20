@@ -6416,3 +6416,101 @@ http://10.163.50.17/ex0.20/production_number.html
   <img src="./img/20261106-04.png" width="200">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+# 2026/11/10
+
+これは、新しい仕事。どうも製造は計画生産をしているらしく、
+生産量を製造部署が決めているらしい。
+それをExcelでやるというめんどくさい事をやっている。
+
+やっていること
+・在庫データ
+・受注データ
+ふたつのExcelから在庫が不足して、直ぐに出荷できないものは
+別の係りの者が生産計画を立て、それに従った納期を入力する。
+これをWeb化して、情報の共有を進めたい。
+
+納期は、係りの者が自分で判断している。ただし、誰が、いつ、判断したかは、残すようにしたい。
+この納期を元に、別の担当者が発注先に対しての納期を連絡するようにしている。
+
+・在庫情報
+・
+
+```sql
+CREATE TABLE stg_production_request (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '内部ID',
+
+    source_file_date DATE NOT NULL COMMENT '取込元ファイル日付',
+
+    production_number VARCHAR(100) NOT NULL COMMENT '品番',
+
+    qty INT NULL COMMENT '数量',
+
+    order_date DATE NULL COMMENT '受注日',
+
+    shipping_deadline DATE NULL COMMENT '出荷期限',
+
+    order_vn_no VARCHAR(50) NULL COMMENT 'Order VN No',
+
+    customer_name VARCHAR(255) NULL COMMENT '顧客名',
+
+    shipping_instruction_no VARCHAR(50) NULL COMMENT '出荷指示番号',
+
+    transport_method VARCHAR(20) NULL COMMENT '輸送方法(SEA/AIR)',
+
+    reply_pc VARCHAR(20) NULL COMMENT 'Reply PC',
+
+    shipping_date DATE NULL COMMENT '出荷日',
+
+    ab_status CHAR(1) NULL COMMENT 'A/B',
+
+    ab_change_date DATE NULL COMMENT 'A⇔B変更日',
+
+    order_jp_code VARCHAR(100) NULL COMMENT 'Mã Order JP',
+
+    order_jp_no VARCHAR(50) NULL COMMENT 'Order JP No',
+
+    process_name VARCHAR(100) NULL COMMENT '工程',
+
+    die_name VARCHAR(100) NULL COMMENT '金型',
+
+    machine_type VARCHAR(100) NULL COMMENT '機種',
+
+    custom_status VARCHAR(50) NULL COMMENT 'Custom',
+
+    country VARCHAR(50) NULL COMMENT '国',
+
+    unit_weight DECIMAL(12,4) NULL COMMENT '単重(kg)',
+
+    total_weight DECIMAL(12,4) NULL COMMENT '総重量(kg)',
+
+    imported_at TIMESTAMP NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        COMMENT '取込日時',
+
+    PRIMARY KEY (id),
+
+    INDEX idx_source_file_date (source_file_date),
+    INDEX idx_production_number (production_number),
+    INDEX idx_order_vn_no (order_vn_no),
+    INDEX idx_shipping_instruction_no (shipping_instruction_no),
+    INDEX idx_order_date (order_date),
+    INDEX idx_shipping_deadline (shipping_deadline),
+    INDEX idx_shipping_date (shipping_date),
+    INDEX idx_customer_name (customer_name),
+    INDEX idx_country (country)
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
+```
+
+# 2026/11/11
+
+http://10.163.50.17/ex0.20/production_number.html
+この表に、一列追加で型番のハイフン手前までを表示できないか？
+
+http://10.163.50.17/ex0.20/production_number.html
+カテゴリー名が途中で切れちゃう。テーブルの問題か？表示の問題か？
+テーブルの問題なし。表示の問題。
+表示範囲に余裕が有るので、すべての文字列を表示するよう改造する。
