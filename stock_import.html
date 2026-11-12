@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stock Import</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { padding: 7px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-main { background: #2e7d32; color: #fff; font-size: 14px; padding: 9px 22px; }
+    .btn-main:disabled { background: #b0bec5; cursor: not-allowed; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+    @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 16px; }
+    .card + .card { margin-top: 16px; }
+    .card h2 { font-size: 15px; margin-bottom: 12px; color: #1f5482; }
+
+    .form-grid { display: grid; grid-template-columns: 120px 1fr; gap: 12px 14px; align-items: center; }
+    .form-grid label.head { font-size: 13px; font-weight: bold; }
+    .form-grid label.head::after { content: " *"; color: #c62828; }
+    .types { display: flex; gap: 10px; flex-wrap: wrap; }
+    .types label { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid #aac4e8; border-radius: 6px; cursor: pointer; font-size: 13px; background: #fff; }
+    .types label:has(input:checked) { background: #e3f0ff; border-color: #0078d4; font-weight: bold; }
+    input[type=date], select { padding: 6px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; font-family: "Roboto Mono", monospace; }
+    input[type=file] { font-size: 13px; }
+    .col-map { font-size: 12px; color: #666; margin-top: 4px; line-height: 1.6; }
+    .col-map code { font-family: "Roboto Mono", monospace; background: #f1f5fa; padding: 0 4px; border-radius: 3px; }
+
+    .summary { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .stat { border-radius: 6px; padding: 8px 14px; background: #f1f5fa; min-width: 120px; }
+    .stat .lbl { font-size: 11px; color: #666; }
+    .stat .val { font-family: "Roboto Mono", monospace; font-size: 20px; font-weight: bold; }
+    .stat.ok .val { color: #2e7d32; }
+    .stat.skip .val { color: #8a6d00; }
+    .stat.err { background: #ffebee; }
+    .stat.err .val { color: #c62828; }
+
+    .errors { background: #fff5f5; border: 1px solid #f3c1c1; border-radius: 6px; padding: 10px 12px; margin-bottom: 12px; max-height: 180px; overflow-y: auto; font-size: 13px; }
+    .errors .ttl { font-weight: bold; color: #c62828; margin-bottom: 4px; }
+    .errors div { line-height: 1.6; }
+    .errors .ln { font-family: "Roboto Mono", monospace; display: inline-block; min-width: 90px; }
+
+    .result { border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; line-height: 1.7; white-space: pre-line; }
+    .result.ok { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
+    .result.ng { background: #ffebee; border: 1px solid #ef9a9a; color: #b71c1c; }
+    .result .big { font-weight: bold; font-size: 16px; }
+    .note { font-size: 12px; color: #8a6d00; background: #fff8e1; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; }
+
+    .table-wrap { overflow: auto; max-height: 55vh; border: 1px solid #e3e8ef; border-radius: 6px; }
+    table { border-collapse: collapse; font-size: 12px; width: 100%; }
+    th, td { border-bottom: 1px solid #eef1f5; padding: 5px 8px; text-align: left; white-space: nowrap; }
+    th { background: #e8f1ff; position: sticky; top: 0; z-index: 1; font-size: 11px; }
+    td.num { text-align: right; font-family: "Roboto Mono", monospace; }
+    td.mono, td.line { font-family: "Roboto Mono", monospace; }
+    td.line { color: #999; }
+    tr.bad td { background: #ffebee; }
+    .empty { color: #aaa; text-align: center; padding: 30px; font-size: 13px; }
+
+    .hist h3 { font-size: 13px; margin: 6px 0; }
+    .hist table { font-size: 12px; margin-bottom: 14px; }
+    .hist td.num, .hist td.mono { font-family: "Roboto Mono", monospace; }
+    .hist .none { font-size: 12px; color: #aaa; margin-bottom: 14px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📥 在庫・出荷指示の取込</h1>
+  <div class="subtitle" data-key="subtitle">Excel ファイルを選ぶと中身を確かめて表示します。問題が無ければ「取込開始」で登録します。同じ取込日付のデータは、消してから登録し直します。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div class="form-grid">
+          <label class="head" data-key="lbl_type">取込種別</label>
+          <div>
+            <div class="types">
+              <label><input type="radio" name="type" value="inventory" checked /><span data-key="type_inventory">在庫データ</span></label>
+              <label><input type="radio" name="type" value="shipping" /><span data-key="type_shipping">出荷指示データ</span></label>
+            </div>
+            <div class="col-map" id="colMap"></div>
+          </div>
+
+          <label class="head" for="fDate" data-key="lbl_date">取込日付</label>
+          <div><input type="date" id="fDate" /></div>
+
+          <label class="head" for="fFile" data-key="lbl_file">Excelファイル</label>
+          <div>
+            <input type="file" id="fFile" accept=".xlsx,.xlsm,.xls" />
+            <select id="fSheet" style="display:none; margin-left: 8px;"></select>
+          </div>
+
+          <div></div>
+          <div><button class="btn btn-main" id="btnImport" disabled data-key="btn_import">取込開始</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div id="resultBox"></div>
+        <div id="previewBox"><div class="empty" data-key="no_file">Excel ファイルを選ぶと、ここに中身が出ます</div></div>
+      </div>
+    </div>
+
+    <div class="card hist">
+      <h2 data-key="hist_title">取込済みのデータ</h2>
+      <div id="histBox"></div>
+    </div>
+  </div>
+
+  <script src="./lib/xlsx.js"></script>
+  <script>
+    const dict = {
+      ja: {
+        title: "📥 在庫・出荷指示の取込",
+        subtitle: "Excel ファイルを選ぶと中身を確かめて表示します。問題が無ければ「取込開始」で登録します。同じ取込日付のデータは、消してから登録し直します。",
+        btn_back: "← 戻る", lbl_type: "取込種別", type_inventory: "在庫データ", type_shipping: "出荷指示データ",
+        lbl_date: "取込日付", lbl_file: "Excelファイル", btn_import: "取込開始",
+        no_file: "Excel ファイルを選ぶと、ここに中身が出ます",
+        hist_title: "取込済みのデータ", hist_none: "まだありません",
+        hist_date: "取込日付", hist_cnt: "件数", hist_at: "取込日時",
+        map_inventory: "読む列：B → 品番、Z → 未引当在庫数（空は 0）",
+        map_shipping: "読む列：A 品番、B 数量、C 受注日付、D 出荷期限、F 得意先名、G 出荷指示番号、H 搬送方法、J 出荷回答日、K AB、S ステータス",
+        sheet: "シート：{s}",
+        st_ok: "登録する件数", st_skip: "スキップ（品番が空・見出し）", st_err: "エラー",
+        err_title: "取込エラー", err_line: "行番号：{n}",
+        more_rows: "先頭の {n} 行だけ表示しています（全部で {m} 行）",
+        col_line: "行",
+        c_production_number: "品番", c_unallocated_inventory: "未引当在庫数",
+        c_quantity: "数量", c_order_date: "受注日付", c_due_date: "出荷期限", c_customer_name: "得意先名",
+        c_shipping_instruction_no: "出荷指示番号", c_transportation_method: "搬送方法", c_reply_date: "出荷回答日",
+        c_ab_status: "AB", c_custom_status: "ステータス",
+        e_no_file: "ファイルが選ばれていません",
+        e_not_excel: "Excel ファイル（.xlsx / .xlsm / .xls）を選んでください",
+        e_read: "ファイルを読めませんでした",
+        e_no_col: "必須列が存在しません（{c} 列まで必要です）",
+        e_no_data: "取込対象データがありません",
+        e_date: "日付形式が不正です（{c} 列：{v}）",
+        e_qty: "数量が整数ではありません（{c} 列：{v}）",
+        e_no_date: "取込日付を入れてください",
+        confirm_replace: "{d} の{t}はもう {n} 件登録されています。消して登録し直しますか？",
+        importing: "取り込んでいます…",
+        done: "取込完了", done_detail: "登録件数：{n}件\nスキップ件数：{s}件", replaced: "（同じ取込日付の {n} 件は消して入れ替えました）",
+        failed: "取込失敗", failed_detail: "エラー件数：{n}件",
+      },
+      vi: {
+        title: "📥 Nhập dữ liệu tồn kho / chỉ thị xuất hàng",
+        subtitle: "Chọn file Excel thì nội dung sẽ được kiểm tra và hiển thị. Nếu không có vấn đề, bấm \"Bắt đầu nhập\" để đăng ký. Dữ liệu có cùng ngày nhập sẽ bị xóa rồi đăng ký lại.",
+        btn_back: "← Quay lại", lbl_type: "Loại dữ liệu", type_inventory: "Dữ liệu tồn kho", type_shipping: "Dữ liệu chỉ thị xuất hàng",
+        lbl_date: "Ngày dữ liệu", lbl_file: "File Excel", btn_import: "Bắt đầu nhập",
+        no_file: "Chọn file Excel thì nội dung sẽ hiện ở đây",
+        hist_title: "Dữ liệu đã nhập", hist_none: "Chưa có",
+        hist_date: "Ngày dữ liệu", hist_cnt: "Số dòng", hist_at: "Thời điểm nhập",
+        map_inventory: "Cột đọc: B → mã SP, Z → tồn kho chưa phân bổ (trống = 0)",
+        map_shipping: "Cột đọc: A mã SP, B số lượng, C ngày đặt hàng, D hạn xuất hàng, F khách hàng, G số chỉ thị xuất, H phương thức vận chuyển, J ngày trả lời xuất, K AB, S trạng thái",
+        sheet: "Sheet: {s}",
+        st_ok: "Số dòng sẽ đăng ký", st_skip: "Bỏ qua (mã SP trống, tiêu đề)", st_err: "Lỗi",
+        err_title: "Lỗi nhập dữ liệu", err_line: "Dòng: {n}",
+        more_rows: "Chỉ hiển thị {n} dòng đầu (tổng cộng {m} dòng)",
+        col_line: "Dòng",
+        c_production_number: "Mã SP", c_unallocated_inventory: "Tồn chưa phân bổ",
+        c_quantity: "Số lượng", c_order_date: "Ngày đặt hàng", c_due_date: "Hạn xuất hàng", c_customer_name: "Khách hàng",
+        c_shipping_instruction_no: "Số chỉ thị xuất", c_transportation_method: "Vận chuyển", c_reply_date: "Ngày trả lời xuất",
+        c_ab_status: "AB", c_custom_status: "Trạng thái",
+        e_no_file: "Chưa chọn file",
+        e_not_excel: "Hãy chọn file Excel (.xlsx / .xlsm / .xls)",
+        e_read: "Không đọc được file",
+        e_no_col: "Thiếu cột bắt buộc (cần đến cột {c})",
+        e_no_data: "Không có dữ liệu để nhập",
+        e_date: "Định dạng ngày không đúng (cột {c}: {v})",
+        e_qty: "Số lượng không phải số nguyên (cột {c}: {v})",
+        e_no_date: "Hãy nhập ngày dữ liệu",
+        confirm_replace: "{t} ngày {d} đã có {n} dòng. Xóa và đăng ký lại?",
+        importing: "Đang nhập…",
+        done: "Nhập xong", done_detail: "Số dòng đăng ký: {n}\nSố dòng bỏ qua: {s}", replaced: "(Đã xóa {n} dòng cùng ngày dữ liệu và thay thế)",
+        failed: "Nhập thất bại", failed_detail: "Số lỗi: {n}",
+      },
+    };
+    let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
+    if (!dict[currentLang]) currentLang = "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k] ?? k;
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      renderColMap();
+      renderPreview();
+      renderHistory();
+      if (lastResult) renderResult(lastResult);
+    }
+
+    const API = "./php/stock_import/";
+
+    // Excel column → DB column (memo.md 2026/11/11 「Excel取込機能 仕様書」)
+    const SPEC = {
+      inventory: {
+        cols: [
+          { key: "production_number", col: "B", kind: "pn" },
+          { key: "unallocated_inventory", col: "Z", kind: "qty" },
+        ],
+      },
+      shipping: {
+        cols: [
+          { key: "production_number", col: "A", kind: "pn" },
+          { key: "quantity", col: "B", kind: "qty" },
+          { key: "order_date", col: "C", kind: "date" },
+          { key: "due_date", col: "D", kind: "date" },
+          { key: "customer_name", col: "F", kind: "text" },
+          { key: "shipping_instruction_no", col: "G", kind: "text" },
+          { key: "transportation_method", col: "H", kind: "text" },
+          { key: "reply_date", col: "J", kind: "date" },
+          { key: "ab_status", col: "K", kind: "text" },
+          { key: "custom_status", col: "S", kind: "text" },
+        ],
+      },
+    };
+    const colIndex = (letter) => [...letter].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+    const pad = (n) => String(n).padStart(2, "0");
+    const ymd = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    let workbook = null;     // SheetJS workbook of the chosen file
+    let parsed = null;       // { type, rows, skipped, errors, total }
+    let lastResult = null;
+    let history = null;
+
+    const currentType = () => document.querySelector("input[name=type]:checked").value;
+
+    function renderColMap() {
+      document.getElementById("colMap").textContent = t(currentType() === "inventory" ? "map_inventory" : "map_shipping");
+    }
+
+    // ---- cell value converters ----
+    function toDate(v) {
+      // returns { ok, value } ; value is "YYYY-MM-DD" or null
+      if (v === "" || v === null || v === undefined) return { ok: true, value: null };
+      if (typeof v === "number") {
+        // Excel date serial
+        const p = XLSX.SSF.parse_date_code(v);
+        if (!p || !p.y) return { ok: false };
+        return { ok: true, value: `${p.y}-${pad(p.m)}-${pad(p.d)}` };
+      }
+      const s = String(v).trim();
+      if (s === "") return { ok: true, value: null };
+      const m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T].*)?$/);
+      if (!m) return { ok: false };
+      const y = +m[1], mo = +m[2], d = +m[3];
+      const dt = new Date(y, mo - 1, d);
+      if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return { ok: false };
+      return { ok: true, value: `${y}-${pad(mo)}-${pad(d)}` };
+    }
+    function toQty(v) {
+      // empty → 0 ; returns { ok, value, isText }
+      if (v === "" || v === null || v === undefined) return { ok: true, value: 0 };
+      if (typeof v === "number") return Number.isInteger(v) ? { ok: true, value: v } : { ok: false };
+      const s = String(v).trim().replace(/[,\s]/g, "");
+      if (s === "") return { ok: true, value: 0 };
+      if (/^-?\d+$/.test(s)) return { ok: true, value: parseInt(s, 10) };
+      if (/^-?\d*\.\d+$/.test(s)) return { ok: false };
+      return { ok: false, isText: true };
+    }
+
+    // ---- read the chosen sheet and map it ----
+    function parseSheet() {
+      parsed = null;
+      lastResult = null;
+      document.getElementById("resultBox").innerHTML = "";
+      if (!workbook) { renderPreview(); return; }
+      const type = currentType();
+      const spec = SPEC[type];
+      const ws = workbook.Sheets[document.getElementById("fSheet").value];
+      const need = Math.max(...spec.cols.map((c) => colIndex(c.col)));
+      const range = ws && ws["!ref"] ? XLSX.utils.decode_range(ws["!ref"]) : null;
+      const lastCol = spec.cols.reduce((a, c) => (colIndex(c.col) > colIndex(a) ? c.col : a), "A");
+      if (!range || range.e.c < need) {
+        parsed = { type, rows: [], skipped: 0, total: 0, errors: [{ line: "-", message: t("e_no_col", { c: lastCol }) }] };
+        renderPreview();
+        return;
+      }
+      const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "", blankrows: true });
+      const qtyCol = spec.cols.find((c) => c.kind === "qty");
+      const rows = [], errors = [];
+      let skipped = 0, started = false;
+      aoa.forEach((cells, i) => {
+        const line = i + 1 + range.s.r; // Excel row number
+        const pn = String(cells[colIndex(spec.cols[0].col)] ?? "").trim();
+        if (pn === "") { if (cells.some((c) => String(c).trim() !== "")) skipped++; return; }
+        // Heading rows: before the first data row, a row whose quantity cell is text (e.g. "数量") is a heading.
+        const q = toQty(cells[colIndex(qtyCol.col)]);
+        if (!started && q.isText) { skipped++; return; }
+        started = true;
+        const row = { line };
+        const rowErr = [];
+        spec.cols.forEach((c) => {
+          const raw = cells[colIndex(c.col)];
+          if (c.kind === "pn") row[c.key] = pn;
+          else if (c.kind === "qty") {
+            const r = toQty(raw);
+            if (r.ok) row[c.key] = r.value; else { row[c.key] = raw; rowErr.push(t("e_qty", { c: c.col, v: raw })); }
+          } else if (c.kind === "date") {
+            const r = toDate(raw);
+            if (r.ok) row[c.key] = r.value; else { row[c.key] = raw; rowErr.push(t("e_date", { c: c.col, v: raw })); }
+          } else {
+            const s = String(raw ?? "").trim();
+            row[c.key] = s === "" ? null : s;
+          }
+        });
+        if (rowErr.length) { row.bad = true; rowErr.forEach((m) => errors.push({ line, message: m })); }
+        rows.push(row);
+      });
+      if (!rows.length && !errors.length) errors.push({ line: "-", message: t("e_no_data") });
+      parsed = { type, rows, skipped, total: rows.length, errors };
+      renderPreview();
+    }
+
+    const PREVIEW_MAX = 200;
+    function renderPreview() {
+      const box = document.getElementById("previewBox");
+      const btn = document.getElementById("btnImport");
+      if (!parsed) {
+        box.innerHTML = `<div class="empty">${esc(t("no_file"))}</div>`;
+        btn.disabled = true;
+        return;
+      }
+      const spec = SPEC[parsed.type];
+      const okCount = parsed.rows.filter((r) => !r.bad).length;
+      let h = `<div class="summary">
+        <div class="stat ok"><div class="lbl">${esc(t("st_ok"))}</div><div class="val">${okCount}</div></div>
+        <div class="stat skip"><div class="lbl">${esc(t("st_skip"))}</div><div class="val">${parsed.skipped}</div></div>
+        ${parsed.errors.length ? `<div class="stat err"><div class="lbl">${esc(t("st_err"))}</div><div class="val">${parsed.errors.length}</div></div>` : ""}
+      </div>`;
+      if (parsed.errors.length) {
+        h += `<div class="errors"><div class="ttl">${esc(t("err_title"))}</div>` +
+          parsed.errors.map((e) => `<div><span class="ln">${esc(t("err_line", { n: e.line }))}</span>${esc(e.message)}</div>`).join("") +
+          `</div>`;
+      }
+      if (parsed.rows.length) {
+        const shown = parsed.rows.slice(0, PREVIEW_MAX);
+        if (parsed.rows.length > PREVIEW_MAX) h += `<div class="note">${esc(t("more_rows", { n: PREVIEW_MAX, m: parsed.rows.length }))}</div>`;
+        h += `<div class="table-wrap"><table><thead><tr><th>${esc(t("col_line"))}</th>` +
+          spec.cols.map((c) => `<th>${esc(c.col)}：${esc(t("c_" + c.key))}</th>`).join("") +
+          `</tr></thead><tbody>` +
+          shown.map((r) => `<tr class="${r.bad ? "bad" : ""}"><td class="line">${r.line}</td>` +
+            spec.cols.map((c) => {
+              const cls = c.kind === "qty" ? "num" : c.kind === "date" || c.kind === "pn" ? "mono" : "";
+              return `<td class="${cls}">${esc(r[c.key] ?? "")}</td>`;
+            }).join("") + `</tr>`).join("") +
+          `</tbody></table></div>`;
+      }
+      box.innerHTML = h;
+      btn.disabled = !(okCount > 0 && parsed.errors.length === 0);
+    }
+
+    function renderResult(res) {
+      const box = document.getElementById("resultBox");
+      if (res.status === "ok") {
+        let s = `<div class="big">${esc(t("done"))}</div>${esc(t("done_detail", { n: res.inserted, s: res.skipped }))}`;
+        if (res.deleted) s += `\n${esc(t("replaced", { n: res.deleted }))}`;
+        box.innerHTML = `<div class="result ok">${s}</div>`;
+      } else {
+        const errs = res.errors || [];
+        let s = `<div class="big">${esc(t("failed"))}</div>${esc(t("failed_detail", { n: errs.length || 1 }))}`;
+        if (errs.length) s += "\n" + errs.slice(0, 20).map((e) => `${esc(t("err_line", { n: e.line }))}　${esc(e.message)}`).join("\n");
+        else if (res.message) s += "\n" + esc(res.message);
+        box.innerHTML = `<div class="result ng">${s}</div>`;
+      }
+    }
+
+    // ---- history ----
+    async function loadHistory() {
+      try {
+        const r = await fetch(API + "history.php", { cache: "no-store" });
+        history = await r.json();
+      } catch (e) { history = null; }
+      renderHistory();
+    }
+    function renderHistory() {
+      const box = document.getElementById("histBox");
+      if (!history || history.status !== "ok") { box.innerHTML = ""; return; }
+      box.innerHTML = ["inventory", "shipping"].map((k) => {
+        const list = history[k] || [];
+        const body = list.length
+          ? `<table><thead><tr><th>${esc(t("hist_date"))}</th><th>${esc(t("hist_cnt"))}</th><th>${esc(t("hist_at"))}</th></tr></thead><tbody>` +
+            list.map((r) => `<tr><td class="mono">${esc(r.source_file_date)}</td><td class="num">${Number(r.cnt).toLocaleString()}</td><td class="mono">${esc(r.imported_at)}</td></tr>`).join("") +
+            `</tbody></table>`
+          : `<div class="none">${esc(t("hist_none"))}</div>`;
+        return `<h3>${esc(t(k === "inventory" ? "type_inventory" : "type_shipping"))}</h3>${body}`;
+      }).join("");
+    }
+    const historyCount = (type, date) => {
+      const r = (history?.[type] || []).find((x) => x.source_file_date === date);
+      return r ? Number(r.cnt) : 0;
+    };
+
+    // ---- events ----
+    document.querySelectorAll("input[name=type]").forEach((el) => el.addEventListener("change", () => { renderColMap(); parseSheet(); }));
+    document.getElementById("fSheet").addEventListener("change", parseSheet);
+
+    document.getElementById("fFile").addEventListener("change", (ev) => {
+      const file = ev.target.files[0];
+      workbook = null;
+      const sel = document.getElementById("fSheet");
+      sel.style.display = "none";
+      sel.innerHTML = "";
+      if (!file) { parsed = null; renderPreview(); return; }
+      if (!/\.(xlsx|xlsm|xls)$/i.test(file.name)) {
+        parsed = { type: currentType(), rows: [], skipped: 0, total: 0, errors: [{ line: "-", message: t("e_not_excel") }] };
+        renderPreview();
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          workbook = XLSX.read(new Uint8Array(e.target.result), { type: "array" });
+        } catch (err) {
+          parsed = { type: currentType(), rows: [], skipped: 0, total: 0, errors: [{ line: "-", message: t("e_read") }] };
+          renderPreview();
+          return;
+        }
+        sel.innerHTML = workbook.SheetNames.map((n) => `<option value="${esc(n)}">${esc(t("sheet", { s: n }))}</option>`).join("");
+        sel.style.display = workbook.SheetNames.length > 1 ? "" : "none";
+        parseSheet();
+      };
+      reader.readAsArrayBuffer(file);
+    });
+
+    document.getElementById("btnImport").addEventListener("click", async () => {
+      const date = document.getElementById("fDate").value;
+      if (!date) { alert(t("e_no_date")); return; }
+      if (!parsed || !workbook) { alert(t("e_no_file")); return; }
+      const type = parsed.type;
+      const exists = historyCount(type, date);
+      if (exists && !confirm(t("confirm_replace", { d: date, t: t(type === "inventory" ? "type_inventory" : "type_shipping"), n: exists }))) return;
+
+      const btn = document.getElementById("btnImport");
+      btn.disabled = true;
+      btn.textContent = t("importing");
+      const rows = parsed.rows.map((r) => {
+        const o = { line: r.line };
+        SPEC[type].cols.forEach((c) => (o[c.key] = r[c.key]));
+        return o;
+      });
+      let res;
+      try {
+        const r = await fetch(API + "import.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type, source_file_date: date, rows }),
+        });
+        res = await r.json();
+      } catch (e) {
+        res = { status: "error", message: String(e) };
+      }
+      if (res.status === "ok") res.skipped = parsed.skipped;
+      lastResult = res;
+      renderResult(res);
+      btn.textContent = t("btn_import");
+      btn.disabled = res.status === "ok"; // avoid importing the same file twice by mistake
+      loadHistory();
+    });
+
+    document.getElementById("fDate").value = ymd(new Date());
+    setLang(currentLang);
+    loadHistory();
+  </script>
+</body>
+</html>

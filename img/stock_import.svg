@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- Stock import: a spreadsheet sheet with an arrow going down into a stock box -->
+  <!-- sheet -->
+  <rect x="3" y="1.5" width="11" height="12" rx="1" fill="#6a9fd0" />
+  <g fill="#ffffff" opacity="0.9">
+    <rect x="4.5" y="3.2" width="8" height="1.4" />
+    <rect x="4.5" y="6" width="3.5" height="1.2" />
+    <rect x="9" y="6" width="3.5" height="1.2" />
+    <rect x="4.5" y="8.4" width="3.5" height="1.2" />
+    <rect x="9" y="8.4" width="3.5" height="1.2" />
+    <rect x="4.5" y="10.8" width="3.5" height="1.2" />
+    <rect x="9" y="10.8" width="3.5" height="1.2" />
+  </g>
+  <!-- arrow -->
+  <path d="M17 4 L19.6 4 L19.6 10 L22 10 L18.3 14.2 L14.6 10 L17 10 Z" fill="#2b6ca3" />
+  <!-- box -->
+  <path d="M2 15.5 L22 15.5 L22 22.5 L2 22.5 Z" fill="#2b6ca3" />
+  <path d="M2 15.5 L22 15.5 L20 13.8 L4 13.8 Z" fill="#1f5482" />
+  <rect x="9.5" y="17.6" width="5" height="1.6" rx="0.4" fill="#d6e6f5" />
+</svg>

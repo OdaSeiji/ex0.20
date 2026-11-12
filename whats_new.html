@@ -85,7 +85,37 @@
         </div>
       </div>
 
-      <!-- 2026-11-06 (最新) -->
+      <!-- 2026-11-13 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新規</span>
+          <span class="entry-date">2026-11-13</span>
+        </div>
+        <div class="entry-title" data-key="ho_title">在庫管理：在庫・出荷指示の取込を追加</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ho_purpose">Excel で行っている在庫と受注（出荷指示）の突き合わせを Web 化するため。まずは2つの Excel をデータベースに取り込めるようにした。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ho_content">トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-11 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-11</span>
+        </div>
+        <div class="entry-title" data-key="hn_title">品番管理：型番の列を追加、カテゴリ名を全部表示</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hn_purpose">品番の一覧で型番ごとに見たいという要望と、カテゴリ名が途中で切れて読めないという声があったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hn_content">品番の右に「型番」の列を追加した（その品番の金型番号のハイフンより前。例：DM031-V01D → DM031。型番が2つある品番は「, 」で並べ、金型が無い品番は空欄）。型番の列でも並べ替えができる。カテゴリ1・カテゴリ2の名前は8文字で切っていたのをやめ、全部表示するようにした。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-06 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
@@ -2022,6 +2052,12 @@
           hm_title: "品質サマリー：表を見やすくした",
           hm_purpose: "不良コードの列が多くて、どの数字がどのコードか追いにくいという声があったため。",
           hm_content: "不良コードの列の幅をすべて同じにし、列の間に縦の線（横の線と同じ色）を引いた。行は1行おきに薄い色を付けた。良品率90%以下の行の色はこれまでどおり。良品率は小数点以下を四捨五入して整数で表示するようにした。",
+          hn_title: "品番管理：型番の列を追加、カテゴリ名を全部表示",
+          hn_purpose: "品番の一覧で型番ごとに見たいという要望と、カテゴリ名が途中で切れて読めないという声があったため。",
+          hn_content: "品番の右に「型番」の列を追加した（その品番の金型番号のハイフンより前。例：DM031-V01D → DM031。型番が2つある品番は「, 」で並べ、金型が無い品番は空欄）。型番の列でも並べ替えができる。カテゴリ1・カテゴリ2の名前は8文字で切っていたのをやめ、全部表示するようにした。",
+          ho_title: "在庫管理：在庫・出荷指示の取込を追加",
+          ho_purpose: "Excel で行っている在庫と受注（出荷指示）の突き合わせを Web 化するため。まずは2つの Excel をデータベースに取り込めるようにした。",
+          ho_content: "トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2317,6 +2353,12 @@
           hm_title: "Tổng hợp chất lượng: bảng dễ nhìn hơn",
           hm_purpose: "Có ý kiến rằng cột mã lỗi nhiều nên khó theo dõi số nào thuộc mã nào.",
           hm_content: "Các cột mã lỗi có cùng độ rộng và có đường kẻ dọc giữa các cột (cùng màu với đường kẻ ngang). Các dòng xen kẽ được tô màu nhạt. Màu của dòng tỷ lệ hàng tốt ≤ 90% vẫn giữ như cũ. Tỷ lệ hàng tốt được làm tròn, hiển thị số nguyên.",
+          hn_title: "Quản lý mã SP: thêm cột mã gốc, hiển thị đầy đủ tên danh mục",
+          hn_purpose: "Có yêu cầu muốn xem danh sách theo mã gốc, và tên danh mục bị cắt giữa chừng nên khó đọc.",
+          hn_content: "Thêm cột \"Mã gốc\" bên phải mã SP (phần trước dấu gạch ngang của mã khuôn, ví dụ DM031-V01D → DM031; nếu có 2 mã gốc thì hiển thị cách nhau bởi \", \", nếu chưa có khuôn thì để trống). Có thể sắp xếp theo cột mã gốc. Tên Danh mục 1 và Danh mục 2 không còn bị cắt ở 8 ký tự mà hiển thị đầy đủ.",
+          ho_title: "Quản lý tồn kho: thêm chức năng nhập tồn kho / chỉ thị xuất hàng",
+          ho_purpose: "Để đưa việc đối chiếu tồn kho và đơn hàng (chỉ thị xuất hàng) đang làm bằng Excel lên Web. Trước tiên, có thể nhập 2 file Excel vào cơ sở dữ liệu.",
+          ho_content: "Thêm mục \"Quản lý tồn kho\" vào menu chính và tạo màn hình \"Nhập tồn kho / chỉ thị xuất hàng\". Chọn loại dữ liệu (tồn kho / chỉ thị xuất hàng), ngày dữ liệu và file Excel thì nội dung và lỗi (kèm số dòng) được hiển thị; nếu không có vấn đề thì bấm \"Bắt đầu nhập\" để đăng ký. Dòng có mã SP trống và dòng tiêu đề được bỏ qua. Dữ liệu cùng ngày dữ liệu bị xóa rồi đăng ký lại. Bên phải hiển thị các ngày đã nhập và số dòng.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

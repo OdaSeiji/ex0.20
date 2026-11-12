@@ -383,11 +383,13 @@
 				width: 200px;
 			}
 			.col-cat2 {
-				width: 110px;
-				max-width: 110px;
+				min-width: 110px;
 			}
 			.col-pn {
-				min-width: 220px;
+				min-width: 190px;
+			}
+			.col-base {
+				width: 90px;
 			}
 			.col-mat,
 			.col-age {
@@ -401,6 +403,7 @@
 			}
 			.col-date {
 				width: 90px;
+				white-space: nowrap;
 			}
 			.updated-recent {
 				background: #fff3cd;
@@ -1092,6 +1095,14 @@
 										oninput="filterTable(this.value)"
 										onclick="event.stopPropagation()" />
 								</th>
+								<th
+									class="sortable col-base"
+									onclick="sortBy('base_number')">
+									<span data-key="col_base">型番</span
+									><span class="sort-icon" data-sortkey="base_number"
+										>↕</span
+									>
+								</th>
 								<th class="col-mat" data-key="col_material">材質</th>
 								<th class="col-age" data-key="col_aging">時効</th>
 								<th class="col-num" data-key="col_area">断面積 (mm²)</th>
@@ -1374,6 +1385,7 @@
 					col_cat1: 'カテゴリ1',
 					col_cat2: 'カテゴリ2',
 					col_pn: '品番',
+					col_base: '型番',
 					col_material: '材質',
 					col_aging: '時効',
 					col_area: '断面積 (mm²)',
@@ -1419,6 +1431,7 @@
 					col_cat1: 'Danh mục 1',
 					col_cat2: 'Danh mục 2',
 					col_pn: 'Mã SP',
+					col_base: 'Mã gốc',
 					col_material: 'Vật liệu',
 					col_aging: 'Lão hóa',
 					col_area: 'Tiết diện (mm²)',
@@ -1508,7 +1521,7 @@
 				tbody.innerHTML = '';
 
 				if (!data.length) {
-					tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+					tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
 					return;
 				}
 
@@ -1526,13 +1539,14 @@
             <td>${cat1}</td>
             <td>${cat2}</td>
             <td><strong>${row.production_number ?? ''}</strong></td>
+            <td class="col-base">${row.base_number ?? ''}</td>
             <td>${mat}</td>
             <td>${agi}</td>
             <td>${row.cross_section_area ?? '—'}</td>
             <td>${row.specific_weight ?? '—'}</td>
             <td>${row.production_length ?? '—'}</td>
             <td><button class="edit-btn" onclick="openEditForm(${row.id})">✏ 編集</button></td>
-            <td class="${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${formatDate(row.updated_at)}</td>
+            <td class="col-date ${isRecentUpdate(row.updated_at) ? 'updated-recent' : ''}">${formatDate(row.updated_at)}</td>
           `;
 					tbody.appendChild(tr);
 				});

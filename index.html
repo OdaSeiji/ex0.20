@@ -565,6 +565,18 @@
       </div>
     </div>
 
+    <!-- 📥 在庫管理 -->
+    <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/stock_import.svg" alt="" /><span data-key="section_stock">在庫管理</span></div>
+    <div class="accordion-content">
+      <div class="menu-row fixed3">
+        <div class="menu-card" onclick="openPage('stock_import.html')">
+          <img class="menu-icon" src="./img/stock_import.svg" alt="" />
+          <div class="menu-title" data-key="stock_import_title">在庫・出荷指示の取込</div>
+          <div class="menu-desc" data-key="stock_import_desc">在庫データと出荷指示データの Excel を取り込む（同じ取込日付は入れ替え）</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ビレット -->
     <div class="accordion" onclick="toggleAccordion(this)"><img class="accordion-icon" src="./img/billet.svg" alt="" /><span data-key="section_billet">ビレット</span></div>
     <div class="accordion-content">
@@ -717,6 +729,9 @@
           ram_log_title: "（試作）押出波形",
           ram_log_desc: "ラム位置ごとの圧力・速度・出口温度を表示",
           section_production: "生産管理",
+          section_stock: "在庫管理",
+          stock_import_title: "在庫・出荷指示の取込",
+          stock_import_desc: "在庫データと出荷指示データの Excel を取り込む（同じ取込日付は入れ替え）",
           section_billet: "ビレット",
           order_sheet_title: "生産指示",
           press_plan_title: "押出計画",
@@ -835,6 +850,9 @@
           ram_log_title: "（Thử nghiệm）Dạng sóng đùn",
           ram_log_desc: "Hiển thị áp suất/tốc độ/nhiệt độ đầu ra theo vị trí Ram",
           section_production: "Quản lý sản xuất",
+          section_stock: "Quản lý tồn kho",
+          stock_import_title: "Nhập tồn kho / chỉ thị xuất hàng",
+          stock_import_desc: "Nhập file Excel dữ liệu tồn kho và chỉ thị xuất hàng (cùng ngày dữ liệu thì thay thế)",
           section_billet: "Billet",
           order_sheet_title: "Chỉ thị sản xuất",
           press_plan_title: "Kế hoạch đùn",

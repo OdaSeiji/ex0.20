@@ -19,9 +19,15 @@
 
 SELECT 
   m_production_numbers.id,
-  SUBSTRING(IFNULL(t1.category1_jp, ''),1, 8) AS category1_jp,
-  SUBSTRING(IFNULL(t1.category2_jp, ''),1, 8) AS category2_jp,
+  IFNULL(t1.category1_jp, '') AS category1_jp,
+  IFNULL(t1.category2_jp, '') AS category2_jp,
   m_production_numbers.production_number,
+  IFNULL((
+    SELECT GROUP_CONCAT(DISTINCT SUBSTRING_INDEX(m_dies.die_number, '-', 1)
+                        ORDER BY SUBSTRING_INDEX(m_dies.die_number, '-', 1) SEPARATOR ', ')
+    FROM m_dies
+    WHERE m_dies.production_number_id = m_production_numbers.id
+  ), '') AS base_number,
   IFNULL(m_production_numbers.drawn_department, '') AS drawn_department,
   IFNULL(m_billet_material.billet_material, '') AS billet_material, 
   IFNULL(m_aging_type.aging_type, '') AS aging_type,
