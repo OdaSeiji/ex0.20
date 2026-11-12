@@ -847,6 +847,12 @@
         sc_ram_speed: "ラム速度", sc_die_temp: "金型温度", sc_scan: "添付",
         sc_source: "入力元", sc_inserted: "入力日時", src_new: "新画面", src_old: "旧画面",
         empty_summary: "実績データなし",
+        msg_billet_bundle_mismatch: (actual, total) =>
+        `実績ビレット数（${actual}）とバンドル数量合計（${total}）が一致しません。`,
+        msg_rack_work_qty_mismatch: (workTotal, rackTotal) =>
+         `製品本数合計（${workTotal}本）とラック数量合計（${rackTotal}本）が一致しません。`,
+        msg_time_code_300_required:
+        "押出時間には停止理由コード「300 - 押出段取り」が必要です。",
       },
       vi: {
         title: "🏭 Nhập báo cáo đùn hằng ngày",
@@ -917,8 +923,14 @@
         sc_ram_speed: "Tốc độ", sc_die_temp: "Nhiệt độ khuôn", sc_scan: "Tệp",
         sc_source: "Nguồn nhập", sc_inserted: "Thời điểm nhập", src_new: "Màn hình mới", src_old: "Màn hình cũ",
         empty_summary: "Chưa có thực tích",
-      },
-    };
+          msg_billet_bundle_mismatch: (actual, total) =>
+        `Billet thực tế (${actual}) phải bằng tổng số lượng theo bảng Bundle (${total}).`,
+        msg_rack_work_qty_mismatch: (workTotal, rackTotal) =>
+        `Tổng số lượng thanh (${workTotal}) phải bằng tổng số lượng Rack (${rackTotal}).`,
+        msg_time_code_300_required:
+         "Phần thời gian bắt buộc phải có mã 300 - Thiết lập đùn.",
+          },
+        };
 
     let currentLang = localStorage.getItem("lang") || "ja";
 
@@ -2752,7 +2764,82 @@
       });
       return rows;
     }
+        /* -------------------------
+      保存前の業務ルール（新規保存・更新で共通）
+    ------------------------- */
+    function validateBilletBundle() {
+      const actualBillet = Number(
+        v("actual-billet-qty__input")
+      );
 
+      const totalBundle = collectBundleRows().reduce(
+        (sum, row) => sum + Number(row.quantity || 0),
+        0
+      );
+
+      if (actualBillet !== totalBundle) {
+        const t = dict[currentLang] ?? dict.ja;
+
+        throw new Error(
+          t.msg_billet_bundle_mismatch(
+            actualBillet,
+            totalBundle
+          )
+        );
+      }
+    }
+    function validateRackWorkLength() {
+        const rackRows = collectRackRows();
+        const workLengthRows = collectWorkLengthRows();
+
+        const rackTotal = rackRows.reduce(
+          (sum, row) => sum + Number(row.work_quantity || 0),
+          0
+        );
+
+        const workTotal = workLengthRows.reduce(
+          (sum, row) => sum + Number(row.work_quantity || 0),
+          0
+        );
+
+        if (rackTotal !== workTotal) {
+          const t = dict[currentLang] ?? dict.ja;
+
+          throw new Error(
+            t.msg_rack_work_qty_mismatch(
+              workTotal,
+              rackTotal
+            )
+          );
+        }
+      }
+      function validateRequiredTimeCode300() {
+        const code300Count = collectTimeRows().filter(
+          row => String(row.code).trim() === "300"
+        ).length;
+
+        const t = dict[currentLang] ?? dict.ja;
+
+        if (code300Count === 0) {
+          throw new Error(t.msg_time_code_300_required);
+        }
+
+        if (code300Count > 1) {
+          throw new Error(
+            currentLang === "vi"
+              ? "Mã 300 - Thiết lập đùn chỉ được nhập một lần."
+              : "停止理由コード300は1回のみ登録できます。"
+          );
+        }
+      }
+
+    function validateBeforeSave() {
+      validateBilletBundle();
+      validateRackWorkLength();
+      validateRequiredTimeCode300();
+      // validateRamData();
+      // validateProductionTime();
+    }
     async function uploadScanFileIfNeeded() {
       const file = document.getElementById("press-direction_file").files[0];
       if (!file) return null;
@@ -2936,6 +3023,8 @@
       btn.disabled = true;
       showSaveStatus("更新中...", false);
       try {
+         validateBeforeSave();
+        
         const scanFileName = await uploadScanFileIfNeeded();
         const payload = {
           id: editingPressId,
@@ -2970,6 +3059,7 @@
       btn.disabled = true;
       showSaveStatus("保存中...", false);
       try {
+        validateBeforeSave();
         const scanFileName = await uploadScanFileIfNeeded();
         const payload = {
           press: collectPressData(scanFileName),
