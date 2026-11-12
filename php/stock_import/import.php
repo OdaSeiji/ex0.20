@@ -5,6 +5,7 @@
 ini_set('display_errors', '0');
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/common.php';
 
 function fail($msg, $errors = []) {
   echo json_encode(['status' => 'error', 'message' => $msg, 'errors' => $errors], JSON_UNESCAPED_UNICODE);
@@ -36,6 +37,12 @@ $str = function ($v, $max) {
   return mb_substr($s, 0, $max);
 };
 
+try {
+  $known = known_pn_set(getPDO());
+} catch (PDOException $e) {
+  fail($e->getMessage());
+}
+
 $errors = [];
 $clean = [];
 foreach ($rows as $r) {
@@ -43,11 +50,21 @@ foreach ($rows as $r) {
   $pn = trim((string)($r['production_number'] ?? ''));
   if ($pn === '') { $errors[] = ['line' => $line, 'message' => '品番が空です']; continue; }
   if (mb_strlen($pn) > 100) { $errors[] = ['line' => $line, 'message' => '品番が長すぎます']; continue; }
+  if (!isset($known[pn_key($pn)])) { $errors[] = ['line' => $line, 'message' => '品番が品番マスタにありません（' . $pn . '）']; continue; }
+  $pn = $known[pn_key($pn)]; // store the part number as written in the master
 
   if ($type === 'inventory') {
-    $q = $r['unallocated_inventory'] ?? 0;
-    if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => '未引当在庫数が整数ではありません']; continue; }
-    $clean[] = [$fileDate, $pn, $q];
+    $vals = [];
+    foreach (['stock_quantity' => '在庫数', 'allocated_quantity' => '引当数', 'unallocated_inventory' => '未引当在庫数'] as $k => $label) {
+      $q = $r[$k] ?? 0;
+      if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => $label . 'が整数ではありません']; continue 2; }
+      $vals[] = $q;
+    }
+    if ($vals[0] - $vals[1] !== $vals[2]) {
+      $errors[] = ['line' => $line, 'message' => '在庫数 − 引当数 が 未引当在庫数 と合いません'];
+      continue;
+    }
+    $clean[] = array_merge([$fileDate, $pn], $vals);
   } else {
     $q = $r['quantity'] ?? 0;
     if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => '数量が整数ではありません']; continue; }
@@ -71,8 +88,8 @@ if ($errors) fail('取込失敗', $errors);
 
 if ($type === 'inventory') {
   $table = 'stg_inventory_snapshot';
-  $cols = '(source_file_date, production_number, unallocated_inventory)';
-  $n = 3;
+  $cols = '(source_file_date, production_number, stock_quantity, allocated_quantity, unallocated_inventory)';
+  $n = 5;
 } else {
   $table = 'stg_shipping_instruction';
   $cols = '(source_file_date, production_number, quantity, order_date, due_date, customer_name,'

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Stock Shortage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-sub { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    input[type=month], select { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; font-family: "Roboto Mono", monospace; }
+    .toolbar label { font-size: 13px; display: flex; align-items: center; gap: 5px; }
+    .sep { width: 1px; height: 24px; background: #d0d8e2; }
+    .pending { font-size: 11px; color: #8a6d00; background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 1px 8px; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 16px; }
+    .info { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+    .stat { border-radius: 6px; padding: 8px 14px; background: #f1f5fa; min-width: 130px; }
+    .stat .lbl { font-size: 11px; color: #666; }
+    .stat .val { font-family: "Roboto Mono", monospace; font-size: 18px; font-weight: bold; }
+    .stat.short { background: #ffebee; }
+    .stat.short .val { color: #c62828; }
+    .notes { font-size: 12px; color: #8a6d00; margin-bottom: 10px; line-height: 1.7; }
+    .warn { font-size: 13px; color: #c62828; font-weight: bold; margin-bottom: 10px; }
+
+    .table-wrap { overflow: auto; max-height: 65vh; border: 1px solid #e3e8ef; border-radius: 6px; }
+    table { border-collapse: collapse; font-size: 13px; width: 100%; }
+    th, td { border-bottom: 1px solid #eef1f5; padding: 6px 10px; white-space: nowrap; }
+    th { background: #e8f1ff; position: sticky; top: 0; z-index: 1; font-size: 12px; text-align: center; }
+    th.grp-a { background: #ffe0e0; }
+    th.grp-b { background: #fff1d6; }
+    td { text-align: right; font-family: "Roboto Mono", monospace; }
+    td.pn { text-align: left; font-weight: bold; }
+    td.date { text-align: center; }
+    td.zero { color: #bbb; }
+    td.bal { font-weight: bold; }
+    td.bal.neg { color: #c62828; background: #ffebee; }
+    td.bal.zero0 { color: #e65100; background: #fff3e0; }
+    td.bal.pos { color: #2e7d32; }
+    .tag-nostock { font-size: 10px; color: #c62828; border: 1px solid #ef9a9a; border-radius: 8px; padding: 0 6px; margin-left: 6px; font-family: "Segoe UI", sans-serif; font-weight: normal; }
+    tfoot td { background: #f5f9ff; font-weight: bold; }
+    .empty { color: #999; text-align: center; padding: 30px; font-size: 13px; font-family: "Segoe UI", sans-serif; }
+    .hint { font-size: 12px; color: #777; margin-top: 10px; line-height: 1.7; max-width: 1000px; }
+  </style>
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">📉 在庫不足の抽出</h1>
+  <div class="subtitle" data-key="subtitle">その月の受注（A＋B）を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-sub" id="btnPrev" data-key="btn_prev">← 前の月</button>
+    <input type="month" id="fMonth" />
+    <button class="btn btn-sub" id="btnNext" data-key="btn_next">次の月 →</button>
+    <div class="sep"></div>
+    <label><span data-key="lbl_basis">月の基準</span>
+      <select id="fBasis">
+        <option value="reply_date" data-key="basis_reply">出荷回答日（J）</option>
+        <option value="due_date" data-key="basis_due">出荷期限（D）</option>
+        <option value="order_date" data-key="basis_order">受注日付（C）</option>
+      </select>
+    </label>
+    <span class="pending" data-key="pending">仮：製造に確認中</span>
+    <div class="sep"></div>
+    <label><input type="checkbox" id="fShortOnly" checked /><span data-key="lbl_short_only">不足（0 以下）だけ</span></label>
+  </div>
+
+  <div class="card">
+    <div id="infoBox"></div>
+    <div id="tableBox"><div class="empty">…</div></div>
+  </div>
+  <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（Z）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "📉 在庫不足の抽出",
+        subtitle: "その月の受注（A＋B）を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。",
+        btn_back: "← 戻る", btn_prev: "← 前の月", btn_next: "次の月 →",
+        lbl_basis: "月の基準", basis_reply: "出荷回答日（J）", basis_due: "出荷期限（D）", basis_order: "受注日付（C）",
+        pending: "仮：製造に確認中", lbl_short_only: "不足（0 以下）だけ",
+        hint: "※ 差引 ＝ 未引当在庫（Z）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。",
+        st_inv: "在庫データ（取込日付）", st_ship: "受注データ（取込日付）", st_pn: "受注のある品番", st_short: "不足（0 以下）",
+        none: "なし",
+        note_no_date: "月の基準の日付が空の受注：{n} 件（数に入れていません）",
+        note_other_ab: "この月で AB が A・B 以外の受注：{n} 件（数に入れていません）",
+        warn_no_inv: "在庫データがまだ取り込まれていません", warn_no_ship: "受注データがまだ取り込まれていません",
+        h_pn: "品番", h_stock: "在庫数（X）", h_alloc: "引当数（Y）", h_unalloc: "未引当在庫（Z）",
+        h_a: "A 受注数", h_b: "B 受注数", h_ab: "A＋B", h_bal: "差引", h_first: "最初の日付", h_cnt: "件数",
+        no_stock: "在庫データに無い", total: "合計",
+        empty_short: "この月に不足する品番はありません", empty_all: "この月の A・B の受注はありません",
+        err: "読み込めませんでした",
+      },
+      vi: {
+        title: "📉 Trích xuất thiếu tồn kho",
+        subtitle: "Cộng đơn hàng (A+B) trong tháng theo mã SP, trừ vào tồn kho chưa phân bổ và hiển thị các mã SP còn 0 trở xuống. Dùng dữ liệu có ngày nhập mới nhất cho cả tồn kho và đơn hàng.",
+        btn_back: "← Quay lại", btn_prev: "← Tháng trước", btn_next: "Tháng sau →",
+        lbl_basis: "Tính tháng theo", basis_reply: "Ngày trả lời xuất (J)", basis_due: "Hạn xuất hàng (D)", basis_order: "Ngày đặt hàng (C)",
+        pending: "Tạm thời: đang hỏi bộ phận sản xuất", lbl_short_only: "Chỉ thiếu (≤ 0)",
+        hint: "※ Chênh lệch = tồn chưa phân bổ (Z) − (số lượng đơn A + B). A là đơn hàng thực tế, B là đơn cho tồn kho. Đơn có AB khác A/B và đơn không có ngày tính tháng không được cộng (số đơn hiển thị ở trên). Mã SP không có trong dữ liệu tồn kho được tính với tồn chưa phân bổ = 0.",
+        st_inv: "Dữ liệu tồn kho (ngày nhập)", st_ship: "Dữ liệu đơn hàng (ngày nhập)", st_pn: "Mã SP có đơn", st_short: "Thiếu (≤ 0)",
+        none: "Chưa có",
+        note_no_date: "Đơn không có ngày tính tháng: {n} (không cộng)",
+        note_other_ab: "Đơn trong tháng có AB khác A/B: {n} (không cộng)",
+        warn_no_inv: "Chưa nhập dữ liệu tồn kho", warn_no_ship: "Chưa nhập dữ liệu đơn hàng",
+        h_pn: "Mã SP", h_stock: "Tồn kho (X)", h_alloc: "Đã phân bổ (Y)", h_unalloc: "Chưa phân bổ (Z)",
+        h_a: "Đơn A", h_b: "Đơn B", h_ab: "A+B", h_bal: "Chênh lệch", h_first: "Ngày sớm nhất", h_cnt: "Số đơn",
+        no_stock: "Không có trong tồn kho", total: "Tổng",
+        empty_short: "Không có mã SP bị thiếu trong tháng này", empty_all: "Không có đơn A/B trong tháng này",
+        err: "Không tải được dữ liệu",
+      },
+    };
+    let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
+    if (!dict[currentLang]) currentLang = "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k] ?? k;
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      render();
+    }
+
+    const API = "./php/stock_shortage/";
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    const num = (n) => (n === null || n === undefined ? "—" : Number(n).toLocaleString());
+    let data = null;
+
+    async function load() {
+      const month = document.getElementById("fMonth").value;
+      const basis = document.getElementById("fBasis").value;
+      try {
+        const r = await fetch(`${API}list.php?month=${encodeURIComponent(month)}&basis=${encodeURIComponent(basis)}`, { cache: "no-store" });
+        data = await r.json();
+      } catch (e) {
+        data = { status: "error", message: String(e) };
+      }
+      render();
+    }
+
+    function render() {
+      const info = document.getElementById("infoBox");
+      const box = document.getElementById("tableBox");
+      if (!data) return;
+      if (data.status !== "ok") {
+        info.innerHTML = "";
+        box.innerHTML = `<div class="empty">${esc(t("err"))} ${esc(data.message || "")}</div>`;
+        return;
+      }
+      const shortRows = data.rows.filter((r) => r.balance <= 0);
+      const shortOnly = document.getElementById("fShortOnly").checked;
+      const rows = shortOnly ? shortRows : data.rows;
+
+      let h = `<div class="info">
+        <div class="stat"><div class="lbl">${esc(t("st_inv"))}</div><div class="val">${esc(data.inventory_date || t("none"))}</div></div>
+        <div class="stat"><div class="lbl">${esc(t("st_ship"))}</div><div class="val">${esc(data.shipping_date || t("none"))}</div></div>
+        <div class="stat"><div class="lbl">${esc(t("st_pn"))}</div><div class="val">${data.rows.length}</div></div>
+        <div class="stat short"><div class="lbl">${esc(t("st_short"))}</div><div class="val">${shortRows.length}</div></div>
+      </div>`;
+      if (!data.inventory_date) h += `<div class="warn">${esc(t("warn_no_inv"))}</div>`;
+      if (!data.shipping_date) h += `<div class="warn">${esc(t("warn_no_ship"))}</div>`;
+      const notes = [];
+      if (data.notes.no_date) notes.push(t("note_no_date", { n: data.notes.no_date }));
+      if (data.notes.other_ab) notes.push(t("note_other_ab", { n: data.notes.other_ab }));
+      if (notes.length) h += `<div class="notes">${notes.map(esc).join("<br>")}</div>`;
+      info.innerHTML = h;
+
+      if (!rows.length) {
+        box.innerHTML = `<div class="empty">${esc(t(shortOnly ? "empty_short" : "empty_all"))}</div>`;
+        return;
+      }
+      const z = (n) => (Number(n) === 0 ? "zero" : "");
+      const sum = (k) => rows.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+      box.innerHTML = `<div class="table-wrap"><table>
+        <thead><tr>
+          <th>${esc(t("h_pn"))}</th>
+          <th>${esc(t("h_stock"))}</th><th>${esc(t("h_alloc"))}</th><th>${esc(t("h_unalloc"))}</th>
+          <th class="grp-a">${esc(t("h_a"))}</th><th class="grp-b">${esc(t("h_b"))}</th><th>${esc(t("h_ab"))}</th>
+          <th>${esc(t("h_bal"))}</th>
+          <th>${esc(t("h_cnt"))}</th><th>${esc(t("h_first"))}</th>
+        </tr></thead>
+        <tbody>${rows.map((r) => {
+          const bal = r.balance < 0 ? "neg" : r.balance === 0 ? "zero0" : "pos";
+          return `<tr>
+            <td class="pn">${esc(r.production_number)}${r.in_stock_file ? "" : `<span class="tag-nostock">${esc(t("no_stock"))}</span>`}</td>
+            <td class="${z(r.stock_qty)}">${num(r.stock_qty)}</td>
+            <td class="${z(r.allocated_qty)}">${num(r.allocated_qty)}</td>
+            <td class="${z(r.unallocated_qty)}">${num(r.unallocated_qty)}</td>
+            <td class="${z(r.a_qty)}">${num(r.a_qty)}</td>
+            <td class="${z(r.b_qty)}">${num(r.b_qty)}</td>
+            <td>${num(r.ab_qty)}</td>
+            <td class="bal ${bal}">${num(r.balance)}</td>
+            <td>${r.a_cnt + r.b_cnt}</td>
+            <td class="date">${esc(r.first_date || "")}</td>
+          </tr>`;
+        }).join("")}</tbody>
+        <tfoot><tr>
+          <td class="pn">${esc(t("total"))}</td>
+          <td>${num(sum("stock_qty"))}</td><td>${num(sum("allocated_qty"))}</td><td>${num(sum("unallocated_qty"))}</td>
+          <td>${num(sum("a_qty"))}</td><td>${num(sum("b_qty"))}</td><td>${num(sum("ab_qty"))}</td>
+          <td>${num(sum("balance"))}</td><td>${num(rows.reduce((a, r) => a + r.a_cnt + r.b_cnt, 0))}</td><td></td>
+        </tr></tfoot>
+      </table></div>`;
+    }
+
+    // month navigation
+    const fMonth = document.getElementById("fMonth");
+    const shiftMonth = (d) => {
+      const [y, m] = fMonth.value.split("-").map(Number);
+      const dt = new Date(y, m - 1 + d, 1);
+      fMonth.value = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}`;
+      load();
+    };
+    document.getElementById("btnPrev").addEventListener("click", () => shiftMonth(-1));
+    document.getElementById("btnNext").addEventListener("click", () => shiftMonth(1));
+    fMonth.addEventListener("change", load);
+    document.getElementById("fBasis").addEventListener("change", load);
+    document.getElementById("fShortOnly").addEventListener("change", render);
+
+    const now = new Date();
+    fMonth.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    setLang(currentLang);
+    load();
+  </script>
+</body>
+</html>
