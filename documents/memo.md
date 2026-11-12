@@ -6514,3 +6514,275 @@ http://10.163.50.17/ex0.20/production_number.html
 カテゴリー名が途中で切れちゃう。テーブルの問題か？表示の問題か？
 テーブルの問題なし。表示の問題。
 表示範囲に余裕が有るので、すべての文字列を表示するよう改造する。
+
+```sql
+CREATE TABLE stg_inventory_snapshot (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    source_file_date DATE NOT NULL COMMENT '在庫データ日付',
+
+    production_number VARCHAR(100) NOT NULL COMMENT '品番',
+
+    unallocated_inventory INT DEFAULT 0 COMMENT '未引当在庫数',
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+
+    INDEX idx_source_file_date (source_file_date),
+    INDEX idx_production_number (production_number),
+    INDEX idx_date_product (source_file_date, production_number)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4;
+```
+
+このステージングテーブルを本番PCで作成済み。
+当該、ExcelのB列、Z列を取り込む。
+
+次は、受注データの取り込み用ステージングテーブル
+
+```sql
+CREATE TABLE stg_shipping_instruction (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+    source_file_date DATE NOT NULL COMMENT '取込日',
+
+    production_number VARCHAR(100) NOT NULL COMMENT '品番',
+
+    quantity INT NULL COMMENT '数量',
+
+    order_date DATE NULL COMMENT '受注日付',
+
+    due_date DATE NULL COMMENT '出荷期限',
+
+    customer_name VARCHAR(255) NULL COMMENT '得意先名',
+
+    shipping_instruction_no VARCHAR(50) NULL COMMENT '出荷指示番号',
+
+    transportation_method VARCHAR(20) NULL COMMENT '搬送方法',
+
+    reply_date DATE NULL COMMENT '出荷回答日',
+
+    ab_status VARCHAR(10) NULL COMMENT 'AB',
+
+    custom_status VARCHAR(50) NULL COMMENT 'OK/遅延/期限にならない',
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+
+    INDEX idx_file_date(source_file_date),
+    INDEX idx_prod_no(production_number),
+    INDEX idx_due_date(due_date),
+    INDEX idx_ship_instruction(shipping_instruction_no),
+    INDEX idx_status(custom_status)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4;
+```
+
+どちらのテーブルも作成済み。
+
+---
+
+# Excel取込機能 仕様書
+
+## 1. 目的
+
+Excelファイルをアップロードし、データをMySQLのステージングテーブルへ登録する。対象は以下の2種類のファイルとする。
+
+- 在庫データ：261110 Aluminum Extrusion_IOB (1).xlsx 【1-ab5154】
+- 出荷指示データ：261110_Aluminum Extrusion_Reply term data (1).xlsx 【2-b346bd】
+
+---
+
+## 2. 画面概要
+
+### 画面名
+
+Excel取込画面
+
+### URL
+
+```
+/import
+```
+
+### 入力項目
+
+| 項目          | 必須 | 説明                        |
+| ------------- | ---- | --------------------------- |
+| 取込種別      | ○    | 在庫データ / 出荷指示データ |
+| 取込日付      | ○    | データ基準日                |
+| Excelファイル | ○    | アップロード対象ファイル    |
+
+### ボタン
+
+- 取込開始
+
+---
+
+## 3. 在庫データ取込
+
+### 取込先テーブル
+
+```sql
+stg_inventory_snapshot
+```
+
+### 対象列
+
+| Excel列 | DB項目                |
+| ------- | --------------------- |
+| B       | production_number     |
+| Z       | unallocated_inventory |
+
+【1-ab5154】
+
+### 取込ルール
+
+- B列（品番）が空の場合はスキップ
+- Z列が空白の場合は 0 として登録
+- 取込前に同一取込日付のデータを削除して再登録する
+
+---
+
+## 4. 出荷指示データ取込
+
+### 取込先テーブル
+
+```sql
+stg_shipping_instruction
+```
+
+### 対象列
+
+| Excel列 | DB項目                  |
+| ------- | ----------------------- |
+| A       | production_number       |
+| B       | quantity                |
+| C       | order_date              |
+| D       | due_date                |
+| F       | customer_name           |
+| G       | shipping_instruction_no |
+| H       | transportation_method   |
+| J       | reply_date              |
+| K       | ab_status               |
+| S       | custom_status           |
+
+【2-b346bd】
+
+### 取込ルール
+
+- 品番が空の場合はスキップ
+- 数量が空白の場合は 0 とする
+- 日付項目はDATE型へ変換する
+- 取込前に同一取込日付のデータを削除して再登録する
+
+---
+
+## 5. エラーチェック
+
+### 共通
+
+- ファイル未選択
+- Excelファイル以外のアップロード
+- 取込対象データなし
+- 必須列が存在しない
+- 日付変換エラー
+
+### エラーメッセージ例
+
+```
+取込エラー
+行番号：125
+内容：日付形式が不正です
+```
+
+---
+
+## 6. 処理結果表示
+
+正常終了時
+
+```
+取込完了
+
+登録件数：XXXX件
+スキップ件数：XXXX件
+```
+
+異常終了時
+
+```
+取込失敗
+
+エラー件数：XXXX件
+```
+
+---
+
+## 7. 取込履歴
+
+取込結果は履歴テーブルへ記録する。
+
+推奨テーブル
+
+```sql
+t_import_history
+```
+
+記録項目
+
+- 取込種別
+- ファイル名
+- 取込日付
+- 登録件数
+- エラー件数
+- 実行日時
+- 実行者
+
+---
+
+## 8. 権限
+
+本機能は管理者権限ユーザーのみ実行可能とする。
+
+```
+ROLE_IMPORT
+```
+
+---
+
+## 9. 使用テーブル
+
+```sql
+stg_inventory_snapshot
+```
+
+```sql
+stg_shipping_instruction
+```
+
+本機能ではExcelデータのステージング登録のみを行い、在庫計算や不足数計算などの業務ロジックは実装対象外とする。
+
+---
+
+# 2026/11/12
+
+更新が必要な金型が分からない。
+
+<figure style="text-align:center;">
+  <img src="./img/20261112-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
+
+左側の型番が選択された状態で、
+右側の品番が出ないことが有るか？
+品番が紐づけられていない金型が有る？
+
+<figure style="text-align:center;">
+  <img src="./img/20261112-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
