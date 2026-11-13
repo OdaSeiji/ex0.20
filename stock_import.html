@@ -61,9 +61,12 @@
     .result .big { font-weight: bold; font-size: 16px; }
     .note { font-size: 12px; color: #8a6d00; background: #fff8e1; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; }
 
-    .table-wrap { overflow: auto; max-height: 55vh; border: 1px solid #e3e8ef; border-radius: 6px; }
-    table { border-collapse: collapse; font-size: 12px; width: 100%; }
-    th, td { border-bottom: 1px solid #eef1f5; padding: 5px 8px; text-align: left; white-space: nowrap; }
+    /* the table is as wide as its contents (not the whole card) */
+    .table-wrap { overflow: auto; max-height: 55vh; border: 1px solid #e3e8ef; border-radius: 6px; width: fit-content; max-width: 100%; }
+    table { border-collapse: collapse; font-size: 12px; }
+    th, td { border-bottom: 1px solid #eef1f5; padding: 5px 10px; text-align: left; white-space: nowrap; }
+    th { text-align: center; }
+    #previewBox td.mono { min-width: 140px; }
     th { background: #e8f1ff; position: sticky; top: 0; z-index: 1; font-size: 11px; }
     td.num { text-align: right; font-family: "Roboto Mono", monospace; }
     td.mono, td.line { font-family: "Roboto Mono", monospace; }
@@ -78,6 +81,23 @@
     .hist table { font-size: 12px; margin-bottom: 14px; }
     .hist td.num, .hist td.mono { font-family: "Roboto Mono", monospace; }
     .hist .none { font-size: 12px; color: #aaa; margin-bottom: 14px; }
+
+    /* Wide screens: the whole page fits in the window height (e.g. 1080), only the lists scroll */
+    @media (min-width: 1001px) {
+      html, body { height: 100%; }
+      body { display: flex; flex-direction: column; overflow: hidden; padding: 14px 20px; }
+      h1, .subtitle, .toolbar { flex: none; }
+      .subtitle, .toolbar { margin-bottom: 10px; }
+      .layout { flex: 1; min-height: 0; align-items: stretch; }
+      .main-col { display: flex; flex-direction: column; min-height: 0; }
+      .main-col > .card:first-child { flex: none; }
+      .preview-card { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+      #resultBox { flex: none; }
+      #previewBox { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+      #previewBox > * { flex: none; }
+      #previewBox > .table-wrap { flex: 0 1 auto; min-height: 120px; max-height: none; }
+      .hist { overflow-y: auto; min-height: 0; }
+    }
   </style>
 </head>
 <body>
@@ -94,7 +114,7 @@
   </div>
 
   <div class="layout">
-    <div>
+    <div class="main-col">
       <div class="card">
         <div class="form-grid">
           <label class="head" data-key="lbl_type">取込種別</label>
@@ -120,7 +140,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card preview-card">
         <div id="resultBox"></div>
         <div id="previewBox"><div class="empty" data-key="no_file">Excel ファイルを選ぶと、ここに中身が出ます</div></div>
       </div>
@@ -143,7 +163,8 @@
         no_file: "Excel ファイルを選ぶと、ここに中身が出ます",
         hist_title: "取込済みのデータ", hist_none: "まだありません",
         hist_date: "取込日付", hist_cnt: "件数", hist_at: "取込日時",
-        map_inventory: "読む列：B 品番、Y 在庫数、Z 引当数、AA 未引当在庫数（数の列が空なら 0）",
+        map_inventory: "A 列が「アルミ押し出し」の行だけを読む。読む列：B 品番、Y 在庫数、Z 引当数、AA 未引当在庫数（数の列が空なら 0）",
+        st_excluded: "対象外（{c} 列が「{v}」以外）", excluded_vals: "対象外にした {c} 列の値：{list}", blank: "（空）",
         map_shipping: "読む列：A 品番、B 数量、C 受注日付、D 出荷期限、F 得意先名、G 出荷指示番号、H 搬送方法、J 出荷回答日、K AB、S ステータス",
         sheet: "シート：{s}",
         st_ok: "登録する件数", st_skip: "スキップ（品番が空・見出し）", st_err: "エラー",
@@ -182,7 +203,8 @@
         no_file: "Chọn file Excel thì nội dung sẽ hiện ở đây",
         hist_title: "Dữ liệu đã nhập", hist_none: "Chưa có",
         hist_date: "Ngày dữ liệu", hist_cnt: "Số dòng", hist_at: "Thời điểm nhập",
-        map_inventory: "Cột đọc: B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ (cột số trống = 0)",
+        map_inventory: "Chỉ đọc các dòng có cột A là \"アルミ押し出し\" (nhôm đùn). Cột đọc: B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ (cột số trống = 0)",
+        st_excluded: "Ngoài phạm vi (cột {c} khác \"{v}\")", excluded_vals: "Giá trị cột {c} bị loại: {list}", blank: "(trống)",
         map_shipping: "Cột đọc: A mã SP, B số lượng, C ngày đặt hàng, D hạn xuất hàng, F khách hàng, G số chỉ thị xuất, H phương thức vận chuyển, J ngày trả lời xuất, K AB, S trạng thái",
         sheet: "Sheet: {s}",
         st_ok: "Số dòng sẽ đăng ký", st_skip: "Bỏ qua (mã SP trống, tiêu đề)", st_err: "Lỗi",
@@ -239,6 +261,8 @@
     // Excel column → DB column (memo.md 2026/11/11 「Excel取込機能 仕様書」)
     const SPEC = {
       inventory: {
+        // read only the rows whose column A is this value (other rows are counted as "excluded")
+        filter: { col: "A", value: "アルミ押し出し" },
         cols: [
           { key: "production_number", col: "B", kind: "pn" },
           { key: "stock_quantity", col: "Y", kind: "qty" },
@@ -327,11 +351,16 @@
       const aoa = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: "", blankrows: true });
       const qtyCol = spec.cols.find((c) => c.kind === "qty");
       const rows = [], errors = [];
-      let skipped = 0, started = false;
+      const excludedVals = {};
+      let skipped = 0, excluded = 0, started = false;
       aoa.forEach((cells, i) => {
         const line = i + 1 + range.s.r; // Excel row number
         const pn = String(cells[colIndex(spec.cols[0].col)] ?? "").trim();
         if (pn === "") { if (cells.some((c) => String(c).trim() !== "")) skipped++; return; }
+        if (spec.filter) {
+          const fv = String(cells[colIndex(spec.filter.col)] ?? "").trim();
+          if (fv !== spec.filter.value) { excluded++; excludedVals[fv] = (excludedVals[fv] || 0) + 1; return; }
+        }
         // Heading rows: before the first data row, a row whose quantity cell is text (e.g. "数量") is a heading.
         const q = toQty(cells[colIndex(qtyCol.col)]);
         if (!started && q.isText) { skipped++; return; }
@@ -361,7 +390,7 @@
         rows.push(row);
       });
       if (!rows.length && !errors.length) errors.push({ line: "-", message: t("e_no_data") });
-      parsed = { type, rows, skipped, total: rows.length, errors, checking: rows.length > 0 };
+      parsed = { type, rows, skipped, excluded, excludedVals, total: rows.length, errors, checking: rows.length > 0 };
       renderPreview();
       if (rows.length) checkProductionNumbers(parsed);
     }
@@ -415,8 +444,14 @@
       let h = `<div class="summary">
         <div class="stat ok"><div class="lbl">${esc(t("st_ok"))}</div><div class="val">${okCount}</div></div>
         <div class="stat skip"><div class="lbl">${esc(t("st_skip"))}</div><div class="val">${parsed.skipped}</div></div>
+        ${spec.filter ? `<div class="stat"><div class="lbl">${esc(t("st_excluded", { c: spec.filter.col, v: spec.filter.value }))}</div><div class="val">${parsed.excluded || 0}</div></div>` : ""}
         ${parsed.errors.length ? `<div class="stat err"><div class="lbl">${esc(t("st_err"))}</div><div class="val">${parsed.errors.length}</div></div>` : ""}
       </div>`;
+      if (spec.filter && parsed.excluded) {
+        const vals = Object.entries(parsed.excludedVals || {}).sort((a, b) => b[1] - a[1]);
+        const list = vals.slice(0, 10).map(([v, n]) => `${v === "" ? t("blank") : v}（${n}）`).join("、") + (vals.length > 10 ? " …" : "");
+        h += `<div class="note">${esc(t("excluded_vals", { c: spec.filter.col, list }))}</div>`;
+      }
       if (parsed.checking) h += `<div class="note">${esc(t("checking"))}</div>`;
       if (parsed.errors.length) {
         h += `<div class="fix">${esc(t("fix_hint"))}` +
@@ -554,7 +589,7 @@
       } catch (e) {
         res = { status: "error", message: String(e) };
       }
-      if (res.status === "ok") res.skipped = parsed.skipped;
+      if (res.status === "ok") res.skipped = parsed.skipped + (parsed.excluded || 0);
       lastResult = res;
       renderResult(res);
       btn.textContent = t("btn_import");
