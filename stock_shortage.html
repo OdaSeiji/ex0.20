@@ -88,7 +88,7 @@
     <div id="infoBox"></div>
     <div id="tableBox"><div class="empty">…</div></div>
   </div>
-  <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（Z）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
+  <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
 
   <script>
     const dict = {
@@ -98,13 +98,13 @@
         btn_back: "← 戻る", btn_prev: "← 前の月", btn_next: "次の月 →",
         lbl_basis: "月の基準", basis_reply: "出荷回答日（J）", basis_due: "出荷期限（D）", basis_order: "受注日付（C）",
         pending: "仮：製造に確認中", lbl_short_only: "不足（0 以下）だけ",
-        hint: "※ 差引 ＝ 未引当在庫（Z）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。",
+        hint: "※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。",
         st_inv: "在庫データ（取込日付）", st_ship: "受注データ（取込日付）", st_pn: "受注のある品番", st_short: "不足（0 以下）",
         none: "なし",
         note_no_date: "月の基準の日付が空の受注：{n} 件（数に入れていません）",
         note_other_ab: "この月で AB が A・B 以外の受注：{n} 件（数に入れていません）",
         warn_no_inv: "在庫データがまだ取り込まれていません", warn_no_ship: "受注データがまだ取り込まれていません",
-        h_pn: "品番", h_stock: "在庫数（X）", h_alloc: "引当数（Y）", h_unalloc: "未引当在庫（Z）",
+        h_pn: "品番", h_stock: "在庫数（Y）", h_alloc: "引当数（Z）", h_unalloc: "未引当在庫（AA）",
         h_a: "A 受注数", h_b: "B 受注数", h_ab: "A＋B", h_bal: "差引", h_first: "最初の日付", h_cnt: "件数",
         no_stock: "在庫データに無い", total: "合計",
         empty_short: "この月に不足する品番はありません", empty_all: "この月の A・B の受注はありません",
@@ -116,13 +116,13 @@
         btn_back: "← Quay lại", btn_prev: "← Tháng trước", btn_next: "Tháng sau →",
         lbl_basis: "Tính tháng theo", basis_reply: "Ngày trả lời xuất (J)", basis_due: "Hạn xuất hàng (D)", basis_order: "Ngày đặt hàng (C)",
         pending: "Tạm thời: đang hỏi bộ phận sản xuất", lbl_short_only: "Chỉ thiếu (≤ 0)",
-        hint: "※ Chênh lệch = tồn chưa phân bổ (Z) − (số lượng đơn A + B). A là đơn hàng thực tế, B là đơn cho tồn kho. Đơn có AB khác A/B và đơn không có ngày tính tháng không được cộng (số đơn hiển thị ở trên). Mã SP không có trong dữ liệu tồn kho được tính với tồn chưa phân bổ = 0.",
+        hint: "※ Chênh lệch = tồn chưa phân bổ (AA) − (số lượng đơn A + B). A là đơn hàng thực tế, B là đơn cho tồn kho. Đơn có AB khác A/B và đơn không có ngày tính tháng không được cộng (số đơn hiển thị ở trên). Mã SP không có trong dữ liệu tồn kho được tính với tồn chưa phân bổ = 0.",
         st_inv: "Dữ liệu tồn kho (ngày nhập)", st_ship: "Dữ liệu đơn hàng (ngày nhập)", st_pn: "Mã SP có đơn", st_short: "Thiếu (≤ 0)",
         none: "Chưa có",
         note_no_date: "Đơn không có ngày tính tháng: {n} (không cộng)",
         note_other_ab: "Đơn trong tháng có AB khác A/B: {n} (không cộng)",
         warn_no_inv: "Chưa nhập dữ liệu tồn kho", warn_no_ship: "Chưa nhập dữ liệu đơn hàng",
-        h_pn: "Mã SP", h_stock: "Tồn kho (X)", h_alloc: "Đã phân bổ (Y)", h_unalloc: "Chưa phân bổ (Z)",
+        h_pn: "Mã SP", h_stock: "Tồn kho (Y)", h_alloc: "Đã phân bổ (Z)", h_unalloc: "Chưa phân bổ (AA)",
         h_a: "Đơn A", h_b: "Đơn B", h_ab: "A+B", h_bal: "Chênh lệch", h_first: "Ngày sớm nhất", h_cnt: "Số đơn",
         no_stock: "Không có trong tồn kho", total: "Tổng",
         empty_short: "Không có mã SP bị thiếu trong tháng này", empty_all: "Không có đơn A/B trong tháng này",

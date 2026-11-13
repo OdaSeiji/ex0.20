@@ -111,7 +111,7 @@
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ho_purpose">Excel で行っている在庫と受注（出荷指示）の突き合わせを Web 化するため。まずは2つの Excel をデータベースに取り込めるようにした。</span>
         </div>
         <div class="entry-purpose">
-          <span class="label" data-key="lbl_content">内容:</span><span data-key="ho_content">トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと（在庫データは B 品番・X 在庫数・Y 引当数・Z 未引当在庫数を読む）、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。品番は品番マスタにあるかも確かめ、無い品番があれば行番号つきのエラーにして取り込まない（Excel を直して選び直す）。在庫データは「在庫数 − 引当数 ＝ 未引当在庫数」になっていない行もエラーにする。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。</span>
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ho_content">トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと（在庫データは B 品番・Y 在庫数・Z 引当数・AA 未引当在庫数を読む）、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。品番は品番マスタにあるかも確かめ、無い品番があれば行番号つきのエラーにして取り込まない（Excel を直して選び直す）。在庫データは「在庫数 − 引当数 ＝ 未引当在庫数」になっていない行もエラーにする。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。</span>
         </div>
       </div>
 
@@ -2072,7 +2072,7 @@
           hn_content: "品番の右に「型番」の列を追加した（その品番の金型番号のハイフンより前。例：DM031-V01D → DM031。型番が2つある品番は「, 」で並べ、金型が無い品番は空欄）。型番の列でも並べ替えができる。カテゴリ1・カテゴリ2の名前は8文字で切っていたのをやめ、全部表示するようにした。",
           ho_title: "在庫管理：在庫・出荷指示の取込を追加",
           ho_purpose: "Excel で行っている在庫と受注（出荷指示）の突き合わせを Web 化するため。まずは2つの Excel をデータベースに取り込めるようにした。",
-          ho_content: "トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと（在庫データは B 品番・X 在庫数・Y 引当数・Z 未引当在庫数を読む）、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。品番は品番マスタにあるかも確かめ、無い品番があれば行番号つきのエラーにして取り込まない（Excel を直して選び直す）。在庫データは「在庫数 − 引当数 ＝ 未引当在庫数」になっていない行もエラーにする。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。",
+          ho_content: "トップメニューに「在庫管理」を追加し、「在庫・出荷指示の取込」の画面を作った。取込種別（在庫データ / 出荷指示データ）と取込日付を選んで Excel を選ぶと（在庫データは B 品番・Y 在庫数・Z 引当数・AA 未引当在庫数を読む）、中身とエラー（行番号つき）を表示し、問題が無ければ「取込開始」で登録する。品番が空の行と見出しの行は飛ばす。品番は品番マスタにあるかも確かめ、無い品番があれば行番号つきのエラーにして取り込まない（Excel を直して選び直す）。在庫データは「在庫数 − 引当数 ＝ 未引当在庫数」になっていない行もエラーにする。同じ取込日付のデータは消してから登録し直す。右側に、取り込んだ日付と件数を表示する。",
           hp_title: "在庫管理：在庫不足の抽出を追加",
           hp_purpose: "その月の受注に対して在庫が足りなくなる品番を、すぐに見つけられるようにするため。",
           hp_content: "在庫管理に「在庫不足の抽出」を追加した。いちばん新しく取り込んだ在庫データと受注データを使い、その月の A・B の受注数を品番ごとに合計して、未引当在庫から引いた差引が 0 以下の品番を出す（「不足だけ」を外すと受注のある品番を全部表示）。月を決める日付は今は出荷回答日（製造に確認中のため、出荷期限・受注日付にも切り替えられる）。",
@@ -2376,7 +2376,7 @@
           hn_content: "Thêm cột \"Mã gốc\" bên phải mã SP (phần trước dấu gạch ngang của mã khuôn, ví dụ DM031-V01D → DM031; nếu có 2 mã gốc thì hiển thị cách nhau bởi \", \", nếu chưa có khuôn thì để trống). Có thể sắp xếp theo cột mã gốc. Tên Danh mục 1 và Danh mục 2 không còn bị cắt ở 8 ký tự mà hiển thị đầy đủ.",
           ho_title: "Quản lý tồn kho: thêm chức năng nhập tồn kho / chỉ thị xuất hàng",
           ho_purpose: "Để đưa việc đối chiếu tồn kho và đơn hàng (chỉ thị xuất hàng) đang làm bằng Excel lên Web. Trước tiên, có thể nhập 2 file Excel vào cơ sở dữ liệu.",
-          ho_content: "Thêm mục \"Quản lý tồn kho\" vào menu chính và tạo màn hình \"Nhập tồn kho / chỉ thị xuất hàng\". Chọn loại dữ liệu (tồn kho / chỉ thị xuất hàng), ngày dữ liệu và file Excel (dữ liệu tồn kho đọc cột B mã SP, X tồn kho, Y đã phân bổ, Z tồn kho chưa phân bổ) thì nội dung và lỗi (kèm số dòng) được hiển thị; nếu không có vấn đề thì bấm \"Bắt đầu nhập\" để đăng ký. Dòng có mã SP trống và dòng tiêu đề được bỏ qua. Mã SP cũng được đối chiếu với danh mục mã SP; nếu có mã không tồn tại thì báo lỗi kèm số dòng và không nhập (sửa file Excel rồi chọn lại). Với dữ liệu tồn kho, dòng không thỏa "tồn kho − đã phân bổ = tồn chưa phân bổ" cũng bị báo lỗi. Dữ liệu cùng ngày dữ liệu bị xóa rồi đăng ký lại. Bên phải hiển thị các ngày đã nhập và số dòng.",
+          ho_content: "Thêm mục \"Quản lý tồn kho\" vào menu chính và tạo màn hình \"Nhập tồn kho / chỉ thị xuất hàng\". Chọn loại dữ liệu (tồn kho / chỉ thị xuất hàng), ngày dữ liệu và file Excel (dữ liệu tồn kho đọc cột B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ) thì nội dung và lỗi (kèm số dòng) được hiển thị; nếu không có vấn đề thì bấm \"Bắt đầu nhập\" để đăng ký. Dòng có mã SP trống và dòng tiêu đề được bỏ qua. Mã SP cũng được đối chiếu với danh mục mã SP; nếu có mã không tồn tại thì báo lỗi kèm số dòng và không nhập (sửa file Excel rồi chọn lại). Với dữ liệu tồn kho, dòng không thỏa "tồn kho − đã phân bổ = tồn chưa phân bổ" cũng bị báo lỗi. Dữ liệu cùng ngày dữ liệu bị xóa rồi đăng ký lại. Bên phải hiển thị các ngày đã nhập và số dòng.",
           hp_title: "Quản lý tồn kho: thêm trích xuất thiếu tồn kho",
           hp_purpose: "Để nhanh chóng tìm ra các mã SP sẽ thiếu tồn kho so với đơn hàng trong tháng.",
           hp_content: "Thêm \"Trích xuất thiếu tồn kho\" vào mục Quản lý tồn kho. Dùng dữ liệu tồn kho và đơn hàng nhập mới nhất, cộng số lượng đơn A và B trong tháng theo mã SP, trừ vào tồn chưa phân bổ và hiển thị các mã SP có chênh lệch từ 0 trở xuống (bỏ chọn \"Chỉ thiếu\" để xem tất cả mã SP có đơn). Ngày dùng để tính tháng hiện tạm là ngày trả lời xuất (đang hỏi bộ phận sản xuất; có thể đổi sang hạn xuất hàng hoặc ngày đặt hàng).",
