@@ -16,7 +16,7 @@
 			}
 
 			body {
-				font-family: 'Roboto Mono', 'Segoe UI', monospace;
+				font-family: 'Arial','Roboto Mono', 'Segoe UI', monospace;
 				background: #f0f2f5;
 				padding: 20px;
 			}
@@ -265,22 +265,8 @@
 			}
 
 			/* 押出条件: card1と同じくラベル+input横並びのボックスを並べる */
-			.form-grid {
-				display: flex;
-				flex-wrap: wrap;
-			}
-			.form-item {
-				display: flex;
-				flex-direction: column;
-				border: 1px solid #e0c66a;
-				background: #fff8e1;
-				padding: 4px 8px;
-				margin: 2px;
-				box-sizing: border-box;
-				transition:
-					background 0.15s,
-					border-color 0.15s;
-			}
+			.form-grid { display:grid; grid-template-columns:repeat(12,1fr); gap:4px; align-items:stretch; }
+			.form-item { display:flex; flex-direction:column; justify-content:space-between; border:1px solid #e0c66a; background:#fff8e1; padding:5px 8px; margin:0; min-width:0; min-height:52px; box-sizing:border-box; grid-column:span 2; transition:background .15s,border-color .15s; }
 			.form-item.complete,
 			.form-item.static {
 				background: #fff;
@@ -591,6 +577,17 @@
 				background: #e0e0e0;
 				color: #666;
 			}
+			/* Form gọn, thẳng hàng nhưng không ép kiểu Excel */
+			.form-grid { display:flex; flex-wrap:wrap; gap:4px; align-items:stretch; }
+			.form-item { margin:0; min-height:52px; padding:5px 8px; justify-content:space-between; width:220px; flex-grow:1; }
+			.form-item.fw-date { width:250px; }
+			.form-item.fw-wide { width:240px; }
+			.form-item[data-field="fIncharge"] { width:300px; }
+			.form-item[data-field="fCooling"] { width:210px; }
+			.form-item.static { width:160px; flex-grow:0; }
+			.form-item.full { width:100%; flex-basis:100%; }
+			.form-item .fi-row { min-height:25px; align-items:center; }
+			.fi-prev { height:13px; line-height:13px; margin-top:2px; }
 		</style>
 	</head>
 	<body>

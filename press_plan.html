@@ -10,7 +10,7 @@
       * { box-sizing: border-box; margin: 0; padding: 0; }
 
       body {
-        font-family: "Roboto Mono", "Segoe UI", monospace;
+        font-family: "Arial","Roboto Mono", "Segoe UI", monospace;
         background: #f0f2f5;
         padding: 16px;
       }
@@ -71,7 +71,12 @@
       }
 
       table { width: 100%; border-collapse: collapse; font-size: 12px; }
-      th, td { padding: 4px 5px; border-bottom: 1px solid #eee; text-align: left; white-space: nowrap; }
+      th, td {padding: 4px 5px;border-bottom: 1px solid #ddd;border-right: 1px solid #ddd;text-align: left;white-space: nowrap;
+      }
+
+      th:first-child,
+      td:first-child {border-left: 1px solid #ddd;
+      }
       th { color: #777; font-size: 11px; background: #fff; position: sticky; top: 0; z-index: 1; }
       td.c { text-align: center; }
       .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -108,13 +113,25 @@
       .plan-item.odd { background: #f8fafd; }
       .pi-row { display: grid; gap: 6px; align-items: end; }
       .pi-row.r1 { grid-template-columns: 136px 46px 52px 30px 37px; }
-      .pi-row.r2 { grid-template-columns: 82px 52px 141px 26px; margin-top: 4px; }
+      .pi-row.r2 { grid-template-columns:82px 52px 1fr 26px; margin-top:4px; }
+      .note-quick { grid-column:1 / -1; display:flex; gap:4px; margin-top:3px; flex-wrap:nowrap; }
+      .note-tag { flex:1; border:none; border-radius:4px; padding:4px 2px; font-size:9px; font-weight:700; cursor:pointer; white-space:nowrap; color:#fff; }
       .pi-cell { min-width: 0; }
       .plan-item input[type="text"], .plan-item input[type="number"], .plan-item select { width: 100%; padding: 3px 4px; font-size: 12px; }
       .plan-item .w-qty { text-align: right; padding-right: 2px; }
       .plan-item .fl { font-size: 10px; color: #888; line-height: 1.2; margin-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }   /* 入力欄の上の項目名 */
       .plan-item .die-name { font-weight: bold; font-size: 12px; line-height: 24px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .plan-item .pn-select { display: block; margin-top: 2px; font-size: 11px; padding: 1px 2px; }
+      /* Nút nhập nhanh ghi chú */
+      .note-quick { grid-column:1 / -1; display:flex; gap:3px; margin-top:3px; }
+      .note-tag { flex:1; border:0; border-radius:4px; padding:4px 2px; font-size:9px; font-weight:700; cursor:pointer; white-space:nowrap; color:#fff !important; opacity:1 !important; }
+      .note-tag:hover { filter:brightness(.85); }
+      .note-tag.tag-test { background:#1565c0 !important; }
+      .note-tag.tag-backup { background:#546e7a !important; }
+      .note-tag.tag-repair { background:#e65100 !important; }
+      .note-tag.tag-day { background:#7b1fa2 !important; }
+      .note-tag.tag-first { background:#2e7d32 !important; }
+      .note-tag.tag-furnace { background:#c62828 !important; }
       .del-btn { border: none; background: none; color: #c62828; cursor: pointer; font-size: 15px; }
       .btn-row { display: flex; gap: 10px; margin-top: 12px; align-items: center; }
       .btn-save { background: #1565c0; color: #fff; padding: 8px 22px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -129,12 +146,21 @@
       .billet-table tr.size-first td { border-top: 2px solid #e0e0e0; }
 
       /* 計画の一覧：選んだ行と同じ日の行を号機ごとの色で */
-      tr.same-date.m1 td { background: #e3f2fd; }
-      tr.same-date.m2 td { background: #e8f5e9; }
-      tr.same-date.m3 td { background: #fff3e0; }
-      tr.same-date.m4 td { background: #f3e5f5; }
-      tr.selected td { font-weight: bold; outline: 2px solid #1565c0; outline-offset: -2px; }
+      /* Danh sách kế hoạch: tô màu theo từng máy */
+      tr.m1 td { background: #e3f2fd; }  /* Máy 1 - xanh dương */
+      tr.m2 td { background: #e8f5e9; }  /* Máy 2 - xanh lá */
+      tr.m3 td { background: #fff3e0; }  /* Máy 3 - cam */
+      tr.m4 td { background: #f3e5f5; }  /* Máy 4 - tím */
 
+      tr.selected td {
+        font-weight: bold;
+        outline: 2px solid #1565c0;
+        outline-offset: -2px;
+      }
+      .date-quick { border:0; border-radius:4px; padding:5px 8px; font-size:11px; font-weight:700; color:#fff; cursor:pointer; white-space:nowrap; }
+      .today-btn { background:#1976d2; }
+      .tomorrow-btn { background:#2e7d32; }
+      .date-quick:hover { filter:brightness(.85); }
       .btn-schedule { margin-left: auto; background: #455a64; color: #fff; padding: 5px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; }
       .src-badge { display: inline-block; padding: 0 6px; border-radius: 8px; font-size: 10px; font-weight: bold; }
       .src-badge.src-new { background: #2e7d32; color: #fff; }
@@ -224,6 +250,7 @@
             <span data-key="plan_list_title">計画の一覧</span>
             <input type="date" id="fStart" onchange="loadPlans()" /> →
             <input type="date" id="fEnd" onchange="loadPlans()" />
+            <button type="button" class="date-quick today-btn" onclick="quickDate(0)">Hôm nay</button><button type="button" class="date-quick tomorrow-btn" onclick="quickDate(1)">Ngày mai</button>
             <input type="text" id="fDie" data-key-placeholder="ph_die" placeholder="型番" oninput="onPlanFilter()" style="width:110px;" />
             <select id="fListMachine" onchange="loadPlans()">
               <option value="0" data-key="all_machines">全号機</option><option value="1">No.1</option><option value="2">No.2</option><option value="3">No.3</option><option value="4">No.4</option>
@@ -326,7 +353,7 @@
           lbl_tank: "Bể", lg_nitriding: "Cần thấm nitơ", lg_fixing: "Đang sửa", lg_nopress: "Cần rửa", hint_click_die: "Bấm vào dòng để thêm vào kế hoạch",
           plan_new_title: "Tạo kế hoạch", plan_edit_title: "Sửa kế hoạch", edit_badge: "Đang sửa",
           lbl_plan_date: "Ngày đùn", lbl_machine: "Máy",
-          col_shift: "Ca", col_ordinal: "Stt", col_qty: "SL", col_nitride: "N2", col_note: "Ghi chú", col_billet: "Billet", col_ptype: "Loại", tip_ptype: "Loại đùn (〇 đùn thử / ◎ thử hàng loạt / ● hàng loạt)", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
+          col_shift: "Ca", col_ordinal: "STT", col_qty: "SL", col_nitride: "Nito", col_note: "Ghi chú", col_billet: "Billet", col_ptype: "Loại", tip_ptype: "Loại đùn (〇 đùn thử / ◎ thử hàng loạt / ● hàng loạt)", origin_0: "Chưa định", origin_1: "Dubai", origin_2: "VN",
           tip_billet: "Loại billet (chiều dài lấy theo phiếu đùn)",
           tip_nitride: "Có gia nhiệt khuôn trong môi trường khí nitơ hay không",
           nitride_yes: "Yes", nitride_no: "No",
@@ -520,12 +547,14 @@
               <div class="pi-cell">${fl("col_billet", "tip_billet")}<select onchange="setAdd(${i}, 'billet_origin', Number(this.value))">${[0, 1, 2].map((o) => `<option value="${o}" ${o === Number(r.billet_origin) ? "selected" : ""}>${t(`origin_${o}`)}</option>`).join("")}</select></div>
               <div class="pi-cell">${fl("col_nitride", "tip_nitride")}<select onchange="setAdd(${i}, 'nitride_use', Number(this.value))"><option value="0" ${r.nitride_use ? "" : "selected"}>${t("nitride_no")}</option><option value="1" ${r.nitride_use ? "selected" : ""}>${t("nitride_yes")}</option></select></div>
               <div class="pi-cell">${fl("col_note")}<input type="text" value="${esc(r.note)}" oninput="setAdd(${i}, 'note', this.value)" /></div>
-              <div class="pi-cell">${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</div>
+<div class="pi-cell">${editingId ? "" : `<button class="del-btn" title="×" onclick="removeAdd(${i})">✕</button>`}</div>
+<div class="note-quick"><button type="button" class="note-tag tag-test" onclick="setQuickNote(${i}, 'TEST')">TEST</button><button type="button" class="note-tag tag-backup" onclick="setQuickNote(${i}, 'DỰ BỊ')">DỰ BỊ</button><button type="button" class="note-tag tag-repair" onclick="setQuickNote(${i}, 'TEST SAU SỬA')">SAU SỬA</button><button type="button" class="note-tag tag-day" onclick="setQuickNote(${i}, 'Ủ TRONG NGÀY')">Ủ NGÀY</button><button type="button" class="note-tag tag-first" onclick="setQuickNote(${i}, 'CHẠY ĐẦU TIÊN')">ĐẦU TIÊN</button><button type="button" class="note-tag tag-furnace" onclick="setQuickNote(${i}, 'CHẠY XONG BỎ LÒ')">BỎ LÒ</button></div>
             </div>
           </div>`).join("");
       }
-      function setAdd(i, key, value) { addRows[i][key] = value; checkForm(); }
-      function removeAdd(i) { addRows.splice(i, 1); renderAdd(); renderDies(); checkForm(); }
+    function setAdd(i, key, value) {addRows[i][key] = value; checkForm();    }
+    function setQuickNote(i, text) { addRows[i].note = text; renderAdd(); checkForm(); }
+    function removeAdd(i) {addRows.splice(i, 1);renderAdd(); renderDies(); checkForm(); }
 
       function checkForm() {
         const dateEl = document.getElementById("fPlanDate"), mcEl = document.getElementById("fMachine");
@@ -609,6 +638,7 @@
       }
 
       /* ── ③ 計画の一覧 ── */
+      function quickDate(offset) { const d=new Date(); d.setDate(d.getDate()+offset); const s=ymd(d); document.getElementById("fStart").value=s; document.getElementById("fEnd").value=s; loadPlans(); }
       async function loadPlans() {
         const p = new URLSearchParams({
           start: document.getElementById("fStart").value,
@@ -636,7 +666,7 @@
         if (!plans.length) { body.innerHTML = `<tr><td colspan="13" class="empty-note">${t("empty_plans")}</td></tr>`; return; }
         const sel = plans.find((p) => p.id === selectedPlanId);
         body.innerHTML = plans.map((p) => {
-          const cls = sel && p.plan_date === sel.plan_date ? `same-date m${p.press_machine}` : "";
+          const cls = `m${p.press_machine}`;
           return `
           <tr class="selectable ${cls} ${p.id === selectedPlanId ? "selected" : ""}" onclick="askEditPlan(${p.id})">
             <td>${p.plan_date}</td><td>${p.press_machine}</td>

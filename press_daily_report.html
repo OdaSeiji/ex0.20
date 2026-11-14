@@ -34,8 +34,8 @@
 
     .layout { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 16px; flex-wrap: wrap; }
 
-    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); overflow: hidden; }
-    .card-header { background: #e8f1ff; padding: 8px 12px; font-size: 13px; font-weight: bold; color: #0055a5; border-bottom: 1px solid #ccd8ee; }
+    .card { background:#fff; border:1px solid #dfe5ec; border-radius:4px; box-shadow:none; overflow:hidden; }
+    .card-header { background:#eef4fb; padding:7px 12px; font-size:13px; font-weight:700; color:#1565c0; border-bottom:2px solid #d5e3f3; }
     .card-body { padding: 14px; }
 
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
@@ -79,10 +79,10 @@
     .right-card { width: 230px; flex-shrink: 0; }
     .time-card  { width: 310px; flex-shrink: 0; }
 
-    .table-wrap { background: #fff; border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); margin-bottom: 8px; }
+    .table-wrap { background:#fff; border:1px solid #e5e9ee; border-radius:3px; overflow:auto; box-shadow:none; margin-bottom:8px; }
     table { border-collapse: collapse; width: 100%; }
-    th { background: #e8f1ff; padding: 6px 8px; border-bottom: 1px solid #e0e0e0; font-size: 11px; white-space: nowrap; text-align: center; position: sticky; top: 0; }
-    td { padding: 5px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; white-space: nowrap; text-align: center; }
+    th { background:#edf4ff; padding:6px 8px; border-bottom:1px solid #d8e2ef; font-size:11px; white-space:nowrap; text-align:center; position:sticky; top:0; }
+    td { padding:5px 8px; border-bottom:1px solid #f0f0f0; font-size:12px; white-space:nowrap; text-align:center; }
     td input { padding: 4px 6px; font-size: 12px; }
     .mono { font-family: "Roboto Mono", monospace; }
     .left { text-align: left; }
@@ -93,11 +93,21 @@
 
     #ram-values__table th, #ram-values__table td { padding-top: 1px; padding-bottom: 1px; }
     #ram-values__table td input { padding-top: 1px; padding-bottom: 1px; }
+    #ram-values__table td { border-bottom:0; }
+    #ram-values__table tbody tr:nth-child(even) { background:#f8fafc; }
+    #ram-values__table tbody tr:hover { background:#eef6ff; }
     #container-temperature__table th, #container-temperature__table td { padding-top: 1px; padding-bottom: 1px; }
     #container-temperature__table td input { padding-top: 1px; padding-bottom: 1px; }
 
     .add-form-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 8px; }
-    .add-form-row input, .add-form-row select { width: auto; min-width: 70px; }
+    .add-form-row input, .add-form-row select { width: auto; min-width: 70px; }.rack-add-row { display:grid; grid-template-columns:1fr 52px 50px; gap:4px; flex-wrap:nowrap; align-items:center; }
+    .rack-add-row input { width:100%; min-width:0; }
+    .rack-add-row .btn { width:50px; padding:6px 3px; white-space:nowrap; }
+    .work-add-row { display:grid; grid-template-columns:1fr 52px 50px; gap:4px; margin-top:8px; align-items:center; }
+    .work-add-row input { width:100%; min-width:0; }
+    .work-add-row .btn { width:50px; padding:6px 3px; white-space:nowrap; }
+    .work-copy-row { margin-top:4px; }
+    .work-copy-row .btn { width:100%; padding:5px; }
 
     .row-del-btn {
       border: none; background: none; color: #c62828; font-size: 13px;
@@ -111,6 +121,23 @@
     .card-header-total { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 4px; }
 
     .time-add-form { margin-top: 8px; }
+    /* Thời gian thao tác: bỏ thanh cuộn ngang */
+    .time-card .table-wrap { overflow-x:hidden; }
+    .time-card table { width:100%; table-layout:fixed; }
+    .time-card th, .time-card td { padding-left:3px; padding-right:3px; overflow:hidden; text-overflow:ellipsis; }
+
+    /* Thời gian đùn */
+    #time__table th:nth-child(1), #time__table td:nth-child(1) { width:auto; text-align:left; }
+    #time__table th:nth-child(2), #time__table td:nth-child(2) { width:52px; }
+    #time__table th:nth-child(3), #time__table td:nth-child(3) { width:52px; }
+    #time__table th:nth-child(4), #time__table td:nth-child(4) { width:22px; }
+
+    /* Thời gian kéo + thời gian cắt */
+    #pull__table th, #pull__table td, #cut__table th, #cut__table td { font-size:11px; padding:4px 2px; }
+    #pull__table th:first-child, #pull__table td:first-child, #cut__table th:first-child, #cut__table td:first-child { width:50px; }
+    #pull__table th:nth-child(2), #pull__table td:nth-child(2), #pull__table th:nth-child(3), #pull__table td:nth-child(3), #cut__table th:nth-child(2), #cut__table td:nth-child(2), #cut__table th:nth-child(3), #cut__table td:nth-child(3) { width:32px; }
+    #pull__table th:nth-child(4), #pull__table td:nth-child(4), #pull__table th:nth-child(5), #pull__table td:nth-child(5), #cut__table th:nth-child(4), #cut__table td:nth-child(4), #cut__table th:nth-child(5), #cut__table td:nth-child(5) { width:48px; }
+    #pull__table th:last-child, #pull__table td:last-child, #cut__table th:last-child, #cut__table td:last-child { width:22px; }
     .mmdd-wrap {
       position: relative; display: inline-flex; align-items: center;
       width: 60px; height: 27px; box-sizing: border-box;
@@ -494,14 +521,8 @@
             <tbody><tr><td colspan="4" class="empty-note" data-key="empty_rack">登録データなし</td></tr></tbody>
           </table>
         </div>
-        <div class="add-form-row">
-          <input type="text" id="racknumber__input" data-key-ph="ph_rack" placeholder="Rack" />
-          <input type="text" id="rackqty__input" data-key-ph="ph_qty" placeholder="Qty" />
-          <button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">追加</button>
-        </div>
-        <div style="font-size:12px; color:#555; margin-top:6px;">
-          <span data-key="lbl_rack_day_total">本日の使用ラック数</span>: <span id="rack-day-total__value" class="mono">0</span>
-        </div>
+        <div class="add-form-row rack-add-row"><input type="text" id="racknumber__input" data-key-ph="ph_rack" placeholder="Số rack" /><input type="text" id="rackqty__input" data-key-ph="ph_qty" placeholder="SL" /><button class="btn btn-add" id="add-rack__button" disabled data-key="btn_save">Thêm</button></div>
+        <div style="display:none;"><span data-key="lbl_rack_day_total">本日の使用ラック数</span>: <span id="rack-day-total__value" class="mono">0</span></div>
 
         <div class="sub-title sub-title-total">
           <span data-key="card_worklength">切出本数</span>
@@ -513,12 +534,8 @@
             <tbody><tr><td colspan="4" class="empty-note" data-key="empty_worklength">登録データなし</td></tr></tbody>
           </table>
         </div>
-        <div class="add-form-row">
-          <input type="text" id="length_exd" data-key-ph="ph_len" placeholder="len" />
-          <input type="text" id="quantity_cut" data-key-ph="ph_qty" placeholder="qty" />
-          <button class="btn btn-add" id="add_row__button" disabled data-key="btn_save">追加</button>
-          <button type="button" class="btn btn-add" id="copy_row__button" disabled data-key="btn_copy" title="一番下のレコードをコピーして追加">コピー</button>
-        </div>
+        <div class="work-add-row"><input type="text" id="length_exd" data-key-ph="ph_len" placeholder="Chiều dài" /><input type="text" id="quantity_cut" data-key-ph="ph_qty" placeholder="SL" /><button class="btn btn-add" id="add_row__button" disabled data-key="btn_save">Thêm</button></div>
+        <div class="work-copy-row"><button type="button" class="btn btn-add" id="copy_row__button" disabled data-key="btn_copy" title="Sao chép dòng cuối">Sao chép</button></div>
       </div>
     </div>
 
@@ -540,6 +557,7 @@
           <input type="text" id="time_start" maxlength="5" data-key-ph="col_start" placeholder="開始" onblur="formatTimeField(this)" style="width:60px;" />
           <input type="text" id="time_end" maxlength="5" data-key-ph="col_end" placeholder="終了" onblur="formatTimeField(this)" style="width:60px;" />
           <button class="btn btn-add" id="add_time__button" disabled data-key="btn_save">追加</button>
+          <span id="time300-warning" style="display:none;color:#d32f2f;font-size:11px;font-weight:bold;">⚠ Thời gian thiết lập quá dài</span>
         </div>
 
         <div class="sub-title" data-key="sub_time_pull">ストレッチ時間</div>
@@ -903,8 +921,8 @@
         btn_save: "Thêm",
         card_rack: "Đăng ký rack", lbl_rack_total: "Tổng số lượng", lbl_rack_day_total: "Số rack đã dùng trong ngày", col_order: "Thứ tự", col_rack: "Rack",
         empty_rack: "Chưa có dữ liệu", ph_rack: "Số rack",
-        rack_lock_note: "🔒 Đã có dữ liệu NG / đóng gói / hóa già nên không thể thay đổi rack",
-        card_worklength: "Đăng ký chiều dài sản phẩm", col_len: "Chiều dài", btn_copy: "Sao chép",
+        rack_lock_note: "🔒 Đã có dữ liệu NG / đóng gói / đ nên không thể thay đổi rack",
+        card_worklength: "Bảng chiều dài sau đùn", col_len: "Chiều dài", btn_copy: "Sao chép",
         lbl_worklength_total: "Tổng", unit_pieces: "thanh",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Chiều dài",
         card_worktime: "Thời gian thao tác", sub_time_extrusion: "Thời gian đùn",
@@ -1435,12 +1453,11 @@
       return val !== "" && !isNaN(val) && Number(val) >= 0 && Number(val) <= 1000;
     }
 
-    function checkBundleInputs() {
-      const bundleOk = isNumericInRange(document.getElementById("bundle_no").value);
-      const qtyOk    = isNumericInRange(document.getElementById("quantity").value);
-      const lotOk    = document.getElementById("lot_no").value.trim() !== "";
-      document.getElementById("add_bundle__button").disabled = !(bundleOk && qtyOk && lotOk);
-    }
+    function checkBundleInputs() { const bundle=document.getElementById("bundle_no").value.trim(); 
+      const bundleOk=/^[A-Za-z0-9]+$/.test(bundle); 
+      const qtyOk=isNumericInRange(document.getElementById("quantity").value); 
+      const lotOk=document.getElementById("lot_no").value.trim()!==""; 
+    document.getElementById("add_bundle__button").disabled=!(bundleOk&&qtyOk&&lotOk); }
 
     document.getElementById("bundle_no").addEventListener("input", checkBundleInputs);
     document.getElementById("quantity").addEventListener("input", checkBundleInputs);
@@ -1886,15 +1903,15 @@
       sel.appendChild(new Option("-", "0"));
       STOP_CODES.forEach(([val, label]) => sel.appendChild(new Option(label, val)));
     }
-
+    function prepare300Input() { if(document.querySelector('#time__table td[data-code="300"]')) return; document.getElementById("time_code").value="300"; sync300Input(); }  
+    function sync300Input() { const is300=document.getElementById("time_code").value==="300"; const start=document.getElementById("time_start"); if(is300) start.value=document.getElementById("press-start__input").value.trim(); start.readOnly=is300; start.style.background=is300?"#eeeeee":""; checkTimeCodeInputs(); }
+    document.getElementById("time_code").addEventListener("change",sync300Input);
+    document.getElementById("press-start__input").addEventListener("input",sync300Input);
+    document.getElementById("press-finish__input").addEventListener("input",checkTimeCodeInputs);
+    document.getElementById("press-finish__input").addEventListener("change",checkTimeCodeInputs);
+    
     /* ---- 押出時間（time__table） ---- */
-    function checkTimeCodeInputs() {
-      const codeOk  = document.getElementById("time_code").value !== "0";
-      const startVal = document.getElementById("time_start").value.trim();
-      const endVal   = document.getElementById("time_end").value.trim();
-      const timeOk = TIME_RE_LOG.test(startVal) && TIME_RE_LOG.test(endVal) && endVal > startVal;
-      document.getElementById("add_time__button").disabled = !(codeOk && timeOk);
-    }
+    function checkTimeCodeInputs() { const code=document.getElementById("time_code").value,startVal=document.getElementById("time_start").value.trim(),endVal=document.getElementById("time_end").value.trim(),pressFinish=document.getElementById("press-finish__input").value.trim(),warn=document.getElementById("time300-warning"); let timeOk=TIME_RE_LOG.test(startVal)&&TIME_RE_LOG.test(endVal)&&endVal>startVal,msg=""; if(timeOk&&code==="300"){ const [sh,sm]=startVal.split(":").map(Number),[eh,em]=endVal.split(":").map(Number),mins=(eh*60+em)-(sh*60+sm); if(mins>10){ timeOk=false; msg="⚠ 300 tối đa 10 phút"; } else if(TIME_RE_LOG.test(pressFinish)&&endVal>pressFinish){ timeOk=false; msg="⚠ Kết thúc 300 không được vượt thời gian kết thúc đùn"; } } warn.textContent=msg; warn.style.display=msg?"inline":"none"; document.getElementById("time_end").classList.toggle("field-invalid",!!msg); document.getElementById("add_time__button").disabled=!(code!=="0"&&timeOk); }
     ["time_code", "time_start", "time_end"].forEach(id => {
       document.getElementById(id).addEventListener("input", checkTimeCodeInputs);
       document.getElementById(id).addEventListener("change", checkTimeCodeInputs);
@@ -1944,7 +1961,7 @@
       tr.appendChild(delTd);
       tbody.appendChild(tr);
     }
-
+    
     document.getElementById("add_time__button").addEventListener("click", function () {
       const codeSel = document.getElementById("time_code");
       appendTimeRow(codeSel.value, document.getElementById("time_start").value, document.getElementById("time_end").value);
@@ -2903,6 +2920,7 @@
 
       setDefaultDate().then(checkAllRequiredFields);
       checkAllRequiredFields();
+      ensure300Row();
     }
 
     /* -------------------------
@@ -3088,13 +3106,14 @@
       }
     });
 
-    buildRamRows();
-    buildStopCodeOptions();
-    setLang(currentLang);
-    setDefaultDate().then(checkAllRequiredFields);
-    loadStaffList();
-    initRequiredFieldChecks();
-    loadSummary();
+          buildRamRows();
+          buildStopCodeOptions();
+          prepare300Input();
+          setLang(currentLang);
+          setDefaultDate().then(checkAllRequiredFields);
+          loadStaffList();
+          initRequiredFieldChecks();
+          loadSummary();
   </script>
 </body>
 </html>

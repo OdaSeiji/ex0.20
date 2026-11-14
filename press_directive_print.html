@@ -43,13 +43,13 @@
 
       function makePrintTimeTable1() {
         let tbd = "";
-        for (let i = 1; i <= 18; ++i) {
+        for (let i = 1; i <= 17; ++i) {
           tbd += `<tr style="height: 17.9px">
                 <td style="width: 60px;"></td>
                 <td style="width: 50px;"></td>
                 <td style="width: 50px;"></td>
             </tr>`;
-        }
+        }   
         return `<tbody style="height: 100%; overflow: hidden;">${tbd}</tbody>`;
       }
 
@@ -149,7 +149,7 @@
           margin: 0;
           padding: 0;
           background-color: #FAFAFA;
-          font: "Tahoma";
+          font-family:"Arial","Segoe UI",sans-serif;
           width: 21cm;
           height: 29.7cm;
           font-size: 8px;
@@ -215,6 +215,7 @@
             border-spacing: 0;
             text-align: center;
           }
+            body, input, select, textarea, button, table, th, td, label, span, div { font-family:"Segoe UI",Arial,sans-serif !important; }
           </style>
 
           <head>
@@ -768,12 +769,9 @@
       </tr>
     </thead>
     <tbody>
-      <tr style="height: 19px;">
-        <th style="width: 70px;">Thời gian đùn tổng</th>
-        <td style="width: 50px; background-color: #ffff00"></td>
-        <td style="width: 50px; background-color: #ffff00"></td>
-      </tr>
-      ${makePrintTimeTable1()}
+        <tr style="height: 19px;"><th style="width:70px;">700</th><td style="width:50px; background-color:#ffff00;"></td><td style="width:50px; background-color:#ffff00;"></td></tr>
+        <tr style="height: 19px;"><th style="width:70px;">300</th><td style="width:50px;"></td><td style="width:50px;"></td></tr>
+        ${makePrintTimeTable1()}
     </tbody>
   </table>
 

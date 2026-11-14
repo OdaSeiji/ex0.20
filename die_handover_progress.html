@@ -832,7 +832,9 @@
 			function rawDate(val) {
 				return val ? String(val).split(' ')[0] : '';
 			}
-
+			function fmtDateCSV(val) {
+   				 return val ? String(val).split(' ')[0] : '';
+			}
 			/* =====================================================
        データ読み込み
     ===================================================== */
@@ -1222,15 +1224,15 @@
 				];
 				const rows = filteredData.map((r) => [
 					r.die_number ?? '',
-					fmtDate(r.arrival_at),
-					fmtDate(r.vn_production_dimensional_inspection_at),
-					fmtDate(r.vn_qa_dimensional_inspection_at),
-					fmtDate(r.jp_dimensional_inspection_at),
+					fmtDateCSV(r.arrival_at),
+					fmtDateCSV(r.vn_production_dimensional_inspection_at),
+					fmtDateCSV(r.vn_qa_dimensional_inspection_at),
+					fmtDateCSV(r.jp_dimensional_inspection_at),
 					r.anodizing_quality_check_required_flag ? '●' : '',
-					fmtDate(r.anodizing_quality_check_at),
-					fmtDate(r.mass_production_trial_at),
-					fmtDate(r.die_handover_at),
-					fmtDate(r.mass_production_start_at),
+					fmtDateCSV(r.anodizing_quality_check_at),
+					fmtDateCSV(r.mass_production_trial_at),
+					fmtDateCSV(r.die_handover_at),
+					fmtDateCSV(r.mass_production_start_at),
 					r.production_site_change_notice ?? '',
 					r.dimensional_inspection_by ?? '',
 					r.bcp_flag ? '●' : '',
@@ -1245,7 +1247,7 @@
 					...rows.map((row) => row.map(escape).join(',')),
 				].join('\r\n');
 
-				const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+				const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
 				const url = URL.createObjectURL(blob);
 				const a = document.createElement('a');
 				a.href = url;

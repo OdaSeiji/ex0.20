@@ -1,0 +1,134 @@
+[1mdiff --git a/press_daily_report.html b/press_daily_report.html[m
+[1mindex ceee91c..accb37d 100644[m
+[1m--- a/press_daily_report.html[m
+[1m+++ b/press_daily_report.html[m
+[36m@@ -847,6 +847,12 @@[m
+         sc_ram_speed: "ラム速度", sc_die_temp: "金型温度", sc_scan: "添付",[m
+         sc_source: "入力元", sc_inserted: "入力日時", src_new: "新画面", src_old: "旧画面",[m
+         empty_summary: "実績データなし",[m
+[32m+[m[32m        msg_billet_bundle_mismatch: (actual, total) =>[m
+[32m+[m[32m        `実績ビレット数（${actual}）とバンドル数量合計（${total}）が一致しません。`,[m
+[32m+[m[32m        msg_rack_work_qty_mismatch: (workTotal, rackTotal) =>[m
+[32m+[m[32m         `製品本数合計（${workTotal}本）とラック数量合計（${rackTotal}本）が一致しません。`,[m
+[32m+[m[32m        msg_time_code_300_required:[m
+[32m+[m[32m        "押出時間には停止理由コード「300 - 押出段取り」が必要です。",[m
+       },[m
+       vi: {[m
+         title: "🏭 Nhập báo cáo đùn hằng ngày",[m
+[36m@@ -917,8 +923,14 @@[m
+         sc_ram_speed: "Tốc độ", sc_die_temp: "Nhiệt độ khuôn", sc_scan: "Tệp",[m
+         sc_source: "Nguồn nhập", sc_inserted: "Thời điểm nhập", src_new: "Màn hình mới", src_old: "Màn hình cũ",[m
+         empty_summary: "Chưa có thực tích",[m
+[31m-      },[m
+[31m-    };[m
+[32m+[m[32m          msg_billet_bundle_mismatch: (actual, total) =>[m
+[32m+[m[32m        `Billet thực tế (${actual}) phải bằng tổng số lượng theo bảng Bundle (${total}).`,[m
+[32m+[m[32m        msg_rack_work_qty_mismatch: (workTotal, rackTotal) =>[m
+[32m+[m[32m        `Tổng số lượng thanh (${workTotal}) phải bằng tổng số lượng Rack (${rackTotal}).`,[m
+[32m+[m[32m        msg_time_code_300_required:[m
+[32m+[m[32m         "Phần thời gian bắt buộc phải có mã 300 - Thiết lập đùn.",[m
+[32m+[m[32m          },[m
+[32m+[m[32m        };[m
+ [m
+     let currentLang = localStorage.getItem("lang") || "ja";[m
+ [m
+[36m@@ -2752,7 +2764,82 @@[m
+       });[m
+       return rows;[m
+     }[m
+[32m+[m[32m        /* -------------------------[m
+[32m+[m[32m      保存前の業務ルール（新規保存・更新で共通）[m
+[32m+[m[32m    ------------------------- */[m
+[32m+[m[32m    function validateBilletBundle() {[m
+[32m+[m[32m      const actualBillet = Number([m
+[32m+[m[32m        v("actual-billet-qty__input")[m
+[32m+[m[32m      );[m
+[32m+[m
+[32m+[m[32m      const totalBundle = collectBundleRows().reduce([m
+[32m+[m[32m        (sum, row) => sum + Number(row.quantity || 0),[m
+[32m+[m[32m        0[m
+[32m+[m[32m      );[m
+[32m+[m
+[32m+[m[32m      if (actualBillet !== totalBundle) {[m
+[32m+[m[32m        const t = dict[currentLang] ?? dict.ja;[m
+[32m+[m
+[32m+[m[32m        throw new Error([m
+[32m+[m[32m          t.msg_billet_bundle_mismatch([m
+[32m+[m[32m            actualBillet,[m
+[32m+[m[32m            totalBundle[m
+[32m+[m[32m          )[m
+[32m+[m[32m        );[m
+[32m+[m[32m      }[m
+[32m+[m[32m    }[m
+[32m+[m[32m    function validateRackWorkLength() {[m
+[32m+[m[32m        const rackRows = collectRackRows();[m
+[32m+[m[32m        const workLengthRows = collectWorkLengthRows();[m
+[32m+[m
+[32m+[m[32m        const rackTotal = rackRows.reduce([m
+[32m+[m[32m          (sum, row) => sum + Number(row.work_quantity || 0),[m
+[32m+[m[32m          0[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        const workTotal = workLengthRows.reduce([m
+[32m+[m[32m          (sum, row) => sum + Number(row.work_quantity || 0),[m
+[32m+[m[32m          0[m
+[32m+[m[32m        );[m
+[32m+[m
+[32m+[m[32m        if (rackTotal !== workTotal) {[m
+[32m+[m[32m          const t = dict[currentLang] ?? dict.ja;[m
+[32m+[m
+[32m+[m[32m          throw new Error([m
+[32m+[m[32m            t.msg_rack_work_qty_mismatch([m
+[32m+[m[32m              workTotal,[m
+[32m+[m[32m              rackTotal[m
+[32m+[m[32m            )[m
+[32m+[m[32m          );[m
+[32m+[m[32m        }[m
+[32m+[m[32m      }[m
+[32m+[m[32m      function validateRequiredTimeCode300() {[m
+[32m+[m[32m        const code300Count = collectTimeRows().filter([m
+[32m+[m[32m          row => String(row.code).trim() === "300"[m
+[32m+[m[32m        ).length;[m
+[32m+[m
+[32m+[m[32m        const t = dict[currentLang] ?? dict.ja;[m
+[32m+[m
+[32m+[m[32m        if (code300Count === 0) {[m
+[32m+[m[32m          throw new Error(t.msg_time_code_300_required);[m
+[32m+[m[32m        }[m
+ [m
+[32m+[m[32m        if (code300Count > 1) {[m
+[32m+[m[32m          throw new Error([m
+[32m+[m[32m            currentLang === "vi"[m
+[32m+[m[32m              ? "Mã 300 - Thiết lập đùn chỉ được nhập một lần."[m
+[32m+[m[32m              : "停止理由コード300は1回のみ登録できます。"[m
+[32m+[m[32m          );[m
+[32m+[m[32m        }[m
+[32m+[m[32m      }[m
+[32m+[m
+[32m+[m[32m    function validateBeforeSave() {[m
+[32m+[m[32m      validateBilletBundle();[m
+[32m+[m[32m      validateRackWorkLength();[m
+[32m+[m[32m      validateRequiredTimeCode300();[m
+[32m+[m[32m      // validateRamData();[m
+[32m+[m[32m      // validateProductionTime();[m
+[32m+[m[32m    }[m
+     async function uploadScanFileIfNeeded() {[m
+       const file = document.getElementById("press-direction_file").files[0];[m
+       if (!file) return null;[m
+[36m@@ -2936,6 +3023,8 @@[m
+       btn.disabled = true;[m
+       showSaveStatus("更新中...", false);[m
+       try {[m
+[32m+[m[32m         validateBeforeSave();[m
+[32m+[m[41m        [m
+         const scanFileName = await uploadScanFileIfNeeded();[m
+         const payload = {[m
+           id: editingPressId,[m
+[36m@@ -2970,6 +3059,7 @@[m
+       btn.disabled = true;[m
+       showSaveStatus("保存中...", false);[m
+       try {[m
+[32m+[m[32m        validateBeforeSave();[m
+         const scanFileName = await uploadScanFileIfNeeded();[m
+         const payload = {[m
+           press: collectPressData(scanFileName),[m
