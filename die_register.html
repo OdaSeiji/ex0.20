@@ -68,6 +68,9 @@
     .right-toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
     #dieSearch { padding: 6px 10px; border: 1px solid #aac4e8; border-radius: 4px; font-family: "Roboto Mono", monospace; font-size: 13px; width: 200px; }
     #dieSearch:focus { outline: none; border-color: #0078d4; }
+    .missing-only { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; margin-left: 10px; cursor: pointer; white-space: nowrap; }
+    .missing-only:has(input:checked) { color: #c62828; font-weight: bold; }
+    #dieBody td.missing { background: #fff1f1; }
     .count-label { font-size: 13px; color: #555; }
 
     .table-wrap { background: #fff; border-radius: 8px; overflow: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1); max-height: calc(100vh - 170px); }
@@ -184,6 +187,7 @@
     <div class="right-panel">
       <div class="right-toolbar">
         <input type="text" id="dieSearch" placeholder="型番で絞り込み…" oninput="filterDies()" />
+        <label class="missing-only"><input type="checkbox" id="missingOnly" onchange="filterDies()" /><span data-key="missing_only">情報が足りない金型だけ（直径・Bolster・穴数）</span></label>
         <span class="count-label" id="countLabel"></span>
       </div>
       <div class="table-wrap">
@@ -245,6 +249,7 @@
         count: n => `${n} 件`,
         dup_error: 'この型番は既に登録されています',
         pn_ph: '品番で絞り込み…', die_ph: '型番で絞り込み…',
+        missing_only: '情報が足りない金型だけ（直径・Bolster・穴数）',
       },
       vi: {
         title: 'Đăng ký & Quản lý khuôn', btn_back: '← Quay lại',
@@ -262,6 +267,7 @@
         count: n => `${n} mục`,
         dup_error: 'Số khuôn này đã được đăng ký',
         pn_ph: 'Lọc theo mã SP…', die_ph: 'Lọc theo số khuôn…',
+        missing_only: 'Chỉ khuôn thiếu thông tin (đường kính, Bolster, số lỗ)',
       },
     };
 
@@ -401,12 +407,12 @@
         if (String(row.id) === String(selectedDieId)) tr.classList.add('selected');
         tr.innerHTML = `
           <td class="die-num">${row.die_number ?? ''}</td>
-          <td>${row.die_diamater ? 'ø' + row.die_diamater : ''}</td>
-          <td class="narrow">${row.bolster_name ?? ''}</td>
+          <td class="${row.die_diamater ? '' : 'missing'}">${row.die_diamater ? 'ø' + row.die_diamater : ''}</td>
+          <td class="narrow ${row.bolster_name ? '' : 'missing'}">${row.bolster_name ?? ''}</td>
           <td class="mono">${row.production_number ?? ''}</td>
           <td class="xs">${row.arrival_at ?? ''}</td>
           <td class="xs">${row.updated_at ?? ''}</td>
-          <td>${row.hole ?? ''}</td>
+          <td class="${row.hole ? '' : 'missing'}">${row.hole ?? ''}</td>
           <td class="xs">${row.die_postition ?? ''}</td>
         `;
         tr.addEventListener('click', () => selectDie(row));
@@ -417,7 +423,11 @@
 
     function filterDies() {
       const q = document.getElementById('dieSearch').value.trim().toUpperCase();
-      renderDieTable(q ? allDies.filter(r => (r.die_number ?? '').toUpperCase().includes(q)) : allDies);
+      // "情報が足りない金型だけ": diameter, bolster or number of holes is empty
+      const missingOnly = document.getElementById('missingOnly').checked;
+      renderDieTable(allDies.filter(r =>
+        (!q || (r.die_number ?? '').toUpperCase().includes(q)) &&
+        (!missingOnly || !r.die_diamater || !r.bolster_name || !r.hole)));
     }
 
     function updateCountLabel() {

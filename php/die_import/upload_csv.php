@@ -26,13 +26,34 @@ foreach ($pdo->query("SELECT id, production_number FROM m_production_numbers")->
     $pnMap[mb_strtolower(trim($r["production_number"]))] = (int)$r["id"];
 }
 
+/* 直径マスタ（mm の数字 → id）とボルスターマスタ（名前 → id・直径 id） */
+$diamMap = [];
+foreach ($pdo->query("SELECT id, die_diamater FROM m_dies_diamater")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $diamMap[(string)(int)$r["die_diamater"]] = (int)$r["id"];
+}
+$diamName = array_flip($diamMap); // id → mm
+/* ボルスター名は "B4620-1208-**" "B6026-1212--**" のように末尾の書き方がばらばらなので、
+   「*」を除き、続いたハイフンを1つにし、前後のハイフンを取ってから比べる（B4620-1208 で書けばよい） */
+function bolster_key($s) {
+    $s = strtoupper(trim((string)$s));
+    $s = str_replace(['*', ' ', '　'], '', $s);
+    $s = preg_replace('/-+/', '-', $s);
+    return trim($s, '-');
+}
+$bolsterMap = [];
+foreach ($pdo->query("SELECT id, bolster_name, die_diamater FROM m_bolster")->fetchAll(PDO::FETCH_ASSOC) as $r) {
+    $bolsterMap[bolster_key($r["bolster_name"])] = ["id" => (int)$r["id"], "diam_id" => (int)$r["die_diamater"], "name" => $r["bolster_name"]];
+}
+
 $stmtCheckDies = $pdo->prepare("SELECT id FROM m_dies WHERE die_number = ?");
 $stmtCheckTmp  = $pdo->prepare("SELECT id FROM t_dies_import_tmp WHERE die_number = ? AND import_flag = 0");
 $stmtInsert    = $pdo->prepare("
     INSERT INTO t_dies_import_tmp
-        (budget_id, die_number, production_number_raw, production_number_id, import_flag, created_at)
-    VALUES (?, ?, ?, ?, 0, CURDATE())
+        (budget_id, die_number, production_number_raw, production_number_id,
+         die_diamater_id, hole, bolstar_id, import_flag, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, 0, CURDATE())
 ");
+$warnings = [];
 
 $inserted = 0;
 $skipped  = 0;
@@ -42,6 +63,9 @@ while (($row = fgetcsv($handle)) !== false) {
     $budgetId  = isset($row[0]) ? trim($row[0]) : null;
     $dieNumber = isset($row[1]) ? trim($row[1]) : null;
     $pnRaw     = isset($row[2]) ? trim($row[2]) : null;
+    $diamRaw   = isset($row[3]) ? trim($row[3]) : '';   // D: 直径 (mm)
+    $holeRaw   = isset($row[4]) ? trim($row[4]) : '';   // E: 穴数
+    $bolstRaw  = isset($row[5]) ? trim($row[5]) : '';   // F: ボルスター
 
     if (!$dieNumber) continue;
 
@@ -67,7 +91,45 @@ while (($row = fgetcsv($handle)) !== false) {
         $pnId = $pnMap[mb_strtolower($pnRaw)] ?? null;
     }
 
-    $stmtInsert->execute([$budgetId ?: null, $dieNumber, $pnRaw ?: null, $pnId]);
+    /* D: 直径。"300" "300mm" "ø300" などから数字を取り出して、マスタの直径に合わせる */
+    $diamId = null;
+    if ($diamRaw !== '') {
+        $mm = preg_replace('/[^0-9.]/', '', $diamRaw);
+        if ($mm !== '' && isset($diamMap[(string)(int)round((float)$mm)])) {
+            $diamId = $diamMap[(string)(int)round((float)$mm)];
+        } else {
+            $warnings[] = "{$dieNumber}: 直径「{$diamRaw}」はマスタにありません（空にしました。編集で選んでください）";
+        }
+    }
+
+    /* E: 穴数（1〜6） */
+    $hole = null;
+    if ($holeRaw !== '') {
+        if (preg_match('/^\d+(\.0+)?$/', $holeRaw) && (int)$holeRaw >= 1 && (int)$holeRaw <= 6) {
+            $hole = (int)$holeRaw;
+        } else {
+            $warnings[] = "{$dieNumber}: 穴数「{$holeRaw}」は 1〜6 の数字ではありません（空にしました）";
+        }
+    }
+
+    /* F: ボルスター。直径が空ならボルスターから直径を決める。直径と合わなければ知らせる */
+    $bolsterId = null;
+    if ($bolstRaw !== '') {
+        $b = $bolsterMap[bolster_key($bolstRaw)] ?? null;
+        if (!$b) {
+            $warnings[] = "{$dieNumber}: ボルスター「{$bolstRaw}」はマスタにありません（空にしました。編集で選んでください）";
+        } else {
+            $bolsterId = $b["id"];
+            if ($diamId === null && $diamRaw === '') {
+                $diamId = $b["diam_id"];
+            } elseif ($diamId !== null && $diamId !== $b["diam_id"]) {
+                $warnings[] = "{$dieNumber}: ボルスター {$b['name']} は直径 " . ($diamName[$b["diam_id"]] ?? '?')
+                            . "mm 用ですが、直径は {$diamName[$diamId]}mm です（確かめてください）";
+            }
+        }
+    }
+
+    $stmtInsert->execute([$budgetId ?: null, $dieNumber, $pnRaw ?: null, $pnId, $diamId, $hole, $bolsterId]);
     $inserted++;
 }
 
@@ -78,4 +140,5 @@ echo json_encode([
     "inserted" => $inserted,
     "skipped"  => $skipped,
     "errors"   => $errors,
-]);
+    "warnings" => $warnings,
+], JSON_UNESCAPED_UNICODE);

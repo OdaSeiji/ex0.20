@@ -56,6 +56,13 @@
         padding: 8px 20px; border: none; border-radius: 5px; cursor: pointer;
         font-weight: bold; white-space: nowrap;
       }
+      .btn-template {
+        background: #fff; color: #2e7d32; border: 1px solid #2e7d32;
+        padding: 7px 16px; border-radius: 5px; cursor: pointer; font-weight: bold; white-space: nowrap;
+        margin-left: auto;
+      }
+      .btn-template:hover { background: #e8f5e9; }
+      td.missing { background: #fff1f1; color: #c62828; }
       .csv-hint { font-size: 12px; color: #888; margin-top: 8px; }
       .upload-result {
         margin-top: 12px; padding: 10px 14px; border-radius: 6px;
@@ -193,8 +200,9 @@
         <div class="upload-row">
           <input type="file" id="csvFile" accept=".csv,.xlsx,.xlsm,.xls" />
           <button class="btn-upload" onclick="uploadCsv()">取り込む</button>
+          <button class="btn-template" onclick="downloadTemplate()">⬇ 雛形の Excel をダウンロード</button>
         </div>
-        <p class="csv-hint">CSV または Excel（いちばん左のシート）　|　列順: A列 = budget_id　B列 = die_number　C列 = production_number（1行目はヘッダーとしてスキップ）</p>
+        <p class="csv-hint">CSV または Excel（いちばん左のシート）　|　列順: A列 = budget_id　B列 = die_number（型番）　C列 = production_number（品番）　D列 = 直径（mm の数字）　E列 = 穴数（1〜6）　F列 = ボルスター（例 B4630-1515）（1行目はヘッダーとしてスキップ）</p>
         <div class="upload-result" id="uploadResult"></div>
       </div>
 
@@ -217,6 +225,9 @@
               <th>budget_id</th>
               <th>die_number</th>
               <th>品番</th>
+              <th>直径</th>
+              <th>穴数</th>
+              <th>ボルスター</th>
               <th>状態</th>
               <th>操作</th>
             </tr>
@@ -261,6 +272,10 @@
             <select class="edit-select" id="eBolster">
               <option value="">-- 選択してください --</option>
             </select>
+          </div>
+          <div class="edit-group">
+            <label class="edit-label">穴数 (1〜6)</label>
+            <input type="number" class="edit-select" id="eHole" min="1" max="6" step="1" />
           </div>
         </div>
         <div class="edit-actions">
@@ -337,6 +352,47 @@
         setTimeout(() => t.classList.remove("show"), 2500);
       }
 
+      const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+      /* ── 雛形の Excel ──
+         1枚目（取り込むシート）は見出しの行だけ。書き方の例とマスタの一覧は2枚目に置く
+         （例の行を1枚目に入れると、消し忘れたときに取り込まれてしまうため） */
+      function downloadTemplate() {
+        const header = ["budget_id", "die_number（型番）", "production_number（品番）", "直径（mm）", "穴数（1〜6）", "ボルスター"];
+        const ws1 = XLSX.utils.aoa_to_sheet([header]);
+        ws1["!cols"] = [{ wch: 12 }, { wch: 20 }, { wch: 26 }, { wch: 11 }, { wch: 12 }, { wch: 18 }];
+
+        const help = [
+          ["書き方（このシートは取り込まれません。1枚目の「登録」シートに書いてください）"],
+          [],
+          ["列", "中身", "書き方", "例"],
+          ["A", "budget_id", "空でもよい", "B2026-001"],
+          ["B", "型番（必須）", "", "MXS16-V01D"],
+          ["C", "品番", "品番マスタにある品番", "P4814401-MH1"],
+          ["D", "直径", "mm の数字だけ（下の一覧のどれか）", 300],
+          ["E", "穴数", "1〜6 の数字", 2],
+          ["F", "ボルスター", "下の一覧の名前。末尾の -** は書かなくてよい。直径が空ならボルスターから決まる", "B4630-1515"],
+          [],
+          ["・1行目（見出し）は取り込まれません。2行目から書いてください。"],
+          ["・すでに登録済みの型番は飛ばします。マスタに無い直径・ボルスターは空にして取り込み、画面で知らせます。"],
+          [],
+          ["直径（mm）", "", "ボルスター", "そのボルスターの直径（mm）"],
+        ];
+        const diams = masters.diameters.map((d) => d.die_diamater);
+        const diamOf = Object.fromEntries(masters.diameters.map((d) => [String(d.id), d.die_diamater]));
+        const bols = masters.bolsters.map((b) => [b.bolster_name, diamOf[String(b.diamater_id)] ?? ""]);
+        for (let i = 0; i < Math.max(diams.length, bols.length); i++) {
+          help.push([diams[i] ?? "", "", bols[i] ? bols[i][0] : "", bols[i] ? bols[i][1] : ""]);
+        }
+        const ws2 = XLSX.utils.aoa_to_sheet(help);
+        ws2["!cols"] = [{ wch: 12 }, { wch: 14 }, { wch: 46 }, { wch: 26 }];
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws1, "登録");
+        XLSX.utils.book_append_sheet(wb, ws2, "書き方");
+        XLSX.writeFile(wb, "新規金型登録_雛形.xlsx");
+      }
+
       /* ── CSV・Excel アップロード ── */
       async function uploadCsv() {
         const file = document.getElementById("csvFile").files[0];
@@ -368,10 +424,16 @@
           if (result.skipped > 0) html += `、${result.skipped} 件スキップ`;
           if (result.errors.length) {
             html += "<ul style='margin-top:6px;padding-left:18px;'>";
-            result.errors.forEach((e) => { html += `<li>${e}</li>`; });
+            result.errors.forEach((e) => { html += `<li>${esc(e)}</li>`; });
             html += "</ul>";
           }
-          box.className = "upload-result " + (result.errors.length ? "err" : "ok");
+          const warnings = result.warnings || [];
+          if (warnings.length) {
+            html += `<div style="margin-top:8px;font-weight:bold;">⚠ 確かめてほしいところ（${warnings.length} 件）</div><ul style='margin-top:4px;padding-left:18px;'>`;
+            warnings.forEach((w) => { html += `<li>${esc(w)}</li>`; });
+            html += "</ul>";
+          }
+          box.className = "upload-result " + (result.errors.length || warnings.length ? "err" : "ok");
           box.innerHTML = html;
           loadList(document.getElementById("flagSelect").value);
         } else {
@@ -393,7 +455,7 @@
         tbody.innerHTML = "";
 
         if (!data.length) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:#aaa;padding:24px">データがありません</td></tr>`;
           return;
         }
 
@@ -429,6 +491,9 @@
             <td class="mono">${row.budget_id ?? "—"}</td>
             <td class="mono">${row.die_number}</td>
             <td>${pnHtml}</td>
+            <td class="mono ${row.die_diamater ? "" : "missing"}">${row.die_diamater ? "ø" + row.die_diamater : "—"}</td>
+            <td class="mono ${row.hole ? "" : "missing"}">${row.hole ?? "—"}</td>
+            <td class="mono ${row.bolster_name ? "" : "missing"}">${esc(row.bolster_name ?? "—")}</td>
             <td>${statusHtml}</td>
             <td>
               <button class="edit-btn" onclick="openEdit(${JSON.stringify(row).replace(/"/g,'&quot;')})"
@@ -476,6 +541,7 @@
         filterBolster();
         document.getElementById("eBolster").value = row.bolstar_id ?? "";
         document.getElementById("eBillet").value  = row.billet_size_id ?? "";
+        document.getElementById("eHole").value    = row.hole ?? "";
 
         document.getElementById("editPanel").classList.add("open");
         document.getElementById("editPanel").scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -493,8 +559,12 @@
         const dieNum = document.getElementById("eDieNumber").value.trim().toUpperCase();
         if (!dieNum) { showToast("型番を入力してください", false); return; }
 
+        const holeStr = document.getElementById("eHole").value.trim();
+        if (holeStr !== "" && !/^[1-6]$/.test(holeStr)) { showToast("穴数は 1〜6 で入れてください", false); return; }
+
         const body = {
           id,
+          hole:                 holeStr || null,
           die_number:           dieNum,
           budget_id:            document.getElementById("eBudgetId").value.trim() || null,
           production_number_id: document.getElementById("ePn").value     || null,

@@ -20,6 +20,7 @@ try {
             die_diamater_id      = ?,
             billet_size_id       = ?,
             bolstar_id           = ?,
+            hole                 = ?,
             import_error         = NULL,
             updated_at           = CURDATE()
         WHERE id = ?
@@ -31,6 +32,7 @@ try {
         $input["die_diamater_id"]      ?: null,
         $input["billet_size_id"]       ?: null,
         $input["bolstar_id"]           ?: null,
+        $input["hole"]                 ?: null,
         $id,
     ]);
     echo json_encode(["status" => "ok"]);

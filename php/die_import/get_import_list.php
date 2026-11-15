@@ -22,10 +22,15 @@ $sql = "
         t.die_diamater_id,
         t.billet_size_id,
         t.bolstar_id,
+        t.hole,
+        dd.die_diamater,
+        b.bolster_name,
         t.import_flag,
         t.import_error
     FROM t_dies_import_tmp t
     LEFT JOIN m_production_numbers p ON t.production_number_id = p.id
+    LEFT JOIN m_dies_diamater dd     ON t.die_diamater_id = dd.id
+    LEFT JOIN m_bolster b            ON t.bolstar_id = b.id
     {$where}
     ORDER BY t.id ASC
 ";
