@@ -10,9 +10,12 @@
     body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
 
     .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons { display: flex; gap: 6px; }
     .lang-buttons button {
-      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
-      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+      /* same size for both buttons (Japanese and Vietnamese text have different line heights) */
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 96px; height: 30px; padding: 0 8px; line-height: 1;
+      border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
     }
     .lang-buttons button.active { background: #0078d4; color: #fff; }
 
@@ -55,7 +58,53 @@
     tfoot td { background: #f5f9ff; font-weight: bold; }
     .empty { color: #999; text-align: center; padding: 30px; font-size: 13px; font-family: "Segoe UI", sans-serif; }
     .hint { font-size: 12px; color: #777; margin-top: 10px; line-height: 1.7; max-width: 1000px; }
+
+    /* main table: every column 90px (part number 150px), widths do not move when a row is opened */
+    table.main { table-layout: fixed; width: auto; }
+    table.main > thead > tr > th { white-space: normal; line-height: 1.3; padding: 6px 6px; }
+    table.main > tbody > tr > td, table.main > tfoot > tr > td { overflow: hidden; text-overflow: ellipsis; padding: 6px 6px; }
+    table.main > tbody > tr > td.tog { padding: 6px 0; overflow: visible; }
+    table.main col.c-tog { width: 28px; }
+    table.main col.c-pn { width: 180px; }
+    table.main col.c { width: 90px; }
+    /* the opened order list may be wider than the main table: let it spread to the right */
+    table.main > tbody > tr.detail > td { overflow: visible; padding: 8px 10px 12px 34px; }
+    .orders-wrap { width: max-content; }
+
+    /* backorder follow-up */
+    .entrant { background: #f3f8ff; border: 1px solid #aac4e8; border-radius: 6px; padding: 3px 8px; }
+    .entrant.missing { background: #fff3e0; border-color: #ffb74d; }
+    tr.pn-row { cursor: pointer; }
+    tr.pn-row:hover td { background: #f7faff; }
+    tr.pn-row.open td { background: #eef5ff; }
+    td.tog { width: 24px; text-align: center; color: #0078d4; font-family: "Segoe UI", sans-serif; }
+    .open-badge { display: inline-block; min-width: 22px; padding: 0 7px; border-radius: 10px; background: #ffe0b2; color: #e65100; font-weight: bold; }
+    .done-badge { color: #2e7d32; font-weight: bold; }
+    tr.detail > td { background: #fafcff; padding: 8px 10px 12px 34px; text-align: left; }
+    table.orders { width: auto; font-size: 12px; border: 1px solid #dde6f2; background: #fff; }
+    table.orders th { position: static; background: #f1f5fa; font-size: 11px; }
+    table.orders td { padding: 4px 8px; vertical-align: middle; }
+    table.orders td.txt { text-align: left; font-family: "Segoe UI", sans-serif; }
+    table.orders select, table.orders input { font-size: 12px; padding: 3px 6px; border: 1px solid #aac4e8; border-radius: 4px; }
+    table.orders input[type=text] { width: 240px; font-family: "Segoe UI", sans-serif; }
+    table.orders input[type=date] { font-family: "Roboto Mono", monospace; }
+    table.orders tr.dirty td { background: #fffde7; }
+    table.orders tr.saved td { animation: flash 1.2s; }
+    @keyframes flash { from { background: #c8e6c9; } to { background: transparent; } }
+    td.late { color: #c62828; font-weight: bold; }
+    .ab-a { color: #c62828; font-weight: bold; }
+    .ab-b { color: #b26a00; font-weight: bold; }
+    .btn-save { background: #2e7d32; color: #fff; padding: 3px 10px; font-size: 12px; }
+    .btn-save:disabled { background: #b0bec5; cursor: default; }
+    .btn-hist { background: #fff; color: #546e7a; border: 1px solid #b0bec5; padding: 3px 8px; font-size: 12px; }
+    .upd { font-size: 11px; color: #888; text-align: left; font-family: "Segoe UI", sans-serif; }
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .modal-bg.show { display: flex; }
+    .modal { background: #fff; border-radius: 8px; padding: 16px; max-width: 760px; width: calc(100% - 32px); max-height: 80vh; overflow: auto; }
+    .modal h3 { font-size: 15px; margin-bottom: 10px; }
+    .modal table td { text-align: left; font-size: 12px; white-space: normal; }
   </style>
+  <link rel="stylesheet" href="./css/lang_buttons.css" />
 </head>
 <body>
   <div class="lang-buttons">
@@ -64,7 +113,7 @@
   </div>
 
   <h1 data-key="title">📉 在庫不足の抽出</h1>
-  <div class="subtitle" data-key="subtitle">その月の受注（A＋B）を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。</div>
+  <div class="subtitle" data-key="subtitle">まだ出荷していない受注（J 出荷日が空）のうち、「月の基準」に当てはまる A＋B を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。</div>
 
   <div class="toolbar">
     <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
@@ -74,34 +123,43 @@
     <div class="sep"></div>
     <label><span data-key="lbl_basis">月の基準</span>
       <select id="fBasis">
-        <option value="reply_date" data-key="basis_reply">出荷回答日（J）</option>
-        <option value="due_date" data-key="basis_due">出荷期限（D）</option>
-        <option value="order_date" data-key="basis_order">受注日付（C）</option>
+        <option value="due" data-key="basis_due">当月までの納期（過去未納分含む）</option>
+        <option value="planned" data-key="basis_planned">当月回答納期</option>
       </select>
     </label>
-    <span class="pending" data-key="pending">仮：製造に確認中</span>
     <div class="sep"></div>
     <label><input type="checkbox" id="fShortOnly" checked /><span data-key="lbl_short_only">不足（0 以下）だけ</span></label>
+    <div class="sep"></div>
+    <label class="entrant" id="entrantBox"><span data-key="lbl_entrant">入力者</span>
+      <select id="fEntrant"><option value="">—</option></select>
+    </label>
+  </div>
+
+  <div class="modal-bg" id="histModal" onclick="if (event.target === this) this.classList.remove('show')">
+    <div class="modal"><h3 id="histTitle"></h3><div id="histBody"></div>
+      <div style="text-align:right;margin-top:10px"><button class="btn btn-sub" onclick="document.getElementById('histModal').classList.remove('show')" data-key="btn_close">閉じる</button></div>
+    </div>
   </div>
 
   <div class="card">
     <div id="infoBox"></div>
     <div id="tableBox"><div class="empty">…</div></div>
   </div>
-  <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
+  <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。「当月までの納期」は、お客さんの出荷期限（D）がその月の末までの受注で、期限を過ぎてまだ出荷していないものも含みます。「当月回答納期」は、担当者が入れた回答納期がその月にある受注です。AB が A・B 以外の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
 
   <script>
     const dict = {
       ja: {
         title: "📉 在庫不足の抽出",
-        subtitle: "その月の受注（A＋B）を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。",
+        subtitle: "まだ出荷していない受注（J 出荷日が空）のうち、「月の基準」に当てはまる A＋B を品番ごとに合計し、未引当在庫から引いて 0 以下になる品番を出します。在庫・受注とも、いちばん新しい取込日付のデータを使います。",
         btn_back: "← 戻る", btn_prev: "← 前の月", btn_next: "次の月 →",
-        lbl_basis: "月の基準", basis_reply: "出荷回答日（J）", basis_due: "出荷期限（D）", basis_order: "受注日付（C）",
-        pending: "仮：製造に確認中", lbl_short_only: "不足（0 以下）だけ",
-        hint: "※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。AB が A・B 以外の受注と、月の基準の日付が空の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。",
+        lbl_basis: "月の基準", basis_due: "当月までの納期（過去未納分含む）", basis_planned: "当月回答納期",
+        lbl_short_only: "不足（0 以下）だけ",
+        hint: "※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。「当月までの納期」は、お客さんの出荷期限（D）がその月の末までの受注で、期限を過ぎてまだ出荷していないものも含みます。「当月回答納期」は、担当者が入れた回答納期がその月にある受注です。AB が A・B 以外の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。",
         st_inv: "在庫データ（取込日付）", st_ship: "受注データ（取込日付）", st_pn: "受注のある品番", st_short: "不足（0 以下）",
         none: "なし",
-        note_no_date: "月の基準の日付が空の受注：{n} 件（数に入れていません）",
+        note_no_date_due: "未出荷で、出荷期限が空の受注：{n} 件（数に入れていません）",
+        note_no_date_planned: "未出荷で、回答納期がまだ入っていない受注：{n} 件（この表には出ません。「当月までの納期」で入れてください）",
         note_other_ab: "この月で AB が A・B 以外の受注：{n} 件（数に入れていません）",
         warn_no_inv: "在庫データがまだ取り込まれていません", warn_no_ship: "受注データがまだ取り込まれていません",
         h_pn: "品番", h_stock: "在庫数（Y）", h_alloc: "引当数（Z）", h_unalloc: "未引当在庫（AA）",
@@ -109,17 +167,26 @@
         no_stock: "在庫データに無い", total: "合計",
         empty_short: "この月に不足する品番はありません", empty_all: "この月の A・B の受注はありません",
         err: "読み込めませんでした",
+        lbl_entrant: "入力者", btn_close: "閉じる", h_open: "未対応",
+        o_no: "出荷指示", o_ab: "AB", o_qty: "数量", o_order: "受注日付", o_due: "出荷期限", o_reply: "出荷回答日",
+        o_customer: "得意先", o_country: "国", o_trans: "搬送", o_staff: "担当者", o_planned: "回答納期", o_comment: "コメント", o_updated: "最終更新",
+        btn_save: "保存", btn_hist: "履歴", saved: "保存しました", no_change: "変更はありません",
+        need_entrant: "上の「入力者」で、自分の名前を選んでください",
+        hist_title: "履歴：出荷指示 {no}", hist_none: "まだ履歴はありません",
+        hh_at: "日時", hh_by: "入力者", hh_staff: "担当者", hh_planned: "納期", hh_comment: "コメント",
+        ph_comment: "コメント",
       },
       vi: {
         title: "📉 Trích xuất thiếu tồn kho",
-        subtitle: "Cộng đơn hàng (A+B) trong tháng theo mã SP, trừ vào tồn kho chưa phân bổ và hiển thị các mã SP còn 0 trở xuống. Dùng dữ liệu có ngày nhập mới nhất cho cả tồn kho và đơn hàng.",
+        subtitle: "Cộng đơn hàng chưa xuất (cột J trống) A+B phù hợp với điều kiện tháng theo mã SP, trừ vào tồn kho chưa phân bổ và hiển thị các mã SP còn 0 trở xuống. Dùng dữ liệu có ngày nhập mới nhất cho cả tồn kho và đơn hàng.",
         btn_back: "← Quay lại", btn_prev: "← Tháng trước", btn_next: "Tháng sau →",
-        lbl_basis: "Tính tháng theo", basis_reply: "Ngày trả lời xuất (J)", basis_due: "Hạn xuất hàng (D)", basis_order: "Ngày đặt hàng (C)",
-        pending: "Tạm thời: đang hỏi bộ phận sản xuất", lbl_short_only: "Chỉ thiếu (≤ 0)",
-        hint: "※ Chênh lệch = tồn chưa phân bổ (AA) − (số lượng đơn A + B). A là đơn hàng thực tế, B là đơn cho tồn kho. Đơn có AB khác A/B và đơn không có ngày tính tháng không được cộng (số đơn hiển thị ở trên). Mã SP không có trong dữ liệu tồn kho được tính với tồn chưa phân bổ = 0.",
+        lbl_basis: "Tính tháng theo", basis_due: "Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)", basis_planned: "Ngày giao đã trả lời trong tháng",
+        lbl_short_only: "Chỉ thiếu (≤ 0)",
+        hint: "※ Chênh lệch = tồn chưa phân bổ (AA) − (số lượng đơn A + B). A là đơn hàng thực tế, B là đơn cho tồn kho. 「Hạn xuất đến hết tháng」 là các đơn có hạn xuất (D) đến cuối tháng, gồm cả đơn đã quá hạn mà chưa xuất. 「Ngày giao đã trả lời trong tháng」 là các đơn có ngày giao do người phụ trách nhập nằm trong tháng. Đơn có AB khác A/B không được cộng (số đơn hiển thị ở trên). Mã SP không có trong dữ liệu tồn kho được tính với tồn chưa phân bổ = 0.",
         st_inv: "Dữ liệu tồn kho (ngày nhập)", st_ship: "Dữ liệu đơn hàng (ngày nhập)", st_pn: "Mã SP có đơn", st_short: "Thiếu (≤ 0)",
         none: "Chưa có",
-        note_no_date: "Đơn không có ngày tính tháng: {n} (không cộng)",
+        note_no_date_due: "Đơn chưa xuất không có hạn xuất: {n} (không cộng)",
+        note_no_date_planned: "Đơn chưa xuất chưa có ngày giao đã trả lời: {n} (không hiện ở bảng này; hãy nhập ở chế độ \"Hạn xuất đến hết tháng\")",
         note_other_ab: "Đơn trong tháng có AB khác A/B: {n} (không cộng)",
         warn_no_inv: "Chưa nhập dữ liệu tồn kho", warn_no_ship: "Chưa nhập dữ liệu đơn hàng",
         h_pn: "Mã SP", h_stock: "Tồn kho (Y)", h_alloc: "Đã phân bổ (Z)", h_unalloc: "Chưa phân bổ (AA)",
@@ -127,6 +194,14 @@
         no_stock: "Không có trong tồn kho", total: "Tổng",
         empty_short: "Không có mã SP bị thiếu trong tháng này", empty_all: "Không có đơn A/B trong tháng này",
         err: "Không tải được dữ liệu",
+        lbl_entrant: "Người nhập", btn_close: "Đóng", h_open: "Chưa xử lý",
+        o_no: "Chỉ thị xuất", o_ab: "AB", o_qty: "Số lượng", o_order: "Ngày đặt hàng", o_due: "Hạn xuất", o_reply: "Ngày trả lời xuất",
+        o_customer: "Khách hàng", o_country: "Quốc gia", o_trans: "Vận chuyển", o_staff: "Người phụ trách", o_planned: "Ngày giao đã trả lời", o_comment: "Ghi chú", o_updated: "Cập nhật cuối",
+        btn_save: "Lưu", btn_hist: "Lịch sử", saved: "Đã lưu", no_change: "Không có thay đổi",
+        need_entrant: "Hãy chọn tên của bạn ở ô \"Người nhập\" phía trên",
+        hist_title: "Lịch sử: chỉ thị xuất {no}", hist_none: "Chưa có lịch sử",
+        hh_at: "Thời điểm", hh_by: "Người nhập", hh_staff: "Người phụ trách", hh_planned: "Ngày giao", hh_comment: "Ghi chú",
+        ph_comment: "Ghi chú",
       },
     };
     let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
@@ -185,7 +260,7 @@
       if (!data.inventory_date) h += `<div class="warn">${esc(t("warn_no_inv"))}</div>`;
       if (!data.shipping_date) h += `<div class="warn">${esc(t("warn_no_ship"))}</div>`;
       const notes = [];
-      if (data.notes.no_date) notes.push(t("note_no_date", { n: data.notes.no_date }));
+      if (data.notes.no_date) notes.push(t(data.basis === "planned" ? "note_no_date_planned" : "note_no_date_due", { n: data.notes.no_date }));
       if (data.notes.other_ab) notes.push(t("note_other_ab", { n: data.notes.other_ab }));
       if (notes.length) h += `<div class="notes">${notes.map(esc).join("<br>")}</div>`;
       info.innerHTML = h;
@@ -196,17 +271,21 @@
       }
       const z = (n) => (Number(n) === 0 ? "zero" : "");
       const sum = (k) => rows.reduce((a, r) => a + (Number(r[k]) || 0), 0);
-      box.innerHTML = `<div class="table-wrap"><table>
+      box.innerHTML = `<div class="table-wrap"><table class="main" style="width:${28 + 180 + 90 * 9}px">
+        <colgroup><col class="c-tog" /><col class="c-pn" />${'<col class="c" />'.repeat(9)}</colgroup>
         <thead><tr>
+          <th></th>
           <th>${esc(t("h_pn"))}</th>
           <th>${esc(t("h_stock"))}</th><th>${esc(t("h_alloc"))}</th><th>${esc(t("h_unalloc"))}</th>
           <th class="grp-a">${esc(t("h_a"))}</th><th class="grp-b">${esc(t("h_b"))}</th><th>${esc(t("h_ab"))}</th>
           <th>${esc(t("h_bal"))}</th>
-          <th>${esc(t("h_cnt"))}</th><th>${esc(t("h_first"))}</th>
+          <th>${esc(t("h_cnt"))}</th><th>${esc(t("h_open"))}</th>
         </tr></thead>
         <tbody>${rows.map((r) => {
           const bal = r.balance < 0 ? "neg" : r.balance === 0 ? "zero0" : "pos";
-          return `<tr>
+          const open = expanded.has(r.production_number);
+          return `<tr class="pn-row ${open ? "open" : ""}" data-pn="${esc(r.production_number)}">
+            <td class="tog">${open ? "▼" : "▶"}</td>
             <td class="pn">${esc(r.production_number)}${r.in_stock_file ? "" : `<span class="tag-nostock">${esc(t("no_stock"))}</span>`}</td>
             <td class="${z(r.stock_qty)}">${num(r.stock_qty)}</td>
             <td class="${z(r.allocated_qty)}">${num(r.allocated_qty)}</td>
@@ -216,17 +295,161 @@
             <td>${num(r.ab_qty)}</td>
             <td class="bal ${bal}">${num(r.balance)}</td>
             <td>${r.a_cnt + r.b_cnt}</td>
-            <td class="date">${esc(r.first_date || "")}</td>
-          </tr>`;
+            <td class="open-cell">${openCell(r)}</td>
+          </tr>${open ? detailRow(r) : ""}`;
         }).join("")}</tbody>
         <tfoot><tr>
+          <td></td>
           <td class="pn">${esc(t("total"))}</td>
           <td>${num(sum("stock_qty"))}</td><td>${num(sum("allocated_qty"))}</td><td>${num(sum("unallocated_qty"))}</td>
           <td>${num(sum("a_qty"))}</td><td>${num(sum("b_qty"))}</td><td>${num(sum("ab_qty"))}</td>
-          <td>${num(sum("balance"))}</td><td>${num(rows.reduce((a, r) => a + r.a_cnt + r.b_cnt, 0))}</td><td></td>
+          <td>${num(sum("balance"))}</td><td>${num(rows.reduce((a, r) => a + r.a_cnt + r.b_cnt, 0))}</td>
+          <td>${num(sum("open_cnt"))}</td>
         </tr></tfoot>
       </table></div>`;
     }
+
+    /* ── backorder follow-up (person in charge / delivery date / comment per order) ── */
+    const BO_API = "./php/backorder/";
+    const expanded = new Set(); // part numbers whose orders are shown
+    let staff = [];
+
+    const isOpen = (o) => !o.staff_id || !o.planned_date;
+    const openCell = (r) => (r.open_cnt ? `<span class="open-badge">${r.open_cnt}</span>` : `<span class="done-badge">✓</span>`);
+    const staffOptions = (sel) => `<option value="">—</option>` +
+      staff.map((s) => `<option value="${s.id}" ${String(s.id) === String(sel ?? "") ? "selected" : ""}>${esc(s.staff_name)}${s.emploee_number ? ` (${esc(s.emploee_number)})` : ""}</option>`).join("");
+    const updText = (o) => (o.updated_at ? `${esc(o.updated_by_name || "")} ${esc(o.updated_at)}` : "");
+
+    function detailRow(r) {
+      const d0 = new Date(), today = `${d0.getFullYear()}-${String(d0.getMonth() + 1).padStart(2, "0")}-${String(d0.getDate()).padStart(2, "0")}`;
+      return `<tr class="detail"><td colspan="11"><div class="orders-wrap"><table class="orders">
+        <thead><tr>
+          <th>${esc(t("o_no"))}</th><th>${esc(t("o_ab"))}</th><th>${esc(t("o_qty"))}</th>
+          <th>${esc(t("o_order"))}</th><th>${esc(t("o_due"))}</th>
+          <th>${esc(t("o_customer"))}</th><th>${esc(t("o_country"))}</th><th>${esc(t("o_trans"))}</th>
+          <th>${esc(t("o_staff"))}</th><th>${esc(t("o_planned"))}</th><th>${esc(t("o_comment"))}</th>
+          <th></th><th>${esc(t("o_updated"))}</th>
+        </tr></thead>
+        <tbody>${r.orders.map((o) => `<tr data-no="${esc(o.shipping_instruction_no)}" data-pn="${esc(r.production_number)}">
+          <td>${esc(o.shipping_instruction_no)}</td>
+          <td class="ab-${o.ab_status === "A" ? "a" : "b"}">${esc(o.ab_status)}</td>
+          <td>${num(o.quantity)}</td>
+          <td class="date">${esc(o.order_date || "")}</td>
+          <td class="date ${o.due_date && o.due_date < today ? "late" : ""}">${esc(o.due_date || "")}</td>
+          <td class="txt">${esc(o.customer_name || "")}</td>
+          <td class="txt">${esc(o.country || "")}</td>
+          <td class="txt">${esc(o.transportation_method || "")}</td>
+          <td><select class="f-staff">${staffOptions(o.staff_id)}</select></td>
+          <td><input type="date" class="f-date" value="${esc(o.planned_date || "")}" /></td>
+          <td><input type="text" class="f-comment" maxlength="1000" placeholder="${esc(t("ph_comment"))}" value="${esc(o.comment || "")}" /></td>
+          <td><button class="btn btn-save" disabled>${esc(t("btn_save"))}</button> <button class="btn btn-hist">${esc(t("btn_hist"))}</button></td>
+          <td class="upd">${updText(o)}</td>
+        </tr>`).join("")}</tbody>
+      </table></div></td></tr>`;
+    }
+
+    const findOrder = (pn, no) => {
+      const r = data.rows.find((x) => x.production_number === pn);
+      return [r, r ? r.orders.find((o) => o.shipping_instruction_no === no) : null];
+    };
+
+    // clicks in the table: open/close a part number, save, history
+    document.getElementById("tableBox").addEventListener("click", (ev) => {
+      const pnRow = ev.target.closest("tr.pn-row");
+      if (pnRow) {
+        const pn = pnRow.dataset.pn;
+        expanded.has(pn) ? expanded.delete(pn) : expanded.add(pn);
+        render();
+        return;
+      }
+      const tr = ev.target.closest("table.orders tbody tr");
+      if (!tr) return;
+      if (ev.target.classList.contains("btn-save")) saveOrder(tr);
+      if (ev.target.classList.contains("btn-hist")) showHistory(tr.dataset.no);
+    });
+    // editing marks the order row as changed
+    document.getElementById("tableBox").addEventListener("input", (ev) => {
+      const tr = ev.target.closest("table.orders tbody tr");
+      if (!tr) return;
+      const [, o] = findOrder(tr.dataset.pn, tr.dataset.no);
+      const cur = {
+        staff: tr.querySelector(".f-staff").value, date: tr.querySelector(".f-date").value, comment: tr.querySelector(".f-comment").value.trim(),
+      };
+      const dirty = cur.staff !== String(o.staff_id ?? "") || cur.date !== (o.planned_date || "") || cur.comment !== (o.comment || "");
+      tr.classList.toggle("dirty", dirty);
+      tr.querySelector(".btn-save").disabled = !dirty;
+    });
+
+    async function saveOrder(tr) {
+      const entrant = document.getElementById("fEntrant").value;
+      if (!entrant) { alert(t("need_entrant")); document.getElementById("fEntrant").focus(); return; }
+      const [r, o] = findOrder(tr.dataset.pn, tr.dataset.no);
+      const btn = tr.querySelector(".btn-save");
+      btn.disabled = true;
+      let res;
+      try {
+        const resp = await fetch(BO_API + "save.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            shipping_instruction_no: o.shipping_instruction_no,
+            production_number: r.production_number,
+            staff_id: tr.querySelector(".f-staff").value,
+            planned_date: tr.querySelector(".f-date").value,
+            comment: tr.querySelector(".f-comment").value,
+            changed_by: entrant,
+          }),
+        });
+        res = await resp.json();
+      } catch (e) {
+        res = { status: "error", message: String(e) };
+      }
+      if (res.status !== "ok") { alert(res.message || "error"); btn.disabled = false; return; }
+      Object.assign(o, res.followup);
+      r.open_cnt = r.orders.filter(isOpen).length;
+      tr.classList.remove("dirty");
+      tr.classList.remove("saved"); void tr.offsetWidth; tr.classList.add("saved");
+      tr.querySelector(".upd").innerHTML = updText(o);
+      const cell = document.querySelector(`tr.pn-row[data-pn="${CSS.escape(r.production_number)}"] .open-cell`);
+      if (cell) cell.innerHTML = openCell(r);
+    }
+
+    async function showHistory(no) {
+      document.getElementById("histTitle").textContent = t("hist_title", { no });
+      const body = document.getElementById("histBody");
+      body.innerHTML = "…";
+      document.getElementById("histModal").classList.add("show");
+      let res;
+      try { res = await (await fetch(BO_API + "history.php?no=" + encodeURIComponent(no), { cache: "no-store" })).json(); }
+      catch (e) { res = { status: "error", message: String(e) }; }
+      if (res.status !== "ok") { body.textContent = res.message || "error"; return; }
+      body.innerHTML = res.log.length
+        ? `<table><thead><tr><th>${esc(t("hh_at"))}</th><th>${esc(t("hh_by"))}</th><th>${esc(t("hh_staff"))}</th><th>${esc(t("hh_planned"))}</th><th>${esc(t("hh_comment"))}</th></tr></thead><tbody>` +
+          res.log.map((l) => `<tr><td>${esc(l.changed_at)}</td><td>${esc(l.changed_by_name || "")}</td><td>${esc(l.staff_name || "")}</td><td>${esc(l.planned_date || "")}</td><td>${esc(l.comment || "")}</td></tr>`).join("") +
+          `</tbody></table>`
+        : `<div class="empty">${esc(t("hist_none"))}</div>`;
+    }
+
+    async function loadStaff() {
+      try {
+        const res = await (await fetch(BO_API + "staff.php", { cache: "no-store" })).json();
+        if (res.status === "ok") staff = res.staff;
+      } catch (e) {}
+      const sel = document.getElementById("fEntrant");
+      let saved = "";
+      try { saved = localStorage.getItem("backorderEntrant") || ""; } catch (e) {}
+      sel.innerHTML = staffOptions(saved);
+      if (sel.value !== saved) sel.value = "";
+      markEntrant();
+      render();
+    }
+    function markEntrant() {
+      document.getElementById("entrantBox").classList.toggle("missing", !document.getElementById("fEntrant").value);
+    }
+    document.getElementById("fEntrant").addEventListener("change", (ev) => {
+      try { localStorage.setItem("backorderEntrant", ev.target.value); } catch (e) {}
+      markEntrant();
+    });
 
     // month navigation
     const fMonth = document.getElementById("fMonth");
@@ -246,6 +469,7 @@
     fMonth.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
     setLang(currentLang);
     load();
+    loadStaff();
   </script>
 </body>
 </html>

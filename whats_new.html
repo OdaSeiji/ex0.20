@@ -72,6 +72,7 @@
       .file-link:hover { background: #e8f1ff; }
       .file-link::before { content: "📄"; font-size: 12px; }
     </style>
+    <link rel="stylesheet" href="./css/lang_buttons.css" />
   </head>
   <body>
     <div class="container">
@@ -85,7 +86,52 @@
         </div>
       </div>
 
-      <!-- 2026-11-13 (最新) -->
+      <!-- 2026-11-15 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-15</span>
+        </div>
+        <div class="entry-title" data-key="hs_title">全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hs_purpose">「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hs_content">言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-15 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新規</span>
+          <span class="entry-date">2026-11-15</span>
+        </div>
+        <div class="entry-title" data-key="hr_title">在庫不足の抽出：受注ごとに担当者・納期・コメントを入れられるようにした</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hr_purpose">在庫が足りない受注について担当者を決め、担当者が納期を入れて、誰が・いつ決めたかを残しながら管理するため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hr_content">品番の行を押すと、その月のまだ出荷していない受注が並ぶ。受注（出荷指示番号）ごとに、担当者（退職していないスタッフから選ぶ）・回答納期・コメントを入れて保存する。保存するときは画面上の「入力者」で自分の名前を選ぶ（ブラウザが覚える）。保存のたびに履歴が残り、「履歴」で見られる。品番の行には、担当者か回答納期がまだ入っていない受注の数（未対応）を出す。Excel を取り込み直しても入れた内容は残る。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-15 -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-15</span>
+        </div>
+        <div class="entry-title" data-key="hq_title">在庫管理：受注データの読む列を直し、未出荷の受注だけで在庫と比べる</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hq_purpose">本物の受注データを確かめたら、出荷回答日・出荷日・国の列の位置が仕様と違っていたため。また、出荷済みの受注まで在庫と比べていたため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hq_content">受注データは I 列を出荷回答日（20261111 のような8桁の数字も読む）、J 列を出荷日（実績、空は未出荷）、S 列を国として読む。R 列（Custom）は読まない。品番マスタとの照らし合わせはやめ、在庫と受注の2つの Excel だけで考える（品番は Excel のまま入れる）。在庫不足の抽出は、J 列が空のまだ出荷していない受注だけを数える。月の基準は「当月までの納期（過去未納分含む）」（お客さんの出荷期限 D 列がその月の末まで。期限を過ぎた未出荷も含む）と「当月回答納期」（担当者が入れた回答納期がその月）の2つ。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-13 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新規</span>
@@ -2076,6 +2122,15 @@
           hp_title: "在庫管理：在庫不足の抽出を追加",
           hp_purpose: "その月の受注に対して在庫が足りなくなる品番を、すぐに見つけられるようにするため。",
           hp_content: "在庫管理に「在庫不足の抽出」を追加した。いちばん新しく取り込んだ在庫データと受注データを使い、その月の A・B の受注数を品番ごとに合計して、未引当在庫から引いた差引が 0 以下の品番を出す（「不足だけ」を外すと受注のある品番を全部表示）。月を決める日付は今は出荷回答日（製造に確認中のため、出荷期限・受注日付にも切り替えられる）。",
+          hq_title: "在庫管理：受注データの読む列を直し、未出荷の受注だけで在庫と比べる",
+          hq_purpose: "本物の受注データを確かめたら、出荷回答日・出荷日・国の列の位置が仕様と違っていたため。また、出荷済みの受注まで在庫と比べていたため。",
+          hq_content: "受注データは I 列を出荷回答日（20261111 のような8桁の数字も読む）、J 列を出荷日（実績、空は未出荷）、S 列を国として読む。R 列（Custom）は読まない。品番マスタとの照らし合わせはやめ、在庫と受注の2つの Excel だけで考える（品番は Excel のまま入れる）。在庫不足の抽出は、J 列が空のまだ出荷していない受注だけを数える。月の基準は「当月までの納期（過去未納分含む）」（お客さんの出荷期限 D 列がその月の末まで。期限を過ぎた未出荷も含む）と「当月回答納期」（担当者が入れた回答納期がその月）の2つ。",
+          hr_title: "在庫不足の抽出：受注ごとに担当者・納期・コメントを入れられるようにした",
+          hr_purpose: "在庫が足りない受注について担当者を決め、担当者が納期を入れて、誰が・いつ決めたかを残しながら管理するため。",
+          hr_content: "品番の行を押すと、その月のまだ出荷していない受注が並ぶ。受注（出荷指示番号）ごとに、担当者（退職していないスタッフから選ぶ）・回答納期・コメントを入れて保存する。保存するときは画面上の「入力者」で自分の名前を選ぶ（ブラウザが覚える）。保存のたびに履歴が残り、「履歴」で見られる。品番の行には、担当者か回答納期がまだ入っていない受注の数（未対応）を出す。Excel を取り込み直しても入れた内容は残る。",
+          hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
+          hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
+          hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
           fq_title: "押出スケジュール表：エッチングの記録用紙を印刷",
           fq_purpose: "ex0.11 の押出計画（In Etching）と同じエッチングの記録用紙を、ex0.20 から印刷できるようにするため。",
           fq_content: "スケジュール表の各計画の行に「エッチング用紙」の印刷ボタンを追加。BÁO CÁO ETCHING（押出日・型番・計画のビレット本数・製品の本数・nBn と穴数・サンプル位置ごとの記入欄・製品のエッチングの写真）を印刷する。ex0.11 から、nBn をその型のいちばん新しい押出指示書から取るように直し、5B1 のサンプル位置（H・A〜F・I・K・END）にも対応した。",
@@ -2376,10 +2431,19 @@
           hn_content: "Thêm cột \"Mã gốc\" bên phải mã SP (phần trước dấu gạch ngang của mã khuôn, ví dụ DM031-V01D → DM031; nếu có 2 mã gốc thì hiển thị cách nhau bởi \", \", nếu chưa có khuôn thì để trống). Có thể sắp xếp theo cột mã gốc. Tên Danh mục 1 và Danh mục 2 không còn bị cắt ở 8 ký tự mà hiển thị đầy đủ.",
           ho_title: "Quản lý tồn kho: thêm chức năng nhập tồn kho / chỉ thị xuất hàng",
           ho_purpose: "Để đưa việc đối chiếu tồn kho và đơn hàng (chỉ thị xuất hàng) đang làm bằng Excel lên Web. Trước tiên, có thể nhập 2 file Excel vào cơ sở dữ liệu.",
-          ho_content: "Thêm mục \"Quản lý tồn kho\" vào menu chính và tạo màn hình \"Nhập tồn kho / chỉ thị xuất hàng\". Chọn loại dữ liệu (tồn kho / chỉ thị xuất hàng), ngày dữ liệu và file Excel (dữ liệu tồn kho chỉ đọc dòng có cột A là "アルミ押し出し", với cột B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ) thì nội dung và lỗi (kèm số dòng) được hiển thị; nếu không có vấn đề thì bấm \"Bắt đầu nhập\" để đăng ký. Dòng có mã SP trống và dòng tiêu đề được bỏ qua. Mã SP cũng được đối chiếu với danh mục mã SP; nếu có mã không tồn tại thì báo lỗi kèm số dòng và không nhập (sửa file Excel rồi chọn lại). Với dữ liệu tồn kho, dòng không thỏa "tồn kho − đã phân bổ = tồn chưa phân bổ" cũng bị báo lỗi. Dữ liệu cùng ngày dữ liệu bị xóa rồi đăng ký lại. Bên phải hiển thị các ngày đã nhập và số dòng.",
+          ho_content: "Thêm mục \"Quản lý tồn kho\" vào menu chính và tạo màn hình \"Nhập tồn kho / chỉ thị xuất hàng\". Chọn loại dữ liệu (tồn kho / chỉ thị xuất hàng), ngày dữ liệu và file Excel (dữ liệu tồn kho chỉ đọc dòng có cột A là 「アルミ押し出し」, với cột B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ) thì nội dung và lỗi (kèm số dòng) được hiển thị; nếu không có vấn đề thì bấm \"Bắt đầu nhập\" để đăng ký. Dòng có mã SP trống và dòng tiêu đề được bỏ qua. Mã SP cũng được đối chiếu với danh mục mã SP; nếu có mã không tồn tại thì báo lỗi kèm số dòng và không nhập (sửa file Excel rồi chọn lại). Với dữ liệu tồn kho, dòng không thỏa 「tồn kho − đã phân bổ = tồn chưa phân bổ」 cũng bị báo lỗi. Dữ liệu cùng ngày dữ liệu bị xóa rồi đăng ký lại. Bên phải hiển thị các ngày đã nhập và số dòng.",
           hp_title: "Quản lý tồn kho: thêm trích xuất thiếu tồn kho",
           hp_purpose: "Để nhanh chóng tìm ra các mã SP sẽ thiếu tồn kho so với đơn hàng trong tháng.",
           hp_content: "Thêm \"Trích xuất thiếu tồn kho\" vào mục Quản lý tồn kho. Dùng dữ liệu tồn kho và đơn hàng nhập mới nhất, cộng số lượng đơn A và B trong tháng theo mã SP, trừ vào tồn chưa phân bổ và hiển thị các mã SP có chênh lệch từ 0 trở xuống (bỏ chọn \"Chỉ thiếu\" để xem tất cả mã SP có đơn). Ngày dùng để tính tháng hiện tạm là ngày trả lời xuất (đang hỏi bộ phận sản xuất; có thể đổi sang hạn xuất hàng hoặc ngày đặt hàng).",
+          hq_title: "Quản lý tồn kho: sửa cột đọc của dữ liệu đơn hàng, chỉ so sánh tồn kho với đơn chưa xuất",
+          hq_purpose: "Khi kiểm tra dữ liệu đơn hàng thực tế, vị trí các cột ngày trả lời xuất, ngày xuất và quốc gia khác với đặc tả. Ngoài ra, các đơn đã xuất cũng bị đem so sánh với tồn kho.",
+          hq_content: "Dữ liệu đơn hàng: cột I là ngày trả lời xuất (đọc được cả số 8 chữ số như 20261111), cột J là ngày xuất thực tế (trống = chưa xuất), cột S là quốc gia. Không đọc cột R (Custom). Bỏ việc đối chiếu với danh mục mã SP, chỉ dùng 2 file Excel tồn kho và đơn hàng (mã SP giữ nguyên như Excel). Trích xuất thiếu tồn kho chỉ tính các đơn chưa xuất (cột J trống). Điều kiện tháng có 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 (hạn xuất cột D đến cuối tháng) và 「Ngày giao đã trả lời trong tháng」 (ngày giao do người phụ trách nhập nằm trong tháng).",
+          hr_title: "Trích xuất thiếu tồn kho: nhập người phụ trách, ngày giao và ghi chú cho từng đơn",
+          hr_purpose: "Để quyết định người phụ trách cho các đơn thiếu tồn kho, người phụ trách nhập ngày giao, và quản lý có lưu lại ai đã quyết định, khi nào.",
+          hr_content: "Bấm vào dòng mã SP thì hiện các đơn chưa xuất trong tháng. Với từng đơn (số chỉ thị xuất), nhập người phụ trách (chọn từ nhân viên chưa nghỉ việc), ngày giao và ghi chú rồi lưu. Khi lưu, chọn tên mình ở ô \"Người nhập\" phía trên (trình duyệt sẽ nhớ). Mỗi lần lưu đều có lịch sử, xem bằng nút \"Lịch sử\". Dòng mã SP hiển thị số đơn chưa có người phụ trách hoặc ngày giao (chưa xử lý). Nhập lại file Excel thì nội dung đã nhập vẫn được giữ.",
+          hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
+          hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
+          hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
           fq_title: "Lịch ép đùn: in phiếu Etching",
           fq_purpose: "Để in phiếu ghi Etching giống \"In Etching\" của kế hoạch ép ex0.11 từ ex0.20.",
           fq_content: "Thêm nút in \"Phiếu Etching\" ở mỗi dòng kế hoạch trong lịch ép. In BÁO CÁO ETCHING (ngày đùn, mã khuôn, số billet kế hoạch, số SP, nBn và số lỗ, ô ghi theo vị trí mẫu, ảnh etching của sản phẩm). Sửa so với ex0.11: nBn lấy từ phiếu đùn mới nhất của khuôn; hỗ trợ vị trí mẫu của 5B1 (H, A–F, I, K, END).",

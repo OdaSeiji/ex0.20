@@ -10,9 +10,12 @@
     body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
 
     .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons { display: flex; gap: 6px; }
     .lang-buttons button {
-      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
-      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+      /* same size for both buttons (Japanese and Vietnamese text have different line heights) */
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 96px; height: 30px; padding: 0 8px; line-height: 1;
+      border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
     }
     .lang-buttons button.active { background: #0078d4; color: #fff; }
 
@@ -99,6 +102,7 @@
       .hist { overflow-y: auto; min-height: 0; }
     }
   </style>
+  <link rel="stylesheet" href="./css/lang_buttons.css" />
 </head>
 <body>
   <div class="lang-buttons">
@@ -157,7 +161,7 @@
     const dict = {
       ja: {
         title: "📥 在庫・出荷指示の取込",
-        subtitle: "Excel ファイルを選ぶと中身を確かめて表示します（品番は品番マスタにあるかも確かめます）。エラーが無ければ「取込開始」で登録します。同じ取込日付のデータは、消してから登録し直します。",
+        subtitle: "Excel ファイルを選ぶと中身を確かめて表示します。エラーが無ければ「取込開始」で登録します。同じ取込日付のデータは、消してから登録し直します。",
         btn_back: "← 戻る", lbl_type: "取込種別", type_inventory: "在庫データ", type_shipping: "出荷指示データ",
         lbl_date: "取込日付", lbl_file: "Excelファイル", btn_import: "取込開始",
         no_file: "Excel ファイルを選ぶと、ここに中身が出ます",
@@ -165,7 +169,7 @@
         hist_date: "取込日付", hist_cnt: "件数", hist_at: "取込日時",
         map_inventory: "A 列が「アルミ押し出し」の行だけを読む。読む列：B 品番、Y 在庫数、Z 引当数、AA 未引当在庫数（数の列が空なら 0）",
         st_excluded: "対象外（{c} 列が「{v}」以外）", excluded_vals: "対象外にした {c} 列の値：{list}", blank: "（空）",
-        map_shipping: "読む列：A 品番、B 数量、C 受注日付、D 出荷期限、F 得意先名、G 出荷指示番号、H 搬送方法、J 出荷回答日、K AB、S ステータス",
+        map_shipping: "読む列：A 品番、B 数量、C 受注日付、D 出荷期限、F 得意先名、G 出荷指示番号、H 搬送方法、I 出荷回答日、J 出荷日（実績・空は未出荷）、K AB、S 国",
         sheet: "シート：{s}",
         st_ok: "登録する件数", st_skip: "スキップ（品番が空・見出し）", st_err: "エラー",
         err_title: "取込エラー", err_line: "行番号：{n}",
@@ -174,7 +178,7 @@
         c_production_number: "品番", c_stock_quantity: "在庫数", c_allocated_quantity: "引当数", c_unallocated_inventory: "未引当在庫数",
         c_quantity: "数量", c_order_date: "受注日付", c_due_date: "出荷期限", c_customer_name: "得意先名",
         c_shipping_instruction_no: "出荷指示番号", c_transportation_method: "搬送方法", c_reply_date: "出荷回答日",
-        c_ab_status: "AB", c_custom_status: "ステータス",
+        c_shipping_date: "出荷日（実績）", c_ab_status: "AB", c_country: "国",
         e_no_file: "ファイルが選ばれていません",
         e_not_excel: "Excel ファイル（.xlsx / .xlsm / .xls）を選んでください",
         e_read: "ファイルを読めませんでした",
@@ -183,12 +187,8 @@
         e_date: "日付形式が不正です（{c} 列：{v}）",
         e_qty: "数量が整数ではありません（{c} 列：{v}）",
         e_no_date: "取込日付を入れてください",
-        e_pn_unknown: "品番が品番マスタにありません（{p}）",
         e_balance: "在庫数 − 引当数 が 未引当在庫数 と合いません（Y {x} − Z {y} = {d}、AA は {z}）",
-        e_pn_check: "品番の確認ができませんでした {m}",
-        checking: "品番を品番マスタと照らし合わせています…",
         fix_hint: "エラーがあるので取り込めません（ステージングには何も登録していません）。Excel を直して保存し、「Excel を選び直す」で読み込み直してください。",
-        unknown_cnt: "品番マスタに無い品番：{n} 種類",
         btn_reselect: "📂 Excel を選び直す",
         confirm_replace: "{d} の{t}はもう {n} 件登録されています。消して登録し直しますか？",
         importing: "取り込んでいます…",
@@ -197,7 +197,7 @@
       },
       vi: {
         title: "📥 Nhập dữ liệu tồn kho / chỉ thị xuất hàng",
-        subtitle: "Chọn file Excel thì nội dung sẽ được kiểm tra và hiển thị (mã SP cũng được đối chiếu với danh mục mã SP). Nếu không có lỗi, bấm \"Bắt đầu nhập\" để đăng ký. Dữ liệu có cùng ngày nhập sẽ bị xóa rồi đăng ký lại.",
+        subtitle: "Chọn file Excel thì nội dung sẽ được kiểm tra và hiển thị. Nếu không có lỗi, bấm \"Bắt đầu nhập\" để đăng ký. Dữ liệu có cùng ngày nhập sẽ bị xóa rồi đăng ký lại.",
         btn_back: "← Quay lại", lbl_type: "Loại dữ liệu", type_inventory: "Dữ liệu tồn kho", type_shipping: "Dữ liệu chỉ thị xuất hàng",
         lbl_date: "Ngày dữ liệu", lbl_file: "File Excel", btn_import: "Bắt đầu nhập",
         no_file: "Chọn file Excel thì nội dung sẽ hiện ở đây",
@@ -205,7 +205,7 @@
         hist_date: "Ngày dữ liệu", hist_cnt: "Số dòng", hist_at: "Thời điểm nhập",
         map_inventory: "Chỉ đọc các dòng có cột A là \"アルミ押し出し\" (nhôm đùn). Cột đọc: B mã SP, Y tồn kho, Z đã phân bổ, AA tồn kho chưa phân bổ (cột số trống = 0)",
         st_excluded: "Ngoài phạm vi (cột {c} khác \"{v}\")", excluded_vals: "Giá trị cột {c} bị loại: {list}", blank: "(trống)",
-        map_shipping: "Cột đọc: A mã SP, B số lượng, C ngày đặt hàng, D hạn xuất hàng, F khách hàng, G số chỉ thị xuất, H phương thức vận chuyển, J ngày trả lời xuất, K AB, S trạng thái",
+        map_shipping: "Cột đọc: A mã SP, B số lượng, C ngày đặt hàng, D hạn xuất hàng, F khách hàng, G số chỉ thị xuất, H phương thức vận chuyển, I ngày trả lời xuất, J ngày xuất thực tế (trống = chưa xuất), K AB, S quốc gia",
         sheet: "Sheet: {s}",
         st_ok: "Số dòng sẽ đăng ký", st_skip: "Bỏ qua (mã SP trống, tiêu đề)", st_err: "Lỗi",
         err_title: "Lỗi nhập dữ liệu", err_line: "Dòng: {n}",
@@ -214,7 +214,7 @@
         c_production_number: "Mã SP", c_stock_quantity: "Tồn kho", c_allocated_quantity: "Đã phân bổ", c_unallocated_inventory: "Tồn chưa phân bổ",
         c_quantity: "Số lượng", c_order_date: "Ngày đặt hàng", c_due_date: "Hạn xuất hàng", c_customer_name: "Khách hàng",
         c_shipping_instruction_no: "Số chỉ thị xuất", c_transportation_method: "Vận chuyển", c_reply_date: "Ngày trả lời xuất",
-        c_ab_status: "AB", c_custom_status: "Trạng thái",
+        c_shipping_date: "Ngày xuất thực tế", c_ab_status: "AB", c_country: "Quốc gia",
         e_no_file: "Chưa chọn file",
         e_not_excel: "Hãy chọn file Excel (.xlsx / .xlsm / .xls)",
         e_read: "Không đọc được file",
@@ -223,12 +223,8 @@
         e_date: "Định dạng ngày không đúng (cột {c}: {v})",
         e_qty: "Số lượng không phải số nguyên (cột {c}: {v})",
         e_no_date: "Hãy nhập ngày dữ liệu",
-        e_pn_unknown: "Mã SP không có trong danh mục mã SP ({p})",
         e_balance: "Tồn kho − đã phân bổ không khớp với tồn chưa phân bổ (Y {x} − Z {y} = {d}, AA là {z})",
-        e_pn_check: "Không kiểm tra được mã SP {m}",
-        checking: "Đang đối chiếu mã SP với danh mục mã SP…",
         fix_hint: "Có lỗi nên không thể nhập (chưa đăng ký gì vào bảng tạm). Hãy sửa file Excel, lưu lại rồi bấm \"Chọn lại Excel\" để đọc lại.",
-        unknown_cnt: "Mã SP không có trong danh mục: {n} loại",
         btn_reselect: "📂 Chọn lại Excel",
         confirm_replace: "{t} ngày {d} đã có {n} dòng. Xóa và đăng ký lại?",
         importing: "Đang nhập…",
@@ -279,9 +275,10 @@
           { key: "customer_name", col: "F", kind: "text" },
           { key: "shipping_instruction_no", col: "G", kind: "text" },
           { key: "transportation_method", col: "H", kind: "text" },
-          { key: "reply_date", col: "J", kind: "date" },
+          { key: "reply_date", col: "I", kind: "date" },
+          { key: "shipping_date", col: "J", kind: "date" },
           { key: "ab_status", col: "K", kind: "text" },
-          { key: "custom_status", col: "S", kind: "text" },
+          { key: "country", col: "S", kind: "text" },
         ],
       },
     };
@@ -305,6 +302,7 @@
     function toDate(v) {
       // returns { ok, value } ; value is "YYYY-MM-DD" or null
       if (v === "" || v === null || v === undefined) return { ok: true, value: null };
+      if (typeof v === "number" && /^\d{8}$/.test(String(v))) v = String(v); // YYYYMMDD as a number
       if (typeof v === "number") {
         // Excel date serial
         const p = XLSX.SSF.parse_date_code(v);
@@ -313,7 +311,7 @@
       }
       const s = String(v).trim();
       if (s === "") return { ok: true, value: null };
-      const m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T].*)?$/);
+      const m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[ T].*)?$/) || s.match(/^(\d{4})(\d{2})(\d{2})$/);
       if (!m) return { ok: false };
       const y = +m[1], mo = +m[2], d = +m[3];
       const dt = new Date(y, mo - 1, d);
@@ -390,43 +388,7 @@
         rows.push(row);
       });
       if (!rows.length && !errors.length) errors.push({ line: "-", message: t("e_no_data") });
-      parsed = { type, rows, skipped, excluded, excludedVals, total: rows.length, errors, checking: rows.length > 0 };
-      renderPreview();
-      if (rows.length) checkProductionNumbers(parsed);
-    }
-
-    // Check that every part number is in m_production_numbers. Unknown ones become errors (import is blocked).
-    async function checkProductionNumbers(target) {
-      const pns = [...new Set(target.rows.map((r) => r.production_number))];
-      let res;
-      try {
-        const r = await fetch(API + "check_pn.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ production_numbers: pns }),
-        });
-        res = await r.json();
-      } catch (e) {
-        res = { status: "error", message: String(e) };
-      }
-      if (parsed !== target) return; // another file / type was chosen meanwhile
-      target.checking = false;
-      if (res.status !== "ok") {
-        target.errors.push({ line: "-", message: t("e_pn_check", { m: res.message || "" }) });
-      } else {
-        const unknown = new Set(res.unknown);
-        target.unknownCount = unknown.size;
-        const pnErrors = [];
-        target.rows.forEach((r) => {
-          if (unknown.has(r.production_number)) {
-            r.bad = true;
-            r.pnBad = true;
-            pnErrors.push({ line: r.line, message: t("e_pn_unknown", { p: r.production_number }) });
-          }
-        });
-        // keep errors in row order
-        target.errors = [...target.errors, ...pnErrors].sort((a, b) => (+a.line || 0) - (+b.line || 0));
-      }
+      parsed = { type, rows, skipped, excluded, excludedVals, total: rows.length, errors };
       renderPreview();
     }
 
@@ -452,10 +414,8 @@
         const list = vals.slice(0, 10).map(([v, n]) => `${v === "" ? t("blank") : v}（${n}）`).join("、") + (vals.length > 10 ? " …" : "");
         h += `<div class="note">${esc(t("excluded_vals", { c: spec.filter.col, list }))}</div>`;
       }
-      if (parsed.checking) h += `<div class="note">${esc(t("checking"))}</div>`;
       if (parsed.errors.length) {
         h += `<div class="fix">${esc(t("fix_hint"))}` +
-          (parsed.unknownCount ? `<br>${esc(t("unknown_cnt", { n: parsed.unknownCount }))}` : "") +
           ` <button class="btn btn-reselect" onclick="reselectFile()">${esc(t("btn_reselect"))}</button></div>`;
         h += `<div class="errors"><div class="ttl">${esc(t("err_title"))}</div>` +
           parsed.errors.map((e) => `<div><span class="ln">${esc(t("err_line", { n: e.line }))}</span>${esc(e.message)}</div>`).join("") +
@@ -470,14 +430,13 @@
           shown.map((r) => `<tr class="${r.bad ? "bad" : ""}"><td class="line">${r.line}</td>` +
             spec.cols.map((c) => {
               let cls = c.kind === "qty" ? "num" : c.kind === "date" || c.kind === "pn" ? "mono" : "";
-              if (c.kind === "pn" && r.pnBad) cls += " pn-bad";
               if (c.kind === "qty" && r.balanceBad) cls += " pn-bad";
               return `<td class="${cls}">${esc(r[c.key] ?? "")}</td>`;
             }).join("") + `</tr>`).join("") +
           `</tbody></table></div>`;
       }
       box.innerHTML = h;
-      btn.disabled = !(okCount > 0 && parsed.errors.length === 0 && !parsed.checking);
+      btn.disabled = !(okCount > 0 && parsed.errors.length === 0);
     }
 
     // Open the file dialog again (to load the corrected Excel, even with the same file name)

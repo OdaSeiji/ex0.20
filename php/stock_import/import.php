@@ -5,7 +5,6 @@
 ini_set('display_errors', '0');
 header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/../db.php';
-require_once __DIR__ . '/common.php';
 
 function fail($msg, $errors = []) {
   echo json_encode(['status' => 'error', 'message' => $msg, 'errors' => $errors], JSON_UNESCAPED_UNICODE);
@@ -37,12 +36,6 @@ $str = function ($v, $max) {
   return mb_substr($s, 0, $max);
 };
 
-try {
-  $known = known_pn_set(getPDO());
-} catch (PDOException $e) {
-  fail($e->getMessage());
-}
-
 $errors = [];
 $clean = [];
 foreach ($rows as $r) {
@@ -50,8 +43,6 @@ foreach ($rows as $r) {
   $pn = trim((string)($r['production_number'] ?? ''));
   if ($pn === '') { $errors[] = ['line' => $line, 'message' => '品番が空です']; continue; }
   if (mb_strlen($pn) > 100) { $errors[] = ['line' => $line, 'message' => '品番が長すぎます']; continue; }
-  if (!isset($known[pn_key($pn)])) { $errors[] = ['line' => $line, 'message' => '品番が品番マスタにありません（' . $pn . '）']; continue; }
-  $pn = $known[pn_key($pn)]; // store the part number as written in the master
 
   if ($type === 'inventory') {
     $vals = [];
@@ -68,7 +59,7 @@ foreach ($rows as $r) {
   } else {
     $q = $r['quantity'] ?? 0;
     if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => '数量が整数ではありません']; continue; }
-    foreach (['order_date', 'due_date', 'reply_date'] as $k) {
+    foreach (['order_date', 'due_date', 'reply_date', 'shipping_date'] as $k) {
       if (!$isDate($r[$k] ?? null)) { $errors[] = ['line' => $line, 'message' => '日付形式が不正です']; continue 2; }
     }
     $clean[] = [
@@ -79,8 +70,9 @@ foreach ($rows as $r) {
       $str($r['shipping_instruction_no'] ?? null, 50),
       $str($r['transportation_method'] ?? null, 20),
       ($r['reply_date'] ?? '') ?: null,
+      ($r['shipping_date'] ?? '') ?: null,
       $str($r['ab_status'] ?? null, 10),
-      $str($r['custom_status'] ?? null, 50),
+      $str($r['country'] ?? null, 50),
     ];
   }
 }
@@ -93,8 +85,8 @@ if ($type === 'inventory') {
 } else {
   $table = 'stg_shipping_instruction';
   $cols = '(source_file_date, production_number, quantity, order_date, due_date, customer_name,'
-        . ' shipping_instruction_no, transportation_method, reply_date, ab_status, custom_status)';
-  $n = 11;
+        . ' shipping_instruction_no, transportation_method, reply_date, shipping_date, ab_status, country)';
+  $n = 12;
 }
 
 try {

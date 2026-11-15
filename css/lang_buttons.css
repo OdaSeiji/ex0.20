@@ -1,0 +1,19 @@
+/* Language switch buttons (日本語 / Tiếng Việt): same width and height on every page.
+   Japanese and Vietnamese text have different line heights, so the button size is fixed
+   and the text is centered. Loaded at the end of <head> on each page that has setLang buttons.
+   The selector is a little stronger than the pages' own rules (e.g. ".lang-buttons button"),
+   so this file wins without !important. Colors (active state etc.) are left to each page. */
+body button[onclick^="setLang"][onclick] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 96px;
+  min-width: 96px;
+  height: 30px;
+  padding: 0 8px;
+  line-height: 1;
+  font-size: 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
