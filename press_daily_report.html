@@ -850,6 +850,10 @@
         card_worklength: "切出本数", col_len: "長さ", btn_copy: "コピー",
         lbl_worklength_total: "合計", unit_pieces: "本",
         empty_worklength: "登録データなし", ph_len: "長さ",
+        dup_die_prompt: "同じ日に同じ金型の押出がすでにあります。\n{list}\n\nこのまま保存するときは、パスワードを入力してください。",
+        dup_die_item: "・ID {id}（{machine}号機、開始 {start}）",
+        dup_die_wrong: "パスワードが違います。",
+        dup_die_cancel: "同じ日に同じ金型の押出があるので、保存を取りやめました",
         card_worktime: "作業時間ログ", sub_time_extrusion: "押出時間",
         sub_time_pull: "ストレッチ時間", sub_time_cut: "切断時間",
         col_code: "停止理由", col_date: "日付",
@@ -926,6 +930,10 @@
         card_worklength: "Bảng chiều dài sau đùn", col_len: "Chiều dài", btn_copy: "Sao chép",
         lbl_worklength_total: "Tổng", unit_pieces: "thanh",
         empty_worklength: "Chưa có dữ liệu", ph_len: "Chiều dài",
+        dup_die_prompt: "Đã có lần đùn cùng khuôn trong cùng ngày.\n{list}\n\nNếu vẫn muốn lưu, vui lòng nhập mật khẩu.",
+        dup_die_item: "・ID {id} (máy {machine}, bắt đầu {start})",
+        dup_die_wrong: "Sai mật khẩu.",
+        dup_die_cancel: "Đã hủy lưu vì có lần đùn cùng khuôn trong cùng ngày",
         card_worktime: "Thời gian thao tác", sub_time_extrusion: "Thời gian đùn",
         sub_time_pull: "Thời gian kéo", sub_time_cut: "Thời gian cắt",
         col_code: "Nguyên nhân dừng máy", col_date: "Ngày",
@@ -2858,6 +2866,27 @@
       // validateRamData();
       // validateProductionTime();
     }
+    // 保存・更新を送る。同じ日に同じ金型の押出があってサーバーが止めたら、パスワードを聞いてもう一度送る
+    async function postPressWithDuplicateCheck(url, payload, failMsg) {
+      let res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+      let data = await res.json();
+      while (res.status === 409 && data.duplicate_die) {
+        const d = dict[currentLang];
+        const list = (data.same_presses || []).map(r => d.dup_die_item
+          .replace("{id}", r.id)
+          .replace("{machine}", r.press_machine_no ?? "")
+          .replace("{start}", String(r.press_start_at ?? "").slice(0, 5))).join("\n");
+        const msg = (data.wrong_password ? d.dup_die_wrong + "\n" : "") + d.dup_die_prompt.replace("{list}", list);
+        const pw = prompt(msg);
+        if (pw === null) throw new Error(d.dup_die_cancel);
+        payload.duplicate_password = pw.trim();
+        res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+        data = await res.json();
+      }
+      if (!res.ok || !data.success) throw new Error(data.error || failMsg);
+      return data;
+    }
+
     async function uploadScanFileIfNeeded() {
       const file = document.getElementById("press-direction_file").files[0];
       if (!file) return null;
@@ -3056,13 +3085,7 @@
           cut: cutHandlers.collect(),
           subStaff: subStaff.map(st => st.id),
         };
-        const res = await fetch("./php/press_daily_report/update_press.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || "更新に失敗しました");
+        const data = await postPressWithDuplicateCheck("./php/press_daily_report/update_press.php", payload, "更新に失敗しました");
 
         showSaveStatus(`✅ 更新しました (ID: ${data.press_id})`, false);
         resetPressForm();
@@ -3090,13 +3113,7 @@
           cut: cutHandlers.collect(),
           subStaff: subStaff.map(st => st.id),
         };
-        const res = await fetch("./php/press_daily_report/save_press.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || "保存に失敗しました");
+        const data = await postPressWithDuplicateCheck("./php/press_daily_report/save_press.php", payload, "保存に失敗しました");
 
         showSaveStatus(`✅ 保存しました (ID: ${data.press_id})`, false);
         resetPressForm();

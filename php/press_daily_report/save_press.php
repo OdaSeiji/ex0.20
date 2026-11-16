@@ -27,6 +27,8 @@ foreach (PRESS_REQUIRED_KEYS as $key) {
     }
 }
 
+checkSameDayDieOrExit($pdo, $p, $body);
+
 try {
     $pdo->beginTransaction();
 

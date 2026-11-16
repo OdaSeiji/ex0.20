@@ -86,7 +86,22 @@
         </div>
       </div>
 
-      <!-- 2026-11-15 (最新) -->
+      <!-- 2026-11-16 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-16</span>
+        </div>
+        <div class="entry-title" data-key="hu_title">押出日報：同じ日に同じ金型を入力するときはパスワードが必要</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hu_purpose">同じ押出を2回入力してしまう（二重登録）のを防ぐため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hu_content">押出日報の「保存」「更新」で、同じ押出日・同じ金型の押出がすでにあるときは、その押出（ID・号機・開始時刻）を表示して、パスワードを聞くようにした。パスワードが違うときや「キャンセル」のときは保存しない。更新では、押出日か金型を変えたときだけ確かめる。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-15 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
@@ -2146,6 +2161,9 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          hu_title: "押出日報：同じ日に同じ金型を入力するときはパスワードが必要",
+          hu_purpose: "同じ押出を2回入力してしまう（二重登録）のを防ぐため。",
+          hu_content: "押出日報の「保存」「更新」で、同じ押出日・同じ金型の押出がすでにあるときは、その押出（ID・号機・開始時刻）を表示して、パスワードを聞くようにした。パスワードが違うときや「キャンセル」のときは保存しない。更新では、押出日か金型を変えたときだけ確かめる。",
           ht_title: "新規金型登録：直径・穴数・ボルスターも Excel で登録、雛形のダウンロード。金型管理：情報が足りない金型だけ表示",
           ht_purpose: "Excel の一括登録では型番と品番しか入らず、直径・穴数・ボルスターが空の金型が増えていたため。また、どの金型の情報が足りないかがわからなかったため。",
           ht_content: "新規金型登録の Excel に D 列 直径（mm）・E 列 穴数（1〜6）・F 列 ボルスターを足した。マスタに無い直径・ボルスターや、おかしな穴数は空にして取り込み、画面で知らせる。ボルスターだけ書けば直径はボルスターから決まり、直径とボルスターが合わないときも知らせる。「雛形の Excel をダウンロード」ボタンを付けた（2枚目のシートに書き方と直径・ボルスターの一覧）。一覧と編集に直径・穴数・ボルスターを足し、m_dies に移すときに穴数も移す。金型管理には「情報が足りない金型だけ（直径・Bolster・穴数）」のチェックを付け、空の欄を薄い赤にした。",
@@ -2462,6 +2480,9 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          hu_title: "Báo cáo đùn hằng ngày: cần mật khẩu khi nhập cùng khuôn trong cùng ngày",
+          hu_purpose: "Để tránh nhập trùng cùng một lần đùn hai lần.",
+          hu_content: "Khi bấm 「Lưu」 hoặc 「Cập nhật」 ở Báo cáo đùn hằng ngày, nếu đã có lần đùn cùng ngày đùn và cùng khuôn thì hiển thị lần đùn đó (ID, máy, giờ bắt đầu) và yêu cầu nhập mật khẩu. Nếu sai mật khẩu hoặc bấm 「Hủy」 thì không lưu. Khi cập nhật, chỉ kiểm tra khi đổi ngày đùn hoặc khuôn.",
           ht_title: "Đăng ký khuôn mới: đăng ký cả đường kính, số lỗ, bolster bằng Excel, tải file mẫu. Quản lý khuôn: chỉ hiện khuôn thiếu thông tin",
           ht_purpose: "Khi đăng ký hàng loạt bằng Excel chỉ nhập được số khuôn và mã SP, nên ngày càng nhiều khuôn bị trống đường kính, số lỗ, bolster. Ngoài ra không biết khuôn nào đang thiếu thông tin.",
           ht_content: "Thêm vào file Excel đăng ký khuôn mới: cột D đường kính (mm), cột E số lỗ (1〜6), cột F bolster. Đường kính hoặc bolster không có trong danh mục, hoặc số lỗ không hợp lệ sẽ để trống khi nhập và được thông báo trên màn hình. Nếu chỉ ghi bolster thì đường kính được lấy theo bolster; nếu đường kính và bolster không khớp cũng được thông báo. Thêm nút 「Tải file Excel mẫu」 (sheet thứ 2 có cách ghi và danh sách đường kính, bolster). Danh sách và màn hình sửa có thêm đường kính, số lỗ, bolster; khi chuyển sang m_dies thì số lỗ cũng được chuyển. Ở Quản lý khuôn thêm ô chọn 「Chỉ khuôn thiếu thông tin (đường kính, Bolster, số lỗ)」 và tô đỏ nhạt các ô trống.",

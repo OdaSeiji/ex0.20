@@ -28,6 +28,8 @@ foreach (PRESS_REQUIRED_KEYS as $key) {
     }
 }
 
+checkSameDayDieOrExit($pdo, $p, $body, $pressId);
+
 // 後工程の記録（NG・梱包・時効）はラックにぶら下がっているので、記録があるときはラックだけ残して他を更新する
 $rackLocked = array_sum(pressEditLocks($pdo, $pressId)) > 0;
 

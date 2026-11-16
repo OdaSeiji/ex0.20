@@ -114,6 +114,49 @@ function resolveDieProductionNumberVariantId($pdo, $pressDirectiveId) {
     return $row ? $row["die_production_number_variant_id"] : null;
 }
 
+// 同じ日に同じ金型の押出がすでにあるときは、パスワードが無いと保存させない（2026-11-16）
+const PRESS_DUPLICATE_PASSWORD = "1039";
+
+// 同じ押出日・同じ金型の、ほかの押出（$excludeId は更新中の自分）を返す
+function findSameDayDiePresses($pdo, $pressDateAt, $diesId, $excludeId = 0) {
+    $stmt = $pdo->prepare("
+        SELECT id, press_machine_no, press_start_at
+        FROM t_press
+        WHERE press_date_at = :date AND dies_id = :dies_id AND id <> :exclude_id
+        ORDER BY press_start_at, id
+    ");
+    $stmt->bindValue(":date", $pressDateAt, PDO::PARAM_STR);
+    $stmt->bindValue(":dies_id", (int)$diesId, PDO::PARAM_INT);
+    $stmt->bindValue(":exclude_id", (int)$excludeId, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// 同じ日・同じ金型があって、パスワードが違えば 409 で止める（画面はパスワードを聞いてもう一度送る）
+//   更新のとき（$excludeId あり）は、押出日か金型を変えたときだけ確かめる（パスワードで通した押出を、直すたびに聞かない）
+function checkSameDayDieOrExit($pdo, $p, $body, $excludeId = 0) {
+    if ($excludeId) {
+        $cur = $pdo->prepare("SELECT press_date_at, dies_id FROM t_press WHERE id = :id");
+        $cur->bindValue(":id", (int)$excludeId, PDO::PARAM_INT);
+        $cur->execute();
+        $row = $cur->fetch(PDO::FETCH_ASSOC);
+        if ($row && $row["press_date_at"] === $p["press_date_at"] && (int)$row["dies_id"] === (int)$p["dies_id"]) return;
+    }
+    $same = findSameDayDiePresses($pdo, $p["press_date_at"], $p["dies_id"], $excludeId);
+    if (!$same) return;
+    $password = trim((string)($body["duplicate_password"] ?? ""));
+    if ($password === PRESS_DUPLICATE_PASSWORD) return;
+    http_response_code(409);
+    echo json_encode([
+        "success"        => false,
+        "duplicate_die"  => true,
+        "wrong_password" => $password !== "",
+        "same_presses"   => $same,
+        "error"          => "同じ日に同じ金型の押出がすでにあります",
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 const PRESS_REQUIRED_KEYS = [
     "dies_id", "is_washed_die", "press_date_at", "pressing_type_id", "press_machine_no",
     "billet_size", "billet_length", "plan_billet_quantities", "actual_billet_quantities",
