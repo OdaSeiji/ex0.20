@@ -92,6 +92,20 @@
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
           <span class="entry-date">2026-11-17</span>
         </div>
+        <div class="entry-title" data-key="hy_title">在庫管理：在庫不足の抽出に「受注 全件（Excel）」のダウンロード</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hy_purpose">月や不足に関係なく、受注データを全部 Excel で見たいため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hy_content">在庫不足の抽出に［⬇ 受注 全件（Excel）］ボタンを足した。いちばん新しい受注データの全部の行（月・AB・出荷済みに関係なく）を、担当者・回答納期・コメントといっしょに出す。出荷日（実績）の列もある。ファイル名は orders_all_取込日付_作った日。あわせて、在庫不足の Excel の受注明細で、出荷回答日が空になっていたのを直した。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-17</span>
+        </div>
         <div class="entry-title" data-key="hx_title">在庫管理：在庫不足の抽出の表を Excel・CSV でダウンロード</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hx_purpose">在庫不足の表を、Excel で見たり、ほかの人に渡したりするため。</span>
@@ -2205,6 +2219,9 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          hy_title: "在庫管理：在庫不足の抽出に「受注 全件（Excel）」のダウンロード",
+          hy_purpose: "月や不足に関係なく、受注データを全部 Excel で見たいため。",
+          hy_content: "在庫不足の抽出に［⬇ 受注 全件（Excel）］ボタンを足した。いちばん新しい受注データの全部の行（月・AB・出荷済みに関係なく）を、担当者・回答納期・コメントといっしょに出す。出荷日（実績）の列もある。ファイル名は orders_all_取込日付_作った日。あわせて、在庫不足の Excel の受注明細で、出荷回答日が空になっていたのを直した。",
           hx_title: "在庫管理：在庫不足の抽出の表を Excel・CSV でダウンロード",
           hx_purpose: "在庫不足の表を、Excel で見たり、ほかの人に渡したりするため。",
           hx_content: "在庫不足の抽出に［⬇ Excel］［⬇ CSV］ボタンを足した。今表示している行（「不足（0 以下）だけ」のチェックに合わせる）を出す。Excel は3つのシート：品番（表と同じ列）、受注明細（その品番の受注・担当者・回答納期・コメント）、条件（月・月の基準・取込日付）。CSV は品番の表だけ。ファイル名は stock_shortage_月_基準_作った日。",
@@ -2533,6 +2550,9 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          hy_title: "Quản lý tồn kho: Thêm tải 「Tất cả đơn hàng (Excel)」 ở trang thiếu tồn kho",
+          hy_purpose: "Để xem toàn bộ dữ liệu đơn hàng bằng Excel, không phân biệt tháng hay thiếu tồn kho.",
+          hy_content: "Thêm nút 「⬇ Tất cả đơn hàng (Excel)」 vào trang Trích xuất thiếu tồn kho. Xuất tất cả các dòng của dữ liệu đơn hàng mới nhất (không phân biệt tháng, AB, đã xuất hay chưa), cùng với người phụ trách, ngày giao đã trả lời, ghi chú. Có cả cột ngày xuất (thực tế). Tên file: orders_all_ngày nhập_ngày tạo. Đồng thời sửa lỗi cột ngày trả lời xuất bị trống trong sheet chi tiết đơn của Excel thiếu tồn kho.",
           hx_title: "Quản lý tồn kho: Tải bảng thiếu tồn kho dạng Excel / CSV",
           hx_purpose: "Để xem bảng thiếu tồn kho bằng Excel hoặc gửi cho người khác.",
           hx_content: "Thêm nút 「⬇ Excel」「⬇ CSV」 vào trang Trích xuất thiếu tồn kho. Tải các dòng đang hiển thị (theo ô 「Chỉ thiếu (≤ 0)」). Excel có 3 sheet: Mã SP (cùng cột với bảng), Chi tiết đơn (đơn hàng, người phụ trách, ngày giao đã trả lời, ghi chú), Điều kiện (tháng, cách tính tháng, ngày nhập). CSV chỉ có bảng mã SP. Tên file: stock_shortage_tháng_cách tính_ngày tạo.",

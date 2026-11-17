@@ -51,6 +51,7 @@ try {
       SELECT s.production_number, s.shipping_instruction_no, s.quantity, UPPER(TRIM(s.ab_status)) AS ab_status,
              DATE_FORMAT(s.order_date, '%Y-%m-%d') AS order_date,
              DATE_FORMAT(s.due_date, '%Y-%m-%d') AS due_date,
+             DATE_FORMAT(s.reply_date, '%Y-%m-%d') AS reply_date,
              s.customer_name, s.country, s.transportation_method,
              f.staff_id, s1.staff_name, DATE_FORMAT(f.planned_date, '%Y-%m-%d') AS planned_date, f.comment,
              s2.staff_name AS updated_by_name, DATE_FORMAT(f.updated_at, '%Y-%m-%d %H:%i') AS updated_at

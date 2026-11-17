@@ -134,6 +134,7 @@
     <div class="sep"></div>
     <button class="btn btn-dl" id="btnXlsx" data-key="btn_xlsx">⬇ Excel</button>
     <button class="btn btn-dl" id="btnCsv" data-key="btn_csv">⬇ CSV</button>
+    <button class="btn btn-dl" id="btnAllOrders" data-key="btn_all_orders">⬇ 受注 全件（Excel）</button>
     <div class="sep"></div>
     <label class="entrant" id="entrantBox"><span data-key="lbl_entrant">入力者</span>
       <select id="fEntrant"><option value="">—</option></select>
@@ -184,6 +185,8 @@
         btn_xlsx: "⬇ Excel", btn_csv: "⬇ CSV", sheet_pn: "品番", sheet_orders: "受注明細", sheet_cond: "条件",
         x_month: "月", x_basis: "月の基準", x_short_only: "不足（0 以下）だけ", x_made: "作成日時", yes: "はい", no: "いいえ",
         no_rows: "ダウンロードする行がありません",
+        btn_all_orders: "⬇ 受注 全件（Excel）", sheet_all_orders: "受注 全件", o_shipped: "出荷日（実績）", x_rows: "件数",
+        x_all_note: "いちばん新しい受注データの全部の行（月・AB・出荷済みに関係なく）",
       },
       vi: {
         title: "📉 Trích xuất thiếu tồn kho",
@@ -214,6 +217,8 @@
         btn_xlsx: "⬇ Excel", btn_csv: "⬇ CSV", sheet_pn: "Mã SP", sheet_orders: "Chi tiết đơn", sheet_cond: "Điều kiện",
         x_month: "Tháng", x_basis: "Tính tháng theo", x_short_only: "Chỉ thiếu (≤ 0)", x_made: "Thời điểm tạo", yes: "Có", no: "Không",
         no_rows: "Không có dòng nào để tải xuống",
+        btn_all_orders: "⬇ Tất cả đơn hàng (Excel)", sheet_all_orders: "Tất cả đơn", o_shipped: "Ngày xuất (thực tế)", x_rows: "Số dòng",
+        x_all_note: "Tất cả các dòng của dữ liệu đơn hàng mới nhất (không phân biệt tháng, AB, đã xuất hay chưa)",
       },
     };
     let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
@@ -387,6 +392,41 @@
       a.remove();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     }
+    async function downloadAllOrders() {
+      const btn = document.getElementById("btnAllOrders");
+      btn.disabled = true;
+      let res;
+      try { res = await (await fetch(API + "orders_all.php", { cache: "no-store" })).json(); }
+      catch (e) { res = { status: "error", message: String(e) }; }
+      btn.disabled = false;
+      if (res.status !== "ok") { alert(t("err") + " " + (res.message || "")); return; }
+      if (!res.rows.length) { alert(t("no_rows")); return; }
+      const head = [t("h_pn"), t("o_no"), t("o_ab"), t("o_qty"), t("o_order"), t("o_due"), t("o_reply"), t("o_shipped"),
+        t("o_customer"), t("o_country"), t("o_trans"), t("o_staff"), t("o_planned"), t("o_comment"), t("o_updated")];
+      const aoa = [head, ...res.rows.map((o) => [
+        o.production_number, o.shipping_instruction_no || "", o.ab_status || "", o.quantity === null ? "" : Number(o.quantity),
+        o.order_date || "", o.due_date || "", o.reply_date || "", o.shipping_date || "",
+        o.customer_name || "", o.country || "", o.transportation_method || "",
+        o.staff_name || "", o.planned_date || "", o.comment || "", o.updated_at ? `${o.updated_by_name || ""} ${o.updated_at}` : "",
+      ])];
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws["!cols"] = [{ wch: 24 }, { wch: 14 }, { wch: 5 }, { wch: 8 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
+        { wch: 28 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 11 }, { wch: 30 }, { wch: 24 }];
+      ws["!autofilter"] = { ref: ws["!ref"] };
+      const cond = XLSX.utils.aoa_to_sheet([
+        [t("x_all_note")],
+        [t("st_ship"), res.shipping_date || ""],
+        [t("x_rows"), res.rows.length],
+        [t("x_made"), new Date().toLocaleString()],
+      ]);
+      cond["!cols"] = [{ wch: 22 }, { wch: 20 }];
+      XLSX.utils.book_append_sheet(wb, ws, t("sheet_all_orders"));
+      XLSX.utils.book_append_sheet(wb, cond, t("sheet_cond"));
+      const d = new Date(), p = (x) => String(x).padStart(2, "0");
+      XLSX.writeFile(wb, `orders_all_${res.shipping_date}_${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}.xlsx`);
+    }
+    document.getElementById("btnAllOrders").addEventListener("click", downloadAllOrders);
     document.getElementById("btnXlsx").addEventListener("click", downloadXlsx);
     document.getElementById("btnCsv").addEventListener("click", downloadCsv);
 
