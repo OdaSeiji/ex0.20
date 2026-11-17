@@ -7413,3 +7413,8 @@ Step3実行結果
   <img src="./img/20261118-01.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+<figure style="text-align:center;">
+  <img src="./img/20261118-02.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
