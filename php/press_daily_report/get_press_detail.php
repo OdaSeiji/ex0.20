@@ -41,6 +41,8 @@ if (!$press) {
 $press["press_date_at"] = $press["press_date_at_fmt"];
 $press["press_start_at"] = $press["press_start_at_fmt"];
 $press["press_finish_at"] = $press["press_finish_at_fmt"];
+// ラム速・ラム圧・温度（t_press_billet_ram）を、画面が読むキー no1_1000_ram_speed などで足す
+$press = array_merge($press, loadBilletRam($pdo, $id));
 
 function fetchAllFor($pdo, $sql, $id) {
     $stmt = $pdo->prepare($sql);

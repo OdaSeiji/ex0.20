@@ -52,6 +52,8 @@
   - `2026-11-15_die_handover_rows_check.sql`：金型の行の確認（読むだけ。結果を見て到着日の移し方を決める）
   - `2026-11-16_t_press_drop_candidates_check.sql`：t_press の消す候補の列の確認（読むだけ）
 - **11/17 追加・本番で実行済み（11/17）**：`2026-11-17_stock_part_number.sql`（m_production_numbers.stock_part_number。品番の対応表のページ用。SHOW COLUMNS で varchar(100)・UNI を確認）
+- **11/17 追加・本番で未実行**：`2026-11-17_t_press_drop_unused_columns.sql`（t_press の使っていない 23列を消す。**先に git pull、そのあと実行**。STEP 0 で外部キーの名前が `t_press_m_press_stop_code` でなければ、消す前に知らせる）
+- **11/17 追加・本番で未実行**：`2026-11-17_t_press_billet_ram_create.sql` → git pull → `2026-11-17_t_press_billet_ram_drop_old.sql`（ラム速・ラム圧・温度を t_press_billet_ram に移して、t_press の no1〜no5 の30列を消す。**この順番で**）
   - `2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す。**11/17 本番で STEP 1〜5 実行済み**。残り：my.ini に `event_scheduler=ON`（未確認）、11/18 に STEP 6 で動いたか確かめる（手順書の末尾に記録）
 
 ---

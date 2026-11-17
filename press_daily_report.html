@@ -671,12 +671,10 @@
               <th data-key="sc_directive">指示書</th>
               <th data-key="sc_type" class="type-col">種別</th>
               <th data-key="sc_washed">洗浄</th>
-              <th data-key="sc_lot">ロット</th>
               <th data-key="sc_billet_size">B/S</th>
               <th data-key="sc_billet_length">B/L</th>
               <th data-key="sc_plan_qty">計画数</th>
               <th data-key="sc_actual_qty">実績数</th>
-              <th data-key="sc_stop_cause">停止理由</th>
               <th data-key="sc_start">開始</th>
               <th data-key="sc_finish">終了</th>
               <th data-key="sc_ram_speed">ラム速度</th>
@@ -686,7 +684,7 @@
               <th class="sortable" data-sort="inserted"><span data-key="sc_inserted">入力日時</span><span class="sort-mark"></span></th>
             </tr>
           </thead>
-          <tbody><tr><td colspan="19" class="empty-note" data-key="empty_summary">実績データなし</td></tr></tbody>
+          <tbody><tr><td colspan="17" class="empty-note" data-key="empty_summary">実績データなし</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -2437,13 +2435,10 @@
       const tbody = document.querySelector("#summary__table tbody");
       updateSortMarks();
       if (!summaryRows.length) {
-        tbody.innerHTML = `<tr><td colspan="19" class="empty-note">${dict[currentLang].empty_summary}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="17" class="empty-note">${dict[currentLang].empty_summary}</td></tr>`;
         return;
       }
       tbody.innerHTML = [...summaryRows].sort(compareSummaryRows).map(r => {
-        const stopCause = r.stop_code
-          ? r.stop_code + (r.stop_cause_remarks ? " " + r.stop_cause_remarks : "")
-          : "-";
         const hasScan = r.press_directive_scan_file_name && r.press_directive_scan_file_name.toLowerCase() !== "no file";
         const scan = hasScan
           ? `<a href="../diereport/upload/01_press_directive/${encodeURIComponent(r.press_directive_scan_file_name)}" target="_blank" rel="noopener">📎</a>`
@@ -2456,12 +2451,10 @@
             <td class="mono left">${r.ordersheet_number ?? "-"}</td>
             <td class="left type-col">${r.pressing_type ?? "-"}</td>
             <td class="left">${washedLabel(r.is_washed_die)}</td>
-            <td class="mono left">${r.billet_lot_number ?? "-"}</td>
             <td class="mono right">${r.billet_size ?? "-"}</td>
             <td class="mono right">${r.billet_length ?? "-"}</td>
             <td class="mono right">${r.plan_billet_quantities ?? "-"}</td>
             <td class="mono right">${r.actual_billet_quantities ?? "-"}</td>
-            <td class="left">${stopCause}</td>
             <td class="mono left">${trimSeconds(r.press_start_at)}</td>
             <td class="mono left">${trimSeconds(r.press_finish_at)}</td>
             <td class="mono right">${r.actual_ram_speed ?? "-"}</td>
@@ -2510,16 +2503,15 @@
       const t = dict[currentLang];
       const header = [
         "ID", t.sc_date, t.sc_machine, t.sc_die, t.sc_directive, t.sc_type, t.sc_washed,
-        t.sc_lot, t.sc_billet_size, t.sc_billet_length, t.sc_plan_qty, t.sc_actual_qty,
-        t.sc_stop_cause, t.sc_start, t.sc_finish, t.sc_ram_speed, t.sc_die_temp, t.sc_scan,
+        t.sc_billet_size, t.sc_billet_length, t.sc_plan_qty, t.sc_actual_qty,
+        t.sc_start, t.sc_finish, t.sc_ram_speed, t.sc_die_temp, t.sc_scan,
         t.sc_source, t.sc_inserted,
       ];
       const rows = [...summaryRows].sort(compareSummaryRows).map(r => [
         r.id, r.press_date_at ?? "", r.press_machine_no ?? "", r.die_number ?? "",
         r.ordersheet_number ?? "", r.pressing_type ?? "", washedLabel(r.is_washed_die),
-        r.billet_lot_number ?? "", r.billet_size ?? "", r.billet_length ?? "",
+        r.billet_size ?? "", r.billet_length ?? "",
         r.plan_billet_quantities ?? "", r.actual_billet_quantities ?? "",
-        r.stop_code ? r.stop_code + (r.stop_cause_remarks ? " " + r.stop_cause_remarks : "") : "",
         trimSeconds(r.press_start_at), trimSeconds(r.press_finish_at),
         r.actual_ram_speed ?? "", r.actual_die_temperature ?? "",
         r.press_directive_scan_file_name ?? "",

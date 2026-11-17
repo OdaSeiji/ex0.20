@@ -43,13 +43,10 @@ $prepare = $pdo->prepare("
         m_ordersheet.ordersheet_number,
         m_pressing_type.pressing_type,
         t_press.is_washed_die,
-        t_press.billet_lot_number,
         t_press.billet_size,
         t_press.billet_length,
         t_press.plan_billet_quantities,
         t_press.actual_billet_quantities,
-        m_press_stop_code.stop_code,
-        m_press_stop_code.remarks_jp AS stop_cause_remarks,
         t_press.press_start_at,
         t_press.press_finish_at,
         t_press.actual_ram_speed,
@@ -61,7 +58,6 @@ $prepare = $pdo->prepare("
     LEFT JOIN m_dies ON t_press.dies_id = m_dies.id
     LEFT JOIN m_ordersheet ON t_press.ordersheet_id = m_ordersheet.id
     LEFT JOIN m_pressing_type ON t_press.pressing_type_id = m_pressing_type.id
-    LEFT JOIN m_press_stop_code ON t_press.press_stop_cause_id = m_press_stop_code.id
     {$whereSql}
     ORDER BY t_press.press_date_at DESC, t_press.id DESC
     LIMIT 300

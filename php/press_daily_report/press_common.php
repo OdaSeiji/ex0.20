@@ -17,13 +17,7 @@ function pressColumns() {
         "press_directive_scan_file_name", "press_directive_id", "die_production_number_variant_id",
         "ordersheet_id", "special_note",
     ];
-    foreach (["no1", "no2", "no3", "no4", "no5"] as $no) {
-        foreach (["0200", "1000"] as $pos) {
-            foreach (["ram_speed", "ram_pressure", "work_temperature"] as $field) {
-                $columns[] = "{$no}_{$pos}_{$field}";
-            }
-        }
-    }
+    // ラム速・ラム圧・温度（No.1〜5）は t_press_billet_ram に保存する（saveBilletRam）
     return $columns;
 }
 
@@ -60,15 +54,60 @@ function bindPressValues($stmt, $p) {
     $stmt->bindValue(":ordersheet_id", $ordersheetId, $ordersheetId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
 
     $stmt->bindValue(":special_note", toStrOrNull($p["special_note"] ?? null), PDO::PARAM_STR);
+}
 
-    foreach (["no1", "no2", "no3", "no4", "no5"] as $no) {
-        foreach (["0200", "1000"] as $pos) {
-            foreach (["ram_speed", "ram_pressure", "work_temperature"] as $field) {
-                $key = "{$no}_{$pos}_{$field}";
-                $stmt->bindValue(":{$key}", toStrOrNull($p[$key] ?? null), PDO::PARAM_STR);
+// ラム速・ラム圧・温度（ビレット1本＝1行、2026-11-17 に t_press の no1〜no5 の列から移した）。
+// 画面とのやりとりは今までどおり no{N}_{1000|0200}_{ram_speed|ram_pressure|work_temperature} のキーで行い、ここで行に直す。
+const BILLET_RAM_FIELDS = ["ram_speed", "ram_pressure", "work_temperature"];
+const BILLET_RAM_POSITIONS = ["1000", "0200"];
+
+// 保存：6つの値がどれも空の No. は行を作らない（更新のときは呼ぶ前に press_id の行を消しておく）
+function saveBilletRam($pdo, $pressId, $p) {
+    $stmt = $pdo->prepare("
+        INSERT INTO t_press_billet_ram (press_id, billet_number,
+            ram_speed_1000, ram_pressure_1000, work_temperature_1000,
+            ram_speed_0200, ram_pressure_0200, work_temperature_0200)
+        VALUES (:press_id, :billet_number,
+            :ram_speed_1000, :ram_pressure_1000, :work_temperature_1000,
+            :ram_speed_0200, :ram_pressure_0200, :work_temperature_0200)
+    ");
+    for ($no = 1; $no <= 5; $no++) {
+        $vals = [];
+        foreach (BILLET_RAM_POSITIONS as $pos) {
+            foreach (BILLET_RAM_FIELDS as $field) {
+                $v = $p["no{$no}_{$pos}_{$field}"] ?? null;
+                $v = is_string($v) ? trim($v) : $v;
+                $vals["{$field}_{$pos}"] = ($v === null || $v === "") ? null : (string)$v;
             }
         }
+        if (count(array_filter($vals, fn($v) => $v !== null)) === 0) continue;
+        $stmt->bindValue(":press_id", $pressId, PDO::PARAM_INT);
+        $stmt->bindValue(":billet_number", $no, PDO::PARAM_INT);
+        foreach ($vals as $k => $v) {
+            $stmt->bindValue(":{$k}", $v, $v === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+        }
+        $stmt->execute();
     }
+}
+
+// 読み込み：画面のキー（no1_1000_ram_speed など）にして返す。行が無い No. は null
+function loadBilletRam($pdo, $pressId) {
+    $out = [];
+    for ($no = 1; $no <= 5; $no++) {
+        foreach (BILLET_RAM_POSITIONS as $pos) {
+            foreach (BILLET_RAM_FIELDS as $field) $out["no{$no}_{$pos}_{$field}"] = null;
+        }
+    }
+    $stmt = $pdo->prepare("SELECT * FROM t_press_billet_ram WHERE press_id = :id AND billet_number BETWEEN 1 AND 5");
+    $stmt->bindValue(":id", $pressId, PDO::PARAM_INT);
+    $stmt->execute();
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+        $no = (int)$r["billet_number"];
+        foreach (BILLET_RAM_POSITIONS as $pos) {
+            foreach (BILLET_RAM_FIELDS as $field) $out["no{$no}_{$pos}_{$field}"] = $r["{$field}_{$pos}"];
+        }
+    }
+    return $out;
 }
 
 // ラックのロック：この押出のラックに、後工程の記録（NG・梱包・時効）がいくつ付いているか。

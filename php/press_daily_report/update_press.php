@@ -61,6 +61,7 @@ try {
         "t_pull_press" => "press_id",
         "t_cut_press" => "press_id",
         "t_press_staff" => "t_press_id",
+        "t_press_billet_ram" => "press_id",
     ];
     if ($rackLocked) {
         unset($subTables["t_using_aging_rack"]);
@@ -74,6 +75,7 @@ try {
 
     saveSubTables($pdo, $pressId, $bundle, $rack, $workLen, $time, $pull, $cut, $p["press_date_at"]);
     saveSubStaff($pdo, $pressId, $subStaff, $p["staff_id"]);
+    saveBilletRam($pdo, $pressId, $p);
 
     $pdo->commit();
     echo json_encode(["success" => true, "press_id" => $pressId, "rack_locked" => $rackLocked], JSON_UNESCAPED_UNICODE);

@@ -87,3 +87,30 @@
 - `documents/2026-11-16_t_press_drop_candidates_check.sql` を本番で実行。**`qc_name_id` 以外の 22列は、ローカルと同じ数字**（最後に値が入ったのは 2025-12-08 以前、10月以降は 0件）→ もう誰も書いていない。消してよい。
 - **`qc_name_id` は、本番では 2026-11-13 まで値が入っていて、10月以降 297件**（ローカルは 10/19 まで 166件）。
   → 11月も、ex0.11（V7）で QC の確認をしている。データを移す・列を消すのは、現場が ex0.20 の品質評価入力に移ってから。
+
+## 8. 23列を消す（11/17）
+
+- 数え直し：消す候補は **`qc_name_id` を除いて 23列**（確認の SQL は `qc_name_id` を入れて 24行）。上の「22列」は数えまちがい。93列 → **70列**。
+- SQL：`documents/2026-11-17_t_press_drop_unused_columns.sql`（STEP 0 確認 → STEP 1 バックアップ `bak_t_press_dropped_cols_20261117` → STEP 2 外部キー `t_press_m_press_stop_code` と 23列を消す → STEP 3 確認）。ローカルは 11/17 に実行（バックアップ 12,549行、列は 70）。
+- 押出日報の一覧表（`get_summary.php`・`press_daily_report.html`）から「ロット」（`billet_lot_number`）と「停止理由」（`press_stop_cause_id` → `m_press_stop_code`）の列を外した。CSV も同じ。
+  今の ex0.20 は、ロットを `t_bundle.lot`、停止理由を `t_time_press.Code` に、押出1回に何行も書く。古い列は1回に1つの作りの名残で、最近は全部「-」だった。
+  一覧表でロットや停止理由を並べて見たいときは、`t_bundle`・`t_time_press` から集めて出す形で、あとで足せる（11/17 ユーザーと相談）。
+- **本番の順番：先に git pull（一覧表が2列を読まなくなる）→ そのあと SQL。** 逆にすると、pull するまで一覧表がエラーになる。
+
+## 9. ラム速・ラム圧・温度を t_press_billet_ram に移す（11/17）
+
+決めたこと（11/17 ユーザー）：
+- 長さの表（`t_press_work_length_quantity`）は今回は触らない。
+- 1000mm か 400mm かを残す列は足さない（今の保存の仕方でも区別できないので）。
+- 列の名前は今に合わせる：`ram_speed_1000`・`ram_pressure_1000`・`work_temperature_1000`・`ram_speed_0200`・`ram_pressure_0200`・`work_temperature_0200`。
+- 古いデータで6つの値が全部空（NULL か 0）の No. は行を作らない。値はそのまま移す（温度 8108 などのおかしな値も）。
+- 移したら t_press の古い30列はすぐ消す（バックアップ `bak_t_press_ram_cols_20261117` を作ってから）。70列 → **40列**。
+- 金型診断の「ram_speed」（No.1 の 200mm ラム速）は新しいテーブルから読む。
+
+作ったもの：
+- `documents/2026-11-17_t_press_billet_ram_create.sql`：テーブルを作って写す。ローカル：29,650行（No.1 12,491・No.2 9,961・No.3 2,781・No.4 2,331・No.5 2,086）。全部の値を古い列と比べて、ちがいは 0。
+- `documents/2026-11-17_t_press_billet_ram_drop_old.sql`：古い30列をバックアップして消す。
+- 押出日報：画面はそのまま（`no1_1000_ram_speed` などのキーのまま）。サーバー（`press_common.php` の `saveBilletRam`・`loadBilletRam`）で行に直す。更新は他の子テーブルと同じく、消してから作り直す。
+- ローカルで、新規保存 → 読み込み → 更新（No.3 を空にすると行が消える）を試した。テストの押出は消した。
+
+**本番の順番：① create の SQL → ② git pull → ③ drop_old の SQL。**（23列を消す SQL は、git pull のあとならいつでもよい）

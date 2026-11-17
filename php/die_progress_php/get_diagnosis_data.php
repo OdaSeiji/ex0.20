@@ -10,9 +10,11 @@ $press_id = $_GET["press_id"];
 $sql = "
 SELECT 
     p.*,
-    d.die_number
+    d.die_number,
+    br.ram_speed_0200 AS no1_0200_ram_speed   -- No.1 ram speed at 200 mm (t_press_billet_ram since 2026-11-17)
 FROM t_press p
 LEFT JOIN m_dies d ON p.dies_id = d.id
+LEFT JOIN t_press_billet_ram br ON br.press_id = p.id AND br.billet_number = 1
 WHERE p.id = ?
 ";
 $stmt = $pdo->prepare($sql);

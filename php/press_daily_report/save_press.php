@@ -48,6 +48,7 @@ try {
 
     saveSubTables($pdo, $pressId, $bundle, $rack, $workLen, $time, $pull, $cut, $p["press_date_at"]);
     saveSubStaff($pdo, $pressId, $subStaff, $p["staff_id"]);
+    saveBilletRam($pdo, $pressId, $p);
 
     $pdo->commit();
     echo json_encode(["success" => true, "press_id" => $pressId], JSON_UNESCAPED_UNICODE);

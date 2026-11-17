@@ -89,6 +89,34 @@
       <!-- 2026-11-17 (最新) -->
       <div class="entry">
         <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-17</span>
+        </div>
+        <div class="entry-title" data-key="ia_title">押出日報：ラム速・ラム圧・温度（No.1〜5）の保存先を新しいテーブルに変えた</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ia_purpose">t_press に No.1〜5 × 1000/400mm・200mm × ラム速・ラム圧・温度の 30列があり、後ろの No. ほど空が多かったため。ビレット1本を1行にして整理する。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ia_content">ラム速・ラム圧・温度を新しいテーブル t_press_billet_ram（1行＝ビレット1本）に保存するようにした。押出日報の画面と入力のしかたは変わらない。今までのデータは全部写して、t_press の古い 30列は消す。金型診断の ram_speed も新しいテーブルから読む。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-17</span>
+        </div>
+        <div class="entry-title" data-key="hz_title">押出日報：一覧表から「ロット」「停止理由」の列を外した（t_press の使っていない 23列を消す準備）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hz_purpose">t_press には、もう誰も書いていない列が 23 あり、整理するため。一覧表の「ロット」「停止理由」はその古い列を読んでいて、最近はいつも「-」だった。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hz_content">押出日報の下の一覧表と CSV から「ロット」「停止理由」の列を外した。入力欄のロット（ビレット情報）と停止理由（コード・開始・終了）は別のテーブルに保存しているので、そのまま使える。このあと t_press の使っていない 23列を消す（93列 → 70列）。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
           <span class="entry-date">2026-11-17</span>
         </div>
@@ -2219,6 +2247,12 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          ia_title: "押出日報：ラム速・ラム圧・温度（No.1〜5）の保存先を新しいテーブルに変えた",
+          ia_purpose: "t_press に No.1〜5 × 1000/400mm・200mm × ラム速・ラム圧・温度の 30列があり、後ろの No. ほど空が多かったため。ビレット1本を1行にして整理する。",
+          ia_content: "ラム速・ラム圧・温度を新しいテーブル t_press_billet_ram（1行＝ビレット1本）に保存するようにした。押出日報の画面と入力のしかたは変わらない。今までのデータは全部写して、t_press の古い 30列は消す。金型診断の ram_speed も新しいテーブルから読む。",
+          hz_title: "押出日報：一覧表から「ロット」「停止理由」の列を外した（t_press の使っていない 23列を消す準備）",
+          hz_purpose: "t_press には、もう誰も書いていない列が 23 あり、整理するため。一覧表の「ロット」「停止理由」はその古い列を読んでいて、最近はいつも「-」だった。",
+          hz_content: "押出日報の下の一覧表と CSV から「ロット」「停止理由」の列を外した。入力欄のロット（ビレット情報）と停止理由（コード・開始・終了）は別のテーブルに保存しているので、そのまま使える。このあと t_press の使っていない 23列を消す（93列 → 70列）。",
           hy_title: "在庫管理：在庫不足の抽出に「受注 全件（Excel）」のダウンロード",
           hy_purpose: "月や不足に関係なく、受注データを全部 Excel で見たいため。",
           hy_content: "在庫不足の抽出に［⬇ 受注 全件（Excel）］ボタンを足した。いちばん新しい受注データの全部の行（月・AB・出荷済みに関係なく）を、担当者・回答納期・コメントといっしょに出す。出荷日（実績）の列もある。ファイル名は orders_all_取込日付_作った日。あわせて、在庫不足の Excel の受注明細で、出荷回答日が空になっていたのを直した。",
@@ -2550,6 +2584,12 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          ia_title: "Báo cáo đùn hằng ngày: Đổi nơi lưu tốc độ ram, áp lực ram, nhiệt độ (No.1〜5) sang bảng mới",
+          ia_purpose: "Vì t_press có 30 cột (No.1〜5 × 1000/400mm・200mm × tốc độ ram, áp lực ram, nhiệt độ), các No. phía sau thường trống. Sắp xếp lại thành 1 dòng cho 1 billet.",
+          ia_content: "Lưu tốc độ ram, áp lực ram, nhiệt độ vào bảng mới t_press_billet_ram (1 dòng = 1 billet). Màn hình báo cáo đùn hằng ngày và cách nhập không thay đổi. Dữ liệu cũ đã được chép hết, 30 cột cũ của t_press sẽ bị xóa. ram_speed ở trang chẩn đoán khuôn cũng đọc từ bảng mới.",
+          hz_title: "Báo cáo đùn hằng ngày: Bỏ cột 「Lot」「Nguyên nhân dừng máy」 khỏi bảng danh sách (chuẩn bị xóa 23 cột không dùng của t_press)",
+          hz_purpose: "Vì t_press có 23 cột không còn ai ghi nữa, cần dọn dẹp. Cột 「Lot」「Nguyên nhân dừng máy」 trong bảng danh sách đọc các cột cũ đó, gần đây luôn hiển thị 「-」.",
+          hz_content: "Bỏ cột 「Lot」「Nguyên nhân dừng máy」 khỏi bảng danh sách phía dưới của báo cáo đùn hằng ngày và file CSV. Lot ở ô nhập (thông tin billet) và nguyên nhân dừng máy (mã, bắt đầu, kết thúc) được lưu ở bảng khác nên vẫn dùng như cũ. Sau đó sẽ xóa 23 cột không dùng của t_press (93 cột → 70 cột).",
           hy_title: "Quản lý tồn kho: Thêm tải 「Tất cả đơn hàng (Excel)」 ở trang thiếu tồn kho",
           hy_purpose: "Để xem toàn bộ dữ liệu đơn hàng bằng Excel, không phân biệt tháng hay thiếu tồn kho.",
           hy_content: "Thêm nút 「⬇ Tất cả đơn hàng (Excel)」 vào trang Trích xuất thiếu tồn kho. Xuất tất cả các dòng của dữ liệu đơn hàng mới nhất (không phân biệt tháng, AB, đã xuất hay chưa), cùng với người phụ trách, ngày giao đã trả lời, ghi chú. Có cả cột ngày xuất (thực tế). Tên file: orders_all_ngày nhập_ngày tạo. Đồng thời sửa lỗi cột ngày trả lời xuất bị trống trong sheet chi tiết đơn của Excel thiếu tồn kho.",
