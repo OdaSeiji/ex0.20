@@ -24,6 +24,8 @@
     .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
     .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
     .btn-back { background: #546e7a; color: #fff; }
+    .btn-dl { background: #2e7d32; color: #fff; }
+    .btn-dl:disabled { background: #b0bec5; cursor: default; }
     .btn-sub { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
     input[type=month], select { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; font-family: "Roboto Mono", monospace; }
     .toolbar label { font-size: 13px; display: flex; align-items: center; gap: 5px; }
@@ -130,6 +132,9 @@
     <div class="sep"></div>
     <label><input type="checkbox" id="fShortOnly" checked /><span data-key="lbl_short_only">不足（0 以下）だけ</span></label>
     <div class="sep"></div>
+    <button class="btn btn-dl" id="btnXlsx" data-key="btn_xlsx">⬇ Excel</button>
+    <button class="btn btn-dl" id="btnCsv" data-key="btn_csv">⬇ CSV</button>
+    <div class="sep"></div>
     <label class="entrant" id="entrantBox"><span data-key="lbl_entrant">入力者</span>
       <select id="fEntrant"><option value="">—</option></select>
     </label>
@@ -147,6 +152,7 @@
   </div>
   <div class="hint" data-key="hint">※ 差引 ＝ 未引当在庫（AA）−（A ＋ B の受注数）。A は実際の受注、B は在庫用です。「当月までの納期」は、お客さんの出荷期限（D）がその月の末までの受注で、期限を過ぎてまだ出荷していないものも含みます。「当月回答納期」は、担当者が入れた回答納期がその月にある受注です。AB が A・B 以外の受注は数に入れていません（件数は上に出します）。在庫データに無い品番は、未引当在庫を 0 として計算します。</div>
 
+  <script src="./lib/xlsx.js"></script>
   <script>
     const dict = {
       ja: {
@@ -175,6 +181,9 @@
         hist_title: "履歴：出荷指示 {no}", hist_none: "まだ履歴はありません",
         hh_at: "日時", hh_by: "入力者", hh_staff: "担当者", hh_planned: "納期", hh_comment: "コメント",
         ph_comment: "コメント",
+        btn_xlsx: "⬇ Excel", btn_csv: "⬇ CSV", sheet_pn: "品番", sheet_orders: "受注明細", sheet_cond: "条件",
+        x_month: "月", x_basis: "月の基準", x_short_only: "不足（0 以下）だけ", x_made: "作成日時", yes: "はい", no: "いいえ",
+        no_rows: "ダウンロードする行がありません",
       },
       vi: {
         title: "📉 Trích xuất thiếu tồn kho",
@@ -202,6 +211,9 @@
         hist_title: "Lịch sử: chỉ thị xuất {no}", hist_none: "Chưa có lịch sử",
         hh_at: "Thời điểm", hh_by: "Người nhập", hh_staff: "Người phụ trách", hh_planned: "Ngày giao", hh_comment: "Ghi chú",
         ph_comment: "Ghi chú",
+        btn_xlsx: "⬇ Excel", btn_csv: "⬇ CSV", sheet_pn: "Mã SP", sheet_orders: "Chi tiết đơn", sheet_cond: "Điều kiện",
+        x_month: "Tháng", x_basis: "Tính tháng theo", x_short_only: "Chỉ thiếu (≤ 0)", x_made: "Thời điểm tạo", yes: "Có", no: "Không",
+        no_rows: "Không có dòng nào để tải xuống",
       },
     };
     let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
@@ -308,6 +320,75 @@
         </tr></tfoot>
       </table></div>`;
     }
+
+    /* ── download (the rows shown in the table: Excel = part numbers + orders + conditions, CSV = part numbers) ── */
+    function shownRows() {
+      if (!data || data.status !== "ok") return [];
+      return document.getElementById("fShortOnly").checked ? data.rows.filter((r) => r.balance <= 0) : data.rows;
+    }
+    function pnSheetRows(rows) {
+      const head = [t("h_pn"), t("h_stock"), t("h_alloc"), t("h_unalloc"), t("h_a"), t("h_b"), t("h_ab"), t("h_bal"), t("h_cnt"), t("h_open"), t("no_stock")];
+      const n = (v) => (v === null || v === undefined ? "" : Number(v));
+      return [head, ...rows.map((r) => [
+        r.production_number, n(r.stock_qty), n(r.allocated_qty), n(r.unallocated_qty),
+        n(r.a_qty), n(r.b_qty), n(r.ab_qty), n(r.balance), r.a_cnt + r.b_cnt, n(r.open_cnt), r.in_stock_file ? "" : "○",
+      ])];
+    }
+    function fileBase() {
+      const d = new Date(), p = (x) => String(x).padStart(2, "0");
+      return `stock_shortage_${data.month || document.getElementById("fMonth").value}_${data.basis || document.getElementById("fBasis").value}_${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}`;
+    }
+    function downloadXlsx() {
+      const rows = shownRows();
+      if (!rows.length) { alert(t("no_rows")); return; }
+      const staffName = (id) => { const s = staff.find((x) => String(x.id) === String(id ?? "")); return s ? s.staff_name : ""; };
+      const orders = [[t("h_pn"), t("o_no"), t("o_ab"), t("o_qty"), t("o_order"), t("o_due"), t("o_reply"),
+        t("o_customer"), t("o_country"), t("o_trans"), t("o_staff"), t("o_planned"), t("o_comment"), t("o_updated")]];
+      rows.forEach((r) => (r.orders || []).forEach((o) => orders.push([
+        r.production_number, o.shipping_instruction_no, o.ab_status, Number(o.quantity),
+        o.order_date || "", o.due_date || "", o.reply_date || "", o.customer_name || "", o.country || "", o.transportation_method || "",
+        staffName(o.staff_id), o.planned_date || "", o.comment || "", o.updated_at ? `${o.updated_by_name || ""} ${o.updated_at}` : "",
+      ])));
+      const basisSel = document.getElementById("fBasis");
+      const cond = [
+        [t("x_month"), document.getElementById("fMonth").value],
+        [t("x_basis"), basisSel.options[basisSel.selectedIndex].textContent],
+        [t("x_short_only"), document.getElementById("fShortOnly").checked ? t("yes") : t("no")],
+        [t("st_inv"), data.inventory_date || ""],
+        [t("st_ship"), data.shipping_date || ""],
+        [t("x_made"), new Date().toLocaleString()],
+      ];
+      const wb = XLSX.utils.book_new();
+      const ws1 = XLSX.utils.aoa_to_sheet(pnSheetRows(rows));
+      ws1["!cols"] = [{ wch: 24 }, ...Array(10).fill({ wch: 12 })];
+      ws1["!autofilter"] = { ref: ws1["!ref"] };
+      const ws2 = XLSX.utils.aoa_to_sheet(orders);
+      ws2["!cols"] = [{ wch: 24 }, { wch: 14 }, { wch: 5 }, { wch: 8 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
+        { wch: 28 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 11 }, { wch: 30 }, { wch: 24 }];
+      ws2["!autofilter"] = { ref: ws2["!ref"] };
+      const ws3 = XLSX.utils.aoa_to_sheet(cond);
+      ws3["!cols"] = [{ wch: 22 }, { wch: 36 }];
+      XLSX.utils.book_append_sheet(wb, ws1, t("sheet_pn"));
+      XLSX.utils.book_append_sheet(wb, ws2, t("sheet_orders"));
+      XLSX.utils.book_append_sheet(wb, ws3, t("sheet_cond"));
+      XLSX.writeFile(wb, fileBase() + ".xlsx");
+    }
+    function downloadCsv() {
+      const rows = shownRows();
+      if (!rows.length) { alert(t("no_rows")); return; }
+      const cell = (v) => { const s = String(v ?? ""); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+      const text = pnSheetRows(rows).map((r) => r.map(cell).join(",")).join("\r\n") + "\r\n";
+      const blob = new Blob(["\uFEFF" + text], { type: "text/csv;charset=utf-8" }); // BOM so Excel reads UTF-8
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = fileBase() + ".csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    }
+    document.getElementById("btnXlsx").addEventListener("click", downloadXlsx);
+    document.getElementById("btnCsv").addEventListener("click", downloadCsv);
 
     /* ── backorder follow-up (person in charge / delivery date / comment per order) ── */
     const BO_API = "./php/backorder/";

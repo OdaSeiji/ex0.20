@@ -92,6 +92,20 @@
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
           <span class="entry-date">2026-11-17</span>
         </div>
+        <div class="entry-title" data-key="hx_title">在庫管理：在庫不足の抽出の表を Excel・CSV でダウンロード</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hx_purpose">在庫不足の表を、Excel で見たり、ほかの人に渡したりするため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hx_content">在庫不足の抽出に［⬇ Excel］［⬇ CSV］ボタンを足した。今表示している行（「不足（0 以下）だけ」のチェックに合わせる）を出す。Excel は3つのシート：品番（表と同じ列）、受注明細（その品番の受注・担当者・回答納期・コメント）、条件（月・月の基準・取込日付）。CSV は品番の表だけ。ファイル名は stock_shortage_月_基準_作った日。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-17</span>
+        </div>
         <div class="entry-title" data-key="hw_title">在庫管理：在庫・受注の取込で、小数の数量を切り捨てて取り込めるようにした</div>
         <div class="entry-purpose">
           <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hw_purpose">在庫の Excel に小数の数量があり、「数量が整数ではありません」で取り込めなかったため。</span>
@@ -2191,6 +2205,9 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          hx_title: "在庫管理：在庫不足の抽出の表を Excel・CSV でダウンロード",
+          hx_purpose: "在庫不足の表を、Excel で見たり、ほかの人に渡したりするため。",
+          hx_content: "在庫不足の抽出に［⬇ Excel］［⬇ CSV］ボタンを足した。今表示している行（「不足（0 以下）だけ」のチェックに合わせる）を出す。Excel は3つのシート：品番（表と同じ列）、受注明細（その品番の受注・担当者・回答納期・コメント）、条件（月・月の基準・取込日付）。CSV は品番の表だけ。ファイル名は stock_shortage_月_基準_作った日。",
           hw_title: "在庫管理：在庫・受注の取込で、小数の数量を切り捨てて取り込めるようにした",
           hw_purpose: "在庫の Excel に小数の数量があり、「数量が整数ではありません」で取り込めなかったため。",
           hw_content: "数量に小数があるときは、小数点以下を切り捨てて取り込む（例 10.7 → 10）。プレビューでは切り捨てたセルを黄色にして、（ ）の中に Excel の数字を出し、上に何か所あったかを出す。在庫の「在庫数 − 引当数 ＝ 未引当在庫数」の確かめは、Excel で合わない行が多くて取り込めないため、やめた（どの数字も Excel のまま（切り捨てだけ）入れる）。",
@@ -2516,6 +2533,9 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          hx_title: "Quản lý tồn kho: Tải bảng thiếu tồn kho dạng Excel / CSV",
+          hx_purpose: "Để xem bảng thiếu tồn kho bằng Excel hoặc gửi cho người khác.",
+          hx_content: "Thêm nút 「⬇ Excel」「⬇ CSV」 vào trang Trích xuất thiếu tồn kho. Tải các dòng đang hiển thị (theo ô 「Chỉ thiếu (≤ 0)」). Excel có 3 sheet: Mã SP (cùng cột với bảng), Chi tiết đơn (đơn hàng, người phụ trách, ngày giao đã trả lời, ghi chú), Điều kiện (tháng, cách tính tháng, ngày nhập). CSV chỉ có bảng mã SP. Tên file: stock_shortage_tháng_cách tính_ngày tạo.",
           hw_title: "Quản lý tồn kho: Khi nhập Excel tồn kho / đơn hàng, số lượng thập phân được làm tròn xuống rồi nhập",
           hw_purpose: "Vì Excel tồn kho có số lượng thập phân, bị lỗi 「Số lượng không phải số nguyên」 và không nhập được.",
           hw_content: "Khi số lượng có phần thập phân, bỏ phần thập phân rồi nhập (ví dụ 10.7 → 10). Ở màn hình xem trước, ô bị làm tròn có màu vàng, số trong Excel hiển thị trong ngoặc ( ), và phía trên hiển thị số ô bị làm tròn. Đã bỏ kiểm tra 「Tồn kho − Đã phân bổ = Chưa phân bổ」, vì trong Excel có nhiều dòng không khớp nên không nhập được (mọi số đều nhập như trong Excel, chỉ làm tròn xuống).",
