@@ -7375,3 +7375,32 @@ mysql> SELECT s.pn AS excel_part_number,
 mysql>
 
 ```
+
+実行結果
+
+```
+mysql> -- 2026-11-17 m_production_numbers: part number as written in the inventory / order Excel
+mysql> --   Only filled when the Excel part number differs from production_number.
+mysql> --   An Excel part number is linked to the master when it equals production_number OR stock_part_number.
+mysql> --   Edited on the page stock_part_map.html (在庫管理 > 品番の対応表).
+mysql> -- Local: run 2026-11-17. Production: run once (before using the new page).
+mysql>
+mysql> ALTER TABLE m_production_numbers
+    ->   ADD COLUMN stock_part_number VARCHAR(100) NULL
+    ->     COMMENT 'Part number in the inventory / order Excel, only when it differs from production_number',
+    ->   ADD UNIQUE KEY uk_stock_part_number (stock_part_number);
+Query OK, 0 rows affected (0.56 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+mysql> -- Check
+mysql> SHOW COLUMNS FROM m_production_numbers LIKE 'stock_part_number';
++-------------------+--------------+------+-----+---------+-------+
+| Field             | Type         | Null | Key | Default | Extra |
++-------------------+--------------+------+-----+---------+-------+
+| stock_part_number | varchar(100) | YES  | UNI | NULL    |       |
++-------------------+--------------+------+-----+---------+-------+
+1 row in set (0.10 sec)
+
+mysql>
+```
