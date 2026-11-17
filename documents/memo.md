@@ -7404,3 +7404,12 @@ mysql> SHOW COLUMNS FROM m_production_numbers LIKE 'stock_part_number';
 
 mysql>
 ```
+
+# 2026/11/18
+
+Step3実行結果
+
+<figure style="text-align:center;">
+  <img src="./img/20261118-01.png" width="300">
+  <!-- <figcaption>測定進捗追加</figcaption> -->
+</figure>
