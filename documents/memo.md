@@ -6843,3 +6843,33 @@ SQLSTATE[42S22]: Column not found: 1054 Unknown column 'shipping_date' in 'field
 ```
 
 のエラー。
+
+```
+mysql> ALTER TABLE stg_shipping_instruction
+    ->   DROP INDEX idx_status,
+    ->   DROP COLUMN custom_status,
+    ->   MODIFY COLUMN reply_date DATE NULL COMMENT 'Shipping reply date (Excel column I)',
+    ->   ADD COLUMN shipping_date DATE NULL COMMENT 'Actual shipping date (Excel column J, empty = not shipped yet)' AFTER reply_date,
+    ->   ADD COLUMN country VARCHAR(50) NULL COMMENT 'Destination country (Excel column S)' AFTER ab_status,
+    ->   ADD INDEX idx_shipping_date (shipping_date);
+Query OK, 0 rows affected (0.32 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql>
+```
+
+を実行して。OK。
+
+次、ラムのレコード、
+
+```
+mysql> SHOW VARIABLES LIKE 'event_scheduler';
++-----------------+-------+
+| Variable_name   | Value |
++-----------------+-------+
+| event_scheduler | OFF   |
++-----------------+-------+
+1 row in set (0.09 sec)
+
+mysql>
+```
