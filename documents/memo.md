@@ -6972,3 +6972,50 @@ mysql> SELECT MIN(date_time) AS oldest, COUNT(*) AS total_rows FROM t_press_ram_
 
 mysql>
 ```
+
+`t_press`の最適化の模索
+
+```terminal
+    -> SELECT 'cutting_start' AS col, COUNT(*) AS rows_with_value, MAX(press_date_at) AS last_press_date,
+    ->        SUM(press_date_at >= '2026-10-01') AS rows_since_oct
+    -> FROM t_press WHERE cutting_start IS NOT NULL AND cutting_start <> '00:00:00'
+    -> UNION ALL
+    -> SELECT 'cutting_finish' AS col, COUNT(*) AS rows_with_value, MAX(press_date_at) AS last_press_date,
+    ->        SUM(press_date_at >= '2026-10-01') AS rows_since_oct
+    -> FROM t_press WHERE cutting_finish IS NOT NULL AND cutting_finish <> '00:00:00'
+    -> UNION ALL
+    -> SELECT 'qc_name_id' AS col, COUNT(*) AS rows_with_value, MAX(press_date_at) AS last_press_date,
+    ->        SUM(press_date_at >= '2026-10-01') AS rows_since_oct
+    -> FROM t_press WHERE qc_name_id IS NOT NULL AND qc_name_id <> 0;
++-------------------------+-----------------+-----------------+----------------+
+| col                     | rows_with_value | last_press_date | rows_since_oct |
++-------------------------+-----------------+-----------------+----------------+
+| production_directive_id |               0 | NULL            |           NULL |
+| no1_work_length         |              21 | 2021-05-13      |              0 |
+| no2_work_length         |               1 | 2021-04-27      |              0 |
+| no3_work_length         |               0 | NULL            |           NULL |
+| no4_work_length         |               0 | NULL            |           NULL |
+| no5_work_length         |               0 | NULL            |           NULL |
+| cutting_quantities      |               0 | NULL            |           NULL |
+| counted_ok_works        |               0 | NULL            |           NULL |
+| press_work_length       |               0 | NULL            |           NULL |
+| die_heating_start       |               8 | 2024-09-18      |              0 |
+| die_heating_finished    |               4 | 2024-09-18      |              0 |
+| diering_temp            |               4 | 2024-09-18      |              0 |
+| bolter_temp             |               4 | 2024-09-18      |              0 |
+| billet_temp             |               4 | 2024-09-18      |              0 |
+| press_date_time_at      |             303 | 2025-01-20      |              0 |
+| billet_lot_number       |             906 | 2025-01-20      |              0 |
+| press_stop_cause_id     |             906 | 2025-01-20      |              0 |
+| aging_check_date        |            5435 | 2025-12-08      |              0 |
+| scrap_weight            |            2555 | 2023-06-23      |              0 |
+| cutting_staff_id        |               2 | 2024-09-05      |              0 |
+| cutting_date            |               2 | 2024-09-05      |              0 |
+| cutting_start           |               2 | 2024-09-05      |              0 |
+| cutting_finish          |               2 | 2024-09-05      |              0 |
+| qc_name_id              |            1958 | 2026-11-13      |            297 |
++-------------------------+-----------------+-----------------+----------------+
+24 rows in set (0.20 sec)
+
+mysql>
+```
