@@ -332,7 +332,7 @@
     function toQty(v) {
       // empty → 0 ; returns { ok, value, isText }
       if (v === "" || v === null || v === undefined) return { ok: true, value: 0 };
-      // decimals are rounded down (11/18): frac = true, raw = the number before rounding
+      // decimals are rounded down (11/17): frac = true, raw = the number before rounding
       if (typeof v === "number") {
         if (!Number.isFinite(v)) return { ok: false };
         return Number.isInteger(v) ? { ok: true, value: v } : { ok: true, value: Math.floor(v), frac: true, raw: v };
