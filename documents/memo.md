@@ -6908,3 +6908,67 @@ mysql> SELECT ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS size_mb
 
 mysql>
 ```
+
+その次
+
+```
+mysql> ALTER TABLE t_press_ram_log ADD INDEX idx_date_time (date_time);
+Query OK, 0 rows affected (13.82 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> SET GLOBAL event_scheduler = ON;
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> SHOW VARIABLES LIKE 'event_scheduler';
++-----------------+-------+
+| Variable_name   | Value |
++-----------------+-------+
+| event_scheduler | ON    |
++-----------------+-------+
+1 row in set (0.09 sec)
+
+mysql>
+```
+
+その先
+
+```
+mysql> SHOW VARIABLES LIKE 'event_scheduler';
++-----------------+-------+
+| Variable_name   | Value |
++-----------------+-------+
+| event_scheduler | ON    |
++-----------------+-------+
+1 row in set (0.09 sec)
+
+mysql> DELETE FROM t_press_ram_log WHERE date_time < NOW() - INTERVAL 1 MONTH LIMIT 50000;
+Query OK, 50000 rows affected (1.73 sec)
+
+mysql> CREATE EVENT IF NOT EXISTS ev_press_ram_log_purge
+    ->   ON SCHEDULE EVERY 1 DAY
+    ->   STARTS (CURRENT_DATE + INTERVAL 1 DAY + INTERVAL 195 MINUTE)
+    ->   COMMENT 'Keep t_press_ram_log for 1 month: delete rows older than 1 month'
+    ->   DO
+    ->     DELETE FROM t_press_ram_log WHERE date_time < NOW() - INTERVAL 1 MONTH;
+Query OK, 0 rows affected (0.15 sec)
+
+mysql> SELECT EVENT_NAME, STATUS, INTERVAL_VALUE, INTERVAL_FIELD, STARTS, LAST_EXECUTED
+    -> FROM information_schema.EVENTS
+    -> WHERE EVENT_SCHEMA = 'extrusion' AND EVENT_NAME = 'ev_press_ram_log_purge';
++------------------------+---------+----------------+----------------+---------------------+---------------+
+| EVENT_NAME             | STATUS  | INTERVAL_VALUE | INTERVAL_FIELD | STARTS              | LAST_EXECUTED |
++------------------------+---------+----------------+----------------+---------------------+---------------+
+| ev_press_ram_log_purge | ENABLED | 1              | DAY            | 2026-11-18 03:15:00 | NULL          |
++------------------------+---------+----------------+----------------+---------------------+---------------+
+1 row in set (0.10 sec)
+
+mysql> SELECT MIN(date_time) AS oldest, COUNT(*) AS total_rows FROM t_press_ram_log;
++---------------------+------------+
+| oldest              | total_rows |
++---------------------+------------+
+| 2026-09-22 11:08:39 |    4779440 |
++---------------------+------------+
+1 row in set (1.39 sec)
+
+mysql>
+```
