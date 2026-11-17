@@ -6873,3 +6873,38 @@ mysql> SHOW VARIABLES LIKE 'event_scheduler';
 
 mysql>
 ```
+
+次のチェック項目
+
+```
+mysql> SELECT MIN(date_time) AS oldest, MAX(date_time) AS newest, COUNT(*) AS total_rows
+    -> FROM t_press_ram_log;
++---------------------+---------------------+------------+
+| oldest              | newest              | total_rows |
++---------------------+---------------------+------------+
+| 2026-09-21 12:02:50 | 2026-11-17 10:41:04 |    4828034 |
++---------------------+---------------------+------------+
+1 row in set (2.48 sec)
+
+mysql> SELECT COUNT(*) AS rows_older_than_1_month
+    -> FROM t_press_ram_log
+    -> WHERE date_time < NOW() - INTERVAL 1 MONTH;
++-------------------------+
+| rows_older_than_1_month |
++-------------------------+
+|                 2146920 |
++-------------------------+
+1 row in set (2.16 sec)
+
+mysql> SELECT ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024) AS size_mb
+    -> FROM information_schema.TABLES
+    -> WHERE TABLE_SCHEMA = 'extrusion' AND TABLE_NAME = 't_press_ram_log';
++---------+
+| size_mb |
++---------+
+|     405 |
++---------+
+1 row in set (0.40 sec)
+
+mysql>
+```
