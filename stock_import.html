@@ -60,6 +60,9 @@
 
     .result { border-radius: 6px; padding: 12px 14px; margin-bottom: 12px; font-size: 14px; line-height: 1.7; white-space: pre-line; }
     .result.ok { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
+    .map-check { border-radius: 6px; padding: 8px 14px; margin-bottom: 12px; font-size: 13px; }
+    .map-check.ng { background: #fff8e1; border: 1px solid #ffe082; color: #8a6d00; }
+    .map-check.ok { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
     .result.ng { background: #ffebee; border: 1px solid #ef9a9a; color: #b71c1c; }
     .result .big { font-weight: bold; font-size: 16px; }
     .note { font-size: 12px; color: #8a6d00; background: #fff8e1; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; }
@@ -193,6 +196,7 @@
         confirm_replace: "{d} の{t}はもう {n} 件登録されています。消して登録し直しますか？",
         importing: "取り込んでいます…",
         done: "取込完了", done_detail: "登録件数：{n}件\nスキップ件数：{s}件", replaced: "（同じ取込日付の {n} 件は消して入れ替えました）",
+        map_ng: "品番マスタにつながらない品番が {n} 件あります。", map_link: "品番の対応表で確かめる →", map_ok: "✅ すべての品番が品番マスタにつながっています",
         failed: "取込失敗", failed_detail: "エラー件数：{n}件",
       },
       vi: {
@@ -229,6 +233,7 @@
         confirm_replace: "{t} ngày {d} đã có {n} dòng. Xóa và đăng ký lại?",
         importing: "Đang nhập…",
         done: "Nhập xong", done_detail: "Số dòng đăng ký: {n}\nSố dòng bỏ qua: {s}", replaced: "(Đã xóa {n} dòng cùng ngày dữ liệu và thay thế)",
+        map_ng: "Có {n} mã SP chưa liên kết với danh mục mã SP.", map_link: "Kiểm tra ở Bảng đối chiếu mã SP →", map_ok: "✅ Tất cả mã SP đã liên kết với danh mục mã SP",
         failed: "Nhập thất bại", failed_detail: "Số lỗi: {n}",
       },
     };
@@ -451,7 +456,8 @@
       if (res.status === "ok") {
         let s = `<div class="big">${esc(t("done"))}</div>${esc(t("done_detail", { n: res.inserted, s: res.skipped }))}`;
         if (res.deleted) s += `\n${esc(t("replaced", { n: res.deleted }))}`;
-        box.innerHTML = `<div class="result ok">${s}</div>`;
+        box.innerHTML = `<div class="result ok">${s}</div><div id="mapCheck"></div>`;
+        checkPartMap();
       } else {
         const errs = res.errors || [];
         let s = `<div class="big">${esc(t("failed"))}</div>${esc(t("failed_detail", { n: errs.length || 1 }))}`;
@@ -459,6 +465,18 @@
         else if (res.message) s += "\n" + esc(res.message);
         box.innerHTML = `<div class="result ng">${s}</div>`;
       }
+    }
+
+    // after an import: are all part numbers linked to the part number master? (stock_part_map.html)
+    async function checkPartMap() {
+      let res;
+      try { res = await (await fetch("./php/stock_part_map/status.php", { cache: "no-store" })).json(); } catch (e) { return; }
+      const el = document.getElementById("mapCheck");
+      if (!el || !res || res.status !== "ok") return;
+      const n = res.unmatched.length;
+      el.innerHTML = n
+        ? `<div class="map-check ng">${esc(t("map_ng", { n }))} <a href="stock_part_map.html">${esc(t("map_link"))}</a></div>`
+        : `<div class="map-check ok">${esc(t("map_ok"))}</div>`;
     }
 
     // ---- history ----

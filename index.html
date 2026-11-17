@@ -580,6 +580,11 @@
           <div class="menu-title" data-key="stock_shortage_title">在庫不足の抽出</div>
           <div class="menu-desc" data-key="stock_shortage_desc">その月の受注（A＋B）と未引当在庫を品番ごとに比べ、在庫が 0 以下になる品番を出す</div>
         </div>
+        <div class="menu-card" onclick="openPage('stock_part_map.html')">
+          <img class="menu-icon" src="./img/link.svg" alt="" />
+          <div class="menu-title" data-key="stock_part_map_title">品番の対応表</div>
+          <div class="menu-desc" data-key="stock_part_map_desc">在庫・受注の Excel の品番が、すべて品番マスタにつながっているか確かめ、書き方がちがう品番をマスタにつなぐ</div>
+        </div>
       </div>
     </div>
 
@@ -740,6 +745,8 @@
           stock_import_desc: "在庫データと出荷指示データの Excel を取り込む（同じ取込日付は入れ替え）",
           stock_shortage_title: "在庫不足の抽出",
           stock_shortage_desc: "その月の受注（A＋B）と未引当在庫を品番ごとに比べ、在庫が 0 以下になる品番を出す",
+          stock_part_map_title: "品番の対応表",
+          stock_part_map_desc: "在庫・受注の Excel の品番が、すべて品番マスタにつながっているか確かめ、書き方がちがう品番をマスタにつなぐ",
           section_billet: "ビレット",
           order_sheet_title: "生産指示",
           press_plan_title: "押出計画",
@@ -863,6 +870,8 @@
           stock_import_desc: "Nhập file Excel dữ liệu tồn kho và chỉ thị xuất hàng (cùng ngày dữ liệu thì thay thế)",
           stock_shortage_title: "Trích xuất thiếu tồn kho",
           stock_shortage_desc: "So sánh đơn hàng (A+B) trong tháng với tồn chưa phân bổ theo mã SP, hiển thị mã SP còn 0 trở xuống",
+          stock_part_map_title: "Bảng đối chiếu mã SP",
+          stock_part_map_desc: "Kiểm tra mã SP trong Excel tồn kho / đơn hàng đã liên kết hết với danh mục mã SP chưa, và liên kết mã SP viết khác với danh mục",
           section_billet: "Billet",
           order_sheet_title: "Chỉ thị sản xuất",
           press_plan_title: "Kế hoạch đùn",

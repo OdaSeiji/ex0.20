@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Part Number Map</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; color: #333; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; display: flex; gap: 6px; }
+    .lang-buttons button {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 96px; height: 30px; padding: 0 8px; line-height: 1;
+      border: 1px solid #0078d4; background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { font-size: 22px; margin-bottom: 6px; border-left: 6px solid #0078d4; padding-left: 10px; }
+    h2 { font-size: 15px; margin-bottom: 10px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 14px; padding-left: 16px; max-width: 1100px; line-height: 1.6; }
+    .toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+    .btn { padding: 6px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; white-space: nowrap; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .btn-sub { background: #fff; color: #0078d4; border: 1px solid #0078d4; }
+    .btn-link { background: #2e7d32; color: #fff; padding: 3px 10px; font-size: 12px; }
+    .btn-search { background: #fff; color: #0078d4; border: 1px solid #0078d4; padding: 3px 10px; font-size: 12px; }
+    .btn-reg { background: #fff; color: #546e7a; border: 1px solid #b0bec5; padding: 3px 10px; font-size: 12px; }
+    .btn-unlink { background: #fff; color: #c62828; border: 1px solid #ef9a9a; padding: 3px 10px; font-size: 12px; }
+    input[type=text] { padding: 5px 8px; border: 1px solid #aac4e8; border-radius: 4px; font-size: 13px; font-family: "Roboto Mono", monospace; }
+    .toolbar label { font-size: 13px; display: flex; align-items: center; gap: 5px; }
+    .sep { width: 1px; height: 24px; background: #d0d8e2; }
+
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); padding: 16px; margin-bottom: 16px; }
+    .info { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 4px; }
+    .src { border: 1px solid #e3e8ef; border-radius: 6px; padding: 8px 12px; }
+    .src .ttl { font-size: 12px; font-weight: bold; margin-bottom: 6px; }
+    .src .ttl .d { font-family: "Roboto Mono", monospace; font-weight: normal; color: #666; margin-left: 6px; }
+    .stats { display: flex; gap: 8px; }
+    .stat { border-radius: 6px; padding: 6px 12px; background: #f1f5fa; min-width: 96px; }
+    .stat .lbl { font-size: 11px; color: #666; }
+    .stat .val { font-family: "Roboto Mono", monospace; font-size: 18px; font-weight: bold; }
+    .stat.ng { background: #ffebee; }
+    .stat.ng .val { color: #c62828; }
+    .stat.ok .val { color: #2e7d32; }
+    .allok { font-size: 14px; color: #2e7d32; font-weight: bold; margin-top: 10px; }
+    .warn { font-size: 13px; color: #c62828; font-weight: bold; margin-top: 10px; }
+
+    .table-wrap { overflow: auto; max-height: 60vh; border: 1px solid #e3e8ef; border-radius: 6px; }
+    table { border-collapse: collapse; font-size: 13px; width: 100%; }
+    th, td { border-bottom: 1px solid #eef1f5; padding: 6px 10px; text-align: left; vertical-align: middle; }
+    th { background: #e8f1ff; position: sticky; top: 0; z-index: 1; font-size: 12px; white-space: nowrap; }
+    td.pn { font-family: "Roboto Mono", monospace; font-weight: bold; white-space: nowrap; }
+    td.mono { font-family: "Roboto Mono", monospace; white-space: nowrap; }
+    td.ops { white-space: nowrap; }
+    .src-tag { display: inline-block; font-size: 10px; border-radius: 8px; padding: 0 6px; margin-right: 4px; white-space: nowrap; }
+    .src-tag.inv { background: #e3f2fd; color: #1565c0; }
+    .src-tag.ship { background: #fff3e0; color: #e65100; }
+    .src-tag.none { background: #eceff1; color: #78909c; }
+    .cand { display: flex; align-items: center; gap: 8px; margin: 2px 0; flex-wrap: wrap; }
+    .cand .cpn { font-family: "Roboto Mono", monospace; }
+    .cand .why { font-size: 11px; color: #888; }
+    .cand .has { font-size: 11px; color: #e65100; }
+    .nocand { font-size: 12px; color: #999; }
+    .empty { color: #999; text-align: center; padding: 24px; font-size: 13px; }
+    .hint { font-size: 12px; color: #777; line-height: 1.7; max-width: 1100px; }
+    tr.done td { background: #e8f5e9; }
+
+    .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.35); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .modal-bg.show { display: flex; }
+    .modal { background: #fff; border-radius: 8px; padding: 16px; max-width: 640px; width: calc(100% - 32px); max-height: 80vh; overflow: auto; }
+    .modal h3 { font-size: 15px; margin-bottom: 10px; }
+    .modal .row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .modal .row input { flex: 1; }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #323232; color: #fff; padding: 8px 18px; border-radius: 6px; font-size: 13px; display: none; z-index: 300; }
+    .toast.err { background: #c62828; }
+  </style>
+  <link rel="stylesheet" href="./css/lang_buttons.css" />
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1 data-key="title">🔗 品番の対応表</h1>
+  <div class="subtitle" data-key="subtitle">いちばん新しく取り込んだ在庫・受注の Excel の品番が、すべて品番マスタにつながっているかを確かめます。マスタと書き方がちがう品番は、ここでマスタの品番につないでおくと、次からはその品番として扱います。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <button class="btn btn-sub" onclick="load()" data-key="btn_reload">再読み込み</button>
+    <div class="sep"></div>
+    <label><span data-key="lbl_filter">絞り込み</span><input type="text" id="fText" style="width:200px" /></label>
+  </div>
+
+  <div class="card"><div id="infoBox"><div class="empty">…</div></div></div>
+
+  <div class="card">
+    <h2 data-key="h_unmatched">つながらない品番</h2>
+    <div id="unmatchedBox"></div>
+  </div>
+
+  <div class="card">
+    <h2 data-key="h_map">登録済みの対応表</h2>
+    <div id="mapBox"></div>
+  </div>
+
+  <div class="hint" data-key="hint">※ 品番は、前後の空白と大文字・小文字のちがいを無視して比べます。候補は「片方がもう片方の頭と同じ」か「最後のハイフンより前が同じ」マスタの品番です。マスタに無い品番は、品番管理で登録してください。つないだ品番は、品番マスタの stock_part_number に入ります。</div>
+
+  <div class="modal-bg" id="searchModal" onclick="if (event.target === this) closeSearch()">
+    <div class="modal">
+      <h3 id="searchTitle"></h3>
+      <div class="row"><input type="text" id="searchInput" /><button class="btn btn-sub" onclick="closeSearch()" data-key="btn_close">閉じる</button></div>
+      <div id="searchBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "🔗 品番の対応表",
+        subtitle: "いちばん新しく取り込んだ在庫・受注の Excel の品番が、すべて品番マスタにつながっているかを確かめます。マスタと書き方がちがう品番は、ここでマスタの品番につないでおくと、次からはその品番として扱います。",
+        btn_back: "← 戻る", btn_reload: "再読み込み", lbl_filter: "絞り込み", btn_close: "閉じる",
+        h_unmatched: "つながらない品番", h_map: "登録済みの対応表",
+        hint: "※ 品番は、前後の空白と大文字・小文字のちがいを無視して比べます。候補は「片方がもう片方の頭と同じ」か「最後のハイフンより前が同じ」マスタの品番です。マスタに無い品番は、品番管理で登録してください。つないだ品番は、品番マスタの stock_part_number に入ります。",
+        src_inv: "在庫", src_ship: "受注", src_none: "最新の Excel に無い",
+        st_total: "品番の数", st_exact: "マスタと同じ", st_mapped: "対応表でつながる", st_unmatched: "つながらない",
+        no_data: "まだ取り込まれていません",
+        all_ok: "✅ すべての品番がマスタにつながっています",
+        not_ok: "⚠ つながらない品番が {n} 件あります",
+        h_excel: "Excel の品番", h_where: "どちらの Excel", h_cand: "マスタの候補", h_ops: "",
+        h_master: "マスタの品番",
+        why_head: "ハイフンより前が同じ", why_prefix: "頭が同じ",
+        has_other: "（もう {s} につながっています）",
+        no_cand: "似た品番はありません",
+        btn_link: "つなぐ", btn_search: "検索してつなぐ", btn_reg: "品番管理で登録", btn_unlink: "解除",
+        empty_unmatched: "つながらない品番はありません", empty_map: "まだ登録されていません",
+        search_title: "「{pn}」をつなぐマスタの品番を検索", search_ph: "品番の一部（2文字以上）", search_none: "見つかりません",
+        confirm_link: "Excel の「{s}」を、マスタの {m} につなぎますか？",
+        confirm_over: "マスタの {m} は、もう Excel の「{c}」につながっています。「{s}」に置きかえますか？",
+        confirm_unlink: "Excel の「{s}」と、マスタの {m} のつながりを解除しますか？",
+        linked: "つなぎました", unlinked: "解除しました", err: "読み込めませんでした",
+      },
+      vi: {
+        title: "🔗 Bảng đối chiếu mã SP",
+        subtitle: "Kiểm tra xem tất cả mã SP trong file Excel tồn kho / đơn hàng nhập mới nhất đã được liên kết với danh mục mã SP chưa. Mã SP viết khác với danh mục thì liên kết ở đây với mã SP của danh mục, từ lần sau sẽ được xử lý như mã đó.",
+        btn_back: "← Quay lại", btn_reload: "Tải lại", lbl_filter: "Lọc", btn_close: "Đóng",
+        h_unmatched: "Mã SP chưa liên kết", h_map: "Bảng đối chiếu đã đăng ký",
+        hint: "※ Mã SP được so sánh bỏ qua khoảng trắng hai đầu và chữ hoa / chữ thường. Ứng viên là mã SP trong danh mục 「phần đầu giống nhau」 hoặc 「phần trước dấu gạch nối cuối cùng giống nhau」. Mã SP không có trong danh mục thì hãy đăng ký ở Quản lý mã SP. Mã SP đã liên kết được lưu vào stock_part_number của danh mục mã SP.",
+        src_inv: "Tồn kho", src_ship: "Đơn hàng", src_none: "Không có trong Excel mới nhất",
+        st_total: "Số mã SP", st_exact: "Giống danh mục", st_mapped: "Liên kết qua bảng", st_unmatched: "Chưa liên kết",
+        no_data: "Chưa nhập dữ liệu",
+        all_ok: "✅ Tất cả mã SP đã liên kết với danh mục",
+        not_ok: "⚠ Có {n} mã SP chưa liên kết",
+        h_excel: "Mã SP trong Excel", h_where: "Excel nào", h_cand: "Ứng viên trong danh mục", h_ops: "",
+        h_master: "Mã SP trong danh mục",
+        why_head: "Giống phần trước dấu gạch nối", why_prefix: "Giống phần đầu",
+        has_other: "(đã liên kết với {s})",
+        no_cand: "Không có mã SP tương tự",
+        btn_link: "Liên kết", btn_search: "Tìm và liên kết", btn_reg: "Đăng ký ở Quản lý mã SP", btn_unlink: "Hủy liên kết",
+        empty_unmatched: "Không có mã SP chưa liên kết", empty_map: "Chưa có đăng ký",
+        search_title: "Tìm mã SP trong danh mục để liên kết với 「{pn}」", search_ph: "Một phần mã SP (từ 2 ký tự)", search_none: "Không tìm thấy",
+        confirm_link: "Liên kết 「{s}」 trong Excel với {m} trong danh mục?",
+        confirm_over: "{m} trong danh mục đã liên kết với 「{c}」 trong Excel. Thay bằng 「{s}」?",
+        confirm_unlink: "Hủy liên kết giữa 「{s}」 trong Excel và {m} trong danh mục?",
+        linked: "Đã liên kết", unlinked: "Đã hủy liên kết", err: "Không tải được dữ liệu",
+      },
+    };
+    let currentLang = (() => { try { return localStorage.getItem("lang") || "ja"; } catch (e) { return "ja"; } })();
+    if (!dict[currentLang]) currentLang = "ja";
+    const t = (k, vars) => {
+      let s = dict[currentLang][k] ?? k;
+      if (vars) Object.entries(vars).forEach(([key, v]) => s = s.replaceAll(`{${key}}`, v));
+      return s;
+    };
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.documentElement.lang = lang;
+      document.querySelectorAll("[data-key]").forEach(el => { const v = dict[lang][el.dataset.key]; if (typeof v === "string") el.textContent = v; });
+      document.getElementById("searchInput").placeholder = t("search_ph");
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      render();
+    }
+
+    const API = "./php/stock_part_map/";
+    const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    let data = null;
+    const masterNames = {};   // master id -> part number, for the confirm messages
+
+    function toast(msg, isErr) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.className = "toast" + (isErr ? " err" : "");
+      el.style.display = "block";
+      clearTimeout(toast.timer);
+      toast.timer = setTimeout(() => (el.style.display = "none"), 2500);
+    }
+
+    async function load() {
+      try {
+        const r = await fetch(API + "status.php", { cache: "no-store" });
+        data = await r.json();
+      } catch (e) {
+        data = { status: "error", message: String(e) };
+      }
+      render();
+    }
+
+    function srcTags(r) {
+      let h = "";
+      if (r.inv) h += `<span class="src-tag inv">${esc(t("src_inv"))}</span>`;
+      if (r.ship) h += `<span class="src-tag ship">${esc(t("src_ship"))}</span>`;
+      return h || `<span class="src-tag none">${esc(t("src_none"))}</span>`;
+    }
+
+    function render() {
+      const info = document.getElementById("infoBox");
+      const ub = document.getElementById("unmatchedBox");
+      const mb = document.getElementById("mapBox");
+      if (!data) return;
+      if (data.status !== "ok") {
+        info.innerHTML = `<div class="warn">${esc(t("err"))}: ${esc(data.message || "")}</div>`;
+        ub.innerHTML = mb.innerHTML = "";
+        return;
+      }
+
+      // summary per file
+      const box = (key, date) => {
+        const c = data.counts[key];
+        const head = `<div class="ttl">${esc(t(key === "inv" ? "src_inv" : "src_ship"))}<span class="d">${esc(date || "")}</span></div>`;
+        if (!date) return `<div class="src">${head}<div class="nocand">${esc(t("no_data"))}</div></div>`;
+        return `<div class="src">${head}<div class="stats">
+          <div class="stat"><div class="lbl">${esc(t("st_total"))}</div><div class="val">${c.total}</div></div>
+          <div class="stat ok"><div class="lbl">${esc(t("st_exact"))}</div><div class="val">${c.exact}</div></div>
+          <div class="stat ok"><div class="lbl">${esc(t("st_mapped"))}</div><div class="val">${c.mapped}</div></div>
+          <div class="stat ${c.unmatched ? "ng" : "ok"}"><div class="lbl">${esc(t("st_unmatched"))}</div><div class="val">${c.unmatched}</div></div>
+        </div></div>`;
+      };
+      const n = data.unmatched.length;
+      info.innerHTML = `<div class="info">${box("inv", data.inventory_date)}${box("ship", data.shipping_date)}</div>` +
+        (data.inventory_date || data.shipping_date
+          ? (n ? `<div class="warn">${esc(t("not_ok", { n }))}</div>` : `<div class="allok">${esc(t("all_ok"))}</div>`)
+          : "");
+
+      const f = document.getElementById("fText").value.trim().toUpperCase();
+      const hit = (s) => !f || String(s ?? "").toUpperCase().includes(f);
+
+      // unmatched part numbers
+      const um = data.unmatched.filter((r) => hit(r.pn) || r.candidates.some((c) => hit(c.production_number)));
+      ub.innerHTML = um.length
+        ? `<div class="table-wrap"><table><thead><tr><th>${esc(t("h_excel"))}</th><th>${esc(t("h_where"))}</th><th>${esc(t("h_cand"))}</th><th></th></tr></thead><tbody>` +
+          um.map((r) => {
+            const i = data.unmatched.indexOf(r);
+            r.candidates.forEach((c) => (masterNames[c.id] = c.production_number));
+            const cands = r.candidates.length
+              ? r.candidates.map((c) => `<div class="cand">
+                  <button class="btn btn-link" onclick="link(${i}, ${c.id})">${esc(t("btn_link"))}</button>
+                  <span class="cpn">${esc(c.production_number)}</span>
+                  <span class="why">${esc(t(c.reason === "head" ? "why_head" : "why_prefix"))}</span>
+                  ${c.stock_part_number ? `<span class="has">${esc(t("has_other", { s: c.stock_part_number }))}</span>` : ""}
+                </div>`).join("")
+              : `<span class="nocand">${esc(t("no_cand"))}</span>`;
+            return `<tr><td class="pn">${esc(r.pn)}</td><td>${srcTags(r)}</td><td>${cands}</td>
+              <td class="ops"><button class="btn btn-search" onclick="openSearch(${i})">${esc(t("btn_search"))}</button>
+              <button class="btn btn-reg" onclick="location.href='production_number.html'">${esc(t("btn_reg"))}</button></td></tr>`;
+          }).join("") + `</tbody></table></div>`
+        : `<div class="empty">${esc(t("empty_unmatched"))}</div>`;
+
+      // registered map
+      const mp = data.map.filter((r) => hit(r.stock_part_number) || hit(r.production_number));
+      mb.innerHTML = mp.length
+        ? `<div class="table-wrap"><table><thead><tr><th>${esc(t("h_excel"))}</th><th></th><th>${esc(t("h_master"))}</th><th>${esc(t("h_where"))}</th><th></th></tr></thead><tbody>` +
+          mp.map((r) => `<tr><td class="pn">${esc(r.stock_part_number)}</td><td>→</td><td class="mono">${esc(r.production_number)}</td>
+            <td>${srcTags(r)}</td>
+            <td class="ops"><button class="btn btn-unlink" onclick="unlink(${r.id})">${esc(t("btn_unlink"))}</button></td></tr>`).join("") +
+          `</tbody></table></div>`
+        : `<div class="empty">${esc(t("empty_map"))}</div>`;
+    }
+
+    async function post(body) {
+      const r = await fetch(API + "save.php", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      return r.json();
+    }
+
+    // link the Excel part number (unmatched[i]) to the master part number id
+    async function link(i, id) {
+      const spn = data.unmatched[i].pn;
+      const masterPn = masterNames[id] ?? "";
+      if (!confirm(t("confirm_link", { s: spn, m: masterPn }))) return;
+      try {
+        let res = await post({ action: "link", production_number_id: id, stock_part_number: spn });
+        if (res.status === "confirm") {
+          if (!confirm(t("confirm_over", { m: res.production_number, c: res.current, s: spn }))) return;
+          res = await post({ action: "link", production_number_id: id, stock_part_number: spn, overwrite: true });
+        }
+        if (res.status !== "ok") throw new Error(res.message || "error");
+        toast(t("linked"));
+        closeSearch();
+        load();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    async function unlink(id) {
+      const r = data.map.find((m) => m.id === id);
+      if (!r) return;
+      const spn = r.stock_part_number, masterPn = r.production_number;
+      if (!confirm(t("confirm_unlink", { s: spn, m: masterPn }))) return;
+      try {
+        const res = await post({ action: "unlink", production_number_id: id });
+        if (res.status !== "ok") throw new Error(res.message || "error");
+        toast(t("unlinked"));
+        load();
+      } catch (e) {
+        toast(e.message, true);
+      }
+    }
+
+    // search the master by hand
+    let searchIndex = -1, searchTimer = null;
+    function openSearch(i) {
+      searchIndex = i;
+      const pn = data.unmatched[i].pn;
+      document.getElementById("searchTitle").textContent = t("search_title", { pn });
+      const inp = document.getElementById("searchInput");
+      inp.value = pn.split("-")[0];
+      document.getElementById("searchModal").classList.add("show");
+      inp.focus();
+      runSearch();
+    }
+    function closeSearch() { document.getElementById("searchModal").classList.remove("show"); }
+    async function runSearch() {
+      const q = document.getElementById("searchInput").value.trim();
+      const body = document.getElementById("searchBody");
+      if (q.length < 2) { body.innerHTML = ""; return; }
+      let res;
+      try { res = await (await fetch(API + "search.php?q=" + encodeURIComponent(q), { cache: "no-store" })).json(); }
+      catch (e) { res = { status: "error", message: String(e) }; }
+      if (res.status !== "ok") { body.innerHTML = `<div class="warn">${esc(res.message || "")}</div>`; return; }
+      res.rows.forEach((c) => (masterNames[c.id] = c.production_number));
+      body.innerHTML = res.rows.length
+        ? res.rows.map((c) => `<div class="cand">
+            <button class="btn btn-link" onclick="link(${searchIndex}, ${c.id})">${esc(t("btn_link"))}</button>
+            <span class="cpn">${esc(c.production_number)}</span>
+            ${c.stock_part_number ? `<span class="has">${esc(t("has_other", { s: c.stock_part_number }))}</span>` : ""}
+          </div>`).join("")
+        : `<div class="nocand">${esc(t("search_none"))}</div>`;
+    }
+    document.getElementById("searchInput").addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 250);
+    });
+    document.getElementById("fText").addEventListener("input", render);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSearch(); });
+
+    setLang(currentLang);
+    load();
+  </script>
+</body>
+</html>

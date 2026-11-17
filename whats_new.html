@@ -86,7 +86,22 @@
         </div>
       </div>
 
-      <!-- 2026-11-16 (最新) -->
+      <!-- 2026-11-17 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新設</span>
+          <span class="entry-date">2026-11-17</span>
+        </div>
+        <div class="entry-title" data-key="hv_title">在庫管理：品番の対応表（Excel の品番が品番マスタにつながっているか確かめる）</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hv_purpose">在庫・受注の Excel の品番には、品番マスタと書き方がちがうもの（-30K と -K など）や、マスタに無いものがあるため。いずれ在庫と金型・生産の記録をつなぐ準備。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hv_content">在庫管理に「品番の対応表」を足した。いちばん新しい在庫・受注の Excel の品番を品番マスタと比べ、件数（マスタと同じ・対応表でつながる・つながらない）と、つながらない品番の一覧を出す。候補（頭が同じ・最後のハイフンより前が同じ）を［つなぐ］か、検索してつなぐ。マスタに無い品番は品番管理で登録する。つないだ品番は品番マスタの新しい列 stock_part_number に入り、［解除］で外せる。取込の画面でも、取り込んだあとにつながらない品番の件数を出す。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-16 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">改善</span>
@@ -2161,6 +2176,9 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          hv_title: "在庫管理：品番の対応表（Excel の品番が品番マスタにつながっているか確かめる）",
+          hv_purpose: "在庫・受注の Excel の品番には、品番マスタと書き方がちがうもの（-30K と -K など）や、マスタに無いものがあるため。いずれ在庫と金型・生産の記録をつなぐ準備。",
+          hv_content: "在庫管理に「品番の対応表」を足した。いちばん新しい在庫・受注の Excel の品番を品番マスタと比べ、件数（マスタと同じ・対応表でつながる・つながらない）と、つながらない品番の一覧を出す。候補（頭が同じ・最後のハイフンより前が同じ）を［つなぐ］か、検索してつなぐ。マスタに無い品番は品番管理で登録する。つないだ品番は品番マスタの新しい列 stock_part_number に入り、［解除］で外せる。取込の画面でも、取り込んだあとにつながらない品番の件数を出す。",
           hu_title: "押出日報：同じ日に同じ金型を入力するときはパスワードが必要",
           hu_purpose: "同じ押出を2回入力してしまう（二重登録）のを防ぐため。",
           hu_content: "押出日報の「保存」「更新」で、同じ押出日・同じ金型の押出がすでにあるときは、その押出（ID・号機・開始時刻）を表示して、パスワードを聞くようにした。パスワードが違うときや「キャンセル」のときは保存しない。更新では、押出日か金型を変えたときだけ確かめる。",
@@ -2480,6 +2498,9 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          hv_title: "Quản lý tồn kho: Bảng đối chiếu mã SP (kiểm tra mã SP trong Excel đã liên kết với danh mục mã SP chưa)",
+          hv_purpose: "Vì trong Excel tồn kho / đơn hàng có mã SP viết khác với danh mục mã SP (ví dụ -30K và -K) hoặc không có trong danh mục. Chuẩn bị để sau này liên kết tồn kho với dữ liệu khuôn và sản xuất.",
+          hv_content: "Thêm 「Bảng đối chiếu mã SP」 vào Quản lý tồn kho. So sánh mã SP trong Excel tồn kho / đơn hàng mới nhất với danh mục mã SP, hiển thị số lượng (giống danh mục, liên kết qua bảng, chưa liên kết) và danh sách mã SP chưa liên kết. Bấm 「Liên kết」 với ứng viên (giống phần đầu, giống phần trước dấu gạch nối cuối cùng), hoặc tìm rồi liên kết. Mã SP không có trong danh mục thì đăng ký ở Quản lý mã SP. Mã SP đã liên kết được lưu vào cột mới stock_part_number của danh mục mã SP, có thể bỏ bằng 「Hủy liên kết」. Màn hình nhập dữ liệu cũng hiển thị số mã SP chưa liên kết sau khi nhập.",
           hu_title: "Báo cáo đùn hằng ngày: cần mật khẩu khi nhập cùng khuôn trong cùng ngày",
           hu_purpose: "Để tránh nhập trùng cùng một lần đùn hai lần.",
           hu_content: "Khi bấm 「Lưu」 hoặc 「Cập nhật」 ở Báo cáo đùn hằng ngày, nếu đã có lần đùn cùng ngày đùn và cùng khuôn thì hiển thị lần đùn đó (ID, máy, giờ bắt đầu) và yêu cầu nhập mật khẩu. Nếu sai mật khẩu hoặc bấm 「Hủy」 thì không lưu. Khi cập nhật, chỉ kiểm tra khi đổi ngày đùn hoặc khuôn.",
