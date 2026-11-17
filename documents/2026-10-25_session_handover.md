@@ -48,9 +48,10 @@
 - `2026-11-03_press_quality_note.sql`（t_press に quality_note を追加）も本番で実行済み（11/04、本番の品質サマリーで品質メモが表示されているのを確認）
 - **本番で未実行**：`2026-11-06_handover_date_fix.sql`（金型移管日・固定資産登録日の暫定の直し、11/06 にユーザーが実行予定）、`2026-11-05_staff_role_packing_qc.sql`（m_staff.role に packing・quality_control を追加）
 - **11/15 追加・本番で未実行**（実行したら、ここを「実行済み」に書き換える）：
-  - `2026-11-15_stg_shipping_columns.sql` / `2026-11-15_backorder_followup.sql`：在庫管理（pull の前に実行。`2026-11-13_stg_inventory_stock_allocated.sql` は実行済み）
+  - ~~`2026-11-15_stg_shipping_columns.sql` / `2026-11-15_backorder_followup.sql`~~：**11/17 本番で実行済み**（在庫管理。backorder を先に流し、shipping_columns が抜けていて受注の取込が `Unknown column 'shipping_date'` で失敗 → 流して解決。memo.md 11/17）
   - `2026-11-15_die_handover_rows_check.sql`：金型の行の確認（読むだけ。結果を見て到着日の移し方を決める）
-  - **`2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す（手順書 `2026-11-15_press_ram_log_retention.md`）。ユーザーが少しあとで実行予定。root が要る**
+  - `2026-11-16_t_press_drop_candidates_check.sql`：t_press の消す候補の列の確認（読むだけ）
+  - `2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す。**11/17 本番で STEP 1〜5 実行済み**。残り：my.ini に `event_scheduler=ON`（未確認）、11/18 に STEP 6 で動いたか確かめる（手順書の末尾に記録）
 
 ---
 

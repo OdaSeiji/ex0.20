@@ -70,3 +70,12 @@ DROP EVENT IF EXISTS ev_press_ram_log_purge;
 
 - 2026-11-15：STEP 2 の索引（`idx_date_time`）を足した（258万件で 2.4秒）。
 - 削除とイベントは流していない（ローカルの波形は 9/21〜10/22 の写しなので、流すとほとんど消える。webuser にはイベントの権限も無い）。
+
+## 本番でやったこと（2026-11-17、memo.md 11/17）
+
+- STEP 1：event_scheduler は OFF。483万件（9/21〜）、1か月より古いもの 215万件、405MB。
+- STEP 2：索引 `idx_date_time` を足した（13.8秒）。
+- STEP 3：`SET GLOBAL event_scheduler = ON` → ON。**my.ini への `event_scheduler=ON` の追加は未確認**。
+- STEP 4：1回だけ（5万件）。残りの約 210万件は、11/18 3:15 のイベントでまとめて消える予定。
+- STEP 5：イベント `ev_press_ram_log_purge` を作った（ENABLED、STARTS 2026-11-18 03:15）。
+- 残り：11/18 に STEP 6 で LAST_EXECUTED と oldest（10/18 ごろ）を確かめる。
