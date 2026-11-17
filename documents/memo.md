@@ -7188,3 +7188,190 @@ mysql> SELECT s.pn AS excel_part_number,
 mysql>
 
 ```
+
+在庫データの品番と、`m_production_number`の品番との突き合せについて
+
+```sql
+mysql> USE extrusion;
+Database changed
+mysql> -- (Part numbers are compared with COLLATE utf8mb4_general_ci, because the tables may use different collations.)
+mysql>
+mysql> SET @d = (SELECT MAX(source_file_date) FROM stg_inventory_snapshot);
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> SELECT @d AS latest_inventory_file;
++-----------------------+
+| latest_inventory_file |
++-----------------------+
+| 2026-11-17            |
++-----------------------+
+1 row in set (0.09 sec)
+
+mysql>
+mysql> -- Q1. Summary: how many inventory part numbers match the master exactly, or only when hyphens/spaces are ignored
+mysql> SELECT
+    ->   COUNT(*) AS inventory_part_numbers,
+    ->   SUM(m1.id IS NOT NULL) AS exact_match,
+    ->   SUM(m1.id IS NULL AND m2.id IS NOT NULL) AS match_ignoring_hyphen_space,
+    ->   SUM(m1.id IS NULL AND m2.id IS NULL) AS no_match
+    -> FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    -> LEFT JOIN m_production_numbers m1 ON m1.production_number = s.pn
+    -> LEFT JOIN (SELECT MIN(id) AS id, REPLACE(REPLACE(production_number, '-', ''), ' ', '') AS k
+    ->            FROM m_production_numbers GROUP BY k) m2
+    ->        ON m2.k = REPLACE(REPLACE(s.pn, '-', ''), ' ', '');
++------------------------+-------------+-----------------------------+----------+
+| inventory_part_numbers | exact_match | match_ignoring_hyphen_space | no_match |
++------------------------+-------------+-----------------------------+----------+
+|                    733 |         692 |                           0 |       41 |
++------------------------+-------------+-----------------------------+----------+
+1 row in set (0.12 sec)
+
+mysql>
+mysql> -- Q2. For part numbers with no exact match: how many master part numbers share the beginning
+mysql> --     (master is the beginning of the Excel number, or the Excel number is the beginning of the master)
+mysql> --     candidates = 0: nothing similar, 1: one-to-one candidate, 2+: ambiguous
+mysql> SELECT candidates, COUNT(*) AS part_numbers
+    -> FROM (
+    ->   SELECT s.pn,
+    ->          (SELECT COUNT(*) FROM m_production_numbers m
+    ->            WHERE s.pn LIKE CONCAT(m.production_number, '%')
+    ->               OR m.production_number LIKE CONCAT(s.pn, '%')) AS candidates
+    ->   FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    ->   WHERE NOT EXISTS (SELECT 1 FROM m_production_numbers m WHERE m.production_number = s.pn)
+    -> ) x
+    -> GROUP BY candidates ORDER BY candidates;
++------------+--------------+
+| candidates | part_numbers |
++------------+--------------+
+|          0 |           40 |
+|          1 |            1 |
++------------+--------------+
+2 rows in set (0.10 sec)
+
+mysql>
+mysql> -- Q3. The list: Excel part number and the master candidates (up to 300 rows)
+mysql> SELECT s.pn AS excel_part_number,
+    ->        COUNT(m.id) AS candidates,
+    ->        GROUP_CONCAT(m.production_number ORDER BY m.production_number SEPARATOR ' / ') AS master_candidates
+    -> FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    -> LEFT JOIN m_production_numbers m
+    ->        ON s.pn LIKE CONCAT(m.production_number, '%') OR m.production_number LIKE CONCAT(s.pn, '%')
+    -> WHERE NOT EXISTS (SELECT 1 FROM m_production_numbers e WHERE e.production_number = s.pn)
+    -> GROUP BY s.pn
+    -> ORDER BY candidates DESC, s.pn
+    -> LIMIT 300;
++---------------------+------------+-------------------+
+| excel_part_number   | candidates | master_candidates |
++---------------------+------------+-------------------+
+| LEY63-1D            |          1 | LEY63-1D-30       |
+| C96A0LBAZ038-20K    |          0 | NULL              |
+| CQS12-04-F6462-30K  |          0 | NULL              |
+| CQS12-04-F6464-30K  |          0 | NULL              |
+| CQS16-04-F6463-30K  |          0 | NULL              |
+| CQS16-04-F6465-30K  |          0 | NULL              |
+| CXS06-03BAV630      |          0 | NULL              |
+| EQY16A-YA096-25-K   |          0 | NULL              |
+| EQY25A-YA096-25-K   |          0 | NULL              |
+| EQY32A-YA096-25-K   |          0 | NULL              |
+| MGZ63ABQ5434-30K    |          0 | NULL              |
+| MYH40J-R6302-25K    |          0 | NULL              |
+| N2A150-03-AV286-20K |          0 | NULL              |
+| N2A200-02-AV287-20K |          0 | NULL              |
+| N2A200-03-AV287-20K |          0 | NULL              |
+| N2A250-02-AV288-20K |          0 | NULL              |
+| N2A250-03-AV288-20K |          0 | NULL              |
+| N2A325-02-AV289-20K |          0 | NULL              |
+| N2A325-03-AV289-20K |          0 | NULL              |
+| N2A400-02-AV290-20K |          0 | NULL              |
+| N2A400-03-AV290-20K |          0 | NULL              |
+| P4814101-M-1        |          0 | NULL              |
+| P4814201-M-1        |          0 | NULL              |
+| S165A63T110X100X30  |          0 | NULL              |
+| S165A63T26X20X20    |          0 | NULL              |
+| S165A63T31X25X20    |          0 | NULL              |
+| S165A63T38X32X30    |          0 | NULL              |
+| S165A63T47X40X30    |          0 | NULL              |
+| S165A63T58X50X30    |          0 | NULL              |
+| S165A63T72X63X30    |          0 | NULL              |
+| S165A63T89X80X30    |          0 | NULL              |
+| S184A63T108X102X30  |          0 | NULL              |
+| S184A63T43X38X30    |          0 | NULL              |
+| S184A63T56X51X30    |          0 | NULL              |
+| S184A63T68X64X30    |          0 | NULL              |
+| S184A63T89X83X30    |          0 | NULL              |
+| S410A63T107X100X30  |          0 | NULL              |
+| S410A63T36X32X30    |          0 | NULL              |
+| S410A63T45X40X30    |          0 | NULL              |
+| S410A63T55X50X30    |          0 | NULL              |
+| S410A63T86X80X30    |          0 | NULL              |
++---------------------+------------+-------------------+
+41 rows in set (0.10 sec)
+
+mysql>
+mysql> -- Q4. Last part after the last hyphen, for part numbers with no exact match (which suffixes differ)
+mysql> SELECT SUBSTRING_INDEX(s.pn, '-', -1) AS last_part, COUNT(*) AS part_numbers,
+    ->        MIN(s.pn) AS example
+    -> FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    -> WHERE NOT EXISTS (SELECT 1 FROM m_production_numbers m WHERE m.production_number = s.pn)
+    ->   AND s.pn LIKE '%-%'
+    -> GROUP BY last_part
+    -> ORDER BY part_numbers DESC
+    -> LIMIT 40;
++-----------+--------------+--------------------+
+| last_part | part_numbers | example            |
++-----------+--------------+--------------------+
+| 20K       |           10 | C96A0LBAZ038-20K   |
+| 30K       |            5 | CQS12-04-F6462-30K |
+| K         |            3 | EQY16A-YA096-25-K  |
+| 1         |            2 | P4814101-M-1       |
+| 03BAV630  |            1 | CXS06-03BAV630     |
+| 1D        |            1 | LEY63-1D           |
+| 25K       |            1 | MYH40J-R6302-25K   |
++-----------+--------------+--------------------+
+7 rows in set (0.09 sec)
+
+mysql>
+mysql> -- Q5. Master part numbers that are used by several Excel part numbers (one master -> many Excel numbers)
+mysql> SELECT m.production_number AS master_part_number, COUNT(*) AS excel_part_numbers,
+    ->        GROUP_CONCAT(s.pn ORDER BY s.pn SEPARATOR ' / ') AS excel_numbers
+    -> FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    -> JOIN m_production_numbers m
+    ->   ON s.pn LIKE CONCAT(m.production_number, '%') OR m.production_number LIKE CONCAT(s.pn, '%')
+    -> WHERE NOT EXISTS (SELECT 1 FROM m_production_numbers e WHERE e.production_number = s.pn)
+    -> GROUP BY m.id
+    -> HAVING COUNT(*) > 1
+    -> ORDER BY excel_part_numbers DESC
+    -> LIMIT 100;
+Empty set (0.10 sec)
+
+mysql>
+mysql> -- Q6. For part numbers with no exact match: master part numbers with the same text before the last hyphen
+mysql> --     (e.g. Excel ABC-123-30K and master ABC-123-20K). Up to 300 rows.
+mysql> SELECT s.pn AS excel_part_number,
+    ->        COUNT(m.id) AS candidates,
+    ->        GROUP_CONCAT(m.production_number ORDER BY m.production_number SEPARATOR ' / ') AS master_candidates
+    -> FROM (SELECT DISTINCT TRIM(production_number) COLLATE utf8mb4_general_ci AS pn FROM stg_inventory_snapshot WHERE source_file_date = @d) s
+    -> JOIN m_production_numbers m
+    ->   ON m.production_number LIKE '%-%'
+    ->  AND s.pn LIKE '%-%'
+    ->  AND LEFT(m.production_number, CHAR_LENGTH(m.production_number) - CHAR_LENGTH(SUBSTRING_INDEX(m.production_number, '-', -1)) - 1)
+    ->    = LEFT(s.pn, CHAR_LENGTH(s.pn) - CHAR_LENGTH(SUBSTRING_INDEX(s.pn, '-', -1)) - 1)
+    -> WHERE NOT EXISTS (SELECT 1 FROM m_production_numbers e WHERE e.production_number = s.pn)
+    -> GROUP BY s.pn
+    -> ORDER BY candidates DESC, s.pn
+    -> LIMIT 300;
++--------------------+------------+-------------------+
+| excel_part_number  | candidates | master_candidates |
++--------------------+------------+-------------------+
+| C96A0LBAZ038-20K   |          1 | C96A0LBAZ038-30K  |
+| CQS12-04-F6462-30K |          1 | CQS12-04-F6462-K  |
+| CQS12-04-F6464-30K |          1 | CQS12-04-F6464-K  |
+| CQS16-04-F6463-30K |          1 | CQS16-04-F6463-K  |
+| CQS16-04-F6465-30K |          1 | CQS16-04-F6465-K  |
+| MYH40J-R6302-25K   |          1 | MYH40J-R6302-30K  |
++--------------------+------------+-------------------+
+6 rows in set (0.11 sec)
+
+mysql>
+
+```
