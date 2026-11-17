@@ -48,6 +48,7 @@ foreach ($rows as $r) {
     $vals = [];
     foreach (['stock_quantity' => '在庫数', 'allocated_quantity' => '引当数', 'unallocated_inventory' => '未引当在庫数'] as $k => $label) {
       $q = $r[$k] ?? 0;
+      if (is_float($q) && is_finite($q)) $q = (int)floor($q); // decimals are rounded down (the page already does this)
       if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => $label . 'が整数ではありません']; continue 2; }
       $vals[] = $q;
     }
@@ -58,6 +59,7 @@ foreach ($rows as $r) {
     $clean[] = array_merge([$fileDate, $pn], $vals);
   } else {
     $q = $r['quantity'] ?? 0;
+    if (is_float($q) && is_finite($q)) $q = (int)floor($q); // decimals are rounded down (the page already does this)
     if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => '数量が整数ではありません']; continue; }
     foreach (['order_date', 'due_date', 'reply_date', 'shipping_date'] as $k) {
       if (!$isDate($r[$k] ?? null)) { $errors[] = ['line' => $line, 'message' => '日付形式が不正です']; continue 2; }

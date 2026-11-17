@@ -51,6 +51,7 @@
   - ~~`2026-11-15_stg_shipping_columns.sql` / `2026-11-15_backorder_followup.sql`~~：**11/17 本番で実行済み**（在庫管理。backorder を先に流し、shipping_columns が抜けていて受注の取込が `Unknown column 'shipping_date'` で失敗 → 流して解決。memo.md 11/17）
   - `2026-11-15_die_handover_rows_check.sql`：金型の行の確認（読むだけ。結果を見て到着日の移し方を決める）
   - `2026-11-16_t_press_drop_candidates_check.sql`：t_press の消す候補の列の確認（読むだけ）
+- **11/17 追加・本番で実行済み（11/17）**：`2026-11-17_stock_part_number.sql`（m_production_numbers.stock_part_number。品番の対応表のページ用。SHOW COLUMNS で varchar(100)・UNI を確認）
   - `2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す。**11/17 本番で STEP 1〜5 実行済み**。残り：my.ini に `event_scheduler=ON`（未確認）、11/18 に STEP 6 で動いたか確かめる（手順書の末尾に記録）
 
 ---

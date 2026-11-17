@@ -65,6 +65,8 @@
     .map-check.ok { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
     .result.ng { background: #ffebee; border: 1px solid #ef9a9a; color: #b71c1c; }
     .result .big { font-weight: bold; font-size: 16px; }
+    td.frac { background: #fff8e1; }
+    .frac-raw { color: #8a6d00; font-size: 11px; margin-left: 2px; }
     .note { font-size: 12px; color: #8a6d00; background: #fff8e1; border-radius: 6px; padding: 8px 10px; margin-bottom: 12px; }
 
     /* the table is as wide as its contents (not the whole card) */
@@ -177,6 +179,8 @@
         st_ok: "登録する件数", st_skip: "スキップ（品番が空・見出し）", st_err: "エラー",
         err_title: "取込エラー", err_line: "行番号：{n}",
         more_rows: "先頭の {n} 行だけ表示しています（全部で {m} 行）",
+        frac_note: "小数の数量が {n} か所ありました。小数点以下を切り捨てて取り込みます（表の（ ）の中が Excel の数字です）。",
+        frac_title: "Excel の数字：{v}（切り捨て）",
         col_line: "行",
         c_production_number: "品番", c_stock_quantity: "在庫数", c_allocated_quantity: "引当数", c_unallocated_inventory: "未引当在庫数",
         c_quantity: "数量", c_order_date: "受注日付", c_due_date: "出荷期限", c_customer_name: "得意先名",
@@ -214,6 +218,8 @@
         st_ok: "Số dòng sẽ đăng ký", st_skip: "Bỏ qua (mã SP trống, tiêu đề)", st_err: "Lỗi",
         err_title: "Lỗi nhập dữ liệu", err_line: "Dòng: {n}",
         more_rows: "Chỉ hiển thị {n} dòng đầu (tổng cộng {m} dòng)",
+        frac_note: "Có {n} ô số lượng là số thập phân. Phần thập phân sẽ bị bỏ (làm tròn xuống) khi nhập (số trong ngoặc ( ) là số trong Excel).",
+        frac_title: "Số trong Excel: {v} (làm tròn xuống)",
         col_line: "Dòng",
         c_production_number: "Mã SP", c_stock_quantity: "Tồn kho", c_allocated_quantity: "Đã phân bổ", c_unallocated_inventory: "Tồn chưa phân bổ",
         c_quantity: "Số lượng", c_order_date: "Ngày đặt hàng", c_due_date: "Hạn xuất hàng", c_customer_name: "Khách hàng",
@@ -326,11 +332,18 @@
     function toQty(v) {
       // empty → 0 ; returns { ok, value, isText }
       if (v === "" || v === null || v === undefined) return { ok: true, value: 0 };
-      if (typeof v === "number") return Number.isInteger(v) ? { ok: true, value: v } : { ok: false };
+      // decimals are rounded down (11/18): frac = true, raw = the number before rounding
+      if (typeof v === "number") {
+        if (!Number.isFinite(v)) return { ok: false };
+        return Number.isInteger(v) ? { ok: true, value: v } : { ok: true, value: Math.floor(v), frac: true, raw: v };
+      }
       const s = String(v).trim().replace(/[,\s]/g, "");
       if (s === "") return { ok: true, value: 0 };
       if (/^-?\d+$/.test(s)) return { ok: true, value: parseInt(s, 10) };
-      if (/^-?\d*\.\d+$/.test(s)) return { ok: false };
+      if (/^-?\d*\.\d+$/.test(s)) {
+        const n = parseFloat(s);
+        return Number.isInteger(n) ? { ok: true, value: n } : { ok: true, value: Math.floor(n), frac: true, raw: n };
+      }
       return { ok: false, isText: true };
     }
 
@@ -355,7 +368,7 @@
       const qtyCol = spec.cols.find((c) => c.kind === "qty");
       const rows = [], errors = [];
       const excludedVals = {};
-      let skipped = 0, excluded = 0, started = false;
+      let skipped = 0, excluded = 0, started = false, fracCells = 0;
       aoa.forEach((cells, i) => {
         const line = i + 1 + range.s.r; // Excel row number
         const pn = String(cells[colIndex(spec.cols[0].col)] ?? "").trim();
@@ -368,14 +381,18 @@
         const q = toQty(cells[colIndex(qtyCol.col)]);
         if (!started && q.isText) { skipped++; return; }
         started = true;
-        const row = { line };
+        const row = { line, raw: {} };
         const rowErr = [];
         spec.cols.forEach((c) => {
           const raw = cells[colIndex(c.col)];
           if (c.kind === "pn") row[c.key] = pn;
           else if (c.kind === "qty") {
             const r = toQty(raw);
-            if (r.ok) row[c.key] = r.value; else { row[c.key] = raw; rowErr.push(t("e_qty", { c: c.col, v: raw })); }
+            if (r.ok) {
+              row[c.key] = r.value;
+              row.raw[c.key] = r.frac ? r.raw : r.value;
+              if (r.frac) { fracCells++; (row.frac = row.frac || {})[c.key] = r.raw; }
+            } else { row[c.key] = raw; rowErr.push(t("e_qty", { c: c.col, v: raw })); }
           } else if (c.kind === "date") {
             const r = toDate(raw);
             if (r.ok) row[c.key] = r.value; else { row[c.key] = raw; rowErr.push(t("e_date", { c: c.col, v: raw })); }
@@ -385,6 +402,15 @@
           }
         });
         // In-stock check: stock − allocated must equal unallocated
+        // With decimals, compare the numbers before rounding down. If they balance but the rounded ones do not
+        // (e.g. 10.2 − 0.5 = 9.7 → 10 − 0 ≠ 9), keep stock and unallocated and make allocated = stock − unallocated.
+        if (type === "inventory" && !rowErr.length && row.frac) {
+          const rw = row.raw;
+          if (Math.abs(rw.stock_quantity - rw.allocated_quantity - rw.unallocated_inventory) < 1e-6
+              && row.stock_quantity - row.allocated_quantity !== row.unallocated_inventory) {
+            row.allocated_quantity = row.stock_quantity - row.unallocated_inventory;
+          }
+        }
         if (type === "inventory" && !rowErr.length && row.stock_quantity - row.allocated_quantity !== row.unallocated_inventory) {
           rowErr.push(t("e_balance", { x: row.stock_quantity, y: row.allocated_quantity, z: row.unallocated_inventory, d: row.stock_quantity - row.allocated_quantity }));
           row.balanceBad = true;
@@ -393,7 +419,7 @@
         rows.push(row);
       });
       if (!rows.length && !errors.length) errors.push({ line: "-", message: t("e_no_data") });
-      parsed = { type, rows, skipped, excluded, excludedVals, total: rows.length, errors };
+      parsed = { type, rows, skipped, excluded, excludedVals, total: rows.length, errors, fracCells };
       renderPreview();
     }
 
@@ -419,6 +445,7 @@
         const list = vals.slice(0, 10).map(([v, n]) => `${v === "" ? t("blank") : v}（${n}）`).join("、") + (vals.length > 10 ? " …" : "");
         h += `<div class="note">${esc(t("excluded_vals", { c: spec.filter.col, list }))}</div>`;
       }
+      if (parsed.fracCells) h += `<div class="note">${esc(t("frac_note", { n: parsed.fracCells }))}</div>`;
       if (parsed.errors.length) {
         h += `<div class="fix">${esc(t("fix_hint"))}` +
           ` <button class="btn btn-reselect" onclick="reselectFile()">${esc(t("btn_reselect"))}</button></div>`;
@@ -436,6 +463,9 @@
             spec.cols.map((c) => {
               let cls = c.kind === "qty" ? "num" : c.kind === "date" || c.kind === "pn" ? "mono" : "";
               if (c.kind === "qty" && r.balanceBad) cls += " pn-bad";
+              if (c.kind === "qty" && r.frac && c.key in r.frac) {
+                return `<td class="${cls} frac" title="${esc(t("frac_title", { v: r.frac[c.key] }))}">${esc(r[c.key] ?? "")}<span class="frac-raw">（${esc(r.frac[c.key])}）</span></td>`;
+              }
               return `<td class="${cls}">${esc(r[c.key] ?? "")}</td>`;
             }).join("") + `</tr>`).join("") +
           `</tbody></table></div>`;

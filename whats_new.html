@@ -86,7 +86,22 @@
         </div>
       </div>
 
-      <!-- 2026-11-17 (最新) -->
+      <!-- 2026-11-18 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-18</span>
+        </div>
+        <div class="entry-title" data-key="hw_title">在庫管理：在庫・受注の取込で、小数の数量を切り捨てて取り込めるようにした</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="hw_purpose">在庫の Excel に小数の数量があり、「数量が整数ではありません」で取り込めなかったため。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="hw_content">数量に小数があるときは、小数点以下を切り捨てて取り込む（例 10.7 → 10）。プレビューでは切り捨てたセルを黄色にして、（ ）の中に Excel の数字を出し、上に何か所あったかを出す。在庫の「在庫数 − 引当数 ＝ 未引当在庫数」の確かめは、切り捨てる前の数字で行う。切り捨てると合わなくなるときは、在庫数と未引当在庫数をそのままにして、引当数を「在庫数 − 未引当在庫数」にする。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-17 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-new" data-key="badge_new">新設</span>
@@ -2176,6 +2191,9 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          hw_title: "在庫管理：在庫・受注の取込で、小数の数量を切り捨てて取り込めるようにした",
+          hw_purpose: "在庫の Excel に小数の数量があり、「数量が整数ではありません」で取り込めなかったため。",
+          hw_content: "数量に小数があるときは、小数点以下を切り捨てて取り込む（例 10.7 → 10）。プレビューでは切り捨てたセルを黄色にして、（ ）の中に Excel の数字を出し、上に何か所あったかを出す。在庫の「在庫数 − 引当数 ＝ 未引当在庫数」の確かめは、切り捨てる前の数字で行う。切り捨てると合わなくなるときは、在庫数と未引当在庫数をそのままにして、引当数を「在庫数 − 未引当在庫数」にする。",
           hv_title: "在庫管理：品番の対応表（Excel の品番が品番マスタにつながっているか確かめる）",
           hv_purpose: "在庫・受注の Excel の品番には、品番マスタと書き方がちがうもの（-30K と -K など）や、マスタに無いものがあるため。いずれ在庫と金型・生産の記録をつなぐ準備。",
           hv_content: "在庫管理に「品番の対応表」を足した。いちばん新しい在庫・受注の Excel の品番を品番マスタと比べ、件数（マスタと同じ・対応表でつながる・つながらない）と、つながらない品番の一覧を出す。候補（頭が同じ・最後のハイフンより前が同じ）を［つなぐ］か、検索してつなぐ。マスタに無い品番は品番管理で登録する。つないだ品番は品番マスタの新しい列 stock_part_number に入り、［解除］で外せる。取込の画面でも、取り込んだあとにつながらない品番の件数を出す。",
@@ -2498,6 +2516,9 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          hw_title: "Quản lý tồn kho: Khi nhập Excel tồn kho / đơn hàng, số lượng thập phân được làm tròn xuống rồi nhập",
+          hw_purpose: "Vì Excel tồn kho có số lượng thập phân, bị lỗi 「Số lượng không phải số nguyên」 và không nhập được.",
+          hw_content: "Khi số lượng có phần thập phân, bỏ phần thập phân rồi nhập (ví dụ 10.7 → 10). Ở màn hình xem trước, ô bị làm tròn có màu vàng, số trong Excel hiển thị trong ngoặc ( ), và phía trên hiển thị số ô bị làm tròn. Kiểm tra 「Tồn kho − Đã phân bổ = Chưa phân bổ」 dùng số trước khi làm tròn. Nếu sau khi làm tròn không khớp, giữ nguyên tồn kho và chưa phân bổ, còn đã phân bổ = 「tồn kho − chưa phân bổ」.",
           hv_title: "Quản lý tồn kho: Bảng đối chiếu mã SP (kiểm tra mã SP trong Excel đã liên kết với danh mục mã SP chưa)",
           hv_purpose: "Vì trong Excel tồn kho / đơn hàng có mã SP viết khác với danh mục mã SP (ví dụ -30K và -K) hoặc không có trong danh mục. Chuẩn bị để sau này liên kết tồn kho với dữ liệu khuôn và sản xuất.",
           hv_content: "Thêm 「Bảng đối chiếu mã SP」 vào Quản lý tồn kho. So sánh mã SP trong Excel tồn kho / đơn hàng mới nhất với danh mục mã SP, hiển thị số lượng (giống danh mục, liên kết qua bảng, chưa liên kết) và danh sách mã SP chưa liên kết. Bấm 「Liên kết」 với ứng viên (giống phần đầu, giống phần trước dấu gạch nối cuối cùng), hoặc tìm rồi liên kết. Mã SP không có trong danh mục thì đăng ký ở Quản lý mã SP. Mã SP đã liên kết được lưu vào cột mới stock_part_number của danh mục mã SP, có thể bỏ bằng 「Hủy liên kết」. Màn hình nhập dữ liệu cũng hiển thị số mã SP chưa liên kết sau khi nhập.",
