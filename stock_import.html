@@ -402,19 +402,7 @@
           }
         });
         // In-stock check: stock − allocated must equal unallocated
-        // With decimals, compare the numbers before rounding down. If they balance but the rounded ones do not
-        // (e.g. 10.2 − 0.5 = 9.7 → 10 − 0 ≠ 9), keep stock and unallocated and make allocated = stock − unallocated.
-        if (type === "inventory" && !rowErr.length && row.frac) {
-          const rw = row.raw;
-          if (Math.abs(rw.stock_quantity - rw.allocated_quantity - rw.unallocated_inventory) < 1e-6
-              && row.stock_quantity - row.allocated_quantity !== row.unallocated_inventory) {
-            row.allocated_quantity = row.stock_quantity - row.unallocated_inventory;
-          }
-        }
-        if (type === "inventory" && !rowErr.length && row.stock_quantity - row.allocated_quantity !== row.unallocated_inventory) {
-          rowErr.push(t("e_balance", { x: row.stock_quantity, y: row.allocated_quantity, z: row.unallocated_inventory, d: row.stock_quantity - row.allocated_quantity }));
-          row.balanceBad = true;
-        }
+        // The check "stock − allocated = unallocated" was turned off (11/17 user: the Excel often does not balance).
         if (rowErr.length) { row.bad = true; rowErr.forEach((m) => errors.push({ line, message: m })); }
         rows.push(row);
       });

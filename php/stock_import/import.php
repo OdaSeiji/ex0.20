@@ -52,10 +52,7 @@ foreach ($rows as $r) {
       if (!is_int($q)) { $errors[] = ['line' => $line, 'message' => $label . 'が整数ではありません']; continue 2; }
       $vals[] = $q;
     }
-    if ($vals[0] - $vals[1] !== $vals[2]) {
-      $errors[] = ['line' => $line, 'message' => '在庫数 − 引当数 が 未引当在庫数 と合いません'];
-      continue;
-    }
+    // (the check stock − allocated = unallocated was turned off on 2026-11-17)
     $clean[] = array_merge([$fileDate, $pn], $vals);
   } else {
     $q = $r['quantity'] ?? 0;
