@@ -7435,4 +7435,14 @@ mysql> SELECT EVENT_NAME, STATUS, INTERVAL_VALUE, INTERVAL_FIELD, STARTS, LAST_E
 1 row in set (0.10 sec)
 
 mysql>
+mysql> SELECT MIN(date_time) AS oldest, COUNT(*) AS total_rows FROM t_press_ram_log;
++---------------------+------------+
+| oldest              | total_rows |
++---------------------+------------+
+| 2026-10-19 06:41:11 |    2709892 |
++---------------------+------------+
+1 row in set (1.06 sec)
+
+mysql>
+
 ```
