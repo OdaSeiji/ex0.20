@@ -7446,3 +7446,8 @@ mysql> SELECT MIN(date_time) AS oldest, COUNT(*) AS total_rows FROM t_press_ram_
 mysql>
 
 ```
+
+改善点、
+
+１：ラムデータ、消しちゃったが、各ロット、ビレット3本目まで、保存したい。
+２：Billet Checkページ、１～４号機の担当がそれぞれ入力して、それを、集計した結果を表示できるようにして欲しい。
