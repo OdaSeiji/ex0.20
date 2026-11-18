@@ -7418,3 +7418,21 @@ Step3実行結果
   <img src="./img/20261118-02.png" width="300">
   <!-- <figcaption>測定進捗追加</figcaption> -->
 </figure>
+
+## ラム測定データの削除
+
+確認SQL実行結果
+
+```
+mysql> SELECT EVENT_NAME, STATUS, INTERVAL_VALUE, INTERVAL_FIELD, STARTS, LAST_EXECUTED
+    -> FROM information_schema.EVENTS
+    -> WHERE EVENT_SCHEMA = 'extrusion' AND EVENT_NAME = 'ev_press_ram_log_purge';
++------------------------+---------+----------------+----------------+---------------------+---------------------+
+| EVENT_NAME             | STATUS  | INTERVAL_VALUE | INTERVAL_FIELD | STARTS              | LAST_EXECUTED       |
++------------------------+---------+----------------+----------------+---------------------+---------------------+
+| ev_press_ram_log_purge | ENABLED | 1              | DAY            | 2026-11-18 03:15:00 | 2026-11-18 03:15:00 |
++------------------------+---------+----------------+----------------+---------------------+---------------------+
+1 row in set (0.10 sec)
+
+mysql>
+```
