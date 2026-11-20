@@ -3,15 +3,21 @@ header("Content-Type: application/json; charset=UTF-8");
 require_once "../db.php";
 
 /* -------------------------
-   検索条件（前方一致）
+   検索条件
+   months : 表示期間（過去 1〜3 ヶ月、デフォルト 1）
+   die    : 金型番号（前方一致）
 -------------------------- */
-$where = "";
+$months = (int)($_GET['months'] ?? 1);
+if ($months < 1 || $months > 3) $months = 1;
+
+$conds = ["p.press_date_at >= CURDATE() - INTERVAL $months MONTH"];
 $params = [];
 
 if (!empty($_GET['die'])) {
-    $where = "WHERE md.die_number LIKE :die";
+    $conds[] = "md.die_number LIKE :die";
     $params[':die'] = $_GET['die'] . '%';
 }
+$where = "WHERE " . implode(" AND ", $conds);
 
 /* -------------------------
    メイン SQL（8ステップ対応版）
@@ -163,7 +169,6 @@ LEFT JOIN m_die_conditions mc
 
 $where
 ORDER BY p.press_date_at DESC, p.id DESC
-LIMIT 400
 ";
 
 $stmt = $pdo->prepare($sql);

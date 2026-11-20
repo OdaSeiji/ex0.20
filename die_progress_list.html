@@ -533,7 +533,18 @@
       <table id="progressTable">
         <thead>
           <tr>
-            <th data-key="col_date">押出日</th>
+            <th data-key="col_date">
+              押出日
+              <select
+                id="filterMonths"
+                class="die-search"
+                style="margin-left: 6px; width: auto"
+              >
+                <option value="1" data-key="period_1m" selected>1ヶ月</option>
+                <option value="2" data-key="period_2m">2ヶ月</option>
+                <option value="3" data-key="period_3m">3ヶ月</option>
+              </select>
+            </th>
 
             <th>
               金型番号
@@ -803,6 +814,9 @@
           btn_back_menu: "← メニューへ戻る",
           title: "📊 金型進捗一覧（Progress List）",
           col_date: "押出日",
+          period_1m: "1ヶ月",
+          period_2m: "2ヶ月",
+          period_3m: "3ヶ月",
           col_die: "金型番号",
           col_watch: "重点管理",
           col_issue_priority: "優先度",
@@ -867,6 +881,9 @@
           btn_back_menu: "← Về menu",
           title: "📊 Danh sách tiến độ",
           col_date: "Ngày ép",
+          period_1m: "1 tháng",
+          period_2m: "2 tháng",
+          period_3m: "3 tháng",
           col_die: "Mã khuôn",
           col_watch: "Theo dõi",
           col_issue_priority: "Ưu tiên",
@@ -946,6 +963,11 @@
         setLang(saved);
         loadProgressList();
 
+        const monthsFilter = document.getElementById("filterMonths");
+        if (monthsFilter) {
+          monthsFilter.addEventListener("change", loadProgressList);
+        }
+
         const typeFilter = document.getElementById("filterPressingType");
         if (typeFilter) {
           typeFilter.addEventListener("change", () => {
@@ -991,7 +1013,13 @@
       進捗リスト読み込み
     ============================================================ */
       function loadProgressList() {
-        fetch("./php/die_progress_php/get_progress_list.php?ts=" + Date.now())
+        const months = document.getElementById("filterMonths")?.value || "1";
+        fetch(
+          "./php/die_progress_php/get_progress_list.php?months=" +
+            months +
+            "&ts=" +
+            Date.now(),
+        )
           .then((res) => res.json())
           .then((data) => {
             data.forEach((row) => {
