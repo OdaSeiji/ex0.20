@@ -502,6 +502,9 @@
 									cursor: pointer;
 								"></button>
 						</th>
+						<th data-col="production_number" data-key="col_pn">
+							品番 <span class="sort-icon"></span>
+						</th>
 						<th data-col="arrival_at" data-key="col_arrival">
 							到着日 <span class="sort-icon"></span>
 						</th>
@@ -593,6 +596,7 @@
 					zzz_show: '-ZZZ 表示中',
 					checked_count: (n) => `${n}件選択中`,
 					col_die: '型番',
+					col_pn: '品番',
 					col_arrival: '到着日',
 					col_vn_prod: 'VN製造型検日',
 					col_vn_qa: 'VN QA型検日',
@@ -650,6 +654,7 @@
 					zzz_show: '-ZZZ Đang hiện',
 					checked_count: (n) => `Đã chọn ${n} mục`,
 					col_die: 'MÃ KHUÔN',
+					col_pn: 'MÃ SP',
 					col_arrival: 'NGÀY ĐẾN',
 					col_vn_prod: 'SẢN XUẤT KT OK',
 					col_vn_qa: 'QA VN KT OK',
@@ -889,6 +894,7 @@
               onchange="toggleCheck('${dieId}', this.checked)" />
           </td>
           <td class="die-num sticky-die">${row.die_number ?? ''}</td>
+          <td class="mono">${row.production_number ?? ''}</td>
           <td class="mono" title="${t.arrival_src}">${fmtDate(row.arrival_at)}</td>
           ${makeDateCell('vn_production_dimensional_inspection_at', dieId, row.id, row.vn_production_dimensional_inspection_at)}
           ${makeDateCell('vn_qa_dimensional_inspection_at', dieId, row.id, row.vn_qa_dimensional_inspection_at)}
@@ -1191,6 +1197,7 @@
 			function exportCSV() {
 				const headersJa = [
 					'型番',
+					'品番',
 					'到着日',
 					'VN製造型検日',
 					'VN QA型検日',
@@ -1208,6 +1215,7 @@
 				];
 				const headersVi = [
 					'Số khuôn',
+					'Mã SP',
 					'Ngày đến',
 					'KT khuôn SX VN',
 					'KT khuôn QA VN',
@@ -1225,6 +1233,7 @@
 				];
 				const rows = filteredData.map((r) => [
 					r.die_number ?? '',
+					r.production_number ?? '',
 					fmtDateCSV(r.arrival_at),
 					fmtDateCSV(r.vn_production_dimensional_inspection_at),
 					fmtDateCSV(r.vn_qa_dimensional_inspection_at),
