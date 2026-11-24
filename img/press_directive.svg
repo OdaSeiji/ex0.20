@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- 押出指示書（press_directive.html）：印刷用の指示書（press_directive_print.html）をそのまま小さくした形（2026-11-24 ユーザーが選んだ案）。
+       太いタイトル、ヘッダー（型番＝黄色、製品長さ＝黒）、下は 3 列（左：小さな表と黄色のメモ、真ん中：番号付きの表、右：時間の表） -->
+  <rect x="3.5" y="1" width="17" height="22" rx="1" fill="#fff" stroke="#37474f" stroke-width="1.1"/>
+  <!-- タイトル -->
+  <rect x="5" y="2.3" width="10" height="1.6" rx="0.4" fill="#37474f"/>
+  <!-- ヘッダー -->
+  <rect x="5" y="4.8" width="14" height="2.6" fill="none" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="8.5" y1="4.8" x2="8.5" y2="7.4" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="12.0" y1="4.8" x2="12.0" y2="7.4" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.5" y1="4.8" x2="15.5" y2="7.4" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="6.1" x2="19" y2="6.1" stroke="#90a4ae" stroke-width="0.45"/>
+  <rect x="5" y="6.1" width="3.5" height="1.3" fill="#fdd835"/>
+  <rect x="12" y="6.1" width="3.5" height="1.3" fill="#37474f"/>
+  <!-- 左：小さな表・黄色のメモ・備考 -->
+  <rect x="5" y="8.4" width="4.4" height="7" fill="none" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="7.2" y1="8.4" x2="7.2" y2="15.4" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="9.567" x2="9.4" y2="9.567" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="10.733" x2="9.4" y2="10.733" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="11.9" x2="9.4" y2="11.9" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="13.067" x2="9.4" y2="13.067" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="5" y1="14.233" x2="9.4" y2="14.233" stroke="#90a4ae" stroke-width="0.45"/>
+  <rect x="5" y="16.3" width="4.4" height="1.6" fill="#fdd835"/>
+  <rect x="5" y="18.6" width="4.4" height="3" fill="none" stroke="#90a4ae" stroke-width="0.45"/>
+  <!-- 真ん中：番号付きの表 -->
+  <rect x="10.1" y="8.4" width="4.4" height="13.2" fill="none" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="11.567" y1="8.4" x2="11.567" y2="21.6" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="13.033" y1="8.4" x2="13.033" y2="21.6" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="9.5" x2="14.5" y2="9.5" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="10.6" x2="14.5" y2="10.6" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="11.7" x2="14.5" y2="11.7" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="12.8" x2="14.5" y2="12.8" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="13.9" x2="14.5" y2="13.9" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="15.0" x2="14.5" y2="15.0" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="16.1" x2="14.5" y2="16.1" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="17.2" x2="14.5" y2="17.2" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="18.3" x2="14.5" y2="18.3" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="19.4" x2="14.5" y2="19.4" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="10.1" y1="20.5" x2="14.5" y2="20.5" stroke="#90a4ae" stroke-width="0.45"/>
+  <!-- 右：時間の表（黄色のマス） -->
+  <rect x="15.2" y="8.4" width="3.8" height="13.2" fill="none" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="17.1" y1="8.4" x2="17.1" y2="21.6" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="10.05" x2="19.0" y2="10.05" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="11.7" x2="19.0" y2="11.7" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="13.35" x2="19.0" y2="13.35" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="15.0" x2="19.0" y2="15.0" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="16.65" x2="19.0" y2="16.65" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="18.3" x2="19.0" y2="18.3" stroke="#90a4ae" stroke-width="0.45"/>
+  <line x1="15.2" y1="19.95" x2="19.0" y2="19.95" stroke="#90a4ae" stroke-width="0.45"/>
+  <rect x="17.1" y="10.05" width="1.9" height="1.65" fill="#fdd835"/>
+  <rect x="17.1" y="15" width="1.9" height="1.65" fill="#fdd835"/>
+</svg>
