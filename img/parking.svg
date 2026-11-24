@@ -1,0 +1,6 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <!-- 駐車場マーク（ヨーロッパ風：濃い青に白い縁取り）。未押出金型一覧（die_not_pressed.html）のアイコン -->
+  <rect x="2" y="2" width="44" height="44" rx="5" fill="#0d47a1"/>
+  <rect x="5" y="5" width="38" height="38" rx="3" fill="none" stroke="#fff" stroke-width="2.5"/>
+  <text x="24" y="35" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="32" fill="#fff">P</text>
+</svg>

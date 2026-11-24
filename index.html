@@ -499,6 +499,11 @@
           <div class="menu-title" data-key="condition_manage_title">（試作）金型コンディション管理</div>
           <div class="menu-desc" data-key="condition_manage_desc">CQ/CP96/MXS/MXQ/CXS/MGP/PS 対象、手動でTrial/MPT/MPを変更</div>
         </div>
+        <div class="menu-card" onclick="openPage('die_not_pressed.html')">
+          <img class="menu-icon" src="./img/parking.svg" alt="" />
+          <div class="menu-title" data-key="not_pressed_title">未押出金型一覧</div>
+          <div class="menu-desc" data-key="not_pressed_desc">まだ一度も押出していない金型（型番・品番・到着日）</div>
+        </div>
       </div>
     </div>
 
@@ -522,14 +527,24 @@
           <div class="menu-desc" data-key="operation_report_desc">1日の号機ごとの時間の使い方（持ち時間・押出・停止コード・記録なし）を、押出日報からまとめる</div>
         </div>
         <div class="menu-card" onclick="openPage('extrusion_quantity_report.html')">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <img class="menu-icon" src="./img/billet_input.svg" alt="" />
           <div class="menu-title" data-key="quantity_report_title">押出投入実績(t)</div>
           <div class="menu-desc" data-key="quantity_report_desc">押出種別・ビレットサイズ・製造工場別の月次投入重量</div>
         </div>
         <div class="menu-card" onclick="openPage('category_good_report.html')">
-          <img class="menu-icon" src="./img/chart.svg" alt="" />
+          <img class="menu-icon" src="./img/category_table.svg" alt="" />
           <div class="menu-title" data-key="category_good_title">カテゴリ別 良品実績</div>
           <div class="menu-desc" data-key="category_good_desc">品番のカテゴリ別の月次良品重量（t）と良品長さ（m）</div>
+        </div>
+        <div class="menu-card" onclick="openPage('pn_good_report.html')">
+          <img class="menu-icon" src="./img/pn_table.svg" alt="" />
+          <div class="menu-title" data-key="pn_good_title">品番別 良品実績</div>
+          <div class="menu-desc" data-key="pn_good_desc">品番ごとの月次良品重量（kg）の一覧表</div>
+        </div>
+        <div class="menu-card" onclick="openPage('download.html')">
+          <img class="menu-icon" src="./img/download.svg" alt="" />
+          <div class="menu-title" data-key="download_title">ダウンロード</div>
+          <div class="menu-desc" data-key="download_desc">データを Excel でダウンロード（Quality Summary Table など）</div>
         </div>
         <div class="menu-card" onclick="openPage('aging_rack_report.html')">
           <img class="menu-icon" src="./img/chart.svg" alt="" />
@@ -735,6 +750,10 @@
           quantity_report_desc: "押出種別・ビレットサイズ・製造工場別の月次投入重量",
           category_good_title: "カテゴリ別 良品実績",
           category_good_desc: "品番のカテゴリ別の月次良品重量（t）と良品長さ（m）",
+          pn_good_title: "品番別 良品実績",
+          pn_good_desc: "品番ごとの月次良品重量（kg）の一覧表",
+          download_title: "ダウンロード",
+          download_desc: "データを Excel でダウンロード（Quality Summary Table など）",
           aging_rack_report_title: "時効ラック使用・解放",
           aging_rack_report_desc: "日別の使用ラック数と解放ラック数",
           ram_log_title: "（試作）押出波形",
@@ -781,6 +800,8 @@
           issue_progress_title: "（暫定）金型進捗確認表",
           issue_progress_desc: "Issue別の現在フェーズと停滞状況の一覧",
           condition_manage_title: "（試作）金型コンディション管理",
+          not_pressed_title: "未押出金型一覧",
+          not_pressed_desc: "まだ一度も押出していない金型（型番・品番・到着日）",
           condition_manage_desc: "CQ/CP96/MXS/MXQ/CXS/MGP/PS 対象、手動でTrial/MPT/MPを変更",
           staff_title: "スタッフ管理",
           staff_desc: "スタッフのロール・パスワードの管理",
@@ -860,6 +881,10 @@
           quantity_report_desc: "Trọng lượng theo tháng: Loại đùn, kích thước phôi, nhà máy",
           category_good_title: "Thực tế hàng tốt theo danh mục",
           category_good_desc: "Trọng lượng (t) và chiều dài (m) hàng tốt theo tháng, theo danh mục mã SP",
+          pn_good_title: "Thực tế hàng tốt theo mã SP",
+          pn_good_desc: "Bảng trọng lượng hàng tốt (kg) theo tháng của từng mã SP",
+          download_title: "Tải xuống",
+          download_desc: "Tải dữ liệu dạng Excel (Quality Summary Table, v.v.)",
           aging_rack_report_title: "Rack hóa già: SD / GP",
           aging_rack_report_desc: "Số Rack sử dụng và giải phóng theo ngày",
           ram_log_title: "（Thử nghiệm）Dạng sóng đùn",
@@ -906,6 +931,8 @@
           issue_progress_title: "（暫定）Bảng xác nhận tiến độ khuôn",
           issue_progress_desc: "Danh sách giai đoạn hiện tại và tình trạng trì hoãn theo Issue",
           condition_manage_title: "（Thử nghiệm）Quản lý tình trạng khuôn",
+          not_pressed_title: "Danh sách khuôn chưa đùn",
+          not_pressed_desc: "Khuôn chưa đùn lần nào (mã khuôn, mã SP, ngày đến)",
           condition_manage_desc: "Đối tượng CQ/CP96/MXS/MXQ/CXS/MGP/PS, thay đổi thủ công Trial/MPT/MP",
           staff_title: "Quản lý nhân viên",
           staff_desc: "Quản lý vai trò và mật khẩu của nhân viên",

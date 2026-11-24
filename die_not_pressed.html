@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Not Pressed Dies</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Segoe UI", sans-serif; background: #f5f5f5; padding: 20px; }
+
+    .lang-buttons { position: fixed; top: 10px; right: 10px; z-index: 100; }
+    .lang-buttons button {
+      padding: 6px 12px; margin-left: 5px; border: 1px solid #0078d4;
+      background: #fff; border-radius: 5px; cursor: pointer; font-size: 12px;
+    }
+    .lang-buttons button.active { background: #0078d4; color: #fff; }
+
+    h1 { display: flex; align-items: center; gap: 10px; font-size: 22px; margin-bottom: 6px; }
+    h1 img { width: 32px; height: 32px; }
+    .subtitle { font-size: 13px; color: #777; margin-bottom: 16px; }
+
+    .toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+    .btn { padding: 7px 14px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+    .btn-back { background: #546e7a; color: #fff; }
+    .count { font-size: 14px; font-weight: bold; color: #0d47a1; }
+    #searchDie {
+      width: 220px; padding: 7px 10px; border: 1px solid #b0bec5; border-radius: 5px;
+      font-size: 13px; font-family: "Roboto Mono", monospace;
+    }
+
+    .table-wrap {
+      display: inline-block; background: #fff; border-radius: 8px; overflow: auto; max-height: 80vh;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    table { border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 6px 16px; border-bottom: 1px solid #e0e0e0; white-space: nowrap; text-align: left; }
+    th { background: #e8f1ff; font-size: 12px; position: sticky; top: 0; }
+    td { font-family: "Roboto Mono", monospace; }
+    tr:hover td { background: #f0f8ff; }
+    .loading { padding: 20px; color: #0078d4; }
+  </style>
+  <link rel="stylesheet" href="./css/lang_buttons.css" />
+</head>
+<body>
+  <div class="lang-buttons">
+    <button id="btnJa" onclick="setLang('ja')">日本語</button>
+    <button id="btnVi" onclick="setLang('vi')">Tiếng Việt</button>
+  </div>
+
+  <h1><img src="./img/parking.svg" alt="" /><span data-key="title">未押出金型一覧</span></h1>
+  <div class="subtitle" data-key="subtitle">まだ一度も押出していない金型（押出日報に記録が無い金型）。到着の古い順。</div>
+
+  <div class="toolbar">
+    <button class="btn btn-back" onclick="location.href='index.html'" data-key="btn_back">← 戻る</button>
+    <input type="text" id="searchDie" placeholder="型番で絞り込み…" oninput="render()" autocomplete="off" />
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th data-key="col_die">型番</th>
+          <th data-key="col_pn">品番</th>
+          <th data-key="col_arrival">到着日</th>
+        </tr>
+      </thead>
+      <tbody id="body"><tr><td class="loading" colspan="3">Loading…</td></tr></tbody>
+    </table>
+  </div>
+
+  <script>
+    const dict = {
+      ja: {
+        title: "未押出金型一覧",
+        subtitle: "まだ一度も押出していない金型（押出日報に記録が無い金型）。到着の古い順。",
+        btn_back: "← 戻る",
+        col_die: "型番",
+        col_pn: "品番",
+        col_arrival: "到着日",
+        count: (n, total) => (n === total ? `${n}型` : `${n}型 / ${total}型`),
+        search_ph: "型番で絞り込み…（* ? も使えます）",
+      },
+      vi: {
+        title: "Danh sách khuôn chưa đùn",
+        subtitle: "Khuôn chưa đùn lần nào (không có trong báo cáo đùn). Xếp theo ngày đến cũ nhất.",
+        btn_back: "← Quay lại",
+        col_die: "Mã khuôn",
+        col_pn: "Mã SP",
+        col_arrival: "Ngày đến",
+        count: (n, total) => (n === total ? `${n} khuôn` : `${n} / ${total} khuôn`),
+        search_ph: "Lọc theo mã khuôn… (có thể dùng * ?)",
+      },
+    };
+    let currentLang = "ja";
+    try { currentLang = localStorage.getItem("lang") || "ja"; } catch (e) {}
+    let rows = null;
+
+    function setLang(lang) {
+      currentLang = lang;
+      try { localStorage.setItem("lang", lang); } catch (e) {}
+      document.querySelectorAll("[data-key]").forEach((el) => {
+        const v = dict[lang][el.dataset.key];
+        if (typeof v === "string") el.textContent = v;
+      });
+      document.getElementById("searchDie").placeholder = dict[lang].search_ph;
+      document.getElementById("btnJa").classList.toggle("active", lang === "ja");
+      document.getElementById("btnVi").classList.toggle("active", lang === "vi");
+      render();
+    }
+
+    const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // 型番の絞り込み：ふつうは「含む」。* ? を使うと前から合わせる（型検進捗管理と同じ）
+    function dieMatcher() {
+      const q = document.getElementById("searchDie").value.trim().toUpperCase();
+      if (!q) return () => true;
+      if (q.includes("*") || q.includes("?")) {
+        const re = new RegExp("^" + q.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, "."));
+        return (dn) => re.test(dn);
+      }
+      return (dn) => dn.includes(q);
+    }
+
+    function render() {
+      if (!rows) return;
+      const match = dieMatcher();
+      const shown = rows.filter((r) => match((r.die_number ?? "").toUpperCase()));
+      document.getElementById("count").textContent = dict[currentLang].count(shown.length, rows.length);
+      document.getElementById("body").innerHTML = shown
+        .map((r) => `<tr><td>${esc(r.die_number)}</td><td>${esc(r.production_number)}</td><td>${esc(r.arrival_at)}</td></tr>`)
+        .join("");
+    }
+
+    async function load() {
+      const res = await fetch("./php/die_progress_php/get_not_pressed.php?ts=" + Date.now());
+      rows = await res.json();
+      render();
+    }
+
+    setLang(currentLang);
+    load();
+  </script>
+</body>
+</html>

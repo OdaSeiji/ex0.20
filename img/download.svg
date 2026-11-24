@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- ダウンロード（download.html）：緑の表の書類に Excel 風の「X」と、下向きの矢印（2026-11-24 ユーザーが選んだ案）。
+       Excel のロゴそのものではなく、一般的な「表計算ファイル」の形で描いた自作アイコン -->
+  <!-- 書類（端が折れている） -->
+  <path d="M6 1.5h9l5 5v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-19a1 1 0 0 1 1-1z" fill="#33a060"/>
+  <path d="M15 1.5v5h5z" fill="#9fd3b0"/>
+  <!-- 表の罫線 -->
+  <g stroke="#fff" stroke-width="0.9" opacity="0.9">
+    <line x1="13.33" y1="9" x2="13.33" y2="19"/>
+    <line x1="15.67" y1="9" x2="15.67" y2="19"/>
+    <line x1="11" y1="11.5" x2="18" y2="11.5"/>
+    <line x1="11" y1="14" x2="18" y2="14"/>
+    <line x1="11" y1="16.5" x2="18" y2="16.5"/>
+  </g>
+  <!-- 左の濃い緑の四角と白い X -->
+  <rect x="1.5" y="6" width="10.5" height="10.5" rx="1.4" fill="#1e7145"/>
+  <path d="M4.2 8.7l5.1 5.1M9.3 8.7l-5.1 5.1" stroke="#fff" stroke-width="1.63" stroke-linecap="round"/>
+  <!-- 右下の丸い矢印 -->
+  <circle cx="17.6" cy="17.6" r="6.1" fill="#fff"/>
+  <circle cx="17.6" cy="17.6" r="5.3" fill="#1e7145"/>
+  <path d="M16.4 13.6h2.4v4h2.2l-3.4 3.9-3.4-3.9h2.2z" fill="#fff"/>
+</svg>
