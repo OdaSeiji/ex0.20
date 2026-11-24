@@ -79,3 +79,9 @@ DROP EVENT IF EXISTS ev_press_ram_log_purge;
 - STEP 4：1回だけ（5万件）。残りの約 210万件は、11/18 3:15 のイベントでまとめて消える予定。
 - STEP 5：イベント `ev_press_ram_log_purge` を作った（ENABLED、STARTS 2026-11-18 03:15）。
 - 残り：11/18 に STEP 6 で LAST_EXECUTED と oldest（10/18 ごろ）を確かめる。
+
+## 11/18 本番：STEP 6 で動いたのを確認（memo.md 11/18）
+
+- `ev_press_ram_log_purge`：STATUS `ENABLED`、LAST_EXECUTED **2026-11-18 03:15:00** → 予定どおり動いた。
+- `t_press_ram_log`：いちばん古いのは **2026-10-19 06:41:11**（1か月より前は消えた）、残りは 2,709,892行。
+- my.ini：`[mysqld]` の中（最後、`[mysqldump]` の直前）に `event_scheduler=ON` があるのを確認（11/18、documents/my.ini）。再起動しても止まらない。**これで完了。**

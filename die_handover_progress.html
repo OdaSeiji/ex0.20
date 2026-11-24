@@ -535,7 +535,7 @@
 							量産開始日 <span class="sort-icon"></span>
 						</th>
 						<th data-col="production_site_change_notice" data-key="col_notice">
-							切替業連発行日 <span class="sort-icon"></span>
+							切替業連 No. <span class="sort-icon"></span>
 						</th>
 						<th data-col="dimensional_inspection_by" data-key="col_inspector">
 							寸法検査担当者 <span class="sort-icon"></span>
@@ -606,7 +606,7 @@
 					col_trial: '量産トライ日',
 					col_handover: '金型移管日',
 					col_prod_start: '量産開始日',
-					col_notice: '切替業連発行日',
+					col_notice: '切替業連 No.',
 					col_inspector: '寸法検査担当者',
 					col_bcp: 'BCP',
 					col_ready: '移管準備完了',
@@ -631,7 +631,7 @@
 					f_trial: '量産トライ日',
 					f_handover: '金型移管日',
 					f_prod_start: '量産開始日',
-					f_notice: '切替業連発行日',
+					f_notice: '切替業連 No.',
 					f_inspector: '寸法検査担当者',
 					f_bcp: 'BCP',
 					f_ready: '移管準備完了',
@@ -664,7 +664,7 @@
 					col_trial: 'TEST SẢN XUẤT',
 					col_handover: 'NGÀY IKAN',
 					col_prod_start: 'NGÀY BẮT ĐẦU SX',
-					col_notice: 'NGÀY PHÁT HÀNH VOL',
+					col_notice: 'SỐ VOL',
 					col_inspector: 'NGƯỜI PIC KT',
 					col_bcp: 'BCP',
 					col_ready: 'HOÀN TẤT CHUẨN BỊ IKAN',
@@ -688,7 +688,7 @@
 					f_trial: 'Ngày thử SX',
 					f_handover: 'Ngày bàn giao',
 					f_prod_start: 'Ngày bắt đầu SX',
-					f_notice: 'Ngày phát hành BC',
+					f_notice: 'Số VOL',
 					f_inspector: 'Người KT KT',
 					f_bcp: 'BCP',
 					f_ready: 'Hoàn tất CB BG',
@@ -1053,7 +1053,7 @@
 				if (noticeUnlocked) return;
 				input.blur();
 				const pw = prompt(
-					'切替業連発行日を編集するにはパスワードを入力してください',
+					'切替業連 No. を編集するにはパスワードを入力してください',
 				);
 				if (pw === '1031') {
 					noticeUnlocked = true;
@@ -1207,7 +1207,7 @@
 					'量産トライ日',
 					'金型移管日',
 					'量産開始日',
-					'切替業連発行日',
+					'切替業連 No.',
 					'寸法検査担当者',
 					'BCP',
 					'移管準備完了',
@@ -1225,7 +1225,7 @@
 					'Ngày thử SX',
 					'Ngày bàn giao',
 					'Ngày bắt đầu SX',
-					'Ngày phát hành BC',
+					'Số VOL',
 					'Người KT KT',
 					'BCP',
 					'Hoàn tất CB BG',

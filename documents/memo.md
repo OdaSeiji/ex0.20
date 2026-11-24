@@ -7451,3 +7451,16 @@ mysql>
 
 １：ラムデータ、消しちゃったが、各ロット、ビレット3本目まで、保存したい。
 ２：Billet Checkページ、１～４号機の担当がそれぞれ入力して、それを、集計した結果を表示できるようにして欲しい。
+
+# 2026/11/24
+
+## TODO（本番の作業）
+
+- [ ] ラムデータの抜けの確認：`documents/2026-11-24_t_press_ram_after_drop_check.sql` を流す（読むだけ）。③ `presses_missing` が 0 なら完了
+- [ ] 流したかどうか確認：`2026-11-06_handover_date_fix.sql`、`2026-11-05_staff_role_packing_qc.sql`
+- [ ] 金型の行の確認：`documents/2026-11-15_die_handover_rows_check.sql` を流す（読むだけ。到着日の移し方を決めるため）
+- [ ] 在庫管理 →「品番の対応表」で、候補が出ている 7件を［つなぐ］
+
+## TODO（切替業連 No. を品番に移す）
+
+- [ ] 食い違っている品番を出す：`documents/2026-11-24_change_notice_by_pn_check.sql` を本番で流す（読むだけ）。② に出た品番は、どの vol. が正しいか決める（ローカルでは PN0683 / DM245 の1件：vol.616 と vol.518）
