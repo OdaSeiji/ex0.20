@@ -7464,3 +7464,22 @@ mysql>
 ## TODO（切替業連 No. を品番に移す）
 
 - [ ] 食い違っている品番を出す：`documents/2026-11-24_change_notice_by_pn_check.sql` を本番で流す（読むだけ）。② に出た品番は、どの vol. が正しいか決める（ローカルでは PN0683 / DM245 の1件：vol.616 と vol.518）
+
+# 2026/11/25
+
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-17_t_press_billet_ram_drop_old.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+t_press_columns_before
+93
+presses_to_copy
+2
+t_press_billet_ram_rows
+31434
+backup_rows
+12965
+t_press_columns_after
+63
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
