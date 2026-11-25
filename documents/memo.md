@@ -7456,7 +7456,8 @@ mysql>
 
 ## TODO（本番の作業）
 
-- [ ] ラムデータの抜けの確認：`documents/2026-11-24_t_press_ram_after_drop_check.sql` を流す（読むだけ）。③ `presses_missing` が 0 なら完了
+- [x] ラムデータの抜けの確認：11/25 に drop_old（STEP 0b あり）を本番で流したので不要になった（下の 11/25 の結果）
+- [x] 使っていない 23列を消す：11/25 本番で実行（63 → 40）
 - [ ] 流したかどうか確認：`2026-11-06_handover_date_fix.sql`、`2026-11-05_staff_role_packing_qc.sql`
 - [ ] 金型の行の確認：`documents/2026-11-15_die_handover_rows_check.sql` を流す（読むだけ。到着日の移し方を決めるため）
 - [ ] 在庫管理 →「品番の対応表」で、候補が出ている 7件を［つなぐ］
@@ -7484,6 +7485,8 @@ t_press_columns_after
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
 
+結果（Claude 確認）：ラムの古い 30列は消えた（93 → 63）。STEP 0b で、古い列にしか値が無かった押出 2件を t_press_billet_ram に写した。抜けは無い。
+
 ```
 PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-17_t_press_drop_unused_columns.sql | mysql -u root -p -h 10.163.50.17 extrusion
 Enter password: ********
@@ -7497,3 +7500,5 @@ t_press_columns_after
 40
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+結果（Claude 確認）：外部キー名は `t_press_m_press_stop_code` で予定どおり。バックアップ 12,965行、列 63 → 40。**t_press のスリム化は本番も完了。**
