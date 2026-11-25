@@ -7509,3 +7509,20 @@ Enter password: ********
 ERROR 1050 (42S01) at line 8: Table 't_die_handover_bak_20261106' already exists
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+結果
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-25_handover_fix_and_role_check.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+TABLE_NAME      TABLE_ROWS      CREATE_TIME
+t_die_handover_bak_20261106     1393    2026-11-06 06:42:54
+t_die_handover_progress_bak_20261106    1299    2026-11-06 06:43:02
+rows_left_3A
+79
+rows_left_3B
+17
+COLUMN_TYPE
+enum('operator','maintenance','inspector','die_setup','admin','die_engineer','packing','quality_control')
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
