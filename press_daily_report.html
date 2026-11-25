@@ -59,6 +59,8 @@
 
     .field-empty { background-color: #fff3cd !important; border-color: #ffca6b !important; }
     .file-label.field-empty { background-color: #fff3cd; }
+    /* 押出日と同じ計画日の押出指示書が無い（2026-11-25） */
+    #press-directive__select.directive-none { background-color: #e53935 !important; border-color: #b71c1c !important; color: #fff; font-weight: bold; }
     .field-invalid { background-color: #ffe0e0 !important; border-color: #ff6b6b !important; }
 
     input[type="file"] { display: none; }
@@ -825,7 +827,7 @@
         lbl_plan_qty: "計画ビレット数", lbl_actual_qty: "実績ビレット数",
         lbl_press_time: "プレス時間（開始 - 終了）",
         lbl_ram_speed: "ラム速度 (mm/s)", lbl_die_temp: "実測金型温度 (℃)",
-        lbl_name: "担当者", lbl_press_directive: "押出指示書",
+        lbl_name: "担当者", lbl_press_directive: "押出指示書", directive_none: "指示書なし",
         lbl_sub_staff: "副担当者", card_sub_staff: "副担当者", lbl_sub_staff_total: "人数", opt_add_sub_staff: "＋ 追加", col_staff_name: "名前", empty_sub_staff: "登録データなし",
         lbl_actual_length: "実測長さ (SP dài)", lbl_stretch_ratio: "ストレッチ",
         lbl_special_note: "特記事項", lbl_file: "ファイル", btn_preview: "プレビュー",
@@ -905,7 +907,7 @@
         lbl_plan_qty: "Billet kế hoạch", lbl_actual_qty: "Billet thực tế",
         lbl_press_time: "Thời gian đùn",
         lbl_ram_speed: "Tốc độ (mm/s)", lbl_die_temp: "Nhiệt độ khuôn thực tế (℃)",
-        lbl_name: "Người phụ trách", lbl_press_directive: "Phiếu đùn",
+        lbl_name: "Người phụ trách", lbl_press_directive: "Phiếu đùn", directive_none: "Không có phiếu",
         lbl_sub_staff: "Phụ trách phụ", card_sub_staff: "Phụ trách phụ", lbl_sub_staff_total: "Số người", opt_add_sub_staff: "＋ Thêm", col_staff_name: "Tên", empty_sub_staff: "Chưa có dữ liệu",
         lbl_actual_length: "Chiều dài thực tế", lbl_stretch_ratio: "Tỉ lệ kéo",
         lbl_special_note: "Ghi chú", lbl_file: "Tệp đính kèm", btn_preview: "Xem trước",
@@ -1381,8 +1383,12 @@
 
       const sel = document.getElementById("press-directive__select");
       sel.innerHTML = "";
+      // 日付を入れているのに、その日の指示書が無い → 赤くして「指示書なし」
+      const none = !directiveList.length && !!date;
+      sel.classList.toggle("directive-none", none);
+      sel.title = none ? dict[currentLang].directive_none + " (" + date + ")" : "";
       if (!directiveList.length) {
-        sel.appendChild(new Option("-", "0"));
+        sel.appendChild(new Option(none ? dict[currentLang].directive_none : "-", "0"));
         return;
       }
       directiveList.forEach(d => sel.appendChild(new Option(d.plan_date_at, d.id)));
@@ -2927,6 +2933,7 @@
       });
       document.getElementById("die__select").innerHTML = '<option value="0">-</option>';
       document.getElementById("press-directive__select").innerHTML = '<option value="0">-</option>';
+      document.getElementById("press-directive__select").classList.remove("directive-none");
       document.getElementById("directive_input__select").innerHTML = '<option value="0">-</option>';
       document.getElementById("directive__group").classList.remove("required");
 
@@ -2981,6 +2988,7 @@
 
         document.getElementById("press-directive__select").innerHTML =
           `<option value="${p.press_directive_id ?? 0}">${p.press_directive_plan_date_at ?? "-"}</option>`;
+        document.getElementById("press-directive__select").classList.remove("directive-none");
         document.getElementById("directive__input").value = p.ordersheet_number ?? "";
         document.getElementById("directive_input__select").innerHTML =
           `<option value="${p.ordersheet_id ?? 0}">${p.ordersheet_number ?? "-"}</option>`;
