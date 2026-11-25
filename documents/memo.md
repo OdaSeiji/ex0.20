@@ -7689,3 +7689,13 @@ CP9632T-V04B    2117    NULL    female die      2026-06-09      NULL
 CP9632T-V04B    2118    NULL    ring    NULL    NULL
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+実行結果
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-24_change_notice_by_pn_check.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+pn_with_value   same_on_all_dies        on_some_dies_only       different_values
+522     172     350     0
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
