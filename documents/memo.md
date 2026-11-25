@@ -7502,3 +7502,10 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
 
 結果（Claude 確認）：外部キー名は `t_press_m_press_stop_code` で予定どおり。バックアップ 12,965行、列 63 → 40。**t_press のスリム化は本番も完了。**
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-06_handover_date_fix.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+ERROR 1050 (42S01) at line 8: Table 't_die_handover_bak_20261106' already exists
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
