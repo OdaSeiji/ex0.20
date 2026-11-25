@@ -7532,3 +7532,20 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 - 11-05（m_staff.role に packing・quality_control）：**入っている。完了。**
 - 11-06（移管日の直し）：バックアップは 11/06 06:42 に作られたが、**書き換えは入っていない**（3A 79行・3B 17行が残っている）。ファイルの COMMIT がコメントだったので、まとめて流したときに最後で取り消された。
   → `documents/2026-11-25_handover_date_fix_v2.sql` を流す（新しいバックアップを作る → 直す → COMMIT → 最後に残りの数（0 と 0）を出す）。
+
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-25_handover_date_fix_v2.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+rows_3A_before
+79
+rows_3B_before
+18
+rows_left_3A
+0
+rows_left_3B
+0
+same_date       different       progress_only_no_body   progress_only_with_body
+821     0       0       0
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
