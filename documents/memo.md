@@ -7461,7 +7461,7 @@ mysql>
 - [x] 流したかどうか確認：11-05（ロール）は本番に入っていた。11-06（移管日の直し）はバックアップだけで、書き換えは取り消されていた（下の 11/25 の結果）
 - [x] 移管日の直しを流し直す（11/25 完了）：`documents/2026-11-25_handover_date_fix_v2.sql`（COMMIT 入り。最後の rows_left_3A・rows_left_3B が 0 なら完了）
 - [x] 金型の行の確認：`documents/2026-11-15_die_handover_rows_check.sql`（11/25 実行。結果は下）
-- [ ] CP9632T-V04B：handover の行 1091（備考 Nửa khuôn）を本体の行にするか決める
+- [x] （11/25 完了）CP9632T-V04B：handover の行 1091（備考 Nửa khuôn）を本体の行にする
 - [ ] 複製の金型（-ZZZ・-20K など、本番 60型）の区別のしかたを決める（フラグ／元の金型の id を持たせる など）
 - [ ] 在庫管理 →「品番の対応表」で、候補が出ている 7件を［つなぐ］
 
@@ -7759,3 +7759,29 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 新画面	NGÀY	MÃ KHUÔN	MÃ SẢN PHẨM	LOẠI	MÁY	KH	TT	SỐ LƯỢNG	NG	OK	%OK	K/THƯỚC	ETCHING	ĐỘ CỨNG	QC	Đ/GÓI	301	302	303	304	305	306	307	308	309	310	311	312	313	314	315	316	317	318	319	320	321	322	323	324	351	401	TON/H	CHU KỲ	IKAN	Total weight	Total time	Note	Quality note					
 
 
+
+# 2026/11/25 残っていることのまとめ（Claude）
+
+## 本番で待ち
+- [ ] `documents/2026-11-25_t_press_container_temp_check.sql` を本番で流す（読むだけ）→ コンテナ温度4列・quality_note の使われ方を見る
+- [ ] 在庫管理 →「品番の対応表」で、候補の 7件を［つなぐ］（画面の操作）
+
+## 決めること（ユーザー）
+- [ ] 押出日報「指示書なし」のとき、前に入れた指示書の値（ビレット本数・ラム速など）を消すか、そのまま残すか
+- [ ] 計画日と実際の押出日がずれることはあるか（ずれるなら、前後の日も出すなどの工夫が要る）
+- [ ] 複製の金型（-ZZZ・-ZZZ-DUN・-20K、本番 60型）の区別のしかた（案：m_dies に元の金型の id を持たせる）
+- [ ] 複製の金型を手動登録したとき、t_die_handover の本体行を作らないようにするか（InsDieV2.php）
+- [ ] quality_note（1000文字）の長さ・使い方 → 上の確認 SQL の結果を見てから
+
+## 改善の要望（11/24 memo、まだ手を付けていない）
+- [ ] ラムデータ：今は 1か月で消える。各ロットのビレット 3本目までは、ずっと残したい
+- [ ] Billet Check ページ：1〜4号機の担当がそれぞれ入力し、まとめた結果を表示したい
+
+## 次の段取り（金型テーブルの整理）
+- [ ] 到着日を t_die_handover に移す（m_dies.arrival_at の値を正にする。documents/2026-11-15_die_tables_reorganization.md）
+
+## そのうち片付け（急がない）
+- [ ] バックアップのテーブルを消す（bak_t_press_*_20261117、t_die_handover*_bak_20261106 / _20261125 など）。しばらく問題なければ
+- [ ] t_die_handover_progress.production_site_change_notice（古い列）を消す。型検進捗管理がしばらく問題なく動いたら
+- [ ] die_register の削除：社員番号のチェックをサーバー側でも
+- 引き継ぎメモ（documents/2026-10-25_session_handover.md §4）の、現場の回答待ち（4〜8-2）・設計の相談（9・10・13・14）・データの直し（15〜19）・テーブルの整理（21・23〜25）はそのまま
