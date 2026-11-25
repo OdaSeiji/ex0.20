@@ -54,8 +54,8 @@
     <div class="item">
       <div class="item-body">
         <div class="item-title">Quality Summary Table</div>
-        <div class="item-desc" data-key="qs_desc">押出ごとの品質のまとめ：押出日・押出時間・号機・型番・品番・ビレット・切断数・不良数・良品数・各工程のチェック日・不良コード別の本数（301〜401）。全期間、新しい押出から。</div>
-        <div class="item-meta" data-key="qs_meta">列と見出しは ex0.11 と同じ（aging_check_date は時効（硬度）の確認日）</div>
+        <div class="item-desc" data-key="qs_desc">押出ごとの品質のまとめ：押出日・押出時間・型番・品番・ビレット・切断数・不良数・良品数・各工程のチェック日・不良コード別の本数（301〜401）・号機・製造（Dubai/VN）・生産性（ton/h）・総時間・300/200コードの時間・オーダーシート番号。全期間、新しい押出から。</div>
+        <div class="item-meta" data-key="qs_meta">列と見出しは旧画面（ex0.11）と同じ（aging_check_date は時効（硬度）の確認日）</div>
       </div>
       <button class="btn btn-csv" onclick="download(this, './php/download/quality_summary.php')" data-key="btn_xlsx">📥 Excel</button>
     </div>
@@ -71,8 +71,8 @@
         btn_xlsx: "📥 Excel",
         downloading: "⏳ 作成中…",
         error: "ダウンロードに失敗しました",
-        qs_desc: "押出ごとの品質のまとめ：押出日・押出時間・号機・型番・品番・ビレット・切断数・不良数・良品数・各工程のチェック日・不良コード別の本数（301〜401）。全期間、新しい押出から。",
-        qs_meta: "列と見出しは ex0.11 と同じ（aging_check_date は時効（硬度）の確認日）",
+        qs_desc: "押出ごとの品質のまとめ：押出日・押出時間・型番・品番・ビレット・切断数・不良数・良品数・各工程のチェック日・不良コード別の本数（301〜401）・号機・製造（Dubai/VN）・生産性（ton/h）・総時間・300/200コードの時間・オーダーシート番号。全期間、新しい押出から。",
+        qs_meta: "列と見出しは旧画面（ex0.11）と同じ（aging_check_date は時効（硬度）の確認日）",
       },
       vi: {
         title: "📥 Tải xuống",
@@ -81,8 +81,8 @@
         btn_xlsx: "📥 Excel",
         downloading: "⏳ Đang tạo…",
         error: "Tải xuống thất bại",
-        qs_desc: "Tổng hợp chất lượng theo từng lần đùn: ngày đùn, thời gian đùn, số máy, mã khuôn, mã SP, phôi, số cây cắt, số NG, số OK, ngày kiểm tra từng công đoạn, số NG theo mã (301〜401). Toàn bộ thời gian, mới nhất trước.",
-        qs_meta: "Cột và tiêu đề giống ex0.11 (aging_check_date là ngày kiểm tra hóa già (độ cứng))",
+        qs_desc: "Tổng hợp chất lượng theo từng lần đùn: ngày đùn, thời gian đùn, mã khuôn, mã SP, phôi, số cây cắt, số NG, số OK, ngày kiểm tra từng công đoạn, số NG theo mã (301〜401), số máy, MFG (Dubai/VN), năng suất (ton/h), tổng thời gian, thời gian mã 300/200, số order sheet. Toàn bộ thời gian, mới nhất trước.",
+        qs_meta: "Cột và tiêu đề giống màn hình cũ (ex0.11) (aging_check_date là ngày kiểm tra hóa già (độ cứng))",
       },
     };
     let currentLang = "ja";
