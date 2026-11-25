@@ -7719,3 +7719,29 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 - [ ] ② `documents/2026-11-25_cp9632t_v04b_body_row.sql`：CP9632T-V04B の行 1091 を本体の行にする。changed_rows **1**、最後の数が **0** なら OK
 - [ ] ③ **git pull**（① より先に pull すると、型検進捗管理が開けなくなる）
 - [ ] ④ 型検進捗管理を開いて、切替業連 No. の列に値が出ているか見る
+
+
+# 実施、もう少し
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-25_change_notice_to_pn.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+pn_with_change_notice
+522
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
+
+```
+PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-25_cp9632t_v04b_body_row.sql | mysql -u root -p -h 10.163.50.17 extrusion
+Enter password: ********
+changed_rows
+1
+id      is_accessory_item_flag  die_model_code  note2   die_arrived_at  asset_registration_applied_at
+1091    0       CP9632T-V04B    N?a khu?n       2026-04-15      2026-08-03
+2116    1       NULL    male die        2026-04-15      NULL
+2117    1       NULL    female die      2026-06-09      NULL
+2118    1       NULL    ring    NULL    NULL
+dies_with_parts_rows_only
+0
+PS C:\Users\odaseiji\htdocs\ex0.20\documents>
+```
