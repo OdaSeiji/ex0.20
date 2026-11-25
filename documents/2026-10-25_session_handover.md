@@ -49,7 +49,7 @@
 - **本番で実行済み（11/25）**：`2026-11-06_handover_date_fix.sql`（金型移管日・固定資産登録日の暫定の直し。11/06 はバックアップだけで書き換えは取り消されていた → 11/25 に `2026-11-25_handover_date_fix_v2.sql` で直した。一致 821型、食い違い 0、進捗だけ 0）。`2026-11-05_staff_role_packing_qc.sql` は本番に入っている（11/25 確認）
 - **11/15 追加・本番で未実行**（実行したら、ここを「実行済み」に書き換える）：
   - ~~`2026-11-15_stg_shipping_columns.sql` / `2026-11-15_backorder_followup.sql`~~：**11/17 本番で実行済み**（在庫管理。backorder を先に流し、shipping_columns が抜けていて受注の取込が `Unknown column 'shipping_date'` で失敗 → 流して解決。memo.md 11/17）
-  - `2026-11-15_die_handover_rows_check.sql`：金型の行の確認（読むだけ。結果を見て到着日の移し方を決める）
+  - ~~`2026-11-15_die_handover_rows_check.sql`~~：**11/25 本番で実行済み**（1対0 は複製の 60型だけ、部品の行だけは CP9632T-V04B の1型。memo.md 11/25）
   - ~~`2026-11-16_t_press_drop_candidates_check.sql`~~：**11/17 本番で実行済み**（qc_name_id 以外の 23列は誰も書いていない）
   - `2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す。**11/17 本番で STEP 1〜5 実行済み、11/18 STEP 6 で動いたのを確認**（03:15 に実行、いちばん古いのは 10/19）。my.ini の `event_scheduler=ON` も確認 → **完了**
 - **11/17 追加・本番で実行済み（11/17）**：`2026-11-17_stock_part_number.sql`（m_production_numbers.stock_part_number。品番の対応表のページ用。SHOW COLUMNS で varchar(100)・UNI を確認）
