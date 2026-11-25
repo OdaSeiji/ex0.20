@@ -7750,3 +7750,12 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 - 切替業連 No.：**522品番に入った**（確認 SQL と同じ数）。④ は何も出なかった → 写せなかった品番は無い。**移すのは完了。**
 - CP9632T-V04B：行 1091 が本体の行になった（changed_rows 1）。部品の行だけの金型は **0**。**完了。**
 - 型検進捗管理：切替業連 No. の表示・チェックボックスのロック、どちらも問題なし（ユーザー確認）。**切替業連 No. の移動は全部完了。**
+
+## 別件修正内容
+
+新しく追加した、Excelの出力を、以下の表の様に修正できるか？
+
+旧画面	press_date_at	pressing_time	die_number	production_number	specific_weight	production_length	production_weight	discard_thickness	discard_weight	pressing_type	plan_billet_quantities	actual_billet_quantities	billet_length	billet_size	work_quantity	total_ng	total_ok	dimension_check_date	etching_check_date	aging_check_date	packing_check_date	code_301	code_302	code_303	code_304	code_305	code_306	code_307	code_308	code_309	code_310	code_311	code_312	code_313	code_314	code_315	code_316	code_317	code_318	code_319	code_320	code_321	code_322	code_323	code_324	code_351	code_401	machine	mfg	productivity	total_time	time code 300	time code 200	ordersheet_number
+新画面	NGÀY	MÃ KHUÔN	MÃ SẢN PHẨM	LOẠI	MÁY	KH	TT	SỐ LƯỢNG	NG	OK	%OK	K/THƯỚC	ETCHING	ĐỘ CỨNG	QC	Đ/GÓI	301	302	303	304	305	306	307	308	309	310	311	312	313	314	315	316	317	318	319	320	321	322	323	324	351	401	TON/H	CHU KỲ	IKAN	Total weight	Total time	Note	Quality note					
+
+
