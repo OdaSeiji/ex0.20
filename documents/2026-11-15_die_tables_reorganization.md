@@ -24,7 +24,7 @@
 
 | 項目 | `m_dies` | `t_die_handover` | `t_die_handover_progress` | 状態 | 決まったこと |
 |---|---|---|---|---|---|
-| 金型移管日＝固定資産登録日 | — | `asset_registration_applied_at`（本体の行） | `die_handover_at` | 食い違い 0（handover_list で保存すると両方に書く）。進捗だけに日付 12型（11/06 の直し B の対象） | 同期済み。整理のときにどちらか1か所にする |
+| 金型移管日＝固定資産登録日 | — | `asset_registration_applied_at`（本体の行） | `die_handover_at` | 食い違い 0（handover_list で保存すると両方に書く）。進捗だけに日付 12型（11/06 の直し B の対象）→ **11/25 本番で直した（一致 821型、食い違い 0、進捗だけ 0）** | 同期済み。整理のときにどちらか1か所にする |
 | **日本への提出日** | — | `submitted_to_japan_at`（画面名「日本送付日」） | `submit_dimensional_inspection_to_japan_at` | 一致 0、平均 156日ずれ。**進捗側はどの画面からも入力・表示されていない**（昔の移行データ） | **11/15 決定：正は `t_die_handover.submitted_to_japan_at`。`t_die_handover_progress.submit_dimensional_inspection_to_japan_at` は消す** |
 | 到着日 | `arrival_at` | `die_arrived_at`（部品ごと） | `arrival_at` | 3か所とも食い違い（下の 3 章） | 未決（次の懸案） |
 | 日本の検査日 | — | `inspection_passed_at`（画面名「検査合格日」） | `jp_dimensional_inspection_at`（画面名「日本型検合格日」） | 両方の画面で入力できる。230型でずれ（平均 2.5日、ほとんど 60日以内） | 未決 |

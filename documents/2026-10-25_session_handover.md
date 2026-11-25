@@ -46,7 +46,7 @@
 - 10/23 までの DB 変更は、本番もすべて反映済み
 - `2026-10-25_press_operation_time.sql`（t_press_schedule_day に end_time を追加）も本番で実行済み（10/27 ユーザー確認）。**本番で未実行の DB 変更は無い**
 - `2026-11-03_press_quality_note.sql`（t_press に quality_note を追加）も本番で実行済み（11/04、本番の品質サマリーで品質メモが表示されているのを確認）
-- **本番で未実行**：`2026-11-06_handover_date_fix.sql`（金型移管日・固定資産登録日の暫定の直し。11/06 はバックアップだけで書き換えは取り消されていた → `2026-11-25_handover_date_fix_v2.sql` を流す）。`2026-11-05_staff_role_packing_qc.sql` は本番に入っている（11/25 確認）
+- **本番で実行済み（11/25）**：`2026-11-06_handover_date_fix.sql`（金型移管日・固定資産登録日の暫定の直し。11/06 はバックアップだけで書き換えは取り消されていた → 11/25 に `2026-11-25_handover_date_fix_v2.sql` で直した。一致 821型、食い違い 0、進捗だけ 0）。`2026-11-05_staff_role_packing_qc.sql` は本番に入っている（11/25 確認）
 - **11/15 追加・本番で未実行**（実行したら、ここを「実行済み」に書き換える）：
   - ~~`2026-11-15_stg_shipping_columns.sql` / `2026-11-15_backorder_followup.sql`~~：**11/17 本番で実行済み**（在庫管理。backorder を先に流し、shipping_columns が抜けていて受注の取込が `Unknown column 'shipping_date'` で失敗 → 流して解決。memo.md 11/17）
   - `2026-11-15_die_handover_rows_check.sql`：金型の行の確認（読むだけ。結果を見て到着日の移し方を決める）

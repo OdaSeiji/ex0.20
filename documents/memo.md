@@ -7459,7 +7459,7 @@ mysql>
 - [x] ラムデータの抜けの確認：11/25 に drop_old（STEP 0b あり）を本番で流したので不要になった（下の 11/25 の結果）
 - [x] 使っていない 23列を消す：11/25 本番で実行（63 → 40）
 - [x] 流したかどうか確認：11-05（ロール）は本番に入っていた。11-06（移管日の直し）はバックアップだけで、書き換えは取り消されていた（下の 11/25 の結果）
-- [ ] 移管日の直しを流し直す：`documents/2026-11-25_handover_date_fix_v2.sql`（COMMIT 入り。最後の rows_left_3A・rows_left_3B が 0 なら完了）
+- [x] 移管日の直しを流し直す（11/25 完了）：`documents/2026-11-25_handover_date_fix_v2.sql`（COMMIT 入り。最後の rows_left_3A・rows_left_3B が 0 なら完了）
 - [ ] 金型の行の確認：`documents/2026-11-15_die_handover_rows_check.sql` を流す（読むだけ。到着日の移し方を決めるため）
 - [ ] 在庫管理 →「品番の対応表」で、候補が出ている 7件を［つなぐ］
 
@@ -7549,6 +7549,9 @@ same_date       different       progress_only_no_body   progress_only_with_body
 821     0       0       0
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+結果（Claude 確認）：**移管日の直し、完了。** 3A 79行・3B 18行を直して、残りは 0 と 0。移管日と固定資産登録日は 821型で一致、食い違い 0、進捗だけに日付がある金型も 0。
+
 次の結果
 ```
 PS C:\Users\odaseiji\htdocs\ex0.20\documents> Get-Content .\2026-11-15_die_handover_rows_check.sql | mysql -u root -p -h 10.163.50.17 extrusion
