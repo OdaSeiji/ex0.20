@@ -7715,9 +7715,9 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 
 ## TODO（本番の作業：11/25 Claude 作成）**この順番で**
 
-- [ ] ① `documents/2026-11-25_change_notice_to_pn.sql`：切替業連 No. を品番（m_production_numbers.change_notice_no）に移す。まとめて流してよい（COMMIT 入り）。③ の数が **522**、④ は何も出なければ OK
-- [ ] ② `documents/2026-11-25_cp9632t_v04b_body_row.sql`：CP9632T-V04B の行 1091 を本体の行にする。changed_rows **1**、最後の数が **0** なら OK
-- [ ] ③ **git pull**（① より先に pull すると、型検進捗管理が開けなくなる）
+- [x] （11/25 済み：522）① `documents/2026-11-25_change_notice_to_pn.sql`：切替業連 No. を品番（m_production_numbers.change_notice_no）に移す。まとめて流してよい（COMMIT 入り）。③ の数が **522**、④ は何も出なければ OK
+- [x] （11/25 済み：1・0）② `documents/2026-11-25_cp9632t_v04b_body_row.sql`：CP9632T-V04B の行 1091 を本体の行にする。changed_rows **1**、最後の数が **0** なら OK
+- [x] ③ **git pull**（① より先に pull すると、型検進捗管理が開けなくなる）
 - [ ] ④ 型検進捗管理を開いて、切替業連 No. の列に値が出ているか見る
 
 
@@ -7745,3 +7745,8 @@ dies_with_parts_rows_only
 0
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+結果（Claude 確認）：
+- 切替業連 No.：**522品番に入った**（確認 SQL と同じ数）。④ は何も出なかった → 写せなかった品番は無い。**移すのは完了。**
+- CP9632T-V04B：行 1091 が本体の行になった（changed_rows 1）。部品の行だけの金型は **0**。**完了。**
+- 残り：型検進捗管理を開いて、切替業連 No. が出ているか・ロックが効いているかを見る。
