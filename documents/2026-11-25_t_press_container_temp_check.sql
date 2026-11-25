@@ -56,3 +56,24 @@ LEFT JOIN m_dies d ON d.id = p.dies_id
 WHERE IFNULL(p.container_upside_stemside_temperature, 0) <> 0
 ORDER BY p.press_date_at DESC, p.id DESC
 LIMIT 20;
+
+-- ------------------------------------------------------------------
+-- 5. (added) quality_note — VARCHAR(1000), added 2026-11-03 (documents/2026-11-03_press_quality_note.sql).
+--    Written in 品質評価入力 (quality_report.html), shown in 品質サマリー (quality_summary.html, "Quality note").
+--    How many presses have one, and how long are they?
+SELECT
+  COUNT(*)                                                   AS presses_since_1103,
+  SUM(NULLIF(TRIM(quality_note), '') IS NOT NULL)            AS with_note,
+  MAX(CHAR_LENGTH(quality_note))                             AS max_len,
+  ROUND(AVG(NULLIF(CHAR_LENGTH(TRIM(quality_note)), 0)))     AS avg_len
+FROM t_press
+WHERE press_date_at >= '2026-11-03';
+
+-- 6. The notes themselves (newest first)
+SELECT p.id, p.press_date_at, p.press_machine_no AS machine, d.die_number,
+       CHAR_LENGTH(p.quality_note) AS len, p.quality_note
+FROM t_press p
+LEFT JOIN m_dies d ON d.id = p.dies_id
+WHERE NULLIF(TRIM(p.quality_note), '') IS NOT NULL
+ORDER BY p.press_date_at DESC, p.id DESC
+LIMIT 30;
