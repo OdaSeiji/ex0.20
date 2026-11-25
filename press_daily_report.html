@@ -1100,6 +1100,11 @@
       });
     }
     document.getElementById("date__input").addEventListener("change", syncSubDatesToPressDate);
+    // 日付を変えたら、選んでいる金型の押出指示書をその日付で選び直す
+    document.getElementById("date__input").addEventListener("change", () => {
+      const dieId = document.getElementById("die__select").value;
+      if (dieId && dieId !== "0") loadDirectivesForDie(dieId).then(checkAllRequiredFields);
+    });
 
     function shiftDate(deltaDays, inputId = "date__input") {
       const input = document.getElementById(inputId);
@@ -1367,8 +1372,11 @@
     ------------------------- */
     let directiveList = [];
 
+    // 押出指示書は、左の日付（押出日）と計画日が同じものだけを出す（2026-11-25）。日付が空なら直近5件
     async function loadDirectivesForDie(dieId) {
-      const res = await fetch("./php/press_daily_report/get_directives.php?die_id=" + encodeURIComponent(dieId));
+      const date = document.getElementById("date__input").value;
+      const res = await fetch("./php/press_daily_report/get_directives.php?die_id=" + encodeURIComponent(dieId)
+        + (date ? "&date=" + encodeURIComponent(date) : ""));
       directiveList = await res.json();
 
       const sel = document.getElementById("press-directive__select");
