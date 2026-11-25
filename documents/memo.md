@@ -7712,3 +7712,10 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 
 結果（Claude 確認）：切替業連 No. が入っている品番 522。全部の型で同じ 172、一部の型にだけ入っている 350、**型ごとに違う値 0**。
 ②〜④ は何も出なかった（違う値の品番なし・`vol.数字` の形でない値なし・品番の無い金型に値なし）。→ **そのまま品番に移せる。** 次は移す SQL とページの変更。
+
+## TODO（本番の作業：11/25 Claude 作成）**この順番で**
+
+- [ ] ① `documents/2026-11-25_change_notice_to_pn.sql`：切替業連 No. を品番（m_production_numbers.change_notice_no）に移す。まとめて流してよい（COMMIT 入り）。③ の数が **522**、④ は何も出なければ OK
+- [ ] ② `documents/2026-11-25_cp9632t_v04b_body_row.sql`：CP9632T-V04B の行 1091 を本体の行にする。changed_rows **1**、最後の数が **0** なら OK
+- [ ] ③ **git pull**（① より先に pull すると、型検進捗管理が開けなくなる）
+- [ ] ④ 型検進捗管理を開いて、切替業連 No. の列に値が出ているか見る

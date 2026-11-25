@@ -632,6 +632,7 @@
 					f_handover: '金型移管日',
 					f_prod_start: '量産開始日',
 					f_notice: '切替業連 No.',
+					notice_per_pn: '切替業連 No. は品番ごと。同じ品番の金型すべてに入ります',
 					f_inspector: '寸法検査担当者',
 					f_bcp: 'BCP',
 					f_ready: '移管準備完了',
@@ -689,6 +690,7 @@
 					f_handover: 'Ngày bàn giao',
 					f_prod_start: 'Ngày bắt đầu SX',
 					f_notice: 'Số VOL',
+					notice_per_pn: 'Số VOL theo mã SP. Áp dụng cho tất cả khuôn cùng mã SP',
 					f_inspector: 'Người KT KT',
 					f_bcp: 'BCP',
 					f_ready: 'Hoàn tất CB BG',
@@ -1066,6 +1068,15 @@
 				}
 			}
 
+			// 切替業連 No. は品番ごと（m_production_numbers）：同じ品番の金型の欄も同じ値にする
+			function syncNotice(input) {
+				const pn = input.dataset.pn;
+				if (!pn) return;
+				document.querySelectorAll('#compareTable .notice-field').forEach((el) => {
+					if (el !== input && el.dataset.pn === pn) el.value = input.value;
+				});
+			}
+
 			function unlockCheckbox(event, dieId) {
 				const inp = event.currentTarget.querySelector('input[type=checkbox]');
 				if (!inp || !inp.disabled) return;
@@ -1122,7 +1133,7 @@
 							const isNotice = f.key === 'production_site_change_notice';
 							html += `<td><input type="${f.type}" name="${f.key}"
                        data-die-id="${dieId}" data-hp-id="${hpId}" value="${v}"
-                       ${isNotice ? 'class="notice-field" readonly onfocus="handleNoticeFocus(this)"' : ''} /></td>`;
+                       ${isNotice ? `class="notice-field" readonly onfocus="handleNoticeFocus(this)" data-pn="${r.production_number ?? ''}" oninput="syncNotice(this)" title="${t.notice_per_pn}"` : ''} /></td>`;
 						}
 					});
 

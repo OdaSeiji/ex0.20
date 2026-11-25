@@ -21,7 +21,7 @@ $sql = "
         h.mass_production_trial_at,
         h.die_handover_at,
         h.mass_production_start_at,
-        h.production_site_change_notice,
+        pn.change_notice_no AS production_site_change_notice,   -- 切替業連 No. は品番ごと（2026-11-25 に m_production_numbers へ移した）
         h.dimensional_inspection_by,
         h.bcp_flag,
         h.die_transfer_ready_flag,

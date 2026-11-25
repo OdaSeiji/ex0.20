@@ -12,6 +12,7 @@ $sql = "
     SELECT
         d.id        AS die_id,
         d.die_number,
+        pn.production_number,
         h.id        AS handover_id,
         h.original_table_no,
         h.die_planning_phase_steps,
@@ -26,13 +27,14 @@ $sql = "
         h.mass_production_trial_at,
         h.die_handover_at,
         h.mass_production_start_at,
-        h.production_site_change_notice,
+        pn.change_notice_no AS production_site_change_notice,   -- 切替業連 No. は品番ごと（2026-11-25 に m_production_numbers へ移した）
         h.dimensional_inspection_by,
         h.bcp_flag,
         h.die_transfer_ready_flag,
         h.memo,
         h.updated_at
     FROM m_dies d
+    LEFT JOIN m_production_numbers pn ON pn.id = d.production_number_id
     LEFT JOIN t_die_handover_progress h ON h.die_id = d.id
     -- 到着日は引き継ぎ一覧（t_die_handover）を正とする。同じ型で複数行あるとき（型＋部品）は最初に入力された行
     LEFT JOIN (
