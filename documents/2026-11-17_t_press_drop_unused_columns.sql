@@ -10,6 +10,8 @@
 --   2. Run STEP 0 (check) and STEP 1 (backup).
 --   3. Run STEP 2 (drop). Then STEP 3 (check).
 -- Local: run 2026-11-17.
+-- Production: the ram drop (2026-11-17_t_press_billet_ram_drop_old.sql) was run FIRST on 2026-11-25 (93 -> 63),
+--   so on production the column counts are 63 -> 40 (not 93 -> 70).
 
 USE extrusion;
 
@@ -20,7 +22,7 @@ FROM information_schema.KEY_COLUMN_USAGE
 WHERE TABLE_SCHEMA = 'extrusion' AND TABLE_NAME = 't_press' AND COLUMN_NAME = 'press_stop_cause_id'
   AND REFERENCED_TABLE_NAME IS NOT NULL;
 
-SELECT COUNT(*) AS t_press_columns_before   -- expected 93
+SELECT COUNT(*) AS t_press_columns_before   -- expected 93 (production after the ram drop: 63)
 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'extrusion' AND TABLE_NAME = 't_press';
 
 -- STEP 1. Backup of the 23 columns (id + values), just in case. Can be dropped after a few months.
@@ -67,5 +69,5 @@ ALTER TABLE t_press
   DROP COLUMN cutting_finish;
 
 -- STEP 3. Check
-SELECT COUNT(*) AS t_press_columns_after   -- expected 70
+SELECT COUNT(*) AS t_press_columns_after   -- expected 70 (production after the ram drop: 40)
 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'extrusion' AND TABLE_NAME = 't_press';

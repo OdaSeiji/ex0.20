@@ -440,6 +440,14 @@
     ===================================================== */
     let chartInstance = null;
 
+    // きりのよい数に切り上げる（1・2・2.5・5・10 × 10のn乗）。例：437 → 500、1230 → 1500
+    function niceCeil(v) {
+      if (!(v > 0)) return 1;
+      const p = Math.pow(10, Math.floor(Math.log10(v)));
+      for (const m of [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]) if (v <= m * p) return m * p;
+      return 10 * p;
+    }
+
     function renderChart(data, columns) {
       const t      = dict[currentLang];
       const labels = columns.map(columnLabel);
@@ -493,6 +501,11 @@
         yAxisID:         "y2",
       });
 
+      // 左（稼働時間）と右（重量）の目盛りをそろえる：どちらも 0 から同じ最大値まで（2026-11-24 ユーザー）
+      //   最大値 ＝ 積み上げた稼働時間と、2本の折れ線のうち一番大きい値を、きりのよい数に切り上げたもの
+      const stackedHours = columns.map((_, ci) => datasets.filter(d => d.type === "bar").reduce((s, d) => s + (d.data[ci] || 0), 0));
+      const axisMax = niceCeil(Math.max(0, ...stackedHours, ...extrusionTotals, ...goodWeightTotals));
+
       if (chartInstance) chartInstance.destroy();
       chartInstance = new Chart(document.getElementById("myChart"), {
         data: { labels, datasets },
@@ -505,12 +518,16 @@
               position: "left",
               stacked:  true,
               beginAtZero: true,
+              min: 0,
+              max: axisMax,
               title: { display: true, text: "稼働時間 (h)" },
             },
             y2: {
               type:     "linear",
               position: "right",
               beginAtZero: true,
+              min: 0,
+              max: axisMax,
               grid: { drawOnChartArea: false },
               title: { display: true, text: "重量 (t)" },
             },

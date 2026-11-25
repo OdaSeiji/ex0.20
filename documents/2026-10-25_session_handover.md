@@ -53,8 +53,8 @@
   - ~~`2026-11-16_t_press_drop_candidates_check.sql`~~：**11/17 本番で実行済み**（qc_name_id 以外の 23列は誰も書いていない）
   - `2026-11-15_press_ram_log_retention.sql`：押出波形を1か月だけ残す。**11/17 本番で STEP 1〜5 実行済み、11/18 STEP 6 で動いたのを確認**（03:15 に実行、いちばん古いのは 10/19）。my.ini の `event_scheduler=ON` も確認 → **完了**
 - **11/17 追加・本番で実行済み（11/17）**：`2026-11-17_stock_part_number.sql`（m_production_numbers.stock_part_number。品番の対応表のページ用。SHOW COLUMNS で varchar(100)・UNI を確認）
-- **11/17 追加・本番で実行済み（11/24 までに）**（11/18 の手順：`documents/2026-11-18_production_steps.md`）：`2026-11-17_t_press_drop_unused_columns.sql`（t_press の使っていない 23列を消す。**先に git pull、そのあと実行**。STEP 0 で外部キーの名前が `t_press_m_press_stop_code` でなければ、消す前に知らせる）
-- **11/17 追加**：`2026-11-17_t_press_billet_ram_create.sql`（**11/18 本番で実行済み、31,090行**）→ git pull（**11/24 までに済み**）→ `2026-11-17_t_press_billet_ram_drop_old.sql`（**11/24 までに本番で実行済み**。抜けの確認：`2026-11-24_t_press_ram_after_drop_check.sql`）（pull のあと。STEP 0b で pull までに入力された分を写す）（ラム速・ラム圧・温度を t_press_billet_ram に移して、t_press の no1〜no5 の30列を消す。**この順番で**）
+- **11/17 追加・本番はまだ（11/25 時点。次に流す。本番は列 63 → 40）**（11/18 の手順：`documents/2026-11-18_production_steps.md`）：`2026-11-17_t_press_drop_unused_columns.sql`（t_press の使っていない 23列を消す。**先に git pull、そのあと実行**。STEP 0 で外部キーの名前が `t_press_m_press_stop_code` でなければ、消す前に知らせる）
+- **11/17 追加**：`2026-11-17_t_press_billet_ram_create.sql`（**11/18 本番で実行済み、31,090行**）→ git pull（**11/24 までに済み**）→ `2026-11-17_t_press_billet_ram_drop_old.sql`（**11/25 本番で実行済み**。STEP 0b で 2件写した。列 93 → 63。抜けは無い）（pull のあと。STEP 0b で pull までに入力された分を写す）（ラム速・ラム圧・温度を t_press_billet_ram に移して、t_press の no1〜no5 の30列を消す。**この順番で**）
 
 ---
 
