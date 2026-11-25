@@ -7467,7 +7467,7 @@ mysql>
 
 ## TODO（切替業連 No. を品番に移す）
 
-- [ ] 食い違っている品番を出す：`documents/2026-11-24_change_notice_by_pn_check.sql` を本番で流す（読むだけ）。② に出た品番は、どの vol. が正しいか決める（ローカルでは PN0683 / DM245 の1件：vol.616 と vol.518）
+- [x] （11/25 実行：食い違い 0）食い違っている品番を出す：`documents/2026-11-24_change_notice_by_pn_check.sql` を本番で流す（読むだけ）。② に出た品番は、どの vol. が正しいか決める（ローカルでは PN0683 / DM245 の1件：vol.616 と vol.518）
 
 # 2026/11/25
 
@@ -7709,3 +7709,6 @@ pn_with_value   same_on_all_dies        on_some_dies_only       different_values
 522     172     350     0
 PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 ```
+
+結果（Claude 確認）：切替業連 No. が入っている品番 522。全部の型で同じ 172、一部の型にだけ入っている 350、**型ごとに違う値 0**。
+②〜④ は何も出なかった（違う値の品番なし・`vol.数字` の形でない値なし・品番の無い金型に値なし）。→ **そのまま品番に移せる。** 次は移す SQL とページの変更。
