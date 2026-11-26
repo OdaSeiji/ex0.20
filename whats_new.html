@@ -86,7 +86,106 @@
         </div>
       </div>
 
-      <!-- 2026-11-17 (最新) -->
+      <!-- 2026-11-26 (最新) -->
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-26</span>
+        </div>
+        <div class="entry-title" data-key="ih_title">押出指示書の印刷：ビレット温度に「flat」と公差 ±10°C</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ih_purpose">テーパー加熱が 0 のとき「0°C/m」と出ていて分かりにくかった。ビレット温度の公差も紙に書いておきたい。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ih_content">テーパー加熱が 0 のときは「flat」と出す（例：501°C-flat）。ビレット温度の最後に、いつも公差 ±10°C を付ける（例：482°C-103°C/m ±10°C）。枠に収まるように、このマスだけ文字を少し小さくした。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">改善</span>
+          <span class="entry-date">2026-11-25</span>
+        </div>
+        <div class="entry-title" data-key="ig_title">押出日報：押出指示書は、左の日付と同じ計画日のものだけ。無いときは赤で「指示書なし」</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ig_purpose">前はその金型の最近の指示書 5件が出ていて、違う日の指示書を選んでしまうことがあった。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ig_content">押出指示書の一覧には、左の日付と同じ計画日の指示書だけを出す。日付を変えると選び直す。その日の指示書が無いときは、背景を赤にして「指示書なし」と出す。前に入れた値はそのまま残る。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-25</span>
+        </div>
+        <div class="entry-title" data-key="if_title">型検進捗管理：切替業連 No. を品番ごとに持つようにした</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="if_purpose">切替業連 No. は品番に1つ決まるものなのに、金型ごとに入力していた。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="if_content">切替業連 No. を品番（品番マスタ）に保存するようにした。今までの値は品番に写した（522品番）。1つの型で入力すると、同じ品番のほかの型にも同じ値が入る。品番が無い金型では入力しても保存されない。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-25</span>
+        </div>
+        <div class="entry-title" data-key="ie_title">ダウンロード：Quality Summary の Excel を旧画面の列の並びに</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ie_purpose">旧画面の Excel と同じ並びで使いたい。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ie_content">列を旧画面の並びにした（machine は後ろへ）。mfg（Dubai / VN）、productivity、total_time、time code 300、time code 200、ordersheet_number の列を追加した。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-new" data-key="badge_new">新規</span>
+          <span class="entry-date">2026-11-24</span>
+        </div>
+        <div class="entry-title" data-key="id_title">新しいページ：品番別 良品実績・ダウンロード・未押出金型一覧</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="id_purpose">品番ごとの実績や、まだ押出していない金型を、すぐ見られるようにする。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="id_content">「品番別 良品実績」：品番ごとの月次の良品重量（kg）。「ダウンロード」：Quality Summary の Excel。「未押出金型一覧」：押出日報に記録が無い金型を、到着の古い順に出す。メニューにアイコンも付けた（押出計画・押出指示書など）。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-24</span>
+        </div>
+        <div class="entry-title" data-key="ic_title">金型の手動登録：移管の行も作る。型検進捗管理の「切替業連発行日」を「切替業連 No.」に</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ic_purpose">手動で登録した金型は移管の行が無く、移管一覧や到着の入力に出てこなかった。列の名前も中身（vol.番号）と合っていなかった。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ic_content">金型登録で金型を作ると、移管の行（本体）も一緒に作る。型検進捗管理の列名を「切替業連 No.」に変えた（中身は vol. の番号）。</span>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="entry-top">
+          <span class="entry-badge badge-update" data-key="badge_update">変更</span>
+          <span class="entry-date">2026-11-20</span>
+        </div>
+        <div class="entry-title" data-key="ib_title">型検進捗管理に品番の列、金型進捗一覧に表示期間の選択</div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_purpose">目的:</span><span data-key="ib_purpose">どの品番の金型か一目で分かるようにする。金型進捗一覧は期間を変えて見たい。</span>
+        </div>
+        <div class="entry-purpose">
+          <span class="label" data-key="lbl_content">内容:</span><span data-key="ib_content">型検進捗管理に品番の列を足した。金型進捗一覧で、表示期間を 1〜3ヶ月から選べるようにした。</span>
+        </div>
+      </div>
+
+      <!-- 2026-11-17 -->
       <div class="entry">
         <div class="entry-top">
           <span class="entry-badge badge-update" data-key="badge_update">変更</span>
@@ -2247,6 +2346,27 @@
           hs_title: "全画面：日本語・ベトナム語の切り替えボタンの大きさをそろえた",
           hs_purpose: "「日本語」と「Tiếng Việt」のボタンの高さや幅が違って見えたため。",
           hs_content: "言語の切り替えボタンがある全43画面で、2つのボタンを同じ大きさ（幅 96px・高さ 30px）にした。大きさは共通の css/lang_buttons.css で決めている。在庫不足の抽出では、品番の列を 180px、ほかの列を 90px にそろえ、月の基準を「当月までの納期（過去未納分含む）」と「当月回答納期」の2つにした。",
+          ih_title: "押出指示書の印刷：ビレット温度に「flat」と公差 ±10°C",
+          ih_purpose: "テーパー加熱が 0 のとき「0°C/m」と出ていて分かりにくかった。ビレット温度の公差も紙に書いておきたい。",
+          ih_content: "テーパー加熱が 0 のときは「flat」と出す（例：501°C-flat）。ビレット温度の最後に、いつも公差 ±10°C を付ける（例：482°C-103°C/m ±10°C）。枠に収まるように、このマスだけ文字を少し小さくした。",
+          ig_title: "押出日報：押出指示書は、左の日付と同じ計画日のものだけ。無いときは赤で「指示書なし」",
+          ig_purpose: "前はその金型の最近の指示書 5件が出ていて、違う日の指示書を選んでしまうことがあった。",
+          ig_content: "押出指示書の一覧には、左の日付と同じ計画日の指示書だけを出す。日付を変えると選び直す。その日の指示書が無いときは、背景を赤にして「指示書なし」と出す。前に入れた値はそのまま残る。",
+          if_title: "型検進捗管理：切替業連 No. を品番ごとに持つようにした",
+          if_purpose: "切替業連 No. は品番に1つ決まるものなのに、金型ごとに入力していた。",
+          if_content: "切替業連 No. を品番（品番マスタ）に保存するようにした。今までの値は品番に写した（522品番）。1つの型で入力すると、同じ品番のほかの型にも同じ値が入る。品番が無い金型では入力しても保存されない。",
+          ie_title: "ダウンロード：Quality Summary の Excel を旧画面の列の並びに",
+          ie_purpose: "旧画面の Excel と同じ並びで使いたい。",
+          ie_content: "列を旧画面の並びにした（machine は後ろへ）。mfg（Dubai / VN）、productivity、total_time、time code 300、time code 200、ordersheet_number の列を追加した。",
+          id_title: "新しいページ：品番別 良品実績・ダウンロード・未押出金型一覧",
+          id_purpose: "品番ごとの実績や、まだ押出していない金型を、すぐ見られるようにする。",
+          id_content: "「品番別 良品実績」：品番ごとの月次の良品重量（kg）。「ダウンロード」：Quality Summary の Excel。「未押出金型一覧」：押出日報に記録が無い金型を、到着の古い順に出す。メニューにアイコンも付けた（押出計画・押出指示書など）。",
+          ic_title: "金型の手動登録：移管の行も作る。型検進捗管理の「切替業連発行日」を「切替業連 No.」に",
+          ic_purpose: "手動で登録した金型は移管の行が無く、移管一覧や到着の入力に出てこなかった。列の名前も中身（vol.番号）と合っていなかった。",
+          ic_content: "金型登録で金型を作ると、移管の行（本体）も一緒に作る。型検進捗管理の列名を「切替業連 No.」に変えた（中身は vol. の番号）。",
+          ib_title: "型検進捗管理に品番の列、金型進捗一覧に表示期間の選択",
+          ib_purpose: "どの品番の金型か一目で分かるようにする。金型進捗一覧は期間を変えて見たい。",
+          ib_content: "型検進捗管理に品番の列を足した。金型進捗一覧で、表示期間を 1〜3ヶ月から選べるようにした。",
           ia_title: "押出日報：ラム速・ラム圧・温度（No.1〜5）の保存先を新しいテーブルに変えた",
           ia_purpose: "t_press に No.1〜5 × 1000/400mm・200mm × ラム速・ラム圧・温度の 30列があり、後ろの No. ほど空が多かったため。ビレット1本を1行にして整理する。",
           ia_content: "ラム速・ラム圧・温度を新しいテーブル t_press_billet_ram（1行＝ビレット1本）に保存するようにした。押出日報の画面と入力のしかたは変わらない。今までのデータは全部写して、t_press の古い 30列は消す。金型診断の ram_speed も新しいテーブルから読む。",
@@ -2584,6 +2704,27 @@
           hs_title: "Tất cả màn hình: thống nhất kích thước nút chuyển tiếng Nhật / tiếng Việt",
           hs_purpose: "Vì nút \"日本語\" và \"Tiếng Việt\" trông khác nhau về chiều cao và chiều rộng.",
           hs_content: "Ở cả 43 màn hình có nút chuyển ngôn ngữ, 2 nút có cùng kích thước (rộng 96px, cao 30px). Kích thước được quy định chung trong css/lang_buttons.css. Ở màn hình trích xuất thiếu tồn kho, cột mã SP rộng 180px, các cột khác 90px, và điều kiện tháng còn 2 loại: 「Hạn xuất đến hết tháng (gồm cả đơn quá hạn chưa xuất)」 và 「Ngày giao đã trả lời trong tháng」.",
+          ih_title: "In phiếu chỉ thị đùn: Nhiệt độ billet hiển thị 「flat」 và dung sai ±10°C",
+          ih_purpose: "Khi gia nhiệt taper là 0 thì hiện 「0°C/m」, khó hiểu. Muốn ghi cả dung sai nhiệt độ billet lên phiếu.",
+          ih_content: "Khi gia nhiệt taper là 0 thì hiện 「flat」 (ví dụ: 501°C-flat). Luôn thêm dung sai ±10°C vào cuối nhiệt độ billet (ví dụ: 482°C-103°C/m ±10°C). Chữ ở ô này nhỏ hơn một chút để vừa khung.",
+          ig_title: "Báo cáo đùn hằng ngày: Phiếu chỉ thị đùn chỉ hiện phiếu cùng ngày kế hoạch với ngày bên trái. Không có thì hiện 「Không có phiếu」 màu đỏ",
+          ig_purpose: "Trước đây hiện 5 phiếu gần nhất của khuôn, có thể chọn nhầm phiếu của ngày khác.",
+          ig_content: "Danh sách phiếu chỉ thị đùn chỉ hiện phiếu có ngày kế hoạch giống ngày bên trái. Đổi ngày thì danh sách được tải lại. Nếu ngày đó không có phiếu, nền đỏ và hiện 「Không có phiếu」. Giá trị đã nhập trước đó vẫn giữ nguyên.",
+          if_title: "Quản lý tiến độ kiểm khuôn: Số VOL được lưu theo mã SP",
+          if_purpose: "Số VOL là một giá trị cho mỗi mã SP, nhưng trước đây phải nhập cho từng khuôn.",
+          if_content: "Số VOL được lưu vào mã SP (master mã SP). Giá trị cũ đã được chép sang mã SP (522 mã). Nhập ở một khuôn thì các khuôn khác cùng mã SP cũng có cùng giá trị. Khuôn không có mã SP thì không lưu.",
+          ie_title: "Tải xuống: File Excel Quality Summary theo thứ tự cột của màn hình cũ",
+          ie_purpose: "Muốn dùng với thứ tự cột giống file Excel của màn hình cũ.",
+          ie_content: "Sắp xếp cột theo màn hình cũ (machine chuyển ra sau). Thêm cột mfg (Dubai / VN), productivity, total_time, time code 300, time code 200, ordersheet_number.",
+          id_title: "Trang mới: Thực tế hàng tốt theo mã SP, Tải xuống, Danh sách khuôn chưa đùn",
+          id_purpose: "Để xem nhanh thực tế theo mã SP và các khuôn chưa đùn.",
+          id_content: "「Thực tế hàng tốt theo mã SP」: trọng lượng hàng tốt (kg) theo tháng của từng mã SP. 「Tải xuống」: file Excel Quality Summary. 「Danh sách khuôn chưa đùn」: các khuôn chưa có trong báo cáo đùn, theo thứ tự đến sớm nhất. Thêm biểu tượng vào menu (kế hoạch đùn, phiếu chỉ thị đùn, v.v.).",
+          ic_title: "Đăng ký khuôn thủ công: Tạo luôn dòng bàn giao. Đổi 「Ngày phát hành BC」 thành 「Số VOL」",
+          ic_purpose: "Khuôn đăng ký thủ công không có dòng bàn giao nên không hiện trong danh sách bàn giao và nhập ngày đến. Tên cột cũng không khớp với nội dung (số vol.).",
+          ic_content: "Khi tạo khuôn ở trang đăng ký khuôn, dòng bàn giao (thân khuôn) cũng được tạo. Đổi tên cột ở quản lý tiến độ kiểm khuôn thành 「Số VOL」 (nội dung là số vol.).",
+          ib_title: "Thêm cột mã SP ở quản lý tiến độ kiểm khuôn, chọn khoảng thời gian ở danh sách tiến độ khuôn",
+          ib_purpose: "Để biết ngay khuôn thuộc mã SP nào. Muốn xem danh sách tiến độ khuôn theo khoảng thời gian khác.",
+          ib_content: "Thêm cột mã SP vào quản lý tiến độ kiểm khuôn. Danh sách tiến độ khuôn có thể chọn khoảng thời gian 1〜3 tháng.",
           ia_title: "Báo cáo đùn hằng ngày: Đổi nơi lưu tốc độ ram, áp lực ram, nhiệt độ (No.1〜5) sang bảng mới",
           ia_purpose: "Vì t_press có 30 cột (No.1〜5 × 1000/400mm・200mm × tốc độ ram, áp lực ram, nhiệt độ), các No. phía sau thường trống. Sắp xếp lại thành 1 dòng cho 1 billet.",
           ia_content: "Lưu tốc độ ram, áp lực ram, nhiệt độ vào bảng mới t_press_billet_ram (1 dòng = 1 billet). Màn hình báo cáo đùn hằng ngày và cách nhập không thay đổi. Dữ liệu cũ đã được chép hết, 30 cột cũ của t_press sẽ bị xóa. ram_speed ở trang chẩn đoán khuôn cũng đọc từ bảng mới.",
