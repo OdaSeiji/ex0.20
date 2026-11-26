@@ -154,7 +154,7 @@ function resolveDieProductionNumberVariantId($pdo, $pressDirectiveId) {
 }
 
 // 同じ日に同じ金型の押出がすでにあるときは、パスワードが無いと保存させない（2026-11-16）
-const PRESS_DUPLICATE_PASSWORD = "1039";
+const PRESS_DUPLICATE_PASSWORD = "1031";
 
 // 同じ押出日・同じ金型の、ほかの押出（$excludeId は更新中の自分）を返す
 function findSameDayDiePresses($pdo, $pressDateAt, $diesId, $excludeId = 0) {
