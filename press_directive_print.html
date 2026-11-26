@@ -107,7 +107,7 @@
         // テーパー加熱が 0 のときは「flat」（2026-11-26 ユーザー）
         const taper = data.billet_taper_heating;
         const billet_taper_heating = taper !== null && taper !== "" && Number(taper) === 0 ? "flat" : taper + "°C/m";
-        const billet_t = billet_temperature + "-" + billet_taper_heating;
+        const billet_t = billet_temperature + "-" + billet_taper_heating + " ±10°C"; // 公差はいつも ±10℃（2026-11-26 ユーザー）
         const die_temperature = data.die_temperature + " ± 5°C";
         const die_heating_time = data.die_heating_time + "h";
         const stretch_ratio = data.stretch_ratio + "%";
@@ -451,7 +451,7 @@
                       </tr>
                       <tr style="height: 15px">
                           <td style="width: 60px; font-size: 7px;" colspan="2">Nhiệt độ billet</td>
-                          <td style="width: 70px;">${billet_t}</td>
+                          <td style="width: 70px; font-size: 7px; white-space: nowrap;">${billet_t}</td>
                           <td style="width: 60px; font-size: 7px;">Nhiệt độ billet</td>
                           <td style="width: 70px; text-align: center;"></td>
                       </tr>
