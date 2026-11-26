@@ -104,7 +104,9 @@
         const ram_speed = data.ram_speed + "mm/s";
         const work_speed = data.work_speed + "m/min";
         const billet_temperature = data.billet_temperature + "°C";
-        const billet_taper_heating = data.billet_taper_heating + "°C/m";
+        // テーパー加熱が 0 のときは「flat」（2026-11-26 ユーザー）
+        const taper = data.billet_taper_heating;
+        const billet_taper_heating = taper !== null && taper !== "" && Number(taper) === 0 ? "flat" : taper + "°C/m";
         const billet_t = billet_temperature + "-" + billet_taper_heating;
         const die_temperature = data.die_temperature + " ± 5°C";
         const die_heating_time = data.die_heating_time + "h";
