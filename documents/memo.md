@@ -7786,3 +7786,10 @@ PS C:\Users\odaseiji\htdocs\ex0.20\documents>
 - [ ] t_die_handover_progress.production_site_change_notice（古い列）を消す。型検進捗管理がしばらく問題なく動いたら
 - [ ] die_register の削除：社員番号のチェックをサーバー側でも
 - 引き継ぎメモ（documents/2026-10-25_session_handover.md §4）の、現場の回答待ち（4〜8-2）・設計の相談（9・10・13・14）・データの直し（15〜19）・テーブルの整理（21・23〜25）はそのまま
+
+
+# 2026/11/26
+
+http://10.163.50.17/ex0.20/production_number.html
+このページのカテゴリ2にフィルターボックス欲しい。
+もう一つは、品番の検索でワイルドカードが正しく使えない。?は1文字のハズ。
