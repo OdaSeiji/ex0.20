@@ -553,6 +553,12 @@
 			}
 			.cat-mgr-item > span {
 				flex: 1;
+				min-width: 0;
+				overflow-wrap: anywhere; /* 長い名前は折り返して全部見せる（2026-11-27） */
+			}
+			/* 件数のバッジは中身の幅だけ（名前の場所を取らない） */
+			.cat-mgr-item > span.count-badge {
+				flex: 0 0 auto;
 			}
 			.cat-mgr-edit {
 				background: none;
@@ -1167,7 +1173,7 @@
 
 		<!-- カテゴリ管理モーダル -->
 		<div id="catMgrModal" class="modal-overlay">
-			<div class="modal-box">
+			<div class="modal-box" style="width: 1000px">
 				<div class="modal-header">
 					<h3>🗂 カテゴリ管理</h3>
 					<button class="modal-close" onclick="closeCatMgr()">✕</button>

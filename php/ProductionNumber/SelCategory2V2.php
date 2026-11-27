@@ -19,7 +19,7 @@
 
       SELECT 
         m_production_numbers_category2.id,
-        SUBSTRING(m_production_numbers_category2.name_jp, 1, 9) AS name_jp,
+        m_production_numbers_category2.name_jp, -- 9文字で切っていたのをやめた（2026-11-27）
         IFNULL(t1.count, 0) as count
       FROM 
       m_production_numbers_category2

@@ -17,7 +17,7 @@
     $prepare = $dbh->prepare("
       SELECT 
         m_production_numbers_category1.id as id,
-        SUBSTRING(m_production_numbers_category1.name_jp, 1, 9) AS name_jp,
+        m_production_numbers_category1.name_jp, -- 9文字で切っていたのをやめた（2026-11-27）
         ifnull(t1.count, 0) AS count
       FROM 
         m_production_numbers_category1
