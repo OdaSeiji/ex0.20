@@ -103,11 +103,11 @@
         const discard_thickness = data.discard_thickness + "mm";
         const ram_speed = data.ram_speed + "mm/s";
         const work_speed = data.work_speed + "m/min";
-        const billet_temperature = data.billet_temperature + "°C";
-        // テーパー加熱が 0 のときは「flat」（2026-11-26 ユーザー）
+        // ビレット温度は2段（2026-11-28 ユーザー）：1段目 温度、2段目 加熱方法と基準（温度 ±10°C）
+        //   加熱方法：テーパー 0 → FLAT、未入力（-1・空）→ -、それ以外 → Taper ○°C
         const taper = data.billet_taper_heating;
-        const billet_taper_heating = taper !== null && taper !== "" && Number(taper) === 0 ? "flat" : taper + "°C/m";
-        const billet_t = billet_temperature + "-" + billet_taper_heating + " ±10°C"; // 公差はいつも ±10℃（2026-11-26 ユーザー）
+        const taperNum = taper === null || taper === "" ? NaN : Number(taper);
+        const billet_heating_method = isNaN(taperNum) || taperNum < 0 ? "-" : taperNum === 0 ? "FLAT" : "Taper " + taperNum + "°C";
         const die_temperature = data.die_temperature + " ± 5°C";
         const die_heating_time = data.die_heating_time + "h";
         const stretch_ratio = data.stretch_ratio + "%";
@@ -451,9 +451,14 @@
                       </tr>
                       <tr style="height: 15px">
                           <td style="width: 60px; font-size: 7px;" colspan="2">Nhiệt độ billet</td>
-                          <td style="width: 70px; font-size: 7px; white-space: nowrap;">${billet_t}</td>
-                          <td style="width: 60px; font-size: 7px;">Nhiệt độ billet</td>
+                          <td style="width: 70px;"><strong style="color: #e53935;">${data.billet_temperature}</strong>°C</td>
+                          <td style="width: 60px; font-size: 7px;">Nhiệt độ billet thực tế</td>
                           <td style="width: 70px; text-align: center;"></td>
+                      </tr>
+                      <tr style="height: 15px">
+                          <td style="width: 60px; font-size: 7px;" colspan="2">Phương pháp gia nhiệt</td>
+                          <td style="width: 70px; background-color: #ffff00;">${billet_heating_method}</td>
+                          <td style="font-size: 7px; text-align: left;" colspan="2">(Tiêu chuẩn: <strong style="color: #e53935;">${data.billet_temperature}</strong>°C ± 10°C)</td>
                       </tr>
                       <tr style="height: 15px">
                           <td style="width: 60px; font-size: 7px" colspan="2">Kích thước đuôi</td>
